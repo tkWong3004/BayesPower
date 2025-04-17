@@ -3,6 +3,7 @@ mode_bf = 1
 # 1: sample size determination
 # 0: design analysis for a fixed N
 N = 509 # sample size in case of one sample t-test
+df <- N-1
 N1=N2=50 # sample size per group for independent t-tests
 r = 1 # ratio of sample size N2/N1
 
@@ -31,7 +32,7 @@ alpha = .05 # targeted alpha
 
 t1_Table(D,target,model,location,scale,dff, hypothesis,
                      model_d,location_d,scale_d,dff_d, de_an_prior,N, mode_bf ,alpha )
-t1_prior_plot(D ,target,model ,location ,scale,dff , hypothesis,model_d,location_d,scale_d,dff_d, hypothesis_d,de_an_prior)
+t1_prior_plot(D ,target,model ,location ,scale,dff , hypothesis,model_d,location_d,scale_d,dff_d,de_an_prior)
 bf10_t1 (D ,df, target,model ,location ,scale,dff  , hypothesis )
 Power_t1(D,model,location,scale,dff, hypothesis,
                    model_d,location_d,scale_d,dff_d, de_an_prior,N)
@@ -41,9 +42,9 @@ Power_t1(D,model,location,scale,dff, hypothesis,
 t1_BF10(t,df,model ,location,scale,dff , hypothesis )
 t1_BF10_bound (D, df,model ,location ,scale,dff , hypothesis)
 t1_BF01_bound (D, df,model ,location ,scale,dff , hypothesis)
-t1_TPE(t , df,model,location ,scale,dff , hypothesis)
-t1_FNE(t , df,model,location ,scale,dff , hypothesis)
-t1_TNE(t , df,model,location ,scale,dff , hypothesis)
-t1_FPE(t , df,model,location ,scale,dff , hypothesis)
+t1_TPE(t , df,model,location ,scale,dff)
+t1_FNE(t , df,model,location ,scale,dff)
+t1_TNE(t , df)
+t1_FPE(t , df)
 t1_N_finder(D,target,model,location,scale,dff, hypothesis ,
                       model_d,location_d,scale_d,dff_d,de_an_prior,alpha)
