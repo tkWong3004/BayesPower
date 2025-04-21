@@ -2,10 +2,12 @@
 mode_bf = 1 
 # 1: sample size determination
 # 0: design analysis for a fixed N
-N = 509 # sample size in case of one sample t-test
+N = 50 # sample size in case of one sample t-test
 df <- N-1
 N1=N2=50 # sample size per group for independent t-tests
 r = 1 # ratio of sample size N2/N1
+df <- N-1
+t <- 1.2
 
 hypothesis = "!="  # the direction of H1"!="  , ">" or "<"
 e = c(-.2,.2) # bound for equivalence tests

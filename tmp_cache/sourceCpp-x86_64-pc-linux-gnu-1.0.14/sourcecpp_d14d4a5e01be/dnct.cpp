@@ -31,3 +31,24 @@ NumericVector dnct(const NumericVector x_raw, const double df,
   return y;
 }
 
+
+
+#include <Rcpp.h>
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
+// dnct
+NumericVector dnct(const NumericVector x_raw, const double df, const NumericVector ncp_raw);
+RcppExport SEXP sourceCpp_1_dnct(SEXP x_rawSEXP, SEXP dfSEXP, SEXP ncp_rawSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector >::type x_raw(x_rawSEXP);
+    Rcpp::traits::input_parameter< const double >::type df(dfSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type ncp_raw(ncp_rawSEXP);
+    rcpp_result_gen = Rcpp::wrap(dnct(x_raw, df, ncp_raw));
+    return rcpp_result_gen;
+END_RCPP
+}

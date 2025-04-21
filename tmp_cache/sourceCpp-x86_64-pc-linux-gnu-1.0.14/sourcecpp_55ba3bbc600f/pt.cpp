@@ -59,7 +59,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 
 // pnct
 NumericVector pnct(const NumericVector x, const double df, const NumericVector ncp, bool lower);
-RcppExport SEXP sourceCpp_1_pnct(SEXP xSEXP, SEXP dfSEXP, SEXP ncpSEXP, SEXP lowerSEXP) {
+RcppExport SEXP sourceCpp_5_pnct(SEXP xSEXP, SEXP dfSEXP, SEXP ncpSEXP, SEXP lowerSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;

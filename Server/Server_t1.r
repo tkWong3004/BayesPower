@@ -93,8 +93,7 @@ observeEvent(input$runt1, {
   
   output$priort1 <- renderPlot({
     switch(x$interval,
-           "1"=
-    t1_prior_plot(
+           "1"= t1_prior_plot(
       D = x$D,                  # Access 'D' explicitly
       target = x$target,        # Access 'target' explicitly
       model = x$model,          # Access 'model' explicitly
@@ -107,8 +106,8 @@ observeEvent(input$runt1, {
       scale_d = x$scale_d,        # Access 'scale_d' explicitly
       dff_d = x$dff_d,            # Access 'dff_d' explicitly
       de_an_prior = x$de_an_prior   # Access 'de_an_prior' explicitly
-    ), "2" = 
-    t1e_prior_plot(x$model,
+    ),
+    "2" = t1e_prior_plot(x$model,
                    x$scale,
                    x$dff ,
                    x$hypothesis,
