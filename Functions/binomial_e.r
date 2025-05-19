@@ -1,3 +1,38 @@
+adjust_root_10_e <- function(root, n, alpha, beta, location, scale, model, hypothesis, D,e) {
+  # Evaluate BF at the root
+  BF_val <- bin_e_BF(root,n,alpha,beta,location,scale,model,hypothesis,e)
+  
+  if (BF_val <= D) {
+    # Try root - 1
+    BF_prev <- bin_e_BF(root-1,n,alpha,beta,location,scale,model,hypothesis,e)
+    if (BF_prev > D) return(root - 1)
+    
+    # Try root + 1
+    BF_next <- bin_e_BF(root+1,n,alpha,beta,location,scale,model,hypothesis,e)
+    if (BF_next > D) return(root + 1)
+  }
+  
+  # Return original if already valid or no better nearby found
+  return(root)
+}
+
+adjust_root_01_e <- function(root, n, alpha, beta, location, scale, model, hypothesis, D,e) {
+  # Evaluate BF at the root
+  BF_val <- 1/bin_e_BF(root,n,alpha,beta,location,scale,model,hypothesis,e)
+  
+  if (BF_val <= D) {
+    # Try root - 1
+    BF_prev <- 1/bin_e_BF(root-1,n,alpha,beta,location,scale,model,hypothesis,e)
+    if (BF_prev > D) return(root - 1)
+    
+    # Try root + 1
+    BF_next <- 1/bin_e_BF(root+1,n,alpha,beta,location,scale,model,hypothesis,e)
+    if (BF_next > D) return(root + 1)
+  }
+  
+  # Return original if already valid or no better nearby found
+  return(root)
+}
 
 bin_e_BF<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
   BF = NA
@@ -12,30 +47,49 @@ bin_e_BF<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
                       "!=" = c(a = location+e[1], b = location+e[2])
   )
   
-  normalizationh1  <- switch(hypothesis,
-                             "!=" = {integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = 0,upper = bound_h1[1],rel.tol = 1e-10)$value+integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[2],upper = 1,rel.tol = 1e-10)$value},
-                             ">"  = integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[1],upper = bound_h1[2],rel.tol = 1e-10)$value,
-                             "<"  = integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[1],upper = bound_h1[2],rel.tol = 1e-10)$value)
+  normalizationh1 <- switch(hypothesis,
+                            "!=" = {
+                              if (model == "beta") {
+                                1 - (pbeta(bound_h1[2], alpha, beta) - pbeta(bound_h1[1], alpha, beta))
+                              } else if (model == "Moment") {
+                                (pmom(1 - location, tau = scale^2) - pmom(bound_h1[2] - location, tau = scale^2)) +
+                                  (pmom(bound_h1[1] - location, tau = scale^2) - pmom(-1 - location, tau = scale^2))
+                              }
+                            },
+                            "<" = ,
+                            ">" = {
+                              if (model == "beta") {
+                                pbeta(bound_h1[2], alpha, beta) - pbeta(bound_h1[1], alpha, beta)
+                              } else if (model == "Moment") {
+                                pmom(bound_h1[2] - location, tau = scale^2) - pmom(bound_h1[1] - location, tau = scale^2)
+                              }
+                            }
+  )
   
-  normalizationh0 <- integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h0[1],upper = bound_h0[2])$value
-  for (i in 1:length(x)){
-  int  <- function(prop){dbinom(x[i], size=n, prob=prop) *bin_prior(prop,alpha,beta,location,scale,model)}
+  normalizationh0 <- switch(model,
+                            "beta"      =   pbeta(bound_h0[2], alpha, beta) - pbeta(bound_h0[1], alpha, beta),
+                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            }
+  )
+  
+    for (i in 1:length(x)){
+  int  <- function(prop){dbinom(x[i], size=n, prob=prop) *bin_prior(prop,alpha,beta,location,scale,model)
+  }
   
   if (hypothesis == "!="){
-    lh1 = integrate(int,lower = 0,upper = bound_h1[1], rel.tol=1e-10,stop.on.error = F)$value+integrate(int,lower =  bound_h1[2],upper = 1, rel.tol=1e-10,stop.on.error = F)$value 
+    lh1 = integrate(int,lower = 0,upper = bound_h1[1], rel.tol=1e-5,stop.on.error = F)$value+integrate(int,lower =  bound_h1[2],upper = 1, rel.tol=1e-5,stop.on.error = F)$value 
   }else{
-    lh1 = integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=1e-10,stop.on.error = F)$value
+    lh1 = integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=1e-5,stop.on.error = F)$value
     
   }
-  lh0 = integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=1e-10,stop.on.error = F)$value
+  lh0 = integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=1e-5,stop.on.error = F)$value
 
     
-    BF[i] = lh1/lh0
+    BF[i] = (lh1/normalizationh1)/(lh0/normalizationh0)
   }
   return(BF)
   
 }
-
 
 
 bin_e_BF_bound_10 <-function(D,n,alpha,beta,location,scale,model,hypothesis,e){
@@ -44,74 +98,23 @@ bin_e_BF_bound_10 <-function(D,n,alpha,beta,location,scale,model,hypothesis,e){
     x = round(x)
     bin_e_BF(x,n,alpha,beta,location,scale,model,hypothesis,e)- D
   }
-  switch(hypothesis,
-         "!="= {
-
-           
-           
-      x <-  tryCatch( round(uniroot(Bound_finding,lower = 0 ,upper = ceiling(n/2))$root), error=function(e){})
-      y <-tryCatch( round(uniroot(Bound_finding,lower = ceiling(n/2) ,upper =n)$root), error=function(e){})
-
-      },
-      ">" = {
-        x <- tryCatch( round(uniroot(Bound_finding,lower = ceiling(n/2) ,upper =n)$root), error=function(e){})
-      },
-      "<" = {
-        x <- tryCatch( round(uniroot(Bound_finding,lower = 0 ,upper = ceiling(n/2))$root), error=function(e){})
-
-      } ) 
-
+  
+  x <- tryCatch(uniroot(Bound_finding, lower = 0 ,upper = round(location*n))$root, error = function(e) NA)
+  y <- tryCatch(uniroot(Bound_finding, lower = round(location*n) ,upper = n)$root, error = function(e) NA)
+  results <- c(x, y)
+  
+  results <- round(results[!is.na(results)])
+  if (length(results) == 0) return("bound cannot be found")
   
   
-  switch(hypothesis,
-         "!=" ={
-           if (length(x) ==0&length(y)==0){
-             x = "no bound is found"
-             return(x)
-           } 
-         },
-           "<" = {if (length(x) ==0){
-             x = "no bound is found"
-             return(x)
-           }},
-         ">" = {if (length(x) ==0){
-           x = "no bound is found"
-           return(x)
-         }})
+  results <- sapply(results, function(root) {
+    adjust_root_10_e(root, n, alpha, beta, location, scale, model, hypothesis, D,e)
+  })
   
-  
-  if (length(y) == 1){
-    x = cbind(x,y)
-  }
-  
-  
-  BF = bin_e_BF(x,n,alpha,beta,location,scale,model,hypothesis,e)
-  
-
-  
-  while (any(D>BF)){
-
- if (length(x) ==2){
-   
-   x =c(x[1] - 1, x[2] + 1)
- }else{
-   
-   if (x>=location*n){
-     x=x+1
-   }else{
-     x=x-1
-   }
-   
- }
-    if (all(x == 0)) {  
-      break
-    }
-    BF = bin_e_BF(x,n,alpha,beta,location,scale,model,hypothesis,e)
-  }  
-    
-    
-    
-    return(x)
+  BF.vals  <- bin_e_BF(results,n,alpha,beta,location,scale,model,hypothesis,e)
+  BF.close <- which(BF.vals > D)
+  if (length(BF.close) == 0) return("bound cannot be found")
+  return(results[BF.close])
 }
 
 
@@ -122,70 +125,29 @@ bin_e_BF_bound_01 <-function(D,n,alpha,beta,location,scale,model,hypothesis,e){
     1/bin_e_BF(x,n,alpha,beta,location,scale,model,hypothesis,e)- D
   }
   
-  switch(hypothesis,
-         "!="= {
-           
-           x <- tryCatch( round(uniroot(Bound_finding,lower = 0 ,upper = round(location*n))$root), error=function(e){})
-           y <-   tryCatch(  round(uniroot(Bound_finding,lower = round(location*n) ,upper = n)$root), error=function(e){})
-         },
-         ">" = {
-           x <- tryCatch(  round(uniroot(Bound_finding,lower = round(location*n) ,upper = n)$root), error=function(e){})
-         },
-         "<" = {
-           x <- tryCatch( round(uniroot(Bound_finding,lower = 0 ,upper = round(location*n))$root), error=function(e){})
-         } ) 
+  x <- tryCatch(uniroot(Bound_finding, lower = 0 ,upper = round(location*n))$root, error = function(e) NA)
+  y <- tryCatch(uniroot(Bound_finding, lower = round(location*n) ,upper = n)$root, error = function(e) NA)
+  results <- c(x, y)
+  
+  results <- round(results[!is.na(results)])
+  if (length(results) == 0) return("bound cannot be found")
   
   
-  switch(hypothesis,
-         "!=" ={
-           if (length(x) ==0&length(y)==0){
-             x = "no bound is found"
-             return(x)
-           } 
-         },
-         "<" = {if (length(x) ==0){
-           x = "no bound is found"
-           return(x)
-         }},
-         ">" = {if (length(x) ==0){
-           x = "no bound is found"
-           return(x)
-         }})
+  results <- sapply(results, function(root) {
+    adjust_root_01_e(root, n, alpha, beta, location, scale, model, hypothesis, D,e)
+  })
   
-  
-  if (length(y) == 1){
-    x = cbind(x,y)
-  }
-  
-  BF = 1/bin_e_BF(x,n,alpha,beta,location,scale,model,hypothesis,e)
-  
-  while (any(D>BF)){
-    
-    if (length(x) ==2){
-      
-      x =c(x[1] + 1, x[2] - 1)
-    }else{
-      if(x>location*n){
-        x=x-1
-      }else{
-        x=x+1
-      }
-
-    }
-    BF = 1/bin_e_BF(x,n,alpha,beta,location,scale,model,hypothesis,e)
-  }  
- 
-  
-  return(x)
+  BF.vals  <- 1/bin_e_BF(results,n,alpha,beta,location,scale,model,hypothesis,e)
+  BF.close <- which(BF.vals > D)
+  if (length(BF.close) == 0) return("bound cannot be found")
+  return(results[BF.close])
 }
 
+
 bin_e_TPE<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
-  if (any(x =="no bound is found" | length(x)==0)){
-    x=0
-    return(x)
-  }
- 
+  if (length(x) == 0 || any(x == "bound cannot be found")) return(x)
   
+
   if (model =="Point"){
     TPE = switch(hypothesis,
                "!=" = {
@@ -204,88 +166,68 @@ bin_e_TPE<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
     )
     return(TPE)
   }
-  
-  
-  
-  
+
   
   bound_h1  <- switch(hypothesis,
                       ">" = c(a = location+e, b = 1),
                       "<" = c(a = 0, b = location+e),
                       "!=" = c(a = location+e[1], b = location+e[2])
   )
-  normalizationh1  <- switch(hypothesis,
-                             "!=" = {integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = 0,upper = bound_h1[1],rel.tol = 1e-10)$value+integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[2],upper = 1,rel.tol = 1e-10)$value},
-                             ">"  = integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[1],upper = bound_h1[2],rel.tol = 1e-10)$value,
-                             "<"  = integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[1],upper = bound_h1[2],rel.tol = 1e-10)$value)
-  
-  switch(hypothesis,
-         
-         "!=" =
-           
-           int  <- function(prop){
-             if (length(x)==2){
-               pro = pbinom(min(x),n,prop,lower.tail = T)+ pbinom(max(x)-1,n,prop,lower.tail = F)
-             }else{
-               
-               pro = mapply(function(x_i, n_i, p_i) {
-                 if (x_i / n_i > p_i) {
-                   pbinom(x_i-1, n_i, p_i, lower.tail = FALSE)
-                 } else {
-                   pbinom(x_i, n_i, p_i, lower.tail = TRUE)
-                 }
-               }, x, n, prop)
-               #if(any(x/n>prop)){
-              # pro = pbinom(x,n,prop,lower.tail = F)
-              # }else{
-               #  pro = pbinom(x,n,prop,lower.tail = T)
-                # }
-             }
-             
-             
-             
-         #  pro = switch(length(x)==2,
-        #                "1" ={pbinom(min(x),n,prop,lower.tail = T)+ pbinom(max(x),n,prop,lower.tail = F)},
-        #                "0"=  {    
-        #                  switch(x/n>prop,
-        #                         "1" = pbinom(x,n,prop,lower.tail = F),
-        #                         "0" = pbinom(x,n,prop,lower.tail = T)
-        #                         )
-                          
-        #                })
-           
-           pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh1
-           },
-         ">" = 
-           int  <- function(prop){
-             pro = pbinom(x-1,n,prop,lower.tail = F)
-             pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh1
-           },
-         "<" = 
-           int  <- function(prop){
-             pro = pbinom(x,n,prop,lower.tail = T)
-             pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh1
-           })
-  
-  
-  
-  if(hypothesis == "!="){
-    TPE = integrate(int,lower = 0,upper = bound_h1[1], rel.tol = 1e-10)$value + integrate(int,lower = bound_h1[2],upper = 1, rel.tol = 1e-10)$value
-  }else{
-    TPE = integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol = 1e-10)$value
+  normalizationh1 <- switch(hypothesis,
+                            "!=" = {
+                              if (model == "beta") {
+                                1 - (pbeta(bound_h1[2], alpha, beta) - pbeta(bound_h1[1], alpha, beta))
+                              } else if (model == "Moment") {
+                                (pmom(1 - location, tau = scale^2) - pmom(bound_h1[2] - location, tau = scale^2)) +
+                                  (pmom(bound_h1[1] - location, tau = scale^2) - pmom(-1 - location, tau = scale^2))
+                              }
+                            },
+                            "<" = ,
+                            ">" = {
+                              if (model == "beta") {
+                                pbeta(bound_h1[2], alpha, beta) - pbeta(bound_h1[1], alpha, beta)
+                              } else if (model == "Moment") {
+                                pmom(bound_h1[2] - location, tau = scale^2) - pmom(bound_h1[1] - location, tau = scale^2)
+                              }
+                            }
+  )  
+  int <- function(prop) {
+    pro <- switch(hypothesis,
+                  "!=" = {
+                    if (length(x) == 2) {
+                      pbinom(min(x), n, prop, lower.tail = TRUE) +
+                        pbinom(max(x) - 1, n, prop, lower.tail = FALSE)
+                    } else {
+                      mapply(function(x_i, n_i, p_i) {
+                        if (x_i / n_i > p_i) {
+                          pbinom(x_i - 1, n_i, p_i, lower.tail = FALSE)
+                        } else {
+                          pbinom(x_i, n_i, p_i, lower.tail = TRUE)
+                        }
+                      }, x, n, prop)
+                    }
+                  },
+                  ">" = pbinom(x - 1, n, prop, lower.tail = FALSE),
+                  "<" = pbinom(x, n, prop, lower.tail = TRUE)
+    )
+    
+    pro * bin_prior(prop, alpha, beta, location, scale, model) / normalizationh1
   }
   
-  
+  if(hypothesis == "!="){
+    TPE = integrate(int,lower = 0,upper = bound_h1[1], rel.tol = 1e-5)$value + integrate(int,lower = bound_h1[2],upper = 1, rel.tol = 1e-5)$value
+  }else{
+    TPE = integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol = 1e-5)$value
+  }
   return(TPE)
   
 }
 
 
 bin_e_FNE<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
-  if (any(x =="no bound is found" | length(x)==0)){
-    x=0
-    return(x)
-  }
+  
+  if (length(x) == 0 || any(x == "bound cannot be found")) return(x)
+  
   
   if (model =="Point"){
     FNE = switch(hypothesis,
@@ -311,40 +253,47 @@ bin_e_FNE<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
                       "<" = c(a = 0, b = location+e),
                       "!=" = c(a = location+e[1], b = location+e[2])
   )
-  normalizationh1  <- switch(hypothesis,
-                             "!=" = {integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = 0,upper = bound_h1[1],rel.tol = 1e-10)$value+integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[2],upper = 1,rel.tol = 1e-10)$value},
-                             ">"  = integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[1],upper = bound_h1[2],rel.tol = 1e-10)$value,
-                             "<"  = integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[1],upper = bound_h1[2],rel.tol = 1e-10)$value)
-  switch(hypothesis,
-         
-         "!=" =
-           
-           int  <- function(prop){
-             pro = switch(length(x)==2,
-                          "1" ={pbinom(max(x),n,prop,lower.tail = T)- pbinom(min(x)-1,n,prop,lower.tail = T)},
-                          "0"=  {    
-                            switch(x/n>prop,
-                                   "1" = pbinom(x,n,prop,lower.tail = T),
-                                   "0" = pbinom(x-1,n,prop,lower.tail = F))
-                            
-                          })
-             pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh1
-           },
-         ">" = 
-           int  <- function(prop){
-             pro = pbinom(x,n,prop,lower.tail = T)
-             pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh1
-           },
-         "<" = 
-           int  <- function(prop){
-             pro = pbinom(x-1,n,prop,lower.tail = F)
-             pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh1
-           })
-  
+  normalizationh1 <- switch(hypothesis,
+                            "!=" = {
+                              if (model == "beta") {
+                                1 - (pbeta(bound_h1[2], alpha, beta) - pbeta(bound_h1[1], alpha, beta))
+                              } else if (model == "Moment") {
+                                (pmom(1 - location, tau = scale^2) - pmom(bound_h1[2] - location, tau = scale^2)) +
+                                  (pmom(bound_h1[1] - location, tau = scale^2) - pmom(-1 - location, tau = scale^2))
+                              }
+                            },
+                            "<" = ,
+                            ">" = {
+                              if (model == "beta") {
+                                pbeta(bound_h1[2], alpha, beta) - pbeta(bound_h1[1], alpha, beta)
+                              } else if (model == "Moment") {
+                                pmom(bound_h1[2] - location, tau = scale^2) - pmom(bound_h1[1] - location, tau = scale^2)
+                              }
+                            }
+  )
+  int <- function(prop) {
+    pro <- switch(hypothesis,
+                  "!=" = {
+                    if (length(x) == 2) {
+                      pbinom(max(x), n, prop, lower.tail = TRUE) - pbinom(min(x) - 1, n, prop, lower.tail = TRUE)
+                    } else {
+                      if ((x / n) > prop) {
+                        pbinom(x, n, prop, lower.tail = TRUE)
+                      } else {
+                        pbinom(x - 1, n, prop, lower.tail = FALSE)
+                      }
+                    }
+                  },
+                  ">" = pbinom(x , n, prop, lower.tail = TRUE),
+                  "<" = pbinom(x - 1, n, prop, lower.tail = FALSE)
+    )
+    
+    pro * bin_prior(prop, alpha, beta, location, scale, model) / normalizationh1
+  }
   if(hypothesis == "!="){
-    FNE = integrate(int,lower = 0,upper = bound_h1[1], rel.tol = 1e-10)$value + integrate(int,lower = bound_h1[2],upper = 1, rel.tol = 1e-10)$value
+    FNE = integrate(int,lower = 0,upper = bound_h1[1], rel.tol = 1e-5)$value + integrate(int,lower = bound_h1[2],upper = 1, rel.tol = 1e-5)$value
   }else{
-    FNE = integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol = 1e-10)$value
+    FNE = integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol = 1e-5)$value
   }
   
   
@@ -352,85 +301,53 @@ bin_e_FNE<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
   
 }
 
-
 bin_e_FPE<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
   
-  if (any(x =="no bound is found" | length(x)==0)){
-    x=0
-    return(x)
-  }
+  if (length(x) == 0 || any(x == "bound cannot be found")) return(x)
   bound_h0  <- switch(hypothesis,
                       ">" = c(a = location, b = location+e),
                       "<" = c(a = location+e, b = location),
                       "!=" = c(a = location+e[1], b = location+e[2])
   )
-  normalizationh0 <- integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h0[1],upper = bound_h0[2])$value
+  normalizationh0 <- switch(model,
+                            "beta"      =   pbeta(bound_h0[2], alpha, beta) - pbeta(bound_h0[1], alpha, beta),
+                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            }
+  )
+  
+  int <- function(prop) {
+    pro <- switch(hypothesis,
+                  "!=" = {
+                    if (length(x) == 2) {
+                      pbinom(min(x), n, prop, lower.tail = TRUE) +
+                        pbinom(max(x) - 1, n, prop, lower.tail = FALSE)
+                    } else {
+                      mapply(function(x_i, n_i, p_i) {
+                        if (x_i / n_i > p_i) {
+                          pbinom(x_i - 1, n_i, p_i, lower.tail = FALSE)
+                        } else {
+                          pbinom(x_i, n_i, p_i, lower.tail = TRUE)
+                        }
+                      }, x, n, prop)
+                    }
+                  },
+                  ">" = pbinom(x - 1, n, prop, lower.tail = FALSE),
+                  "<" = pbinom(x, n, prop, lower.tail = TRUE)
+    )
+    
+    pro * bin_prior(prop, alpha, beta, location, scale, model) / normalizationh0
+  }
   
   
-  switch(hypothesis,
-         
-         "!=" =
-           
-           int  <- function(prop){
-             if (length(x)==2){
-               pro = pbinom(min(x),n,prop,lower.tail = T)+ pbinom(max(x)-1,n,prop,lower.tail = F)
-             }else{
-               
-               pro = mapply(function(x_i, n_i, p_i) {
-                 if (x_i / n_i > p_i) {
-                   pbinom(x_i-1, n_i, p_i, lower.tail = FALSE)
-                 } else {
-                   pbinom(x_i, n_i, p_i, lower.tail = TRUE)
-                 }
-               }, x, n, prop)
-               #if(any(x/n>prop)){
-               # pro = pbinom(x,n,prop,lower.tail = F)
-               # }else{
-               #  pro = pbinom(x,n,prop,lower.tail = T)
-               # }
-             }
-             
-             
-             
-             #  pro = switch(length(x)==2,
-             #                "1" ={pbinom(min(x),n,prop,lower.tail = T)+ pbinom(max(x),n,prop,lower.tail = F)},
-             #                "0"=  {    
-             #                  switch(x/n>prop,
-             #                         "1" = pbinom(x,n,prop,lower.tail = F),
-             #                         "0" = pbinom(x,n,prop,lower.tail = T)
-             #                         )
-             
-             #                })
-             
-             pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh0
-           },
-         ">" = 
-           int  <- function(prop){
-             pro = pbinom(x-1,n,prop,lower.tail = F)
-             pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh0
-           },
-         "<" = 
-           int  <- function(prop){
-             pro = pbinom(x,n,prop,lower.tail = T)
-             pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh0
-           })
-  
-  
-  
-
-    FPE = integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol = 1e-10)$value
+    FPE = integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol = 1e-5)$value
     return(FPE)
 
 }
 
-
 bin_e_TNE<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
   
-  if (any(x =="no bound is found" | length(x)==0)){
-    x=0
-    return(x)
-  }
   
+  if (length(x) == 0 || any(x == "bound cannot be found")) return(x)
   
   bound_h0  <- switch(hypothesis,
                       ">" = c(a = location, b = location+e),
@@ -438,37 +355,32 @@ bin_e_TNE<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
                       "!=" = c(a = location+e[1], b = location+e[2])
   )
   
-  normalizationh0 <- integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h0[1],upper = bound_h0[2])$value
-  
-  
-  switch(hypothesis,
-         
-         "!=" =
-           
-           int  <- function(prop){
-             pro = switch(length(x)==2,
-                          "1" ={pbinom(max(x),n,prop,lower.tail = T)- pbinom(min(x)-1,n,prop,lower.tail = T)},
-                          "0"=  {    
-                            switch(x/n>prop,
-                                   "1" = pbinom(x,n,prop,lower.tail = T),
-                                   "0" = pbinom(x-1,n,prop,lower.tail = F))
-                            
-                          })
-             pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh0
-           },
-         ">" = 
-           int  <- function(prop){
-             pro = pbinom(x,n,prop,lower.tail = T)
-             pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh0
-           },
-         "<" = 
-           int  <- function(prop){
-             pro = pbinom(x-1,n,prop,lower.tail = F)
-             pro*bin_prior(prop,alpha,beta,location,scale,model)/normalizationh0
-           })
-  
+  normalizationh0 <- switch(model,
+                            "beta"      =   pbeta(bound_h0[2], alpha, beta) - pbeta(bound_h0[1], alpha, beta),
+                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            }
+  )
+  int <- function(prop) {
+    pro <- switch(hypothesis,
+                  "!=" = {
+                    if (length(x) == 2) {
+                      pbinom(max(x), n, prop, lower.tail = TRUE) - pbinom(min(x) - 1, n, prop, lower.tail = TRUE)
+                    } else {
+                      if ((x / n) > prop) {
+                        pbinom(x, n, prop, lower.tail = TRUE)
+                      } else {
+                        pbinom(x - 1, n, prop, lower.tail = FALSE)
+                      }
+                    }
+                  },
+                  ">" = pbinom(x , n, prop, lower.tail = TRUE),
+                  "<" = pbinom(x - 1, n, prop, lower.tail = FALSE)
+    )
+    
+    pro * bin_prior(prop, alpha, beta, location, scale, model) / normalizationh0
+  }
 
-    TNE = integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol = 1e-10)$value
+    TNE = integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol = 1e-5)$value
   
   
   
@@ -477,238 +389,159 @@ bin_e_TNE<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
 
 bin_e_N_finder <-function(D,target,alpha,beta,location,scale,model,hypothesis,
                         alpha_d,beta_d,location_d,scale_d,model_d,de_an_prior,FP,e){
-  lo = 10
-  x = bin_e_BF_bound_10(D,lo,alpha,beta,location,scale,model,hypothesis,e)
-  pro = bin_e_TPE(x,lo,alpha,beta,location,scale,model,hypothesis,e)
+  lower = 10
+  upper = 10000
   
-  if ( pro>target){
-
-    FPE = bin_e_FPE(x,lo,alpha,beta,location,scale,model,hypothesis,e)
-    #attempt = 0 
-    if(FPE<FP){
-      return(lo)
-    }else{
-      while(FP<pro){
-        alpha_root <- function(N){
-          N =round(N)
-          x = bin_e_BF_bound_10(D,N,alpha,beta,location,scale,model,hypothesis,e)
-          
-          
-          if(de_an_prior == 1){
-            pro = bin_e_FPE(x,N,alpha,beta,location,scale,model,hypothesis,e)
-          } else{
-            pro = bin_e_FPE(x,N,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
-          }
-          return(pro-FP)
-        }
-        
-        N = round(uniroot(alpha_root,lower = lo,upper = up)$root)
-        
-        
-        return(N)}}}
-        
-        
-        
-        
-        
-        
-        
-        #attempt = attempt +1
-        #lo = lo +1
-        #x = bin_e_BF_bound_10(D,lo,alpha,beta,location,scale,model,hypothesis,e)
-        #pro = switch(de_an_prior,
-        #             "1" = bin_e_FPE(x,lo,alpha,beta,location,scale,model,hypothesis,e),
-        #             "0" = bin_e_FPE(x,lo,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
-        #)
-        #if(attempt>100){
-        #  return(lo)
-        #  break
-        #}
-      
-
-       #return(lo)
- 
-
+  b10 =  bin_e_BF_bound_10(D,lower,alpha,beta,location,scale,model,hypothesis,e)
+  
+  TPE_lo <- if (de_an_prior == 1)
+    bin_e_TPE(b10,lower,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e) else
+      bin_e_TPE(b10,lower,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
+  if (TPE_lo > target) return(lower)
+  FPE_lo <-  bin_e_FPE(b10,lower,alpha,beta,location,scale,model,hypothesis,e)
+  if (TPE_lo > target&FPE_lo<FP) return(lower)
   
   Power_root <- function(N){
     N =round(N)
     x = bin_e_BF_bound_10(D,N,alpha,beta,location,scale,model,hypothesis,e)
 
-    
     if(de_an_prior == 1){
       pro = bin_e_TPE(x,N,alpha,beta,location,scale,model,hypothesis,e)
     } else{
       pro = bin_e_TPE(x,N,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
     }
-    #pro = switch(de_an_prior,
-    #             "1" = bin_TPE(x,N,alpha,beta,location,scale,model,hypothesis),
-    #            "0" = bin_TPE(x,N,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis)
-    #            )
-    
     return(pro-target)
   }
-  
-  up= 50000
-  N = round(uniroot(Power_root,lower = lo,upper = up)$root)
-  x10 = bin_e_BF_bound_10(D,N,alpha,beta,location,scale,model,hypothesis,e)
-  FPE = bin_e_FPE(x10,N,alpha,beta,location,scale,model,hypothesis,e)
-  
-  if(FPE<FP){
-    return(N)
-  }else{
-    
-    
-    alpha_root <- function(N){
-      N =round(N)
-      x = bin_e_BF_bound_10(D,N,alpha,beta,location,scale,model,hypothesis,e)
-      
-      
-      if(de_an_prior == 1){
-        pro = bin_e_FPE(x,N,alpha,beta,location,scale,model,hypothesis,e)
-      } else{
-        pro = bin_e_FPE(x,N,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
-      }
-      #pro = switch(de_an_prior,
-      #             "1" = bin_TPE(x,N,alpha,beta,location,scale,model,hypothesis),
-      #            "0" = bin_TPE(x,N,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis)
-      #            )
-      
-      return(pro-FP)
+
+  N.power = round(uniroot(Power_root,lower = lower,upper = upper)$root)+1
+
+    while(TRUE) {
+    b10 <- bin_e_BF_bound_10(D,N.power,alpha,beta,location,scale,model,hypothesis,e)
+    pro <- if (de_an_prior == 0) {
+      bin_e_TPE(b10, N.power, alpha_d, beta_d, location_d, scale_d, model_d, hypothesis,e)
+    } else {
+      bin_e_TPE(b10,N.power,alpha,beta,location,scale,model,hypothesis,e)
     }
     
-    N = round(uniroot(alpha_root,lower = N,upper = up)$root)
-
-    
-    return(N)
-    #attempt = 0
-    #while(FP<pro){
-    #  attempt = attempt +1
-    #  N = N +5
-    #  x = bin_e_BF_bound_10(D,N,alpha,beta,location,scale,model,hypothesis,e)
-    #  pro = switch(de_an_prior,
-    #               "1" = bin_e_FPE(x,N,alpha,beta,location,scale,model,hypothesis,e),
-    #               "0" = bin_e_FPE(x,N,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
-    #  )
-    #  if(attempt>100){
-    #    
-    #    return(N)
-    #    break
-    # }
-    #}
-    
-    
+    if (pro > target) break
+    N.power <- N.power + 1
+  }
+  b10 = bin_e_BF_bound_10(D,N.power,alpha,beta,location,scale,model,hypothesis,e)
+  FPE =  bin_e_FPE(b10,N.power,alpha,beta,location,scale,model,hypothesis,e)
+  if (FPE <= FP) return(N.power)
+  
+  alpha.root <- function(n) {
+    n=round(n)
+    b10 <- bin_e_BF_bound_10(D,n,alpha,beta,location,scale,model,hypothesis,e)
+    bin_e_FPE(b10,n,alpha,beta,location,scale,model,hypothesis,e)-FP
+  }
+  N.alpha = round(uniroot(alpha.root,lower = N.power,upper = upper)$root)
+  return(N.alpha)
     
   }
-    
-    
-  
-}
+
 
 bin_e_table<-function(D,target,alpha,beta,location,scale,model,hypothesis,
                     alpha_d,beta_d,location_d,scale_d,model_d,de_an_prior,N, mode_bf,FP,e){
-  bound01 = as.numeric(0)
-  bound10 = as.numeric(0)
-  if (mode_bf == "0"){
-    n = N
-  }else {
+  if (mode_bf == "0") n = N else n =  bin_e_N_finder(D,target,alpha,beta,location,scale,model,hypothesis,
+                                                     alpha_d,beta_d,location_d,scale_d,model_d,de_an_prior,FP,e)
+  
+  # b bounds:
+  b10 <- bin_e_BF_bound_10(D,n,alpha,beta,location,scale,model,hypothesis,e)
+  b01 <-  bin_e_BF_bound_01(D,n,alpha,beta,location,scale,model,hypothesis,e)
+  
+  max_BF <- 1 /bin_e_BF(ceiling(n/2),n,alpha,beta,location,scale,model,hypothesis,e)
+  
+  # FPE and TPE:
+  FPE       <- bin_e_FPE(b10,n,alpha,beta,location,scale,model,hypothesis,e)
+  if (de_an_prior == 1) {
+    TPE          <- bin_e_TPE(b10,n,alpha,beta,location,scale,model,hypothesis,e)
+    TPR_alpha    <- alpha
+    TPR_beta     <- beta
+    TPR_location <- location
+    TPR_scale    <- scale
+    TPR_model    <- model
     
-    n =  bin_e_N_finder(D,target,alpha,beta,location,scale,model,hypothesis,
-                                 alpha_d,beta_d,location_d,scale_d,model_d,de_an_prior,FP,e)
-  
+  } else {
+    TPE          <- bin_e_TPE(b10,n,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
+    TPR_alpha    <- alpha_d
+    TPR_beta     <- beta_d
+    TPR_location <- location_d
+    TPR_scale    <- scale_d
+    TPR_model    <- model_d
   }
-  bound01 = bin_e_BF_bound_01(D,n,alpha,beta,location,scale,model,hypothesis,e)
-  
-  if (length(bound01)==0|any(bound01 == "bound cannot be found")){
-    FNE = 0
-    TNE = 0
-  }else{
-    
-    if (de_an_prior ==1){
-      FNE = bin_e_FNE(bound01,n,alpha,beta,location,scale,model,hypothesis,e)
-      TNE = bin_e_TNE(bound01,n,alpha,beta,location,scale,model,hypothesis,e)
-    }
-    if (de_an_prior ==0){
-      FNE = bin_e_FNE(bound01,n,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
-      TNE = bin_e_TNE(bound01,n,alpha,beta,location,scale,model,hypothesis,e)
-    }
-}
-  bound10 = bin_e_BF_bound_10(D,n,alpha,beta,location,scale,model,hypothesis,e)
-  
-
-  if (de_an_prior ==1){
-    TPE = bin_e_TPE(bound10,n,alpha,beta,location,scale,model,hypothesis,e)
-    FPE = bin_e_FPE(bound10,n,alpha,beta,location,scale,model,hypothesis,e)
-  }else{
-    TPE = bin_e_TPE(bound10,n,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
-    FPE = bin_e_FPE(bound10,n,alpha,beta,location,scale,model,hypothesis,e)
+  # FNE and TNE:
+  if (any(hypothesis == "!=" & max_BF < D | b01 == "bound cannot be found")) {
+    FNE <- 0
+    TNE <- 0
+  } else {
+    FNE <- bin_e_FNE(b01,n,TPR_alpha,TPR_beta,TPR_location,TPR_scale,TPR_model,hypothesis,e)
+    TNE <- bin_e_TNE(b01,n,alpha,beta,location,scale,model,hypothesis,e)
   }
-  
-  
-  table <- data.frame(
-    TPE = TPE,
-    FNE = FNE,
-    TNE = TNE,
-    FPE = FPE,
-    N =  n)
-  return(table)
+  # table:
+  tab.names <- c(
+    sprintf("p(BF10 > %0.f | H1)", D),
+    sprintf("p(BF01 > %0.f | H1)", D),
+    sprintf("p(BF01 > %0.f | H0)", D),
+    sprintf("p(BF10 > %0.f | H0)", D),
+    "Required N"
+  )
+  table <- data.frame(TPE, FNE, TNE, FPE, n, check.names = FALSE, row.names = NULL)
+  colnames(table) <- tab.names
+  table
 }
 
 bin_e_bf10 <-function(DD,n,alpha,beta,location,scale,model,hypothesis,e){
-  x= seq(from = 0,to =n,by= 5)
-  BF_D = bin_e_BF_bound_10(DD,n,alpha,beta,location,scale,model,hypothesis,e)
-  D = round(bin_e_BF(BF_D,n,alpha,beta,location,scale,model,hypothesis,e),2)
-  BF10 = bin_e_BF(x,n,alpha,beta,location,scale,model,hypothesis,e)
+  x= seq(from = 0,to =n,by= 3)
   
+  # Compute BF10 and x-bounds:
+  b.BF10     <- bin_e_BF_bound_10(D,n,alpha,beta,location,scale,model,hypothesis,e)
+  BF10_at_b  <- round(bin_e_BF(b.BF10,n,alpha,beta,location,scale,model,hypothesis,e),2)
+  BF10       <- bin_e_BF(x,n,alpha,beta,location,scale,model,hypothesis,e)
+
+  if (length(b.BF10)== 2){  part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1]) / .(BF10_at_b[2])))}else{part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1])))}
   
+  if (length(b.BF10)== 2){  part2 = bquote("when x = " ~ .(b.BF10[1]) / .(b.BF10[2]))}else{  part2 <- bquote("when x = " ~ .(b.BF10[1]))}
   
-  if (length(D)== 2){part1 = bquote(bold("BF"[10] ~ "=" ~ .(D[1]) / .(D[2])))}else{part1 = bquote(bold("BF"[10] ~ "=" ~ .(D[1])))}
-  
-  if (length(D)== 2){  part2 = bquote("when x = " ~ .(BF_D[1]) / .(BF_D[2]))}else{  part2 <- bquote("when x = " ~ .(BF_D[1]))}
-  
-  
-  main = bquote(.(part1) ~ .(part2))
- 
+  main <- bquote(bold(.(part1) ~ .(part2)))
   
   par(mfrow = c(1, 2))
-  plot(x,log10(BF10),xlab= "Number of success",type="l", ylab = expression("logarithm of BF"[10]),main =   main,frame.plot = FALSE,xaxt = "n")
-  abline(v = BF_D)
-  axis(1, c(0,n))
-  if (length(BF_D) != 0 ){
-    for(i in 1:length(BF_D))
-      axis(1, BF_D[i])
-      }
+  plot(x, BF10, type = "l", log = "y", xlab = "Number of success", ylab = expression("BF"[10]),
+       main = main, frame.plot = FALSE, xaxt = "n")
+  abline(v = b.BF10)
+  axis(1, c(0, n))
+  if (length(b.BF10)) axis(1, round(b.BF10, 2))
   
-  max_BF = 1/bin_e_BF(ceiling(location*n),n,alpha,beta,location,scale,model,hypothesis,e)
+  # right plot - BF01:
+  BF01   <- 1 / BF10
+  b.BF01 <- bin_e_BF_bound_01(D,n,alpha,beta,location,scale,model,hypothesis,e)
+  BF01_at_b <- round(1/bin_e_BF(b.BF01,n,alpha,beta,location,scale,model,hypothesis,e),2)
+  
+  # Check if BF01 = D is possible:
+  max.BF01 <- 1 / bin_e_BF(round(n/2),n,alpha,beta,location,scale,model,hypothesis,e)
+  impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(b.BF01, "bound cannot be found"))
+  
+  plot(x, BF01, type = "l", log = "y", xlab = "Number of success", ylab = bquote("BF"['01']),
+       main = "", frame.plot = FALSE, xaxt = "n")
+  axis(1, c(0, n))
+  
+  if (impossible) {
+    title(main = bquote(bold("It is impossible to have BF"[01]~"="~.(D))))
+  } else {
+    abline(v = b.BF01)
+    axis(1, round(b.BF01, 2))
     
-  
-  BF_D = bin_e_BF_bound_01(DD,n,alpha,beta,location,scale,model,hypothesis,e)
+    if (length(b.BF10) == 2) {
+      part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])) / bold(.(BF10_at_b[2])))
+      part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1])) / bold(.(b.BF10[2]))))
+    } else {
+      part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])))
+      part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1]))))
+    }
+    main.bf01 = bquote(bold(.(part1) ~ .(part2)))
+    title(main = main.bf01)
+  }
 
-  
-  plot(x,log10(1/BF10),xlab= "Number of success",type="l",main = "",frame.plot = FALSE,ylab = bquote("logarithm of BF"[0][1]),xaxt = "n")
-  axis(1, c(0,n))
-  
-  if (any(hypothesis == "!=" & max_BF<D |BF_D == "bound cannot be found" |BF_D == "no bound is found" ) ) {
-    main = bquote(bold("It is impossible to have BF"[0][1]~"="~.(D)))
-    title(main = main)
-    #sprintf("It is impossible to have BF01 = %.3f ",D)
-  } else      {
-    D = round(1/bin_e_BF(BF_D,n,alpha,beta,location,scale,model,hypothesis,e),2)
-    
-    abline(v = BF_D)
-    
-    if (length(BF_D) != 0 ){
-      for(i in 1:length(BF_D))
-        axis(1, BF_D[i])
-    }
-    
-    if (length(D)== 2){part1 = bquote(bold("BF"[10] ~ "=" ~ .(D[1]) / .(D[2])))}else{part1 = bquote(bold("BF"[10] ~ "=" ~ .(D[1])))}
-    
-    if (length(D)== 2){  part2 = bquote("when x = " ~ .(BF_D[1]) / .(BF_D[2]))}else{  part2 <- bquote("when x = " ~ .(BF_D[1]))}
-    
-    
-    main = bquote(.(part1) ~ .(part2))
-    title(main = main)
-    }
 }
 
 
@@ -717,147 +550,132 @@ Power_e_bin<-function(D,alpha,beta,location,scale,model,hypothesis,
 
   smin = 10
   smax = N*1.2
-  sdf = ceiling(seq(smin,smax , by = (smax-smin)/50))
+  sN = ceiling(seq(smin,smax , by = (smax-smin)/50))
   
-  power =  array(NA, dim = c(length(sdf)))
+  power =  array(NA, dim = c(length(sN)))
   
-  for ( i in 1:length(sdf)){
-    x = bin_e_BF_bound_10 (D,sdf[i],alpha,beta,location,scale,model,hypothesis,e)
+  for ( i in 1:length(sN)){
+    x = bin_e_BF_bound_10 (D,sN[i],alpha,beta,location,scale,model,hypothesis,e)
 
  
     if(de_an_prior ==1){
-      power[i] = bin_e_TPE(x,sdf[i],alpha,beta,location,scale,model,hypothesis,e)
-        
-        
-        
-    }else{
-      power[i] = bin_e_TPE(x,sdf[i],alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
-    }
-    #power[i] = switch(de_an_prior,
-    #                  "1" =  bin_TPE(x,sdf[i],alpha,beta,location,scale,model,hypothesis), 
-    #                  "0" = bin_TPE(x,sdf[i],alpha_d,beta_d,location_d,scale_d,model_d,hypothesis))
-    #
+      power[i] = bin_e_TPE(x,sN[i],alpha,beta,location,scale,model,hypothesis,e)
     
+    }else{
+      power[i] = bin_e_TPE(x,sN[i],alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
+    }
+
   }
-  plot(sdf,power,type="l",main = "",frame.plot = FALSE,xlab = "Total sample size", ylab = "Probability of True positive evidence",xlim = c(10,max(sdf)), 
+  par(mfrow = c(1, 1))
+  
+  plot(sN,power,type="l",main = "",frame.plot = FALSE,xlab = "Total sample size", ylab = "Probability of True positive evidence",xlim = c(10,max(sN)), 
        ylim = c(0,1) )
   
 }
 
-
-
-bin_e_prior_plot <-function(alpha,beta,location,scale,model,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,de_an_prior,e){
-  par(mfrow = c(1, 1))
-
+compute.prior.density.be.h1 <- function(prop,alpha,beta,location,scale,model,hypothesis,e) {
+  if (model == "Point") return(rep(NA, length(prop)))
   bound_h1  <- switch(hypothesis,
                       ">" = c(a = location+e, b = 1),
                       "<" = c(a = 0, b = location+e),
                       "!=" = c(a = location+e[1], b = location+e[2])
   )
+  
+  prior_h1<- bin_prior(prop,alpha,beta,location,scale,model)
+  switch(hypothesis,
+         "!=" = { prior_h1[prop>min(bound_h1)&prop<max(bound_h1)]=0 },
+         ">" = { prior_h1[prop<bound_h1[1]]=0 },
+         "<" = { prior_h1[prop>bound_h1[2]]=0 }
+  )
+  prior_h1
+}
+
+
+compute.prior.density.be.h0 <- function(prop,alpha,beta,location,scale,model,hypothesis,e) {
+  if (model == "Point") return(rep(NA, length(prop)))
   bound_h0  <- switch(hypothesis,
                       ">" = c(a = location, b = location+e),
                       "<" = c(a = location+e, b = location),
                       "!=" = c(a = location+e[1], b = location+e[2])
   )
   
-  normalizationh1  <- switch(hypothesis,
-                             "!=" = {integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = 0,upper = bound_h1[1],rel.tol = 1e-10)$value+integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[2],upper = 1,rel.tol = 1e-10)$value},
-                             ">"  = integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[1],upper = bound_h1[2],rel.tol = 1e-10)$value,
-                             "<"  = integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h1[1],upper = bound_h1[2],rel.tol = 1e-10)$value)
-  normalizationh0 <- integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound_h0[1],upper = bound_h0[2])$value
-  
-  
-  
-  
-  
-  propp = switch(hypothesis,
-               "!=" = seq(0,1,.001),
-               ">" = seq(location,1,.001),
-               "<" = seq(0,location,.001)
-  )
-  
-  
-
-
-  
-
-  prior_h1 = bin_prior(propp,alpha,beta,location,scale,model)/normalizationh1
-  prior_h0 = bin_prior(propp,alpha,beta,location,scale,model)/normalizationh0
-  
-  
+  prior_h0<- bin_prior(prop,alpha,beta,location,scale,model)
   switch(hypothesis,
-         "!=" = { prior_h1[propp>=min(bound_h1)&propp<=max(bound_h1)]=-1 },
-         ">" = { prior_h1[propp<min(bound_h1)]=-1 },
-         "<" = { prior_h1[propp>max(bound_h1)]=-1 }
-         
+         "!=" = { prior_h0[prop<min(bound_h0)|prop>max(bound_h0)]=0 },
+         ">" = { prior_h0[prop>bound_h0[2]]=0 },
+         "<" = { prior_h0[prop<bound_h0[1]]=0 }
   )
-  
-  switch(hypothesis,
-         "!=" = { prior_h0[!(propp>min(bound_h0)&propp<max(bound_h0))]=-1},
-         ">" = { prior_h0[propp>max(bound_h0)]=-1 },
-         "<" = { prior_h0[propp<min(bound_h0)]=-1 }
-         
-  )
-  
-  
-  plot(propp,prior_h0,
-       type = "l",
-       lty = 3,
-       lwd = 4,
-       xlab = bquote(bold(p)),
-       ylim = c(0,max(prior_h0)*1.1),
-       ylab = "density",
-       main = bquote(bold("prior distribution on " ~ rho ~ " under the two hypotheses")),
-       frame.plot = FALSE)
-  
-  lines(propp,prior_h1, type="l", lty=1, lwd=4)
-  legend("topright", 
-         legend = c("H1", "H0"),  # Labels for the lines
-         col = c("black", "black"),  # Line colors
-         lty = c(1, 3),  # Line types
-         lwd = c(4, 4),  # Line widths
-         bty = "n",
-         title = "Analysis Prior")  # No box around the legend
-  
-  
-  
-  if (de_an_prior ==0){
-    if (model_d == "Point"){
-      
-      arrows(x0=location, y0=0, x1=location, y1=max(prior_h1,prior_h0), length=0.2, code=2, col="gray", lwd=4,lty = 2)
-    }else{
-      
-      normalizationd  <- switch(hypothesis,
-                                 "!=" = 1-integrate(function(prop)bin_prior(prop,alpha_d,beta_d,location_d,scale_d,model_d),lower = bound_h1[1],upper = bound_h1[2],rel.tol = 1e-10)$value,
-                                 ">"  = integrate(function(prop)bin_prior(prop,alpha_d,beta_d,location_d,scale_d,model_d),lower = bound_h1[1],upper = bound_h1[2],rel.tol = 1e-10)$value,
-                                 "<"  = integrate(function(prop)bin_prior(prop,alpha_d,beta_d,location_d,scale_d,model_d),lower = bound_h1[1],upper = bound_h1[2],rel.tol = 1e-10)$value)
-      
-      prior_d = bin_prior(propp,alpha_d,beta_d,location_d,scale_d,model_d)/normalizationd
-      
-      
-      switch(hypothesis,
-             "!=" = { prior_d[propp>=min(bound_h1)&propp<=max(bound_h1)]=-1 },
-             ">" = { prior_d[propp<min(bound_h1)]=-1 },
-             "<" = { prior_d[propp>max(bound_h1)]=-1 }
-             
-      )
-      
-      lines(propp,prior_d, type="l", lty=1, lwd=4,col="gray")
-      
-      
-    }
-    legend("topleft", 
-           legend = c("Analysis prior", "Design prior"), 
-           lty = c(1, 1), 
-           lwd = c(4, 4),
-           col = c("black", "gray"),
-           bty = "n") 
-    
-  }
-  
-  
+  prior_h0
 }
 
 
+
+
+
+bin_e_prior_plot <-function(alpha,beta,location,scale,model,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,de_an_prior,e){
+  par(mfrow = c(1, 1))
+  bounds <- switch(hypothesis,
+                        ">"  = c(location, 1),
+                        "<"  = c(0, location),
+                        "!=" = c(0, 1))
+  prop           <- seq(bounds[1],bounds[2],.002)
+  
+  
+  prior.analysis.h1 <- compute.prior.density.be.h1(prop,alpha,beta,location,scale,model,hypothesis,e) 
+  prior.analysis.h0<-  compute.prior.density.be.h0(prop,alpha,beta,location,scale,model,hypothesis,e) 
+  prior.design <- if (de_an_prior == 0 && model_d != "Point") {
+    compute.prior.density.be.h1(prop,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e) 
+  } else {
+    rep(NA, length(prop))
+  }
+  # Combine all values into one vector
+  all_vals <- c(prior.analysis.h1, prior.analysis.h0, prior.design)
+  
+  # Filter out NA and infinite values
+  finite_vals <- all_vals[is.finite(all_vals)]
+  
+  # Get the max from finite values only
+  ylim.max <- max(finite_vals)
+  
+  
+  # Base plot
+  plot(prop, prior.analysis.h1, type = "l", lwd = 2,
+       xlab =bquote(bold(rho)),
+       ylab = "density",
+       main = bquote(bold("Prior distribution on "~rho~" under the alternative hypothesis")),
+       frame.plot = FALSE,
+       ylim = c(0, ylim.max))
+  
+  lines(prop, prior.analysis.h0, lty = 2, col = "black", lwd = 2)
+  
+  # Optional: design prior
+  legend.labels <- c("H1 - Analysis Prior", "H0 - Analysis Prior")
+  legend.cols   <- c("black", "black")
+  legend.lty    <- c(1, 2)
+  legend.lwd    <- c(2, 2)
+  
+  if (de_an_prior == 0) {
+    if (model_d == "Point") {
+      arrows(x0 = location_d, y0 = 0, x1 = location_d, y1 = ylim.max,
+             length = 0.1, col = "gray", lty = 2)
+    } else {
+      lines(prop, prior.design, lty = 1, col = "gray", lwd = 3)
+    }
+    
+    # Add design prior to legend
+    legend.labels <- c(legend.labels, "Design prior")
+    legend.cols   <- c(legend.cols, "gray")
+    legend.lty    <- c(legend.lty, 1)
+    legend.lwd    <- c(legend.lwd, 2)
+  }
+  
+  legend("topleft",
+         legend = legend.labels,
+         col = legend.cols,
+         lty = legend.lty,
+         lwd = legend.lwd,
+         bty = "n")
+  
+}
 
 

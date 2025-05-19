@@ -28,8 +28,6 @@ input_t1 <- reactive({
                                     "2" =  ">",
                                     "3" =  "<"))
   
-
-  
   model <- switch(input$modelt1,
                   "1" = "t-distribution",
                   "2" = "Normal",
@@ -63,7 +61,7 @@ input_t1 <- reactive({
   list(
     mode_bf = mode_bf,
     interval = interval,
-    hypothesis = hypothesis,
+    hypothesis = hypothesis ,
     e = e,
     model = model,
     location = location,
@@ -86,15 +84,14 @@ input_t1 <- reactive({
 observeEvent(input$runt1, {
   x = input_t1()
   
-  dat = switch(x$interval, "1" =  t1_Table(x$D,x$target,x$model,x$location,x$scale,x$dff, x$hypothesis,
+  dat = suppressWarnings(switch(x$interval, "1" =  t1_Table(x$D,x$target,x$model,x$location,x$scale,x$dff, x$hypothesis,
                   x$model_d,x$location_d,x$scale_d,x$dff_d, x$de_an_prior,x$N, x$mode_bf ,
                   x$alpha),"2" = t1e_table(x$D,x$target,x$model,x$scale,x$dff, x$hypothesis,x$e ,
-                                           x$model_d,x$scale_d,x$dff_d, x$de_an_prior,x$N,x$mode_bf,x$location_d ,x$alpha))
+                                           x$model_d,x$scale_d,x$dff_d, x$de_an_prior,x$N,x$mode_bf,x$location_d ,x$alpha)))
   
   output$priort1 <- renderPlot({
-    switch(x$interval,
-           "1"=
-    t1_prior_plot(
+    suppressWarnings(switch(x$interval,
+           "1"= t1_prior_plot(
       D = x$D,                  # Access 'D' explicitly
       target = x$target,        # Access 'target' explicitly
       model = x$model,          # Access 'model' explicitly
@@ -107,8 +104,8 @@ observeEvent(input$runt1, {
       scale_d = x$scale_d,        # Access 'scale_d' explicitly
       dff_d = x$dff_d,            # Access 'dff_d' explicitly
       de_an_prior = x$de_an_prior   # Access 'de_an_prior' explicitly
-    ), "2" = 
-    t1e_prior_plot(x$model,
+    ),
+    "2" = t1e_prior_plot(x$model,
                    x$scale,
                    x$dff ,
                    x$hypothesis,
@@ -119,13 +116,13 @@ observeEvent(input$runt1, {
                    x$dff_d,
                    x$location )
     
-  )
+  ))
     
   })
   
   output$bfrt1 <- renderPlot({
     
-    switch(x$interval,
+    suppressWarnings(switch(x$interval,
            "1"=
     bf10_t1(
       D = x$D,                  # Access 'D' explicitly
@@ -136,7 +133,7 @@ observeEvent(input$runt1, {
       scale = x$scale,          # Access 'scale' explicitly
       dff = x$dff,              # Access 'dff' explicitly again, if required
       hypothesis = x$hypothesis # Access 'hypothesis' explicitly
-    ), "2"= te1_BF (x$D,dat[1,5],x$model ,x$scale,x$dff , x$hypothesis ,x$e))
+    ), "2"= te1_BF (x$D,dat[1,5],x$model ,x$scale,x$dff , x$hypothesis ,x$e)))
     
   })
   
@@ -169,12 +166,12 @@ observeEvent(input$runt1, {
   
   
   output$PCt1 <- renderPlot({
-    switch(x$interval,
+    suppressWarnings(switch(x$interval,
            "1"=
     Power_t1(x$D,x$model,x$location,x$scale,x$dff, x$hypothesis,
                        x$model_d,x$location_d,x$scale_d,x$dff_d, x$de_an_prior,dat[1,5]),
     "2" = Power_t1e(x$D,x$model,x$location,x$scale,x$dff, x$hypothesis,
-                    x$model_d,x$location_d,x$scale_d,x$dff_d, x$de_an_prior,dat[1,5],x$e))
+                    x$model_d,x$location_d,x$scale_d,x$dff_d, x$de_an_prior,dat[1,5],x$e)))
   })
   
 })

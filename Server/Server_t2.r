@@ -91,15 +91,16 @@ input_t2 <- reactive({
 observeEvent(input$runt2, {
   t2 = input_t2()
   
-  dat = switch (t2$interval,
+  dat = suppressWarnings(switch (t2$interval,
                 "1" = t2_Table (t2$D,t2$r,t2$target,t2$model,t2$location,t2$scale,t2$dff, t2$hypothesis,
                   t2$model_d,t2$location_d,t2$scale_d,t2$dff_d, t2$de_an_prior,t2$N1,t2$N2, t2$mode_bf ,t2$alpha ),
                 
                 "2" = t2e_table(t2$D,t2$r,t2$target,t2$model,t2$scale,t2$dff, t2$hypothesis,t2$e ,
                                 t2$model_d,t2$scale_d,t2$dff_d, t2$de_an_prior,t2$mode_bf,t2$location,t2$N1,t2$N2,t2$alpha ))
+  )
   
   output$priort2 <- renderPlot({
-    switch(t2$interval,
+    suppressWarnings(switch(t2$interval,
            "1"=
              t1_prior_plot(
                D = t2$D,                  # Access 'D' explicitly
@@ -126,15 +127,15 @@ observeEvent(input$runt2, {
                             t2$dff_d,
                             t2$location )
            
-    )
+    ))
     
   })
   
   output$bfrt2 <- renderPlot({
     
-    switch(t2$interval,
+    suppressWarnings(switch(t2$interval,
            "1"= t2_bf10(t2$D ,dat[1,5],t2$r, t2$target,t2$model ,t2$location ,t2$scale,t2$dff  , t2$hypothesis ),
-           "2" =t2e_BF (t2$D,dat[1,5],t2$r,t2$model ,t2$scale,t2$dff , t2$hypothesis ,t2$e) )
+           "2" =t2e_BF (t2$D,dat[1,5],t2$r,t2$model ,t2$scale,t2$dff , t2$hypothesis ,t2$e) ))
     
   })
   
@@ -168,11 +169,12 @@ observeEvent(input$runt2, {
   
   
   output$PCt2 <- renderPlot({
-    switch(t2$interval,
+    suppressWarnings(switch(t2$interval,
            "1" = Power_t2(t2$D,t2$model,t2$location,t2$scale,t2$dff, t2$hypothesis,
              t2$model_d,t2$location_d,t2$scale_d,t2$dff_d, t2$de_an_prior,dat[1,5],dat[1,6]/dat[1,5]),
            "2" = Power_t2e(t2$D,t2$model,t2$location,t2$scale,t2$dff, t2$hypothesis,
                           t2$model_d,t2$location_d,t2$scale_d,t2$dff_d, t2$de_an_prior,dat[1,5],dat[1,6]/dat[1,5]))
+           )
 
   })
   
@@ -183,7 +185,7 @@ observeEvent(input$cal1, {
   
   N = t2$df +2
   N1 = N/(1+t2$r)
-  BF10 =  t2_BF10(t2$tval,N1,t2$r,t2$model ,t2$location,t2$scale,t2$dff , t2$hypothesis )
+  BF10 =  suppressWarnings(t2_BF10(t2$tval,N1,t2$r,t2$model ,t2$location,t2$scale,t2$dff , t2$hypothesis ))
   
   output$BFt2 <- renderUI({
     # Create the LaTeX formatted strings for the table

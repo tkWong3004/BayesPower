@@ -1,46 +1,59 @@
+# The app is riddled with dt() warnings of the type:
+#    In dt(t[i], df, ncp = delta * sqrt(df + 1)) :
+#      full precision may not have been achieved in 'pnt{final}'
+# This is why I used dnct() in the past. 
+# I tried to bring it back, see dnct.cpp.
+# Also tried a different pnct, see pnct.cpp.
+# But they are slow, I could not make them fast.
+# So for now we use your code for pnct() and dt().
+
 ############# prior density function #############
-# likelihood of non-local prior
+# Probability density function of non-local prior:
 dnlp <-function(delta,mu,ta){
   ((delta-mu)^2)/(sqrt(2*pi)*ta^3)*exp(-((delta-mu)^2)/(2*ta^2))
 }
-# likelihood of informed t prior
+# Probability density function of informed t prior:
 tstude <- function(t, location = 0, scale = sqrt(2)/2, df = 1) {
   gamma((df+1)/2) * ((df+((t-location)/scale)^2)/df)^(-((df+1)/2)) / (scale*sqrt(df*pi)*gamma(df/2))
-  
-  #dt((t-location)/scale,df,ncp = 0)/scale
+  #dt((t-location)/scale, df, ncp = 0)/scale 
 }
 
-t1_prior<- function(delta, location,scale,dff,model){
-  
+t1_prior<- function(delta, location, scale, dff, model){
   switch(model,
-         "Cauchy" = tstude(delta,location, scale,1),
-         "Normal"   = dnorm(delta,location,scale),
-         "NLP"   = dnlp(delta,location,scale),
-         "t-distribution" = tstude(delta,location,scale,dff))
-  
-  
+         "Cauchy"         = tstude(delta, location, scale, 1),
+         "Normal"         = dnorm (delta, location, scale),
+         "NLP"            = dnlp  (delta, location, scale),
+         "t-distribution" = tstude(delta, location, scale, dff))
 }
 
 ############# the Bayes Factor #############
-
-t1_BF10 <-function(t,df,model ,location,scale,dff , hypothesis ){
+t1_BF10 <-function(t, df, model, location, scale, dff, hypothesis){
   bound  <- switch(hypothesis,
-                   ">" = c(a = 0, b = Inf),
-                   "<" = c(a = -Inf, b = 0),
+                   ">"  = c(a = 0, b = Inf),
+                   "<"  = c(a = -Inf, b = 0),
                    "!=" = c(a = -Inf, b = Inf)
   )
   x <- numeric(length(t))
-  
-  for(i in 1:length(t)){
-    
-    normalization  <- integrate(function(delta)t1_prior(delta, location,scale,dff,model),lower = bound[1],upper = bound[2])$value
-    
-    int  <- function(delta){
-      dt(t[i],df,ncp = delta *sqrt(df+1))* t1_prior(delta, location,scale,dff,model)/normalization}
 
-    error = 1e-8
-    x[i]= integrate(int,lower = bound[1],upper = bound[2], rel.tol=error,stop.on.error = F)$value/dt(t[i],df,ncp = 0)
-    
+  # Normalize the prior outside the for-loop:
+  # normalization  <- integrate(function(delta) t1_prior(delta, location, scale, dff, model),lower = bound[1], upper = bound[2])$value
+  # For all priors, the prior integrates to 1 when a = -Inf, b = Inf.
+  # For all priors, we use their CDFs when either a = 0 or b = 0 and minimize manual integrations.
+  # Note: pmom() errors at -Inf and Inf, so we avoid it below.
+  normalization <- if (hypothesis == "!=") 1 else
+    switch(model,
+           "Cauchy"         = pcauchy(bound[2], location, scale)     - pcauchy(bound[1], location, scale),
+           "Normal"         = pnorm (bound[2], location, scale)      - pnorm (bound[1], location, scale),
+           "NLP"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "t-distribution" = pt((bound[2] - location) / scale, dff, 0) - pt((bound[1] - location) / scale, dff, 0))
+
+  for(i in 1:length(t)){
+    # int  <- function(delta) dnct(t[i], df, ncp = delta * sqrt(df+1)) * t1_prior(delta, location, scale, dff, model)/normalization
+    int <- function(delta) dt(t[i], df, ncp = delta * sqrt(df + 1)) * t1_prior(delta, location, scale, dff, model) / normalization
+
+    # Removed stop.on.error = FALSE as it is bad form.
+    # Below, I increased rel.tol. It gives good enough precision, and the app becomes quite faster:
+    x[i] <- integrate(int, lower = bound[1], upper = bound[2], rel.tol = 1e-5)$value / dt(t[i], df, ncp = 0)
   }
   return(x)
 }
@@ -48,506 +61,379 @@ t1_BF10 <-function(t,df,model ,location,scale,dff , hypothesis ){
 
 
 ############# bound function  #############
-# for finding the t value being equal to a value of BF
-
-t1_BF10_bound <-function(D, df,model ,location ,scale,dff , hypothesis){
-
-  y <- numeric(0)
-  Bound_finding <-function(t){
-    t1_BF10(t,df,model,location,scale,dff, hypothesis  )- D
-  }
+# for finding the t value such that BF10 = D (code optimized):
+t1_BF10_bound <- function(D, df, model, location, scale, dff, hypothesis) {
+  Bound_finding <- function(t) t1_BF10(t, df, model, location, scale, dff, hypothesis) - D
   
-  if (hypothesis=="!="){
-    x <- tryCatch( uniroot(Bound_finding, lower = -8, upper = 0)$root, error=function(e){})
-    
-    y <- tryCatch( uniroot(Bound_finding, lower = 0, upper = 8)$root, error=function(e){})
-    
-    
-  } else {
-    x <- tryCatch( uniroot.all(Bound_finding, lower = -8, upper = 8), error=function(e){})
-
-  }
-  if (length(x) ==0){
-    x = "bound cannot be found"
-    return(x)
-  } 
-  if (length(y) == 1){
-    x = cbind(x,y)
-  }
-  ##preventing possible wrong t-value
-  BF = t1_BF10(x,df,model,location,scale,dff,hypothesis )
-  x = x[round(BF,2)==round(D,2)]
+    x <- tryCatch(uniroot(Bound_finding, lower = -7, upper = 0)$root, error = function(e) NA)
+    y <- tryCatch(uniroot(Bound_finding, lower =  0, upper = 7)$root, error = function(e) NA)
+    results <- c(x, y)
   
+  results <- results[!is.na(results)]
+  if (length(results) == 0) return("bound cannot be found")
   
-  if (length(x) ==0){
-    x = "bound cannot be found"
-    return(x)
-  } 
-  return(x)
+  BF.vals  <- t1_BF10(results, df, model, location, scale, dff, hypothesis)
+  BF.close <- which(round(BF.vals, 2) == round(D, 2))
+  if (length(BF.close) == 0) return("bound cannot be found")
+  
+  return(results[BF.close])
 }
 
-
-
-# finding the t that correspond to BF01=D
-t1_BF01_bound <-function(D , df,model ,location ,scale,dff , hypothesis){
-  
-  Bound_finding <-function(t){
-    1/t1_BF10(t,df=df,model=model,location=location,scale=scale,dff=dff, hypothesis =hypothesis )-D
-  }
-  
-   x = uniroot.all(Bound_finding, lower = -8, upper = 8)
-  
-  if (length(x) == 0 ){
-    x = "bound cannot be found"
-    return(x)
-  }
-  
-  BF = 1/t1_BF10(x ,df,model,location,scale,dff, hypothesis )
-  x = x[round(BF,1)== round(D,1)]
-  
-  return(x)
+# finding the t that correspond to BF01 = D is the same as 
+# finding the t that corresponds to BF10 = 1/D:
+t1_BF01_bound <- function(D, df, model, location, scale, dff, hypothesis) {
+  t1_BF10_bound(1 / D, df, model, location, scale, dff, hypothesis)
 }
-
-
 
 # p(BF01>D|H0)
-# t is the t-value lead to BF = b based on the bound functions
-t1_TNE <- function(t , df,model,location ,scale,dff , hypothesis){
+# t is the t-value lead to BF = b based on the bound functions (optimized):
+t1_TNE <- function(t, df) {
+  if (any(t == "bound cannot be found") || length(t) == 0) return(0)
   
-  # where there is no t-value, then the probability is of course is 0 since there is no bound
+  if (length(t) == 2) return(pt(max(t), df) - pt(min(t), df))
   
-  if (any(t == "bound cannot be found")){
-    return(t)
-  }
-  
-  if (length(t)>1){
-    pro = pt(max(t),df) - pt(min(t),df)
-  }else{
-    # when t>0, the alternative hypothesis is delta >0
-    # so , the true negative rate is based on left tail.
-    if (t >0){
-      pro = pt(t,df)
-    } else {
-      pro = 1-pt(t,df)
-    }
-  }
-  
-   
-  
-  return(pro)
+  # length(t) = 1:
+  return(if (t > 0) pt(t, df) else 1 - pt(t, df))
 }
 
 # p(BF10>D|H1)
-t1_TPE <-function(t,df,model ,location ,scale,dff , hypothesis ){
+# Argument 'hypothesis' is fully determined by the length and sign of the t values.
+# I removed it as a function argument and compute it inside t1_TPE() instead.
+t1_TPE <- function(t, df, model, location, scale, dff) {
+  if (any(t == "bound cannot be found") || length(t) == 0) return(0)
   
-  if (any(t =="bound cannot be found" | length(t)==0)){
-    t=0
-    return(t)
-  }
+  hypothesis <- if (length(t) == 2) "!=" else if (t >= 0) ">" else "<"
   
-  if (model == "Point"){
-    pro = switch(hypothesis,
-                 "!="= pnct(t[t<0],df,ncp = location *sqrt(df+1),lower  = T)+pnct(t[t>0],df,ncp = location *sqrt(df+1),lower  = F),
-                 ">" = pnct(t,df,ncp = location *sqrt(df+1),lower  = F),
-                 "<" = pnct(t,df,ncp = location *sqrt(df+1),lower  = T))
-    return(pro)
+  if (model == "Point") {
+    ncp <- location * sqrt(df + 1)
+    if (length(t) == 2) return(pnct(min(t), df, ncp) + (1 - pnct(max(t), df, ncp)))
+    # Length 1:
+    return(if (t >= 0) 1 - pnct(t, df, ncp) else pnct(t, df, ncp))
   }
   
   bound  <- switch(hypothesis,
-                   ">" = c(a = 0, b = Inf),
-                   "<" = c(a = -Inf, b = 0),
-                   "!=" = c(a = -Inf, b = Inf)
-  )
-  x = NULL
-
-  normalization  <- integrate(function(delta)t1_prior(delta, location,scale,dff,model),lower = bound[1],upper = bound[2])$value
+                   ">"  = c(a = 0,    b = Inf),
+                   "<"  = c(a = -Inf, b = 0),
+                   "!=" = c(a = -Inf, b = Inf))
   
-  if (length(t) > 1){
-    # two-sided test
-    int  <- function(delta){
-      pro1 = pnct(max(t),df,ncp = delta *sqrt(df+1),lower  = F)
-      pro2 = pnct(min(t),df,ncp = delta *sqrt(df+1),lower  = T)
-      (pro1+pro2)* t1_prior(delta, location,scale,dff,model)/normalization }
-    
-    
-    
-  }  else if (t >= 0) { 
-    # one-sided test with delta >0
-    int  <- function(delta){
-      pro1 = pnct(t,df,ncp = delta *sqrt(df+1),lower  = F)
-      (pro1)* t1_prior(delta, location,scale,dff,model)/normalization }
-    
-  } else if (t < 0){
-    # one-sided test with delta <0
-    int  <- function(delta){
-      pro1 = pnct(t,df,ncp = delta *sqrt(df+1),lower  = T)
-      (pro1)* t1_prior(delta, location,scale,dff,model)/normalization }
-    
-  }
-  # setting error value such that error are prevented
-  if (scale >.3){
-    error = .Machine$double.eps^0.25
-  }else {
-    error = 1e-8
+  normalization <- if (hypothesis == "!=") 1 else
+    switch(model,
+           "Cauchy"         = pcauchy(bound[2], location, scale)     - pcauchy(bound[1], location, scale),
+           "Normal"         = pnorm (bound[2], location, scale)      - pnorm (bound[1], location, scale),
+           "NLP"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "t-distribution" = pt((bound[2] - location) / scale, dff, 0) - pt((bound[1] - location) / scale, dff, 0))
+  
+  int <- if (length(t) == 2) { # two-sided test
+    function(delta) {
+      pro1 <- 1 - pnct(max(t), df, delta * sqrt(df + 1))
+      pro2 <-     pnct(min(t), df, delta * sqrt(df + 1))
+      (pro1 + pro2) * t1_prior(delta, location, scale, dff, model) / normalization
+    }
+  } else if (t >= 0) { # one-sided test with delta > 0
+    function(delta) (1 - pnct(t, df, delta * sqrt(df + 1))) * t1_prior(delta, location, scale, dff, model) / normalization
+  } else {             # one-sided test with delta < 0
+    function(delta) pnct(t, df, delta * sqrt(df + 1)) * t1_prior(delta, location, scale, dff, model) / normalization
   }
   
-  if (model == "NLP" & scale <.3 ){
-    error = 1e-14
-  }
-  x = integrate(int,lower = bound[1],upper = bound[2], rel.tol = error,stop.on.error=FALSE)$value
-  
-  return(x) 
-  
-} 
+  # setting error value such that error are prevented:
+  #error <- if (model == "NLP" && scale < 0.3) 1e-14 else if (scale > 0.3) .Machine$double.eps^0.25 else 1e-8
+  error = 1e-4
+  integrate(int, lower = bound[1], upper = bound[2], rel.tol = error, stop.on.error = FALSE)$value
+}
 
 # p(BF01>D|H1)
-t1_FNE<-function(t,df,model ,location ,scale,dff , hypothesis ){
+# Similar as above:
+t1_FNE <- function(t, df, model, location, scale, dff){
   
-  if (any(t =="bound cannot be found" | length(t)==0)){
-    t=0
-    return(t)
+  if (any(t == "bound cannot be found") || length(t) == 0) return(0)
+  
+  hypothesis <- if (length(t) == 2) "!=" else if (t >= 0) ">" else "<"
+  
+  if (model == "Point") {
+    ncp <- location * sqrt(df + 1)
+    if (length(t) == 2) return(pnct(max(t), df, ncp) - pnct(min(t), df, ncp))
+    # Length 1:
+    return(if (t >= 0) pnct(t, df, ncp) else 1 - pnct(t, df, ncp))
   }
   
-  if (model == "Point"){
-    pro = switch(hypothesis,
-                 "!="=  pnct(t[t>0],df,ncp = location *sqrt(df+1),lower  = T) - pnct(t[t<0],df,ncp = location *sqrt(df+1),lower  = T),
-                 ">" = pnct(t,df,ncp = location *sqrt(df+1),lower  = T),
-                 "<" = pnct(t,df,ncp = location *sqrt(df+1),lower  = F))
-    return(pro)
-  }
   bound  <- switch(hypothesis,
-                   ">" = c(a = 0, b = Inf),
-                   "<" = c(a = -Inf, b = 0),
-                   "!=" = c(a = -Inf, b = Inf)
-  )
-  x = NULL
-  # in some weird situation uniroot.all gives 4 t-values leading to BF =b 
-  # but after some checking, only the middle two are the t-values leading to BF =b.
-  t <- as.numeric(t)
-  if (length(t) == 4) {  # Corrected condition check
-    t = t[2:3]
+                   ">"  = c(a = 0,    b = Inf),
+                   "<"  = c(a = -Inf, b = 0),
+                   "!=" = c(a = -Inf, b = Inf))
+  
+  
+  normalization <- if (hypothesis == "!=") 1 else
+    switch(model,
+           "Cauchy"         = pcauchy(bound[2], location, scale)     - pcauchy(bound[1], location, scale),
+           "Normal"         = pnorm (bound[2], location, scale)      - pnorm (bound[1], location, scale),
+           "NLP"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "t-distribution" = pt((bound[2] - location) / scale, dff, 0) - pt((bound[1] - location) / scale, dff, 0))
+  
+  int <- if (length(t) == 2) { # two-sided test
+    function(delta) {
+      pro1 <- pnct(max(t), df, delta * sqrt(df + 1))
+      pro2 <- pnct(min(t), df, delta * sqrt(df + 1))
+      (pro1 - pro2) * t1_prior(delta, location, scale, dff, model) / normalization
+    }
+  } else if (t >= 0) { # one-sided test with delta > 0
+    function(delta) pnct(t, df, delta * sqrt(df + 1)) * t1_prior(delta, location, scale, dff, model) / normalization
+  } else {             # one-sided test with delta < 0
+    function(delta) (1 - pnct(t, df, delta * sqrt(df + 1))) * t1_prior(delta, location, scale, dff, model) / normalization
   }
   
-  normalization  <- integrate(function(delta)t1_prior(delta, location,scale,dff,model),lower = bound[1],upper = bound[2])$value
-  if (length(t)>1){
-    
-    int  <- function(delta){
-      pro1 = pnct(max(t),df,ncp = delta *sqrt(df+1),lower  = T)
-      pro2 = pnct(min(t),df,ncp = delta *sqrt(df+1),lower  = T)
-      (pro1-pro2)* t1_prior(delta, location,scale,dff,model)/normalization }
-    
-  } else if (t>0) { 
-    int  <- function(delta){
-      pro1 = pnct(t,df,ncp = delta *sqrt(df+1),lower  = T)
-      (pro1)* t1_prior(delta, location,scale,dff,model)/normalization }
-    
-  } else if (t<0){
-    int  <- function(delta){
-      pro1 = pnct(t,df,ncp = delta *sqrt(df+1),lower  = F)
-      (pro1)* t1_prior(delta, location,scale,dff,model)/normalization }
-    
-  }
-  x = integrate(int,lower = bound[1],upper = bound[2],stop.on.error = FALSE)$value
-  
-  return(x) 
+  # setting error value such that error are prevented:
+  #error <- if (model == "NLP" && scale < 0.3) 1e-14 else if (scale > 0.3) .Machine$double.eps^0.25 else 1e-8
+  error = 1e-4
+  integrate(int, lower = bound[1], upper = bound[2], rel.tol = error, stop.on.error = FALSE)$value
 } 
 
 # p(BF10>D|H0)
-t1_FPE <- function(t,df,model ,location ,scale,dff, hypothesis){
-  if (any(t =="bound cannot be found" | length(t)==0)){
-    return(0)
-  }
+t1_FPE <- function(t, df) {
+  if (any(t == "bound cannot be found") || length(t) == 0) return(0)
   
-
-  if (hypothesis=="!="){
-    
-    if (any(t[1] == "bound cannot be found"|t[2] == "bound cannot be found")){
-    return(0)
-  }
-  } else if (t == "bound cannot be found"){
-    return(0)
-  }
+  # if (length(t) == 4) t <- t[2:3]
   
-  if (length(t) == 4) {  # Corrected condition check
-    t = t[2:3]
-  }
-  if (length(t)>1){
-    pro = pt(max(t),df=df,lower.tail = F) +pt(min(t),df=df,lower.tail = T)
-  }else if (t>0){
-    pro = pt(t[t>0],df=df,lower.tail = F)
-  }else if (t<0){
-    pro = pt(t[t<0],df=df,lower.tail = T)
-  } 
-    return(pro)
-    
+  if (length(t) == 2) return(pt(min(t), df) + (1 - pt(max(t), df)))
   
-  
+  # length(t) = 1:
+  return(if (t > 0) 1 - pt(t, df) else pt(t, df))
 }
 
 
 
-# Finding the degree of freedom that ensure p(BF10>D|H1) > targeted probability
+# Finding the degree of freedom that ensure p(BF10>D|H1) > targeted probability:
+t1_N_finder <- function(D, target, model, location, scale, dff, hypothesis,
+                        model_d, location_d, scale_d, dff_d, de_an_prior, alpha) {
+  #de_an_prior: 1 = design prior and analysis priors are the same, otherwise different.
+  
+  # error prevention
+  # sometimes, power can go higher than .8 with N= 2 already.
+  # So, N should be returned now, otherwise, error will occur later.
+  # Jorge: Below, I added design prior for N=2 too.
+  lower <- 2
+  upper <- 10000
+  
+  t2 <- t1_BF10_bound(D, df = lower, model, location, scale, dff,hypothesis)
+  p2 <- if (de_an_prior == 1)
+    t1_TPE(t2, df = lower, model, location, scale, dff ) else
+      t1_TPE(t2, df = lower, model_d, location_d, scale_d, dff_d)
+  if (p2 > target) return(lower)
 
-t1_N_finder<-function(D,target,model,location,scale,dff, hypothesis ,
-                   model_d,location_d,scale_d,dff_d,de_an_prior,alpha){
-  # error prevention 
-  #sometimes, power can go higher than .8 with N= 2 already.
-  # So, N should be returned now, otherwise , error will occur later
-  
-  lo = 2
-  t = t1_BF10_bound(D=D,df=lo,model=model,location=location ,scale=scale ,dff = dff, hypothesis =hypothesis)
-  
-  pro = t1_TPE(t , df=lo , model=model , location=location ,scale=scale,dff=dff, hypothesis=hypothesis)
-  
-  if (pro>target){
-    N = 2
-    return(N)
+  Power_root <- function(df) {
+    t <- t1_BF10_bound(D, df, model, location, scale, dff,hypothesis)
+    if (de_an_prior == 1)
+      t1_TPE(t, df, model, location, scale, dff) - target else
+        t1_TPE(t, df, model_d, location_d, scale_d, dff_d) - target
   }
   
+  ## finding the required df, i will do the plus one to get the N in the later function.
+  # Jorge: It's a pity if we don't fix it here already, super easy to do right now.
+  #        So I did it, see below. I'll adapt latter functions if needed be.
   
-  Power_root <- function(df){
-    
-    #de_an_prior: 1 means design prior and analysis priors are the same
-    # otherwise, they are different, so the calculate of power differs as well here.
-    
-    t = t1_BF10_bound(D,df,model,location ,scale ,dff, hypothesis )
-    if (de_an_prior == 1){
-    pro = t1_TPE(t , df , model , location ,scale,dff, hypothesis)
-    }else{
-      pro = t1_TPE(t , df=df , model=model_d , location=location_d ,scale=scale_d,dff=dff_d, hypothesis )
-    }
-    
-    return(pro-target)}
-  
-  
-  up= 100000
-  ## finding the required df , i will do the plus one to get the N in the later function.
-  N = uniroot(Power_root,lower = lo,upper =  up)$root
-  
+  # Jorge: 'df.power' makes for a more accurate name than 'N'.message("Power at lower = ", Power_root(lower))
+  df.power <- uniroot(Power_root, lower = lower, upper = upper)$root
   
   ## checking if the N lead to an acceptable alpha level
-  t = t1_BF10_bound(D=D,df=N,model=model,location=location ,scale=scale ,dff=dff, hypothesis =hypothesis)
-  FPE =t1_FPE(t , df=N , model=model , location=location ,scale=scale,dff=dff, hypothesis=hypothesis )
-  # if the PFE > alpha, then we search for another df 
+  t   <- t1_BF10_bound(D, df.power, model, location, scale, dff,hypothesis)
+  FPE <- t1_FPE(t, df.power)
+  if (FPE <= alpha) return(df.power + 1)
   
-  if (FPE<alpha){
-    
-    return(N)
-  }else{
-    alpha_bound <- function(df) {
-      t <- t1_BF10_bound(D=D, df=df, model=model, location=location, scale=scale, dff=dff, hypothesis=hypothesis)
-      pro <- t1_FPE(t, df=df, model=model, location=location, scale=scale, dff=dff, hypothesis=hypothesis)
-      return(pro - alpha)
-      
-    }
-    NN = uniroot(alpha_bound,lower = N,upper =  up)$root
-    return(NN)
-    }
-
+  # if the FPE > alpha, then we search for another df
+  # Jorge: 'alpha.root' is better than 'alpha_bound'.
+  alpha.root <- function(df) {
+    t <- t1_BF10_bound(D, df, model, location, scale, dff, hypothesis)
+    t1_FPE(t, df) - alpha
+  }
   
-  
-  #N = auto_uniroot_fixed_lower_going_up(Power_root,fixed_lower = 2, upper = 2000, step = 500, max_attempts = 16)
-}
-
+  # Jorge: 'df.alpha' is better than 'NN'.
+  df.alpha <- uniroot(alpha.root, lower = df.power, upper = upper)$root
+  return(df.alpha + 1)
+  }
 
 
 
 
 
 ############ probability table
-t1_Table <- function(D,target,model,location,scale,dff, hypothesis,
-                  model_d,location_d,scale_d,dff_d, de_an_prior,N, mode_bf ,alpha ){
+# Jorge: I edited so that it used N returned by t1_N_finder().
+t1_Table <- function(D, target, model, location, scale, dff, hypothesis,
+                     model_d, location_d, scale_d, dff_d, de_an_prior, N, mode_bf, alpha) {
   # mode_bf == "0" means that the design analysis is done for a fixed N
   # Otherwise, it searches N where power > targeted power with FPE < FP
-  if (mode_bf == "0"){
-  df = N-1
- }else {
-  
-  df =  t1_N_finder(D,target,model,location,scale,dff, hypothesis,
-                model_d,location_d,scale_d,dff_d, de_an_prior ,alpha )
-  # here is the exact df that we need, required N is df +1 , which is done at the very end
-  df = ceiling(df+1) -1
- }
-  
-  
-  
-  t10 = t1_BF10_bound(D ,df ,model ,location ,scale ,dff ,hypothesis )
-  BF_D= t01 = t1_BF01_bound(D = D, df =df,model = model,location =location,scale=scale,dff = dff, hypothesis)
-  
-  
-  if (de_an_prior == 1 ){
-  TPE = t1_TPE(t10,df ,model ,location ,scale ,dff ,hypothesis )
-  FPE = t1_FPE(t10,df,model ,location ,scale,dff, hypothesis)
-  
-  max_BF = 1/t1_BF10(0,df=df,model=model,location=location,scale=scale,dff=dff, hypothesis =hypothesis )
-
-  if (any(hypothesis == "!=" & max_BF<D |BF_D == "bound cannot be found"  )) {
-    FNE = 0
-    TNR = 0
-  }else{
-    FNE = t1_FNE(t01,df,model ,location ,scale,dff, hypothesis)
-    TNR = t1_TNE(t01 , df,model ,location ,scale,dff , hypothesis)
+  if (mode_bf == "0") df <- N-1 else {
+    N  <- ceiling(t1_N_finder(D, target, model, location, scale, dff, hypothesis,
+                              model_d, location_d, scale_d, dff_d, de_an_prior, alpha))
+    df <- N -1
   }
-  table <- data.frame(
-    H11 = TPE,
-    H10 = FNE,
-    H00 = TNR,
-    H01 = FPE,
-    N =  ceiling(df+1))
-  colnames(table) <- c(sprintf("p(BF10> %0.f|H1)",D), sprintf("p(BF01> %0.f|H1)",D), sprintf("p(BF01> %0.f|H0)",D), sprintf("p(BF10> %0.f|H0)",D), " Reqiured N")
-  
+
+  # t bounds:
+  t10 <- t1_BF10_bound(D, df, model, location, scale, dff, hypothesis)
+  t01 <- t1_BF01_bound(D, df, model, location, scale, dff, hypothesis)
+
+  # max BF10 possible:
+  max_BF <- 1 / t1_BF10(0, df, model, location, scale, dff, hypothesis)
+  BF_D   <- t10
+
+  # FPE and TPE:
+  FPE       <- t1_FPE(t10, df)
+  if (de_an_prior == 1) {
+    TPE       <- t1_TPE(t10, df, model, location, scale, dff)
+    TPR_model <- model
+    TPR_loc   <- location
+    TPR_scale <- scale
+    TPR_dff   <- dff
   } else {
-    TPE = t1_TPE(t10,df,model_d ,location_d ,scale_d ,dff_d ,hypothesis )
-    FPE = t1_FPE(t10,df,model ,location ,scale,dff, hypothesis)
-    
-    max_BF = 1/t1_BF10(0,df=df,model=model,location=location,scale=scale,dff=dff, hypothesis =hypothesis )
-    BF_D = t1_BF10_bound(D = D, df =df,model = model,location =location,scale=scale,dff = dff, hypothesis)
-    
-    if (any(hypothesis == "!=" & max_BF<D |BF_D == "bound cannot be found"  )) {
-      FNE = 0
-      TNR = 0
-    }else{
-      
-      FNE = t1_FNE(t01,df,model_d,location_d ,scale_d,dff_d, hypothesis)
-      TNR = t1_TNE(t01 , df,model ,location ,scale,dff , hypothesis)
-    }
-    table <- data.frame(
-      H11 = TPE,
-      H10 = FNE,
-      H00 = TNR,
-      H01 = FPE,
-      N =  ceiling(df+1))
-    colnames(table) <- c(sprintf("p(BF10> %0.f|H1)",D), sprintf("p(BF01> %0.f|H1)",D), sprintf("p(BF01> %0.f|H0)",D), sprintf("p(BF10> %0.f|H0)",D), " Reqiured N")
-    
-    }
-  return(table)
+    TPE       <- t1_TPE(t10, df, model_d, location_d, scale_d, dff_d)
+    TPR_model <- model_d
+    TPR_loc   <- location_d
+    TPR_scale <- scale_d
+    TPR_dff   <- dff_d
+  }
+
+  # FNE and TNE:
+  if (any(hypothesis == "!=" & max_BF < D | BF_D == "bound cannot be found")) {
+    FNE <- 0
+    TNE <- 0
+  } else {
+    FNE <- t1_FNE(t01, df, TPR_model, TPR_loc, TPR_scale, TPR_dff)
+    TNE <- t1_TNE(t01, df)
+  }
+
+  # table:
+  tab.names <- c(
+    sprintf("p(BF10 > %0.f | H1)", D),
+    sprintf("p(BF01 > %0.f | H1)", D),
+    sprintf("p(BF01 > %0.f | H0)", D),
+    sprintf("p(BF10 > %0.f | H0)", D),
+    "Required N"
+  )
+  table <- data.frame(TPE, FNE, TNE, FPE, N, check.names = FALSE, row.names = NULL)
+  colnames(table) <- tab.names
+  table
 }
 
-
-
+# For plotting, compute normalized prior density over tt:
+compute.prior.density.t <- function(tt, model, location, scale, dff, hypothesis) {
+  if (model == "Point") return(rep(NA, length(tt)))
+  bounds <- switch(hypothesis,
+                   ">"  = c(0, Inf),
+                   "<"  = c(-Inf, 0),
+                   "!=" = c(-Inf, Inf))
+  norm <- integrate(function(delta) t1_prior(delta, location, scale, dff, model),
+                    lower = bounds[1], upper = bounds[2])$value
+  t1_prior(tt, location, scale, dff, model) / norm
+}
 
 # plot for the selected prior 
-t1_prior_plot<-function(D ,target,model ,location ,scale,dff , hypothesis,model_d,location_d,scale_d,dff_d, hypothesis_d,de_an_prior){
+t1_prior_plot <- function(D, target, model, location, scale, dff, hypothesis,
+                          model_d, location_d, scale_d, dff_d, de_an_prior) {
   par(mfrow = c(1, 1))
-  # the bound for the plot
-  bound  <- switch(hypothesis,
-                   ">" = c(a = 0, b = 5),
-                   "<" = c(a = -5, b = 0),
-                   "!=" = c(a = -5, b = 5)
-  )
-  tt= seq(bound[1],bound[2],.01)
-  
-  # the bound for the intergrals
-  bound  <- switch(hypothesis,
-                   ">" = c(a = 0, b = Inf),
-                   "<" = c(a = -Inf, b = 0),
-                   "!=" = c(a = -Inf, b = Inf)
-  )
-  
-  normalization  <- integrate(function(delta)t1_prior(delta, location,scale,dff,model),lower = bound[1],upper = bound[2])$value
-  # anlaysis prior
-  prior_DELTA = NA
-  prior_DELTA = t1_prior(tt, location,scale,dff,model)/normalization
-  
-  plot(tt,prior_DELTA,xlab= bquote(bold(delta)),ylab= "density",type = "l",main  = bquote(bold("prior distribution on "~delta~" under the alternative hypothesis")),frame.plot = FALSE)
-  if (de_an_prior ==0){
-    
-    if (model_d != "Point"){
-      # design prior
-      normalization_d  <- integrate(function(delta)t1_prior(delta,location_d,scale_d,dff_d,model_d),lower = bound[1],upper = bound[2])$value
-      
-      prior_DELTA_D = t1_prior(tt,location_d,scale_d,dff_d,model_d)/normalization_d
-      
-      plot(tt,prior_DELTA,xlab= bquote(bold(delta)),ylim = c(0,max(max(prior_DELTA_D),max(prior_DELTA))),ylab= "density",type = "l",main  = bquote(bold("prior distribution on "~delta~" under the alternative hypothesis")),frame.plot = FALSE)
-      
-      lines(tt,prior_DELTA_D ,lty = 2)
-      
-    } else{
-      # point prior
-      plot(tt,prior_DELTA,xlab= bquote(bold(delta)),ylim = c(0,max(prior_DELTA)),ylab= "density",type = "l",main  = bquote(bold("prior distribution on "~delta~" under the alternative hypothesis")),frame.plot = FALSE)
-      arrows(x0=location_d, y0=0, x1=location_d, y1=max(prior_DELTA), length=0.2, code=2, col="black", lwd=1,,lty = 2)
-    }
-    
-    legend("topright", 
-           legend = c("Analysis prior", "Design prior"), 
-           lty = c(1, 2), 
+
+  plot.bounds    <- switch(hypothesis,
+                           ">"  = c(0, 5),
+                           "<"  = c(-5, 0),
+                           "!=" = c(-5, 5))
+  tt             <- seq(plot.bounds[1], plot.bounds[2], 0.01)
+  prior.analysis <- compute.prior.density.t(tt, model, location, scale, dff, hypothesis)
+  prior.design   <- if (de_an_prior == 0 && model_d != "Point")
+    compute.prior.density.t(tt, model_d, location_d, scale_d, dff_d, hypothesis) else
+      rep(NA, length(tt))
+  ylim.max <- max(prior.analysis, prior.design, na.rm = TRUE)
+
+  # Base plot:
+  plot(tt, prior.analysis, type = "l", lwd = 2,
+       xlab = expression(bold(delta)),
+       ylab = "density",
+       main = bquote(bold("Prior distribution on "~delta~" under the alternative hypothesis")),
+       frame.plot = FALSE,
+       ylim = c(0, ylim.max))
+
+  # If design prior != analysis prior:
+  if (de_an_prior == 0) {
+    if (model_d == "Point")
+      arrows(x0 = location_d, y0 = 0, x1 = location_d, y1 = ylim.max, length = 0.1, col = "black", lty = 2) else
+        lines(tt, prior.design, lty = 2)
+
+    # Add legend:
+    legend("topright",
+           legend = c("Analysis prior", "Design prior"),
+           lty = c(1, 2),
            col = c("black", "black"),
-           bty = "n") 
-    
+           bty = "n")
   }
 }
 
 # plots for showing the relationship between BF and t-values 
 
-bf10_t1 <-function(D =3,df, target,model = "NA",location =0,scale=.707,dff = 1, hypothesis ){
-  
-  tt= seq(from = -5,to = 5,.2)
-  # finding the t leading to BF10 = b
-  BF_D = t1_BF10_bound(D = D, df =df,model = model,location =location,scale=scale,dff = dff, hypothesis)
-  BF10 = t1_BF10(tt,df,model ,location,scale,dff,hypothesis)
-  
-  # setting the title of the plot
-  if (length(BF_D) == 1){
-    main =  bquote(bold("BF"[10]~"="~.(D) ~"when t = "~.(format(BF_D, digits = 4))))
-    #sprintf("BF10 = %.0f when t = %.3f ",D,BF_D)
-  } else {
-    main =  bquote(bold("BF"[10]~"="~.(D) ~"when t = "~.(format(BF_D[1], digits = 4))~"or"~.(format(BF_D[2], digits = 4))))
-    #sprintf("BF10 = %.0f when t = %.3f or %.3f ",D,BF_D[1],BF_D[2])
-  }
+# Plot BF10 and BF01 vs. t-values:
+bf10_t1 <-function(D = 3, df, target, model = "NA", location = 0, scale = 0.707, dff = 1, hypothesis) {
+  tt <- seq(-5, 5, 0.2)
+
+  # Compute BF10 and t-bounds:
+  BF10   <- t1_BF10(tt, df, model, location, scale, dff, hypothesis)
+  t.BF10 <- t1_BF10_bound(D, df, model, location, scale, dff, hypothesis)
+
   par(mfrow = c(1, 2))
-  plot(tt,log10(BF10),xlab= "t-value",type="l", ylab = expression("logarithm of BF"[10]),main =   main,frame.plot = FALSE,xaxt = "n")
-  abline(v = BF_D)
-  axis(1, c(-5,5))
-  if (length(BF_D) != 0 ){
-  axis(1, round(BF_D,2))}
-  
-  max_BF = 1/t1_BF10(0,df=df,model=model,location=location,scale=scale,dff=dff, hypothesis ="!=" )
-  BF_D = t1_BF01_bound(D = D, df =df,model = model,location =location,scale=scale,dff = dff, hypothesis)
+  # Left plot - BF10:
+  main.bf10 <- if (length(t.BF10) == 1) {
+    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10, digits = 4))))
+  } else {
+    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10[1], digits = 4))~"or"~.(format(t.BF10[2], digits = 4))))
+  }
+  plot(tt, BF10, type = "l", log = "y", xlab = "t-value", ylab = expression("BF"[10]),
+       main = main.bf10, frame.plot = FALSE, xaxt = "n")
+  abline(v = t.BF10)
+  axis(1, c(-5, 5))
+  if (length(t.BF10)) axis(1, round(t.BF10, 2))
 
-  
-  
-  plot(tt,log10(1/BF10),xlab= "t-value",type="l",main = "",frame.plot = FALSE,ylab = bquote("logarithm of BF"[0][1]),xaxt = "n")
-  axis(1, c(-5,5))
-  if (any(hypothesis == "!=" & max_BF<D |BF_D == "bound cannot be found" ) ) {
-    main = bquote(bold("It is impossible to have BF"[0][1]~"="~.(D)))
-    title(main = main)
-    #sprintf("It is impossible to have BF01 = %.3f ",D)
-  } else      {
-    abline(v = BF_D)
-    axis(1, round(BF_D,2))
-    if (length(BF_D) == 1){
-      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when t = "~.(format(BF_D, digits = 4))))
-      title(main = main)
+  # Left plot - BF01:
+  BF01   <- 1 / BF10
+  t.BF01 <- t1_BF01_bound(D, df, model, location, scale, dff, hypothesis)
+
+  # Check if BF01 = D is possible:
+  max.BF01   <- 1 / t1_BF10(0, df, model, location, scale, dff, hypothesis = "!=")
+  impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
+
+  plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']),
+       main = "", frame.plot = FALSE, xaxt = "n")
+  axis(1, c(-5, 5))
+  if (impossible) {
+    title(main = bquote(bold("It is impossible to have BF"[01]~"="~.(D))))
+  } else {
+    abline(v = t.BF01)
+    axis(1, round(t.BF01, 2))
+    main.bf01 <- if (length(t.BF01) == 1) {
+      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01, digits = 4))))
     } else {
-      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when t = "~.(format(BF_D[1], digits = 4))~"or"~.(format(BF_D[2], digits = 4))))
-      title(main = main)
-    }}
-
-
-  
-
-  
+      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01[1], digits = 4))~"or"~.(format(t.BF01[2], digits = 4))))
+    }
+    title(main = main.bf01)
+  }
 }
 
-# Power curve functions
-Power_t1<-function(D,model,location,scale,dff, hypothesis,
-                   model_d,location_d,scale_d,dff_d, de_an_prior,N){
-  
-  smin = 2
-  smax = N*1.2
-  sdf = seq(smin,smax , by = (smax-smin)/30)
-  power =  array(NA, dim = c(length(sdf)))
-  
-  for ( i in 1:length(sdf)){
-    t = t1_BF10_bound(D ,sdf[i],model ,location ,scale  ,dff ,hypothesis )
-    power[i] = switch(de_an_prior,
-                      "1" = t1_TPE(t,sdf[i],model  ,location  ,scale,dff, hypothesis),
-                      "0" = t1_TPE(t,sdf[i],model_d  ,location_d  ,scale_d,dff_d, hypothesis))
-    
-    
+# Power curve function for BF10 > D under H1:
+Power_t1 <- function(D, model, location, scale, dff, hypothesis,
+                     model_d, location_d, scale_d, dff_d,
+                     de_an_prior, N) {
+  par(mfrow = c(1, 1))
+  # df range to evaluate power:
+  df.min     <- 2
+  df.max     <- ceiling(N * 1.2)
+  dfs        <- seq(df.min, df.max, length.out = 31)
+  power.vals <- numeric(length(dfs))
+
+  for (i in seq_along(dfs)) {
+    t <- t1_BF10_bound(D, dfs[i], model, location, scale, dff, hypothesis)
+    # Choose correct design prior:
+    power.vals[i] <- if (de_an_prior == 1)
+      t1_TPE(t, dfs[i], model, location, scale, dff) else
+        t1_TPE(t, dfs[i], model_d, location_d, scale_d, dff_d)
   }
-  plot(sdf+1,power,type="l",main = "",frame.plot = FALSE,xlab = "Sample size", ylab = "Probability of True positive evidence",xlim = c(1,max(sdf)), 
-       ylim = c(0,1) )
-  
+
+  plot(dfs + 1, power.vals, type = "l",
+       xlab = "Sample size",
+       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylim = c(0, 1), frame.plot = FALSE,
+       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
 }
 

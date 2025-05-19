@@ -1,91 +1,47 @@
-library(rootSolve)
-
-F_prior<- function(fsq,q,dff,rscale,f,model) {
-  
-  
-  switch(model,
-         "tdis" = {gamma((q + dff) / 2) / gamma(dff / 2) /gamma(q / 2) *
-    (dff * rscale^2)^(dff / 2) * fsq^(q / 2 - 1) *
-    (dff * rscale^2 + f^2 + fsq)^(-dff / 2 - q / 2) *
-    hypergeo::genhypergeo(c((dff + q) / 4, (2 + dff + q) / 4),
-                          q / 2, 4 * f^2 * fsq / (dff * rscale^2 + f^2 + fsq)^2)},
-          "Moment" = { temp <- f^2 * (dff + q - 2)/2
-          
-          gamma((q + dff) / 2) / gamma(dff / 2) / gamma(q / 2) *
-            2 * (dff - 2) / q / (dff-2 + q) / f^2 *
-            fsq^(q/2) * temp^(dff/2) * (temp + fsq)^(-(dff+q)/2)})
-  
-}
-
-Fe_BF <-function(f,q,m,dff,rscale,f_m,model,e){
-
-  
+Fe_BF <- function(f, q, m, dff, rscale, f_m, model, e) {
+  # Compute normalizations once
   normalizationh1  <- integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
-  normalizationh0 = 1-normalizationh1
-  x = NA
-  for(i in 1:length(f)){
+  normalizationh0 <- 1 - normalizationh1
   
-  int1  <- function(fsq){df(f[i],q,m-q,ncp =m*fsq)*F_prior(fsq,q,dff,rscale,f_m,model)/normalizationh1
-   
-  }
-  int0  <- function(fsq){df(f[i],q,m-q,ncp =m*fsq)*F_prior(fsq,q,dff,rscale,f_m,model)/normalizationh0
-    
-  }
-  lh1 = integrate(int1,lower = e,upper = Inf,stop.on.error = F)$value
-  lh0 = integrate(int0,lower = 0,upper = e,stop.on.error = F)$value
-  x[i] = lh1/lh0
-  }
-  return(x)
+  # Define likelihood ratio function
+  sapply(f, function(fi) {
+    int1 <- function(fsq) {
+      df(fi, q, m - q, ncp = m * fsq) * F_prior(fsq,q,dff,rscale,f_m,model) / normalizationh1
+    }
+    int0 <- function(fsq) {
+      df(fi, q, m - q, ncp = m * fsq) * F_prior(fsq,q,dff,rscale,f_m,model) / normalizationh0
+    }
+    lh1 <- integrate(int1, lower = e, upper = Inf, stop.on.error = FALSE)$value
+    lh0 <- integrate(int0, lower = 0, upper = e,   stop.on.error = FALSE)$value
+    lh1 / lh0
+  })
 }
-
 
 Fe_BF_bound_10 <-function(D,q,m,dff,rscale,f_m,model,e){
   x = numeric(0)
   Bound_finding <-function(f){
     Fe_BF(f,q,m,dff,rscale,f_m,model,e)-D
   }
- 
-  x = tryCatch( uniroot(Bound_finding,lower=0.001,upper = 200 )$root, error=function(e){})
-  if (length(x) ==0){
-    x = "no bound is found"
-    return(x)
-  } 
+  x = tryCatch( uniroot(Bound_finding,lower=0.01,upper = 500 )$root, error=function(e){})
+  if (length(x) == 0) return("no bound is found")
   
-
   return(x)
 }
 
 Fe_BF_bound_01 <-function(D,q,m,dff,rscale,f_m,model,e){
-  Bound_finding <-function(f){
-    Fe_BF(f,q,m,dff,rscale,f_m,model,e)-1/D
-  }
-  
-  x = tryCatch( uniroot(Bound_finding,lower=0.001,upper = 200 )$root, error=function(e){})
-  
-  if (length(x) ==0){
-    x = "no bound is found"
-    return(x)
-  } 
-  
-  return(x)
+  Fe_BF_bound_10(1/D,q,m,dff,rscale,f_m,model,e)
 }
 
 
 Fe_TPE<-function(f,q,m,dff,rscale,f_m,model,e){
   
   
-  if (any(f =="no bound is found" | length(f)==0)){
-    t=0
-    return(t)
-  }
+  if (length(f) == 0 || any(f == "no bound is found")) return(0)
   
-  if (model == "Point"){
-    
-    x = pf(f,q,m-q,ncp =m*f_m,lower.tail = F)
-    return(x)
-  }
   
-  normalizationh1  <- integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
+  if (model == "Point") return(pf(f,q,m-q,ncp =m*f_m,lower.tail = F))
+  
+  normalizationh1  <- integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-5)$value
   int  <- function(fsq){
     
     pf(f,q,m-q,ncp =m*fsq,lower.tail = F)*F_prior(fsq,q,dff,rscale,f_m,model)/normalizationh1
@@ -96,17 +52,10 @@ Fe_TPE<-function(f,q,m,dff,rscale,f_m,model,e){
 
 Fe_FNE<-function(f,q,m,dff,rscale,f_m,model,e){
   
+  if (length(f) == 0 || any(f == "no bound is found")) return(0)
   
-  if (any(f =="no bound is found" | length(f)==0)){
-    t=0
-    return(t)
-  }
   
-  if (model == "Point"){
-    
-    x = pf(f,q,m-q,ncp =m*f_m,lower.tail = T)
-    return(x)
-  }
+  if (model == "Point") pf(f,q,m-q,ncp =m*f_m,lower.tail = T)
   
   normalizationh1  <- integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
   int  <- function(fsq){
@@ -118,12 +67,11 @@ Fe_FNE<-function(f,q,m,dff,rscale,f_m,model,e){
 }
 
 Fe_TNE<-function(f,q,m,dff,rscale,f_m,model,e){
-  normalizationh0  <- integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = 0,upper = e,rel.tol = 1e-10)$value
   
-  if (any(f =="no bound is found" | length(f)==0)){
-    t=0
-    return(t)
-  }
+  if (length(f) == 0 || any(f == "no bound is found")) return(0)
+  
+  normalizationh0  <- integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = 0,upper = e,rel.tol = 1e-5)$value
+
   int  <- function(fsq){
     
     pf(f,q,m-q,ncp =m*fsq,lower.tail = T)*F_prior(fsq,q,dff,rscale,f_m,model)/normalizationh0
@@ -133,12 +81,12 @@ Fe_TNE<-function(f,q,m,dff,rscale,f_m,model,e){
 }
 
 Fe_FPE<-function(f,q,m,dff,rscale,f_m,model,e){
+  
+  if (length(f) == 0 || any(f == "no bound is found")) return(0)
+  
   normalizationh0  <- integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = 0,upper = e,rel.tol = 1e-10)$value
   
-  if (any(f =="no bound is found" | length(f)==0)){
-    t=0
-    return(t)
-  }
+
   int  <- function(fsq){
     
     pf(f,q,m-q,ncp =m*fsq,lower.tail = F)*F_prior(fsq,q,dff,rscale,f_m,model)/normalizationh0
@@ -148,119 +96,101 @@ Fe_FPE<-function(f,q,m,dff,rscale,f_m,model,e){
 }
 
 fe_N_finder<-function(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,de_an_prior,e,FP ){
-  q= k-p
-  lo = 2*k-p+1
-  m= lo-p
-  f = Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
-  if ( de_an_prior ==1 ){
-    power = Fe_TPE(f,q,m,dff,rscale,f_m,model,e)
-  }else{
-    power = Fe_TPE(f,q,m,dff_d,rscale_d,f_m_d,model_d,e)
-      
-  }  
-  if(any(power >target)){
-    return(lo)
-  }
+  q     <- k-p
+  lower <- 2*k-p+1
+  m     <- lower-p
+  f     <- Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
   
-  
+  p2    <- if (de_an_prior == 1)
+    Fe_TPE(f,q,m,dff,rscale,f_m,model,e) else
+      Fe_TPE(f,q,m,dff_d,rscale_d,f_m_d,model_d,e)
+  if (p2 > target) return(lower)
   
   Power_root <- function(n){
-    m= n-p
-    f = Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
-    if ( de_an_prior ==1 ){
-      pro = Fe_TPE(f,q,m,dff,rscale,f_m,model,e)
-    }else{
-      pro = Fe_TPE(f,q,m,dff_d,rscale_d,f_m_d,model_d,e)
-      
-    }  
+    m   <- n-p
+    f   <- Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
+    pro <- if (de_an_prior == 1)
+      Fe_TPE(f,q,m,dff,rscale,f_m,model,e) else
+        Fe_TPE(f,q,m,dff_d,rscale_d,f_m_d,model_d,e)
     return(pro-target)
   }
   
-  N = uniroot(Power_root,lower = lo,upper =  5000)$root
-  m= N-p
-  f = Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
-  FPE = Fe_FPE(f,q,m,dff,rscale,f_m,model,e)
+  #N.power <- uniroot(Power_root,lower = lower,upper =  5000)$root
+  N.power <-robust_uniroot(Power_root,lower=lower)
+  m       <- N.power-p
+  f       <- Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
+  FPE     <- Fe_FPE(f,q,m,dff,rscale,f_m,model,e)
   
-  
-  if (FP>FPE){
-    return(N)
-  } else{
+  if (FPE <= FP) return(N.power)
     
     alpha_root <- function(n){
       m= n-p
       f = Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
       pro = Fe_FPE(f,q,m,dff,rscale,f_m,model,e)
-      
-      
       return(pro-FP)
     }
-    NN = uniroot(alpha_root,lower = N,upper =  10000)$root
-    return(NN)
-  }
-
-
+  N.alpha <- robust_uniroot(alpha_root,lower=lower)
+    #uniroot(alpha_root,lower = N.power,upper =  5000)$root
+    return(N.alpha)
 }
 
 fe_table<-function(D,target,p,k,dff,rscale,f_m,model,
                   dff_d,rscale_d,f_m_d,model_d,de_an_prior,n, mode_bf,e ,FP){
-  bound01 = as.numeric(0)
-  bound10 = as.numeric(0)
   
   if (mode_bf == 1){
     
-    n = fe_N_finder(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,de_an_prior,e ,FP)
+    n = ceiling(fe_N_finder(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,de_an_prior,e ,FP))
   } else {
     n=n
   }
   q= k-p
   m= n-p
   
-  max_BF = 1/Fe_BF(0.00001,q,m,dff,rscale,f_m,model,e)
-  if (max_BF<D){
-    TPE = 0
-    FPE = 0
+  # f bounds:
+  f10 <- Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
+  f01 <- Fe_BF_bound_01(D,q,m,dff,rscale,f_m,model,e)
+  
+  # max BF10 possible:
+  max_BF <- 1/Fe_BF(0.00001,q,m,dff,rscale,f_m,model,e)
+  BF_D   <- f10
+  
+  # FPE and TPE:
+  FPE       <- Fe_FPE(f10,q,m,dff,rscale,f_m,model,e)
+  if (de_an_prior == 1) {
+    TPE       <- Fe_TPE(f10,q,m,dff,rscale,f_m,model,e)
+    TPR_dff   <- dff
+    TPR_rscale<- rscale
+    TPR_f_m   <- f_m
+    TPR_model <- model
+  } else {
+    TPE       <- Fe_TPE(f,q,m,dff_d,rscale_d,f_m_d,model_d,e)
+    TPR_dff   <- dff_d
+    TPR_rscale<- rscale_d
+    TPR_f_m   <- f_m_d
+    TPR_model <- model_d
   }
   
-  bound01 = Fe_BF_bound_01(D,q,m,dff,rscale,f_m,model,e)
-  
-  
-  if (length(bound01)==0){
-    FNE = 0
-    TNE = 0
-  }else{
-    
-    if (de_an_prior ==1){
-      FNE = Fe_FNE(bound01,q,m,dff,rscale,f_m,model,e)
-      TNE = Fe_TNE(bound01,q,m,dff,rscale,f_m,model,e)
-    }
-    if (de_an_prior ==0){
-      FNE = Fe_FNE(bound01,q,m,dff_d,rscale_d,f_m_d,model_d,e)
-      TNE = Fe_TNE(bound01,q,m,dff,rscale,f_m,model,e)
-    }
-    
-    
+  # FNE and TNE:
+  if (max_BF < D | BF_D == "no bound is found") {
+    FNE <- 0
+    TNE <- 0
+  } else {
+    FNE <- Fe_FNE(f01,q,m,TPR_dff,TPR_rscale,TPR_f_m,TPR_model,e)
+    TNE <-  Fe_TNE(f01,q,m,dff,rscale,f_m,model,e)
     
   }
-  
-  bound10 = Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
-  
-  if (de_an_prior ==1){
-    TPE = Fe_TPE(bound10,q,m,dff,rscale,f_m,model,e)
-    FPE = Fe_FPE(bound10,q,m,dff,rscale,f_m,model,e)
-  }else{
-    TPE = Fe_TPE(bound10,q,m,dff_d,rscale_d,f_m_d,model_d,e)
-    FPE = Fe_FPE(bound10,q,m,dff,rscale,f_m,model,e)
-  }
-  
-  
-  table <- data.frame(
-    TPE = TPE,
-    FNE = FNE,
-    TNE = TNE,
-    FPE = FPE,
-    N =  ceiling(n))
-  return(table)
-  
+  # table:
+  tab.names <- c(
+    sprintf("p(BF10 > %0.f | H1)", D),
+    sprintf("p(BF01 > %0.f | H1)", D),
+    sprintf("p(BF01 > %0.f | H0)", D),
+    sprintf("p(BF10 > %0.f | H0)", D),
+    "Required N"
+  )
+  table <- data.frame(TPE, FNE, TNE, FPE, n, check.names = FALSE, row.names = NULL)
+  colnames(table) <- tab.names
+  table
+ 
 }
 
 
@@ -268,119 +198,103 @@ fe_table<-function(D,target,p,k,dff,rscale,f_m,model,
 
 prior_plot_fe <-function(q,dff,rscale,f,model,dff_d,rscale_d,f_m_d,model_d,de_an_prior ,e){
   par(mfrow = c(1, 1))
-  normalization  <- integrate(function(fsq)F_prior(fsq,q,dff,rscale,f,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
   
+  normalization  <- integrate(function(fsq)F_prior(fsq,q,dff,rscale,f,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
 
   fsq = seq(0.001,20,.05)
-  priorh1 = F_prior(fsq,q,dff,rscale,f,model)/normalization
-  priorh1[fsq<e]=-1
-  priorh0 = F_prior(fsq,q,dff,rscale,f,model)/(1-normalization)
-  priorh0[fsq>e]=-1
+  #prior.analysis.h1 = F_prior(fsq,q,dff,rscale,f,model)/normalization
+  prior.analysis.h1 = F_prior(fsq,q,dff,rscale,f,model)
+  prior.analysis.h1[fsq<e]=0
+  #prior.analysis.h0 = F_prior(fsq,q,dff,rscale,f,model)/(1-normalization)
+  prior.analysis.h0 = F_prior(fsq,q,dff,rscale,f,model)
+  prior.analysis.h0[fsq>e]=0
+  prior.design <- if (de_an_prior == 0 && model_d != "Point"){
+    #normalization_d  <- integrate(function(fsq)F_prior(fsq,q,dff,rscale,f,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
+    
+    F_prior(fsq,q,dff_d,rscale_d,f_m_d,model_d)/normalization_d
+    F_prior(fsq,q,dff_d,rscale_d,f_m_d,model_d)}else
+      rep(NA, length(fsq))
+  ylim.max <- max(prior.analysis.h1, prior.analysis.h0, prior.design, na.rm = TRUE)
   
-
-  plot(fsq,priorh0,
-       lty = 3,
-       lwd = 4,
-       xlab= bquote(bold(lambda^2)),
-       ylab= "density",
-       type = "l",
-       ylim = c(0,max(max(priorh1),max(priorh0))),
-       main  = bquote(bold("prior distribution on "~lambda^2~" under the alternative hypothesis")),frame.plot = FALSE)
-  lines(fsq,priorh1, type="l", lty=1, lwd=4)
-
+  plot(fsq, prior.analysis.h1, type = "l", lwd = 2,
+       xlab = bquote(bold(lambda^2)),
+       ylab = "density",
+       main  = bquote(bold("prior distribution on "~lambda^2~" under the alternative hypothesis")),
+       frame.plot = FALSE,
+       ylim = c(0, ylim.max))
   
-  if (de_an_prior ==0){
-    if (model_d != "Point"){
-      
-      normalization  <- integrate(function(fsq)F_prior(fsq,q,dff_d,rscale_d,f_m_d,model_d),lower = e,upper = Inf,rel.tol = 1e-10)$value
-      
-      
-      
-    prior_d = F_prior(fsq,q,dff_d,rscale_d,f_m_d,model)/normalization
-    prior_d[fsq<e]=-1
-    
-    
-    plot(fsq,priorh0,
-         lty = 3,
-         lwd = 4,
-         xlab= bquote(bold(lambda^2)),
-         ylab= "density",
-         type = "l",
-         ylim = c(0,max(max(priorh1),max(prior_d),max(priorh0))),
-         main  = bquote(bold("prior distribution on "~lambda^2~" under the alternative hypothesis")),frame.plot = FALSE)
-    lines(fsq,priorh1, type="l", lty=1, lwd=4)
-    
-    
-    
+  lines(fsq, prior.analysis.h0, lty = 2, col = "black", lwd = 2)
   
-    lines(fsq,prior_d, type="l", lty=1, lwd=2,col="gray")}else{
-      
-      arrows(x0=f_m_d, y0=0, x1=f_m_d, y1=max(priorh1,priorh0), length=0.2, code=2, col="gray", lwd=4,lty = 2)
+  # Optional: design prior
+  legend.labels <- c("H1 - Analysis Prior", "H0 - Analysis Prior")
+  legend.cols   <- c("black", "black")
+  legend.lty    <- c(1, 2)
+  legend.lwd    <- c(2, 2)
+  
+  if (de_an_prior == 0) {
+    if (model_d == "Point") {
+      arrows(x0 = f_m_d, y0 = 0, x1 = f_m_d, y1 = ylim.max,
+             length = 0.1, col = "gray", lty = 2,lwd = 3)
+    } else {
+      lines(fsq, prior.design, lty = 1, col = "gray", lwd = 3)
     }
-
-    legend("topleft", 
-           legend = c("Analysis prior", "Design prior"), 
-           lty = c(1, 1), 
-           lwd = c(4, 2),
-           col = c("black", "gray"),
-           bty = "n") 
     
+    # Add design prior to legend
+    legend.labels <- c(legend.labels, "Design prior")
+    legend.cols   <- c(legend.cols, "gray")
+    legend.lty    <- c(legend.lty, 1)
+    legend.lwd    <- c(legend.lwd, 2)
   }
-  
-  
-  
-  legend("topright", 
-         legend = c("H1", "H0"),  # Labels for the lines
-         col = c("black", "black"),  # Line colors
-         lty = c(1, 3),  # Line types
-         lwd = c(4, 4),  # Line widths
-         bty = "n",
-         title = "Analysis Prior")  # No box around the legend
+  legend("topleft",
+         legend = legend.labels,
+         col = legend.cols,
+         lty = legend.lty,
+         lwd = legend.lwd,
+         bty = "n")
   
   
 }
 
 bf10_fe <-function(D,n,k,p,dff,rscale,f_m,model,e){
-  q= k-p
-  m= n-p
-  ff = seq(from = .01,to = 10,.05)
-  BF_D = Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
-  BF10 = Fe_BF(ff,q,m,dff,rscale,f_m,model,e)
+  q       <- k-p
+  m       <- n-p
+  ff      <- seq(from = .01,to = 10,.05)
+  f.BF10  <- Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
+  BF10    <- Fe_BF(ff,q,m,dff,rscale,f_m,model,e) 
   
-  
-  if (length(BF_D) == 1){
-    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(BF_D, digits = 4))))
-    #sprintf("BF10 = %.0f when f = %.3f ",D,BF_D)
+  if (length(f.BF10) == 1){
+    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(f.BF10, digits = 4))))
   } else {
-    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(BF_D[1], digits = 4))~"or"~.(format(BF_D[2], digits = 4))))
-    #sprintf("BF10 = %.0f when f = %.3f or %.3f ",D,BF_D[1],BF_D[2])
+    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(f.BF10[1], digits = 4))~"or"~.(format(f.BF10[2], digits = 4))))
   }
   par(mfrow = c(1, 2))
-  plot(ff,log10(BF10),xlim=c(0,10),xlab= "f-value",type="l", ylab = expression("logarithm of BF"[10]),main =   main,frame.plot = FALSE,xaxt = "n")
-  abline(v = BF_D)
+  plot(ff,BF10,log = "y",xlim=c(0,10),xlab= "f-value",type="l", ylab = expression("BF"[10]),main =   main,frame.plot = FALSE,xaxt = "n")
+  abline(v = f.BF10)
   axis(1, c(0,10))
-  if (length(BF_D) != 0 ){
-    axis(1, round(BF_D,2))}
   
-  max_BF = 1/  Fe_BF(.001,q,m,dff,rscale,f_m,model,e)
-  BF_D =  Fe_BF_bound_01(D,q,m,dff,rscale,f_m,model,e)
+  if (length(f.BF10) != 0 ){
+    axis(1, round(f.BF10,2))}
+  
+  max_BF <- 1/  Fe_BF(.001,q,m,dff,rscale,f_m,model,e)
+  f.BF01   <-  Fe_BF_bound_01(D,q,m,dff,rscale,f_m,model,e)
   
   
   
-  plot(ff,log10(1/BF10),xlab= "f-value",type="l",main = "",frame.plot = FALSE,ylab = bquote("logarithm of BF"[0][1]),xaxt = "n")
+  plot(ff,1/BF10,log = "y",xlab= "f-value",type="l",main = "",frame.plot = FALSE,ylab = bquote("BF"[0][1]),xaxt = "n")
   axis(1, c(0,10))
-  if (any(max_BF<D |BF_D == "bound cannot be found" ) ) {
+  
+  if (any(max_BF<D |f.BF01 == "bound cannot be found" ) ) {
     main = bquote(bold("It is impossible to have BF"[0][1]~"="~.(D)))
     title(main = main)
     #sprintf("It is impossible to have BF01 = %.3f ",D)
   } else      {
-    abline(v = BF_D)
-    axis(1, round(BF_D,2))
-    if (length(BF_D) == 1){
-      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(BF_D, digits = 4))))
+    abline(v = f.BF01)
+    axis(1, round(f.BF01,2))
+    if (length(f.BF01) == 1){
+      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(f.BF01, digits = 4))))
       title(main = main)
     } else {
-      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(BF_D[1], digits = 4))~"or"~.(format(BF_D[2], digits = 4))))
+      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(f.BF01[1], digits = 4))~"or"~.(format(f.BF01[2], digits = 4))))
       title(main = main)
     }}
   
@@ -408,8 +322,11 @@ Power_fe<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model
     
     
   }
-  plot(sdf+1,power,type="l",main = "",frame.plot = FALSE,xlab = "Sample size", ylab = "Probability of True positive evidence",xlim = c(smin,max(sdf)), 
-       ylim = c(0,1) )
+  plot(sdf, power, type = "l",
+       xlab = "Sample size",
+       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylim = c(0, 1), frame.plot = FALSE,
+       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   
 }
 
