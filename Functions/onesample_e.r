@@ -571,13 +571,13 @@ te1_BF <-function(D,df,model ,scale,dff , hypothesis ,e){
        main = main.bf10, frame.plot = FALSE, xaxt = "n",xlim = c(-5,5))
   abline(v = t.BF10)
   axis(1, c(-5, 5))
-  if (length(t.BF10)) axis(1, round(t.BF10, 2))
+  if (length(t.BF10)) {axis(1, round(t.BF10, 2))}
   
   # right plot - BF01:
   BF01   <- 1 / BF10
   t.BF01 <- t1e_BF01_bound(D, df,model,scale,dff , hypothesis,e)
   # Check if BF01 = D is possible:
-  max.BF01   <- 1 / t1_BF10(0, df, model, location, scale, dff, hypothesis = "!=")
+  max.BF01   <- 1 / t1e_BF10(0,df,model,scale,dff , hypothesis,e )
   impossible <- (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
   
   plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']),

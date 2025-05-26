@@ -218,7 +218,6 @@ t2_N_finder<-function(D,r,target,model,location,scale,dff, hypothesis ,
       t2_TPE(t2 , n1=lower,r , model_d , location_d,scale_d,dff_d, hypothesis)
   if (p2 > target) return(lower)
   Power_root <- function(n1) {
-    i<<-i+1
     t <- t2_BF10_bound(D, n1,r,model ,location ,scale,dff , hypothesis)
     if (de_an_prior == 1)
       t2_TPE(t , n1,r , model , location ,scale,dff , hypothesis) - target else

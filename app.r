@@ -1213,7 +1213,7 @@ sidebarLayout(sidebarPanel(
     ),
     selected = 1, inline = TRUE
   ) ,fluidRow(
-    column(4,
+    column(5,
            em("\\(\\mathcal{H}_0: p_0 = p_1 = p_2\\)"),
            br(),
            em("\\(p_0 \\sim \\text{Beta}(\\alpha_0, \\beta_0)\\)")
@@ -1226,7 +1226,7 @@ sidebarLayout(sidebarPanel(
     
     
     
-    column(8,
+    column(5,
            em("\\(\\mathcal{H}_1: p_1 \\neq p_2\\)"),
            br(),
            em("\\(p_1 \\sim \\text{Beta}(\\alpha_1, \\beta_1)\\)"),

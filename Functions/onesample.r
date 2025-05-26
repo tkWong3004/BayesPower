@@ -1,8 +1,8 @@
 # The app is riddled with dt() warnings of the type:
 #    In dt(t[i], df, ncp = delta * sqrt(df + 1)) :
 #      full precision may not have been achieved in 'pnt{final}'
-# This is why I used dnct() in the past. 
-# I tried to bring it back, see dnct.cpp.
+# This is why I used dt() in the past. 
+# I tried to bring it back, see dt.cpp.
 # Also tried a different pnct, see pnct.cpp.
 # But they are slow, I could not make them fast.
 # So for now we use your code for pnct() and dt().
@@ -48,7 +48,7 @@ t1_BF10 <-function(t, df, model, location, scale, dff, hypothesis){
            "t-distribution" = pt((bound[2] - location) / scale, dff, 0) - pt((bound[1] - location) / scale, dff, 0))
 
   for(i in 1:length(t)){
-    # int  <- function(delta) dnct(t[i], df, ncp = delta * sqrt(df+1)) * t1_prior(delta, location, scale, dff, model)/normalization
+    # int  <- function(delta) dt(t[i], df, ncp = delta * sqrt(df+1)) * t1_prior(delta, location, scale, dff, model)/normalization
     int <- function(delta) dt(t[i], df, ncp = delta * sqrt(df + 1)) * t1_prior(delta, location, scale, dff, model) / normalization
 
     # Removed stop.on.error = FALSE as it is bad form.
