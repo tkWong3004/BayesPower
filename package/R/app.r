@@ -1,3 +1,4 @@
+#' @export
 pkgs <- c(
   "rootSolve", "shiny", "gsl", "shinyWidgets", "shinyjs",
   "kableExtra", "knitr", "Rcpp", "fontawesome", "BH",
