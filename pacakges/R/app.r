@@ -11,18 +11,6 @@ invisible(lapply(pkgs, function(pkg) {
   }
   library(pkg, character.only = TRUE)
 }))
-source("R/Functions/onesample.r")
-source("R/Functions/onesample_e.r")
-source("R/Functions/twosample.r")
-source("R/Functions/twosample_e.r")
-source("R/Functions/Correlation.r")
-source("R/Functions/Correlation_e.r")
-source("R/Functions/ANOVA.r")
-source("R/Functions/ANOVAe.r")
-source("R/Functions/binomial.r")
-source("R/Functions/binomial_e.r")
-source("R/Functions/proportions.r")
-
 
 ui <- navbarPage(id = "id",
                  "\\(\\text{BayesPower}_{1.0}\\)",
