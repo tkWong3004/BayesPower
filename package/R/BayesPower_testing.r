@@ -1,4 +1,4 @@
-#' @export
+
 pkgs <- c(
   "rootSolve", "shiny", "gsl", "shinyWidgets", "shinyjs",
   "kableExtra", "knitr", "Rcpp", "fontawesome", "BH",
@@ -1399,6 +1399,8 @@ server <- function(input, output, session) {
 
 # Run the application
 
+#' Launch BayesPower Shiny App
+#'
 #' @export
 BayesPower_testing <- function(){
   # Run the application
