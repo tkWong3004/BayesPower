@@ -1,4 +1,33 @@
 
+# Run the application
+
+#' Launch BayesPower Shiny App
+#'
+#' @export
+BayesPower_testing <- function(){
+
+pkgs <- c(
+  "rootSolve", "shiny", "gsl", "shinyWidgets", "shinyjs",
+  "kableExtra", "knitr", "Rcpp", "fontawesome", "BH",
+  "bslib", "pracma", "profvis", "mombf", "ExtDist",
+  "ggplot2", "patchwork"
+)
+
+invisible(lapply(pkgs, function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+  library(pkg, character.only = TRUE)
+}))
+
+
+
+  # Run the application
+  shinyApp(ui = ui, server = server)
+
+}
+
+
 
 ui <- navbarPage(id = "id",
                  "\\(\\text{BayesPower}_{1.0}\\)",
