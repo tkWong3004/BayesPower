@@ -1,0 +1,152 @@
+---
+title: "BayesPower: Output"
+output:
+  pdf_document: default
+fontsize: 12pt
+params:
+  t2: NA
+  dat: NA
+  pc_t2: NA
+  rela_t2: NA
+geometry: margin=2cm
+classoption: a4paper
+---
+
+A Bayes Factor design analysis for independent samples t-test was conducted on `r Sys.time()`.
+
+**Hypothesis**
+
+```{r echo=FALSE, results='asis'}
+if (params$t2$interval == 1) {
+  cat("\\(\\mathcal{H}_0: \\delta = 0\\) vs ")
+
+  cat(switch(
+    params$t2$hypothesis,
+    ">" = "\\(\\mathcal{H}_1: \\delta > 0\\)\n",
+    "<" = "\\(\\mathcal{H}_1: \\delta < 0\\)\n",
+    "\\(\\mathcal{H}_1: \\delta \\neq 0\\)\n"
+  ))
+} else if (params$t2$interval == 2) {
+  # Extract epsilon values
+  hyp <- params$t2$hypothesis
+e <- params$t2$e
+
+eps <- switch(hyp,
+  ">"  = list(eps_neg = 0,       eps_pos = e),
+  "<"  = list(eps_neg = e,       eps_pos = 0),
+  "!=" = list(eps_neg = e[1],    eps_pos = e[2]),
+  list(eps_neg = NA,             eps_pos = NA)  # default/fallback
+)
+
+cat(sprintf("\\(\\mathcal{H}_0: \\delta \\in \\{ %.2f, %.2f \\} \\) vs ", eps[1], eps[2]))
+
+cat(sprintf("\\(\\mathcal{H}_1: \\delta \\notin \\{ %.2f, %.2f \\} \\)", eps[1], eps[2]))
+
+  
+
+  
+  
+}
+
+```
+
+```{r results='asis', echo=FALSE}
+if (params$t2$de_an_prior == 0) {
+  cat("**Analysis prior**  \n")}
+if (params$t2$de_an_prior == 1) {
+  cat("**Analysis and design prior**  \n")}
+
+cat(paste0(params$t2$model,"(location = ", params$t2$location,", scale = ",params$t2$scale)
+    )
+if (params$t2$model == "t-distribution"){
+  cat(paste0(", df = ",params$t2$dff),")")
+}else cat(paste0(")"))
+
+```
+
+
+```{r results='asis', echo=FALSE}
+if (params$t2$de_an_prior == 0) {
+  cat("**Design prior**  \n")
+  
+  if (params$t2$model_d == "Point") {
+    cat(sprintf("Point(location = %s)  \n", params$t2$location_d))
+  } else {
+    cat(sprintf("%s(location = %s, scale = %s", 
+                params$t2$model_d, 
+                params$t2$location_d, 
+                params$t2$scale_d))
+    
+    if (params$t2$model_d == "t-distribution") {
+      cat(sprintf(", df = %s)\n", params$t2$dff_d))
+    } else {
+      cat(")\n")
+    }
+  }
+}
+```
+
+
+
+**Result**
+```{r results='asis', echo=FALSE}
+cat("\n Table format \n") 
+
+# Your existing LaTeX table output
+table_latex <- paste0(
+  '\\begin{array}{l c}
+  \\textbf{Probability of Compelling Evidence} & \\\\
+  \\hline
+  \\text{p(BF}_{10} > ', params$t2$D, '\\, | \\, \\mathcal{H}_1) & ', round(params$dat[1,1], 3), ' \\\\
+  \\text{p(BF}_{01} > ', params$t2$D, '\\, | \\, \\mathcal{H}_0) & ', round(params$dat[1,3], 3), ' \\\\
+  \\textbf{Probability of Misleading Evidence} & \\\\
+  \\hline
+  \\text{p(BF}_{01} > ', params$t2$D, '\\, | \\, \\mathcal{H}_1) & ', round(params$dat[1,2], 3), ' \\\\
+  \\text{p(BF}_{10} > ', params$t2$D, '\\, | \\, \\mathcal{H}_0) & ', round(params$dat[1,4], 3), ' \\\\
+  \\textbf{Required Sample Size} & \\\\
+  \\hline
+  \\text{N}_1 & ', params$dat[1,5], ' \\\\
+  \\text{N}_2 & ', params$dat[1,6], ' \\\\
+  \\end{array}'
+)
+
+cat('$$', table_latex, '$$\n\n')
+
+cat("\n CSV format \n")
+
+# Prepare a CSV output for dat (excluding params$t2$D)
+dat_csv <- params$dat[1, ]  # assuming dat is a matrix or data frame row
+
+# Remove the D column if you want (assuming D is params$t2$D, not in dat)
+# Just print the dat row as CSV
+cat("```\n")  # start of code block in markdown
+write.csv(as.data.frame(t(dat_csv)), row.names = TRUE, quote = FALSE)
+cat("```\n")  # end of code block in markdown
+```
+
+```{r results='asis', echo=FALSE}
+if (isTRUE(params$t2$pc) || isTRUE(params$t2$rela)) {
+  cat("\\newpage\n")
+}
+```
+
+
+
+```{r results='asis', echo=FALSE,fig.width= 12, fig.height= 8}
+
+if (params$t2$pc){
+    cat("**Power Curve **\n\n")
+
+params$pc_t2}
+
+```
+
+
+```{r results='asis', echo=FALSE,  fig.width= 12, fig.height= 8}
+if (params$t2$rela){
+    cat("**Relationship between BF and data **\n\n")
+
+params$rela_t2
+}
+
+```
