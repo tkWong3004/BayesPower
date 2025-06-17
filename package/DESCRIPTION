@@ -10,18 +10,10 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
-    rootSolve,
     shiny,
     gsl,
     shinyWidgets,
-    shinyjs,
-    kableExtra,
-    knitr,
     Rcpp,
-    fontawesome,
-    bslib,
-    pracma,
-    profvis,
     mombf,
     ExtDist,
     ggplot2,
