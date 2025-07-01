@@ -4159,7 +4159,7 @@ t1e_N_finder<-function(D,target,model,scale,dff, hypothesis,e ,
 
 
 t1e_table<-function(D,target,model,scale,dff, hypothesis,e ,
-                    model_d,scale_d,dff_d, de_an_prior,df,mode_bf,location_d ,alpha ){
+                    model_d,scale_d,dff_d, de_an_prior,N,mode_bf,location_d ,alpha ){
   bound01 = as.numeric(0)
   bound10 = as.numeric(0)
   if (mode_bf == "0") df <- N-1 else {
@@ -5916,7 +5916,8 @@ server_t1<- function(input, output, session) {
 input_t1 <- shiny::reactive({
   mode_bf <- switch(input$Modet1,
                     "1" = 1,
-                    "2" = 0)# mode
+                    "2" = 0,
+                    "3" = 0)# mode
   N <-  switch(input$Modet1,
                "1" = 2,
                "2" = input$nt1,
@@ -6183,7 +6184,8 @@ server_t2<- function(input, output, session) {
 input_t2 <- shiny::reactive({
   mode_bf <- switch(input$Modet2,
                     "1" = 1,
-                    "2" = 0)# mode
+                    "2" = 0,
+                    "3" = 0)# mode
   interval <- input$h0t2 # point null or interval
 
   e <- switch(input$h1t2e,        # bound for interval test
@@ -6242,7 +6244,6 @@ input_t2 <- shiny::reactive({
               "3" = input$rt2)
   N1 = input$n1t2
   N2 = input$n2t2
-  df = input$t2df
   pc   <- "1" %in% input$o_plot_t2
   rela <- "2" %in% input$o_plot_t2
   if (mode_bf!=1){
@@ -6428,15 +6429,18 @@ shiny::observeEvent(input$runt2, {
 
 shiny::observeEvent(input$cal1, {
   t2 = input_t2()
+  r = t2$N2/t2$N1
+  N1 = t2$N1
+  ddff = t2$N1+t2$N2-2
 
-  N = t2$df +2
-  N1 = N/(1+t2$r)
-  BF10 =  suppressWarnings(t2_BF10(t2$tval,N1,t2$r,t2$model ,t2$location,t2$scale,t2$dff , t2$hypothesis ))
+  BF10 <- suppressWarnings(switch(t2$interval,
+                 "1" = t2_BF10(t2$tval,N1,r,t2$model ,t2$location,t2$scale,t2$dff , t2$hypothesis ),
+                 "2" = t2e_BF10(t2$t,N1,r,t2$model,t2$scale,t2$dff , t2$hypothesis,t2$e )))
 
   output$BFt2 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('
-    \\textit{t}(', t2$df, ') = ',t2$tval,', \\textit{BF}_{10} = ', round(BF10, 4), '
+    \\textit{t}(', ddff, ') = ',t2$tval,', \\textit{BF}_{10} = ', round(BF10, 4), '
 ')
 
 

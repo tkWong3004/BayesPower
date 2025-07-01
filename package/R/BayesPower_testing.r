@@ -347,7 +347,7 @@ ui <-
             ),
             shiny::column(
               width = 4,
-              shiny::sliderInput("st2", label = "\\(\\text{Scale}\\)", min = 0.01, max = 3, value = 1, step = 0.01, ticks = FALSE)
+              shiny::sliderInput("st2", label = "\\(\\text{Scale}\\)", min = 0.01, max = 3, value = .707, step = 0.001, ticks = FALSE)
             ),
             shiny::column(
               width = 4,
@@ -426,28 +426,28 @@ ui <-
 
           # Shared parameters
           shiny::conditionalPanel("input.Modet2 == 1 || input.Modet2 == 2", shiny::sliderInput("bt2", "\\(\\text{Bound of compelling evidence:}\\)", min = 1, max = 20, value = 3, ticks = FALSE)),
-          shiny::conditionalPanel("input.Modet2 == 1 || input.Modet2 == 3", shiny::sliderInput("rt2", "\\(N_2/N_1\\)", min = 1, max = 10, value = 1, ticks = FALSE)),
+          shiny::conditionalPanel("input.Modet2 == 1", shiny::sliderInput("rt2", "\\(N_2/N_1\\)", min = 1, max = 10, value = 1, ticks = FALSE)),
 
           # Fixed sample sizes
-          shiny::conditionalPanel("input.Modet2 == 2",
+          shiny::conditionalPanel("input.Modet2 == 2||input.Modet2 == 3",
                            shiny::fluidRow(
                              shiny::column(4, shiny::numericInput("n1t2", "\\(N_1:\\)", value = 50)),
-                             shiny::column(4, shiny::numericInput("n2t2", "\\(N_2:\\)", value = 50))
-                           )
+                             shiny::column(4, shiny::numericInput("n2t2", "\\(N_2:\\)", value = 50)),
+                             shiny::conditionalPanel("input.Modet2 == 3",
+                                                     shiny::column(4, shiny::numericInput("t2tval", "\\(\\text{t-value:}\\)", value = 2)))
+                             ),
+                           shiny::conditionalPanel("input.Modet2 == 3",
+                                                   shiny::actionButton("cal1", label = "\\(\\text{Calculate}\\)"),
+                                                   shiny::htmlOutput("BFt2"))
+
+
+
           ),
 
           # Action buttons
           shiny::conditionalPanel("input.Modet2 == 1 || input.Modet2 == 2",
                            shiny::actionButton("runt2", label = "\\(\\text{Run}\\)"),
                            shiny::conditionalPanel("input.Modet2 == 1", shiny::em(shiny::span("\\(\\text{Note: Error when required } N > 10,000\\)", style = "color: red;")))
-          ),
-          shiny::conditionalPanel("input.Modet2 == 3",
-                           shiny::fluidRow(
-                             shiny::column(6, shiny::numericInput("t2df", "\\(\\text{Degrees of freedom:}\\)", value = 50)),
-                             shiny::column(6, shiny::numericInput("t2tval", "\\(\\text{t-value:}\\)", value = 2))
-                           ),
-                           shiny::actionButton("cal1", label = "\\(\\text{Calculate}\\)"),
-                           shiny::htmlOutput("BFt2")
           ),
           shiny::conditionalPanel(
             condition = "input.Modet2 == 1",
@@ -1392,6 +1392,6 @@ server <- function(input, output, session) {
 #' @export
 BayesPower_testing <- function(){
   # Run the application
-  shiny::shinyApp(ui = ui, server = server)
+ shiny::shinyApp(ui = ui, server = server)
 
 }

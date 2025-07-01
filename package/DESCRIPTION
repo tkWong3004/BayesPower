@@ -1,9 +1,12 @@
 Package: BayesPower
-Title: What the Package Does (One Line, Title Case)
+Title: Sample Size and Power Calculation Using Bayes Factor
 Version: 1.0.0
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+Authors@R: c(
+    person("Tsz Keung", "Wong", email = "t.k.wong3004@gmail.com", role = c("aut", "cre")),
+    person("Jorge", "Tendeiro", role = c("aut")),
+    person("Samuel", "Pawel", role = c("aut")))
 Description: What the package does (one paragraph).
+BugReports: https://github.com/tkWong3004/BayesPower/issues
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
@@ -17,7 +20,8 @@ Imports:
     mombf,
     ExtDist,
     ggplot2,
-    patchwork
+    patchwork,
+    rmarkdown
 LinkingTo:
     Rcpp,
     BH
