@@ -685,7 +685,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
              shiny::conditionalPanel("input.Moder == 3",
                               shiny::fluidRow(
                                 shiny::column(6,
-                                       shiny::numericInput("rdf", "\\( \\text{Degree of freedom:} \\)", value = 50)
+                                       shiny::numericInput("rdf", "\\( \\text{Sample size:} \\)", value = 50)
                                 ),
                                 shiny::column(6,
                                        shiny::sliderInput("rval", "\\(\\text{Pearson's:} \\)", min = -1, max = 1, value = 0, step = 0.01, ticks = FALSE)

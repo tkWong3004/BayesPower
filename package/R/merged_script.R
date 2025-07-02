@@ -456,7 +456,7 @@ fe_N_finder<-function(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,de_
   }
 
   #N.power <- stats::uniroot(Power_root,lower = lower,upper =  5000)$root
-  N.power <-robust_stats::uniroot(Power_root,lower=lower)
+  N.power <-robust_uniroot(Power_root,lower=lower)
   m       <- N.power-p
   f       <- Fe_BF_bound_10(D,q,m,dff,rscale,f_m,model,e)
   FPE     <- Fe_FPE(f,q,m,dff,rscale,f_m,model,e)
@@ -469,7 +469,7 @@ fe_N_finder<-function(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,de_
       pro = Fe_FPE(f,q,m,dff,rscale,f_m,model,e)
       return(pro-FP)
     }
-  N.alpha <- robust_stats::uniroot(alpha_root,lower=lower)
+  N.alpha <- robust_uniroot(alpha_root,lower=lower)
     #stats::uniroot(alpha_root,lower = N.power,upper =  5000)$root
     return(N.alpha)
 }
@@ -2992,7 +2992,7 @@ re_N_finder<-function(D,target,model,k, alpha, beta,h0,location,scale,dff, hypot
 return(pro-target)
     }
 
-  N.power <- robust_stats::uniroot(Power_root, lower = lo)
+  N.power <- robust_uniroot(Power_root, lower = lo)
   r = re_BF_bound_10(D, N.power,k,alpha, beta,h0,hypothesis,location,scale,dff,model,e)
   FPE = re_FPE(r, N.power,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e)
   if (FPE <= FP) return(N.power)
@@ -3779,7 +3779,7 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
 
 
 # ---- onesample_e.r ----
-robust_uniroot <- function(f, lower, upper_start = 200, max_attempts = 20, step = 500, ...) {
+robust_uniroot <- function(f, lower, upper_start = 500, max_attempts = 20, step = 500, ...) {
   upper <- upper_start
   attempt <- 1
 
@@ -4141,7 +4141,7 @@ t1e_N_finder<-function(D,target,model,scale,dff, hypothesis,e ,
     target - pro
   }
 
-  df.power <- robust_stats::uniroot(Power_root, lower = 2)
+  df.power <- robust_uniroot(Power_root, lower = 2)
   t <- t1e_BF10_bound(D,df.power,model,scale,dff,hypothesis ,e )
   FPE <-t1e_FPE(t,df.power,model ,scale,dff , hypothesis ,e)
   if (FPE <= alpha) return(df.power + 1)
@@ -5645,7 +5645,7 @@ input_r <- shiny::reactive({
   N <-  switch(input$Moder,
                "1" = 2,
                "2" = input$nr,
-               "3" = input$rdf+1)
+               "3" = input$rdf)
   rval <- input$rval
   pc   <- 1 %in% input$o_plot_r
   rela <- 2 %in% input$o_plot_r
@@ -6216,8 +6216,7 @@ input_t2 <- shiny::reactive({
   location <- switch(input$h0t2,
                      "1" =input$lt2,
                      "2" = 0,
-                     "3" = 0,
-                     "4" = 0)
+                     "3" = 0)
   scale <- input$st2
   dff <- input$dft2
   de_an_prior <- switch(input$priort2,
@@ -6228,9 +6227,7 @@ input_t2 <- shiny::reactive({
                     "2" = "Normal",
                     "3" = "NLP",
                     "4" = "Point")
-  location_d <- switch(interval,
-                       "1" = input$lt2d,
-                       "2" = 0)
+  location_d <- input$lt2d
   scale_d <- input$st2d
   dff_d <- input$dft2d
   D <- input$bt2
@@ -6285,13 +6282,11 @@ shiny::observeEvent(input$runt2, {
                             "1" = t2_Table(t2$D, t2$r, t2$target, t2$model, t2$location, t2$scale, t2$dff, t2$hypothesis,
                                            t2$model_d, t2$location_d, t2$scale_d, t2$dff_d, t2$de_an_prior, t2$N1, t2$N2, t2$mode_bf, t2$alpha),
                             "2" = t2e_table(t2$D, t2$r, t2$target, t2$model, t2$scale, t2$dff, t2$hypothesis, t2$e,
-                                            t2$model_d, t2$scale_d, t2$dff_d, t2$de_an_prior, t2$mode_bf, t2$location, t2$N1, t2$N2, t2$alpha)
+                                            t2$model_d, t2$scale_d, t2$dff_d, t2$de_an_prior, t2$mode_bf, t2$location_d, t2$N1, t2$N2, t2$alpha)
     ))
   }, error = function(e) {
     "Error"
   })
-
-
   output$priort2 <- shiny::renderPlot({
     suppressWarnings(switch(t2$interval,
            "1"=
@@ -6435,7 +6430,7 @@ shiny::observeEvent(input$cal1, {
 
   BF10 <- suppressWarnings(switch(t2$interval,
                  "1" = t2_BF10(t2$tval,N1,r,t2$model ,t2$location,t2$scale,t2$dff , t2$hypothesis ),
-                 "2" = t2e_BF10(t2$t,N1,r,t2$model,t2$scale,t2$dff , t2$hypothesis,t2$e )))
+                 "2" = t2e_BF10(t2$tval,N1,r,t2$model,t2$scale,t2$dff , t2$hypothesis,t2$e )))
 
   output$BFt2 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
@@ -6501,8 +6496,8 @@ t2_BF10_bound <-function(D, n1,r,model ,location ,scale,dff , hypothesis){
   Bound_finding <-function(t){
     t2_BF10(t,n1,r,model=model,location=location,scale=scale,dff=dff, hypothesis =hypothesis )- D
   }
-  x <- tryCatch(stats::uniroot(Bound_finding, lower = -7, upper = 0)$root, error = function(e) NA)
-  y <- tryCatch(stats::uniroot(Bound_finding, lower =  0, upper = 7)$root, error = function(e) NA)
+  x <- tryCatch(stats::uniroot(Bound_finding, lower = -6, upper = 0)$root, error = function(e) NA)
+  y <- tryCatch(stats::uniroot(Bound_finding, lower =  0, upper = 6)$root, error = function(e) NA)
   results <- c(x, y)
 
   results <- results[!is.na(results)]
@@ -6686,6 +6681,7 @@ t2_N_finder<-function(D,r,target,model,location,scale,dff, hypothesis ,
         t2_TPE(t , n1,r , model_d , location_d,scale_d,dff_d, hypothesis) - target
   }
   N1.power <-  stats::uniroot(Power_root,lower = lower,upper =  upper)$root
+  #N1.power <- robust_uniroot(Power_root, lower = 2)
   t  <-  t2_BF10_bound(D,  N1.power,r,model ,location ,scale,dff , hypothesis)
   FPE <- t2_FPE(t,N1.power,r, hypothesis)
   if (FPE <= alpha) return(N1.power)
@@ -7049,7 +7045,7 @@ t2e_FNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
 
   if (model =="Point"){
     x = switch(hypothesis,
-               "!=" = {pnct(min(t),df,ncp= location*constant,lower = T)- pnct(max(t),df,ncp=location*constant,lower = T)},
+               "!=" = {pnct(max(t),df,ncp= location*constant,lower = T)- pnct(min(t),df,ncp=location*constant,lower = T)},
                "<"  = {pnct(t,df,ncp = location *constant,lower  = F)},
                ">"  = {pnct(t,df,ncp = location *constant,lower  = T)}
     )
@@ -7216,7 +7212,7 @@ t2e_N_finder<-function(D,r,target,model,scale,dff, hypothesis,e ,
 
     target - pro
   }
-  N1.power <- robust_stats::uniroot(Power_root, lower = 2)
+  N1.power <- robust_uniroot(Power_root, lower = 2)
   t <- t2e_BF10_bound(D, N1.power,r,model,scale,dff , hypothesis,e)
   FPE <-t2e_FPE(t,N1.power,r,model ,scale,dff , hypothesis ,e)
 
@@ -7227,7 +7223,7 @@ t2e_N_finder<-function(D,r,target,model,scale,dff, hypothesis,e ,
     pro <- t2e_FPE(t,n1,r,model ,scale,dff , hypothesis ,e)
     return(pro - alpha)
   }
-  N1.alpha <- robust_stats::uniroot(alpha.root , lower = N1.power)
+  N1.alpha <- robust_uniroot(alpha.root , lower = N1.power)
   return(N1.alpha)
   }
 
@@ -7260,13 +7256,13 @@ t2e_table<-function(D,r,target,model,scale,dff, hypothesis,e ,
   if (de_an_prior == 1) {
     TPE       <- t2e_TPE(t10,n1,r,model ,scale,dff , hypothesis,e ,location)
     TPR_model <- model
-    TPR_loc   <- location
+    TPR_location   <- location
     TPR_scale <- scale
     TPR_dff   <- dff
   } else {
     TPE       <- t2e_TPE(t10,n1,r,model_d ,scale_d,dff_d , hypothesis,e ,location)
     TPR_model <- model_d
-    TPR_loc   <- location
+    TPR_location   <- location
     TPR_scale <- scale_d
     TPR_dff   <- dff_d
   }
