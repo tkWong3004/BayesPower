@@ -313,11 +313,11 @@ Power_f<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model_
   graphics::par(mfrow = c(1, 2))
   plot(n, TPE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(n,FPE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
          legend = c("True positive", "False positive"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -325,11 +325,11 @@ Power_f<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model_
 
   plot(n, TNE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(n,FNE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
          legend = c("True negative", "False negative"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -679,11 +679,11 @@ Power_fe<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model
   graphics::par(mfrow = c(1, 2))
   plot(sdf, TPE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(sdf,FPE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
          legend = c("True positive", "False positive"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -691,11 +691,11 @@ Power_fe<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model
 
   plot(sdf, TNE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(sdf,FNE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
          legend = c("True negative", "False negative"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -1235,22 +1235,22 @@ Power_bin<-function(D,alpha,beta,location,scale,model,hypothesis,
   graphics::par(mfrow = c(1, 2))
   plot(Ns, TPE, type = "l",
        xlab = "Sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(Ns,FPE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
          legend = c("True positive", "False positive"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
          bty = "n")
   plot(Ns, TNE, type = "l",
        xlab = "Sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(Ns,FNE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
          legend = c("True negative", "False negative"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -1935,22 +1935,22 @@ Power_e_bin<-function(D,alpha,beta,location,scale,model,hypothesis,
   graphics::par(mfrow = c(1, 2))
   plot(sN, TPE, type = "l",
        xlab = "Sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(sN,FPE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
          legend = c("True positive", "False positive"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
          bty = "n")
   plot(sN, TNE, type = "l",
        xlab = "Sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(sN,FNE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
          legend = c("True negative", "False negative"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -2573,7 +2573,7 @@ Power_r<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
   graphics::par(mfrow = c(1, 2))
   plot(Ns, TPE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(Ns,FPE,col = "grey")
@@ -2585,7 +2585,7 @@ Power_r<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
 
   plot(Ns, TNE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(Ns,FNE,col = "grey")
@@ -3285,7 +3285,7 @@ Power_re<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
   graphics::par(mfrow = c(1, 2))
   plot(Ns, TPE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(Ns,FPE,col = "grey")
@@ -3297,7 +3297,7 @@ Power_re<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
 
   plot(Ns, TNE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(Ns,FNE,col = "grey")
@@ -3753,11 +3753,11 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
   graphics::par(mfrow = c(1, 2))
   plot(dfs+1, TPE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(dfs+1,FPE,col = "grey")
-  graphics::legend(x = df.max*.4,y=.5,              # position of the legend
+  graphics::legend(x = df.max*.1,y=.5,              # position of the legend
          legend = c("True positive", "False positive"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -3765,11 +3765,11 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
 
   plot(dfs+1, TNE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(dfs+1,FNE,col = "grey")
-  graphics::legend(x = df.max*.4,y=.5,              # position of the legend
+  graphics::legend(x = df.max*.1,y=.5,              # position of the legend
          legend = c("True negative", "False negative"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -4409,11 +4409,11 @@ Power_t1e<-function(D,model,location,scale,dff, hypothesis,
   graphics::par(mfrow = c(1, 2))
   plot(dfs+1, TPE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(dfs+1,FPE,col = "grey")
-  graphics::legend(x = df.max*.4,y=.5,              # position of the legend
+  graphics::legend(x = df.max*.1,y=.5,              # position of the legend
          legend = c("True positive", "False positive"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -4421,11 +4421,11 @@ Power_t1e<-function(D,model,location,scale,dff, hypothesis,
 
   plot(dfs+1, TNE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(dfs+1,FNE,col = "grey")
-  graphics::legend(x = df.max*.4,y=.5,              # position of the legend
+  graphics::legend(x = df.max*.1,y=.5,              # position of the legend
          legend = c("True negative", "False negative"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -4436,17 +4436,6 @@ Power_t1e<-function(D,model,location,scale,dff, hypothesis,
 
 
 # ---- proportions.r ----
-BF10_p2<-function(a0, b0, a1, b1, a2, b2,n1,n2,k1,k2){
-
-  logBF = lbeta(k1 + k2 + a0, n1 + n2 - k1 - k2 + b0) -
-    lbeta(k1 + a1, n1 - k1 + b1) -
-    lbeta(k2 + a2, n2 - k2 + b2) +
-    lbeta(a1, b1) +
-    lbeta(a2, b2) -
-    lbeta(a0, b0)
-  1/exp(logBF)
-}
-
 
 ps_N_finder<-function(D,target, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,model2,da2,db2,dp2) {
 
@@ -4463,7 +4452,7 @@ ps_N_finder<-function(D,target, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,mod
     n2 = n1*r
     grid <<- BF_grid_rcpp(D, a0, b0, a1, b1, n1, a2, b2, n2,model1,da1,db1,dp1,model2,da2,db2,dp2)
     pro <- sum_rcpp(grid$log_h1_dp,grid$PE)
-    return(pro - target - 1e-3)
+    return(pro - target - .01)
   }
   n1 <- suppressWarnings(round(stats::uniroot(power, lower = lo_n1, upper = 5000,maxiter = 10)$root))
   grid_power <- grid
@@ -4533,7 +4522,6 @@ p2_prior_plot<-function(a,b,ad,bd,dp,model,nu){
 }
 
 
-
 Power_p2<-function(D,n1, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,model2,da2,db2,dp2){
   smax = n1*1.2
   Ns = ceiling(seq(10,smax,by = (smax-10)/20))
@@ -4544,40 +4532,46 @@ Power_p2<-function(D,n1, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,model2,da2
   TNE =  array(NA, dim = c(length(Ns)))
   FNE =  array(NA, dim = c(length(Ns)))
 
-    for(i in 1:length(Ns)){
+  for(i in 1:length(Ns)){
 
-      n2 = Ns[i]*r
-      grid <- BF_grid_rcpp(D, a0, b0, a1, b1, Ns[i], a2, b2, n2,model1,da1,db1,dp1,model2,da2,db2,dp2)
-      TPE[i] <- sum_rcpp(grid$log_h1_dp,grid$PE)
-      FPE[i] <- sum_rcpp(grid$log_h0,grid$PE)
-      TNE[i] <- sum_rcpp(grid$log_h0,grid$NE)
-      FNE[i] <- sum_rcpp(grid$log_h1_dp,grid$NE)
+    n2 = Ns[i]*r
+    grid <- BF_grid_rcpp(D, a0, b0, a1, b1, Ns[i], a2, b2, n2,model1,da1,db1,dp1,model2,da2,db2,dp2)
+    TPE[i] <- sum_rcpp(grid$log_h1_dp,grid$PE)
+    FPE[i] <- sum_rcpp(grid$log_h0,grid$PE)
+    TNE[i] <- sum_rcpp(grid$log_h0,grid$NE)
+    FNE[i] <- sum_rcpp(grid$log_h1_dp,grid$NE)
 
-    }
+  }
 
-  graphics::par(mfrow = c(1, 2))
+  par(mfrow = c(1, 2))
   plot(Nt, TPE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
-  graphics::lines(Nt,FPE,col = "grey")
-  graphics::legend(x = max(Nt)*.4,y=.5,              # position of the legend
-         legend = c("True positive", "False positive"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  lines(Nt,FPE,col = "grey")
+  graphics::legend("topleft",                       # Position
+                   legend = c("True positive", "False positive"),  # Labels
+                   col = c("black", "grey"),                       # Colors
+                   lty = 1,                                        # Line type
+                   seg.len = 1,                                    # Line length (half of default)
+                   x.intersp = 0.5,                                # Space between line and text
+                   bty = "n"                                       # No box
+  )
   plot(Nt, TNE, type = "l",
        xlab = "Total ample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
-  graphics::lines(Nt,FNE,col = "grey")
-  graphics::legend(x = max(Nt)*.4,y=.5,              # position of the legend
-         legend = c("True negative", "False negative"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  lines(Nt,FNE,col = "grey")
+  graphics::legend("topleft",                       # Position
+                   legend = c("True negative", "False negative"),  # Labels
+                   col = c("black", "grey"),                       # Colors
+                   lty = 1,                                        # Line type
+                   seg.len = 1,                                    # Line length (half of default)
+                   x.intersp = 0.5,                                # Space between line and text
+                   bty = "n"                                       # No box
+  )
 
 
 
@@ -4617,7 +4611,7 @@ heatmap_p2_0<-function(x,D){
     ) +
     ggplot2::labs(title = "BF and number of success",
                   x = "x1", y = "x2") +
-    coord_fixed() +
+    ggplot2::coord_fixed() +
     ggplot2::theme_minimal()
 
 
@@ -4632,7 +4626,7 @@ heatmap_p2_0<-function(x,D){
       x = "k1",
       y = "k2"
     ) +
-    coord_fixed() +  # equal aspect ratio
+    ggplot2::coord_fixed() +  # equal aspect ratio
     ggplot2::theme_minimal()
 
 
@@ -4672,7 +4666,7 @@ heatmap_p2<-function(x,D){
       labels = labels
     ) +
     ggplot2::labs(title = "BF and number of success", x = "x1", y = "x2") +
-    coord_fixed() +
+    ggplot2::coord_fixed() +
     ggplot2::theme_minimal()
 
   # Second plot: continuous heatmap of BF
@@ -4680,11 +4674,11 @@ heatmap_p2<-function(x,D){
     ggplot2::geom_tile() +
     ggplot2::scale_fill_viridis_c(name = "log BF10") +
     ggplot2::labs(title = "Heatmap of BF", x = "k1", y = "k2") +
-    coord_fixed() +
+    ggplot2::coord_fixed() +
     ggplot2::theme_minimal()
 
   # Combine side by side
-  combined_plot <- p1 + p2 + package::plot_layout(ncol = 2)
+  combined_plot <- p1 + p2 + patchwork::plot_layout(ncol = 2)
 
   # Display
   print(combined_plot)
@@ -5415,6 +5409,7 @@ input_p2 <- shiny::reactive({
 
 shiny::observeEvent(input$runp2, {
   p2  <- input_p2()
+  gc()
   dat <- tryCatch({pro_table_p2(p2$D,p2$target, p2$a0, p2$b0,
                       p2$a1, p2$b1, p2$a2, p2$b2, p2$r,
                       p2$model1,p2$a1d,p2$b1d,p2$dp1,
@@ -5891,7 +5886,7 @@ shiny::observeEvent(input$calr, {
   output$BFrv <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('
-    \\textit{r}(', rr$N-1 , ') = ',rr$rval,', \\textit{BF}_{10} = ', round(BF10, 4), '
+    \\textit{r}(', rr$N-2 , ') = ',rr$rval,', \\textit{BF}_{10} = ', round(BF10, 4), '
 ')
 
 
@@ -6358,7 +6353,11 @@ shiny::observeEvent(input$runt2, {
                             "1" = Power_t2(t2$D,t2$model,t2$location,t2$scale,t2$dff, t2$hypothesis,
                                            t2$model_d,t2$location_d,t2$scale_d,t2$dff_d, t2$de_an_prior,dat[1,5],dat[1,6]/dat[1,5]),
                             "2" = Power_t2e(t2$D,t2$model,t2$location,t2$scale,t2$dff, t2$hypothesis,
-                                            t2$model_d,t2$location_d,t2$scale_d,t2$dff_d, t2$de_an_prior,dat[1,5],dat[1,6]/dat[1,5])))
+                                            t2$model_d,t2$location_d,t2$scale_d,t2$dff_d, t2$de_an_prior,dat[1,5],dat[1,6]/dat[1,5],t2$e)))
+
+
+
+
     pc_t2 <- grDevices::recordPlot()
   } else pc_t2 <- NA
 
@@ -6812,7 +6811,6 @@ t2_bf10 <-function(D ,n1,r, target,model ,location ,scale,dff  , hypothesis ){
 
 Power_t2<-function(D,model,location,scale,dff, hypothesis,
                    model_d,location_d,scale_d,dff_d, de_an_prior,n1,r){
-  graphics::par(mfrow = c(1, 1))
   Total_ = n1 + n1*r
   smin = 4
   smax = Total_*1.2
@@ -6827,11 +6825,11 @@ Power_t2<-function(D,model,location,scale,dff, hypothesis,
     t10 = t2_BF10_bound(D , sn1[i],r,model ,location ,scale,dff , hypothesis)
     t01 = t2_BF01_bound(D , sn1[i],r,model ,location ,scale,dff , hypothesis)
 
-    TPE[i] = switch(de_an_prior,
+    TPE[i] = switch(as.character(de_an_prior),
                       "1" = t2_TPE(t10,sn1[i],r,model ,location ,scale,dff , hypothesis ),
-                      "0" = t2_TPE(t,sn1[i],r,model_d ,location_d ,scale_d,dff_d , hypothesis ))
+                      "0" = t2_TPE(t10,sn1[i],r,model_d ,location_d ,scale_d,dff_d , hypothesis ))
     FPE[i] = t2_FPE(t10,sn1[i],r, hypothesis)
-    FNE[i] = switch(de_an_prior,
+    FNE[i] = switch(as.character(de_an_prior),
                       "1" = t2_FNE(t01,sn1[i],r,model ,location ,scale,dff , hypothesis ),
                       "0" = t2_FNE(t01,sn1[i],r,model_d ,location_d ,scale_d,dff_d , hypothesis ))
     TNE[i] = t2_TNE(t01,sn1[i],r, hypothesis)
@@ -6841,11 +6839,11 @@ Power_t2<-function(D,model,location,scale,dff, hypothesis,
   graphics::par(mfrow = c(1, 2))
   plot(sdf, TPE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(sdf,FPE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
          legend = c("True positive", "False positive"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -6853,11 +6851,11 @@ Power_t2<-function(D,model,location,scale,dff, hypothesis,
 
   plot(sdf, TNE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(sdf,FNE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
          legend = c("True negative", "False negative"),  # labels
          col = c("black", "grey"),   # colors matching lines
          lty = 1,                   # line type (solid)
@@ -7336,53 +7334,53 @@ t2e_BF <-function(D,n1,r,model ,scale,dff , hypothesis ,e){
 
 
 Power_t2e<-function(D,model,location,scale,dff, hypothesis,
-                   model_d,location_d,scale_d,dff_d, de_an_prior,n1,r){
+                    model_d,location_d,scale_d,dff_d, de_an_prior,n1,r,e){
   Total_ = n1 + n1*r
   smin = 4
   smax = Total_*1.2
   sdf = seq(smin,smax , by = (smax-smin)/30)
   sn1 = sdf/(1+r)
-  TPE = array(NA, dim = c(length(sdf)))
-  FPE = array(NA, dim = c(length(sdf)))
-  TNE = array(NA, dim = c(length(sdf)))
-  FNE = array(NA, dim = c(length(sdf)))
+  TPE =  array(NA, dim = c(length(sdf)))
+  FPE  =  array(NA, dim = c(length(sdf)))
+  TNE  =  array(NA, dim = c(length(sdf)))
+  FNE  =  array(NA, dim = c(length(sdf)))
 
   for ( i in 1:length(sdf)){
     t10 = t2e_BF10_bound(D, sn1[i],r,model,scale,dff , hypothesis,e)
     t01 = t2e_BF01_bound(D, sn1[i],r,model,scale,dff , hypothesis,e)
-    TPE[i] = switch(de_an_prior,
-                      "1" = t2e_TPE(t10,sn1[i],r,model ,scale,dff , hypothesis ,e,location),
-                      "0" = t2e_TPE(t10,sn1[i],r,model_d ,scale_d,dff_d , hypothesis ,e,location_d))
+    TPE[i] = switch(as.character(de_an_prior),
+                    "1" = t2e_TPE(t10,sn1[i],r,model ,scale,dff , hypothesis ,e,location),
+                    "0" = t2e_TPE(t10,sn1[i],r,model_d ,scale_d,dff_d , hypothesis ,e,location_d))
     FPE[i] = t2e_FPE(t10,sn1[i],r,model ,scale,dff , hypothesis ,e)
     TNE[i] = t2e_TNE(t01,sn1[i],r,model ,scale,dff , hypothesis ,e)
-    FNE[i] = switch(de_an_prior,
-                 "1" = t2e_FNE(t01,sn1[i],r,model ,scale,dff , hypothesis ,e,location),
-                 "0" = t2e_FNE(t01,sn1[i],r,model_d ,scale_d,dff_d , hypothesis ,e,location_d))
+    FNE[i] = switch(as.character(de_an_prior),
+                    "1" = t2e_FNE(t01,sn1[i],r,model ,scale,dff , hypothesis ,e,location),
+                    "0" = t2e_FNE(t01,sn1[i],r,model_d ,scale_d,dff_d , hypothesis ,e,location_d))
 
   }
   graphics::par(mfrow = c(1, 2))
   plot(sdf, TPE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(sdf,FPE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
-         legend = c("True positive", "False positive"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
+                   legend = c("True positive", "False positive"),  # labels
+                   col = c("black", "grey"),   # colors matching lines
+                   lty = 1,                   # line type (solid)
+                   bty = "n")
 
   plot(sdf, TNE, type = "l",
        xlab = "Total sample size",
-       ylab = bquote("p(BF"[10]~">"~.(D)~"| H1)"),
+       ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(sdf,FNE,col = "grey")
-  graphics::legend(x = smax*.4,y=.5,              # position of the legend
-         legend = c("True negative", "False negative"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
-}
+  graphics::legend(x = smax*.1,y=.5,              # position of the legend
+                   legend = c("True negative", "False negative"),  # labels
+                   col = c("black", "grey"),   # colors matching lines
+                   lty = 1,                   # line type (solid)
+                   bty = "n")
 
+}

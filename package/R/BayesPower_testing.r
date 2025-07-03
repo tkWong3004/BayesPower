@@ -688,7 +688,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                                        shiny::numericInput("rdf", "\\( \\text{Sample size:} \\)", value = 50)
                                 ),
                                 shiny::column(6,
-                                       shiny::sliderInput("rval", "\\(\\text{Pearson's:} \\)", min = -1, max = 1, value = 0, step = 0.01, ticks = FALSE)
+                                       shiny::numericInput("rval", "\\(\\text{Pearson's:} \\)", value = 0)
                                 )
                               ),
                               shiny::actionButton("calr", label = "\\( \\text{Calculate} \\)"),
@@ -1097,7 +1097,7 @@ shiny::navbarMenu(
 
                  shiny::column(4,
                         shiny::conditionalPanel("input.modelbin == 1",
-                                         shiny::sliderInput("betabin", "\\(\\beta\\)", min = 0.01, max = 100, value = 1, step = 0.01, ticks = FALSE))
+                                         shiny::sliderInput("betabin", "\\(\\beta\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE))
                  )
                ),
 
@@ -1132,7 +1132,7 @@ shiny::navbarMenu(
                                                    ),
                                                    shiny::column(4,
                                                           shiny::conditionalPanel("input.modelbind == 1",
-                                                                           shiny::sliderInput("betabind", "\\(\\beta\\)", min = 0.01, max = 100, value = 1, step = 0.01, ticks = FALSE))
+                                                                           shiny::sliderInput("betabind", "\\(\\beta\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE))
                                                    )
                                                  )
                                 )
