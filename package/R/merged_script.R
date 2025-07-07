@@ -57,7 +57,7 @@ F_TPE<-function(f,q,m,dff,rscale,f_m,model){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
   if (model == "Point"){
-    x = stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = F)
+    x = stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = F)
     return(x)
   }
   int  <- function(fsq){
@@ -73,7 +73,7 @@ F_FNE<-function(f,q,m,dff,rscale,f_m,model){
 
   if (model == "Point"){
 
-    x = stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = T)
+    x = stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = T)
     return(x)
   }
   int  <- function(fsq){
@@ -379,7 +379,7 @@ Fe_TPE<-function(f,q,m,dff,rscale,f_m,model,e){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
 
-  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = F))
+  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = F))
 
   normalizationh1  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-5)$value
   int  <- function(fsq){
@@ -395,7 +395,7 @@ Fe_FNE<-function(f,q,m,dff,rscale,f_m,model,e){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
 
-  if (model == "Point") stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = T)
+  if (model == "Point") stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = T)
 
   normalizationh1  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
   int  <- function(fsq){
@@ -1156,11 +1156,11 @@ bin_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis){
 
   graphics::par(mfrow = c(1, 2))
 
-  if (length(b.BF10)== 2){  graphics::part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1]) / .(BF10_at_b[2])))}else{graphics::part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1])))}
+  if (length(b.BF10)== 2){  part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1]) / .(BF10_at_b[2])))}else{part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1])))}
 
-  if (length(b.BF10)== 2){  graphics::part2 = bquote("when x = " ~ .(b.BF10[1]) / .(b.BF10[2]))}else{  graphics::part2 <- bquote("when x = " ~ .(b.BF10[1]))}
+  if (length(b.BF10)== 2){  part2 = bquote("when x = " ~ .(b.BF10[1]) / .(b.BF10[2]))}else{  part2 <- bquote("when x = " ~ .(b.BF10[1]))}
 
-  main <- bquote(bold(.(graphics::part1) ~ .(graphics::part2)))
+  main <- bquote(bold(.(part1) ~ .(part2)))
 
   plot(x, BF10, type = "l", log = "y", xlab = "Number of success", ylab = expression("BF"[10]),
        main = main, frame.plot = FALSE, xaxt = "n")
@@ -1189,14 +1189,14 @@ bin_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis){
     graphics::axis(1, round(b.BF01, 2))
 
     if (length(b.BF10) == 2) {
-      graphics::part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])) / bold(.(BF10_at_b[2])))
-      graphics::part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1])) / bold(.(b.BF10[2]))))
+      part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])) / bold(.(BF10_at_b[2])))
+      part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1])) / bold(.(b.BF10[2]))))
     } else {
-      graphics::part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])))
-      graphics::part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1]))))
+      part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])))
+      part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1]))))
     }
 
-    main.bf01 = bquote(bold(.(graphics::part1) ~ .(graphics::part2)))
+    main.bf01 = bquote(bold(.(part1) ~ .(part2)))
     graphics::title(main = main.bf01)
   }
 }
@@ -1851,11 +1851,11 @@ bin_e_bf10 <-function(DD,n,alpha,beta,location,scale,model,hypothesis,e){
   BF10_at_b  <- round(bin_e_BF(b.BF10,n,alpha,beta,location,scale,model,hypothesis,e),2)
   BF10       <- bin_e_BF(x,n,alpha,beta,location,scale,model,hypothesis,e)
 
-  if (length(b.BF10)== 2){  graphics::part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1]) / .(BF10_at_b[2])))}else{graphics::part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1])))}
+  if (length(b.BF10)== 2){  part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1]) / .(BF10_at_b[2])))}else{part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1])))}
 
-  if (length(b.BF10)== 2){  graphics::part2 = bquote("when x = " ~ .(b.BF10[1]) / .(b.BF10[2]))}else{  graphics::part2 <- bquote("when x = " ~ .(b.BF10[1]))}
+  if (length(b.BF10)== 2){  part2 = bquote("when x = " ~ .(b.BF10[1]) / .(b.BF10[2]))}else{  part2 <- bquote("when x = " ~ .(b.BF10[1]))}
 
-  main <- bquote(bold(.(graphics::part1) ~ .(graphics::part2)))
+  main <- bquote(bold(.(part1) ~ .(part2)))
 
   graphics::par(mfrow = c(1, 2))
   plot(x, BF10, type = "l", log = "y", xlab = "Number of success", ylab = expression("BF"[10]),
@@ -1884,13 +1884,13 @@ bin_e_bf10 <-function(DD,n,alpha,beta,location,scale,model,hypothesis,e){
     graphics::axis(1, round(b.BF01, 2))
 
     if (length(b.BF10) == 2) {
-      graphics::part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])) / bold(.(BF10_at_b[2])))
-      graphics::part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1])) / bold(.(b.BF10[2]))))
+      part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])) / bold(.(BF10_at_b[2])))
+      part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1])) / bold(.(b.BF10[2]))))
     } else {
-      graphics::part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])))
-      graphics::part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1]))))
+      part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])))
+      part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1]))))
     }
-    main.bf01 = bquote(bold(.(graphics::part1) ~ .(graphics::part2)))
+    main.bf01 = bquote(bold(.(part1) ~ .(part2)))
     graphics::title(main = main.bf01)
   }
 
@@ -5007,7 +5007,8 @@ server_f<- function(input, output, session) {
 input_f <- shiny::reactive({
   mode_bf <- switch(input$Modef,
                     "1" = 1,
-                    "2" = 0)
+                    "2" = 0,
+                    "3" = 0)
  anovareg <- input$ANOREG
  reduced_model <-input$redf
  f1 <-input$f1
@@ -5300,18 +5301,21 @@ shiny::observeEvent(input$calf, {
 
   output$BFcalf <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
-    table_html <- paste0('
-    \\textit{F(',ff$df1,',',ff$df2,')} = ',ff$fval,', \\textit{BF}_{10} = ', round(BF10, 4), '
-')
-
-
-    # Render the table using MathJax
-    shiny::tagList(
-      # Render the table using MathJax
-      shiny::withMathJax(
-        shiny::em(table_html)
+    output$BFcalf <- renderUI({
+      # Create the LaTeX formatted string with proper escaping
+      table_latex <- paste0(
+        "$$ \\textit{F}(", ff$df1, ",", ff$df2,
+        ") = ", round(ff$fval, 3),
+        ",\\ \\textit{BF}_{10} = ", round(BF10, 4), " $$"
       )
-    )
+
+      tagList(
+        withMathJax(
+          em(table_latex)
+        )
+      )
+    })
+
   })
 
 })

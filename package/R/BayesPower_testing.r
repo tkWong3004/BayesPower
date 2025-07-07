@@ -907,44 +907,45 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                  ),
                  selected = 1,
                  inline = TRUE
-               )
-             ),
-
-             # Design prior ≠ analysis prior
-             shiny::conditionalPanel(
-               condition = "input.priorf == 2",
-               shinyWidgets::prettyRadioButtons(
-                 inputId = "modelfd",
-                 label = shiny::em("\\(\\text{Design Prior Distribution}\\)"),
-                 choices = list(
-                   "\\( \\text{Effect size prior} \\)" = 1,
-                   "\\( \\text{Moment prior (must df ≥ 3)} \\)" = 2,
-                   "\\( \\text{Point} \\)" = 3
-                 ),
-                 inline = TRUE,
-                 selected = 1
                ),
-               shiny::fluidRow(
-                 shiny::column(width = 4,
-                        shiny::conditionalPanel(condition = "input.modelfd == 1",
-                                         shiny::sliderInput("rfd", "\\(\\text{r scale:}\\)", min = 0, max = 3, value = 1, step = 0.01, ticks = FALSE)
-                        ),
-                        shiny::conditionalPanel(condition = "input.modelfd == 3",
-                                         shiny::sliderInput("lfd", "\\(\\lambda^2:\\)", min = 0, max = 0.5, value = 0.1, step = 0.01, ticks = FALSE)
-                        )
+               # Design prior ≠ analysis prior
+               shiny::conditionalPanel(
+                 condition = "input.priorf == 2",
+                 shinyWidgets::prettyRadioButtons(
+                   inputId = "modelfd",
+                   label = shiny::em("\\(\\text{Design Prior Distribution}\\)"),
+                   choices = list(
+                     "\\( \\text{Effect size prior} \\)" = 1,
+                     "\\( \\text{Moment prior (must df ≥ 3)} \\)" = 2,
+                     "\\( \\text{Point} \\)" = 3
+                   ),
+                   inline = TRUE,
+                   selected = 1
                  ),
-                 shiny::column(width = 4,
-                        shiny::conditionalPanel(condition = "input.modelfd == 1|input.modelfd == 2",
-                                         shiny::sliderInput("fsdfd", "\\(\\mathcal{f}^2 :\\)", min = 0.01, max = 0.5, value = 0.1, step = 0.01, ticks = FALSE)
-                        )
-                 ),
-                 shiny::column(width = 4,
-                        shiny::conditionalPanel(condition = "input.modelfd == 1|input.modelfd == 2",
-                                         shiny::sliderInput("dffd", "\\(\\text{df :}\\)", min = 1, max = 100, value = 1, step = 1, ticks = FALSE)
-                        )
+                 shiny::fluidRow(
+                   shiny::column(width = 4,
+                                 shiny::conditionalPanel(condition = "input.modelfd == 1",
+                                                         shiny::sliderInput("rfd", "\\(\\text{r scale:}\\)", min = 0, max = 3, value = 1, step = 0.01, ticks = FALSE)
+                                 ),
+                                 shiny::conditionalPanel(condition = "input.modelfd == 3",
+                                                         shiny::sliderInput("lfd", "\\(\\lambda^2:\\)", min = 0, max = 0.5, value = 0.1, step = 0.01, ticks = FALSE)
+                                 )
+                   ),
+                   shiny::column(width = 4,
+                                 shiny::conditionalPanel(condition = "input.modelfd == 1|input.modelfd == 2",
+                                                         shiny::sliderInput("fsdfd", "\\(\\mathcal{f}^2 :\\)", min = 0.01, max = 0.5, value = 0.1, step = 0.01, ticks = FALSE)
+                                 )
+                   ),
+                   shiny::column(width = 4,
+                                 shiny::conditionalPanel(condition = "input.modelfd == 1|input.modelfd == 2",
+                                                         shiny::sliderInput("dffd", "\\(\\text{df :}\\)", min = 1, max = 100, value = 1, step = 1, ticks = FALSE)
+                                 )
+                   )
                  )
                )
-             ),
+             )
+
+            ,
 
              # Sample size determination controls
              shiny::conditionalPanel(condition = "input.Modef == 1",
