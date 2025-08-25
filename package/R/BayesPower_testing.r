@@ -1,4 +1,6 @@
-
+#' @useDynLib BayesPower, .registration = TRUE
+#' @importFrom Rcpp evalCpp
+NULL
 
 ui <-
   shiny::navbarPage(id = "id",
@@ -20,6 +22,7 @@ ui <-
 
       shiny::sidebarLayout(
         shiny::sidebarPanel(
+          shiny::tags$h4("\\(\\text{One-sample / paired t-test}\\)"),
           # Mode selection
           shinyWidgets::prettyRadioButtons(
             "Modet1",
@@ -41,7 +44,7 @@ ui <-
                      label = shiny::em("\\(\\mathcal{H}_0:\\)"),
                      choices = list(
                        "\\(\\delta = 0\\)" = 1,
-                       "\\(\\delta \\in \\{-\\epsilon, \\epsilon\\}\\)" = 2
+                       "\\(\\delta \\in [-\\epsilon, \\epsilon]\\)"= 2
                      ),
                      inline = TRUE,
                      selected = 1
@@ -66,7 +69,7 @@ ui <-
                                       inputId = "h1t1e",
                                       label = shiny::em("\\(\\mathcal{H}_1:\\)"),
                                       choices = list(
-                                        "\\(\\delta \\not\\in \\{-\\epsilon, \\epsilon\\}\\)" = 1,
+                                        "\\(\\delta \\not\\in [-\\epsilon, \\epsilon]\\)" = 1,
                                         "\\(\\delta > \\epsilon\\)" = 2,
                                         "\\(\\delta < \\epsilon\\)" = 3
                                       ),
@@ -178,13 +181,30 @@ ui <-
 
           # Power / error control
           shiny::conditionalPanel("input.Modet1 == 1",
+                                  shinyWidgets::prettyRadioButtons(
+                                    inputId = "t1_direct",
+                                    label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                                    choices = list(
+                                      "\\(\\mathrm{BF}_{10}\\)" = 1,
+                                      "\\(\\mathrm{BF}_{01}\\)" = 0
+                                    ),
+                                    selected = 1,
+                                    inline = TRUE
+                                  ),
+
                            shiny::em("\\(\\text{Controlling for the probability of}\\)"),
                            shiny::fluidRow(
                              shiny::column(6,
-                                    shiny::sliderInput("powert1", "\\(\\text{True Positive Evidence:}\\)", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
+                                           shiny::conditionalPanel("input.t1_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                                           shiny::conditionalPanel("input.t1_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
+
+                                           shiny::sliderInput("powert1", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
                              ),
                              shiny::column(6,
-                                    shiny::sliderInput("alphat1", "\\(\\text{False Positive Evidence:}\\)", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
+
+                                           shiny::conditionalPanel("input.t1_direct == 1",shiny::em("\\(\\text{False positive:}\\)")),
+                                           shiny::conditionalPanel("input.t1_direct == 0",shiny::em("\\(\\text{False negative:}\\)")),
+                                           shiny::sliderInput("alphat1", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
                              )
                            )
           ),
@@ -226,7 +246,7 @@ ui <-
               choices = list("\\(\\text{Power Curve}\\)" = 1, "\\(\\text{Relationship between BF and data}\\)" = 2),
               selected = NULL
             ),
-            shiny::downloadButton("export_t1", "Download result as PDF")
+            shiny::downloadButton("export_t1", "Download result as HTML")
           )
         ),
 
@@ -242,6 +262,7 @@ ui <-
       shiny::withMathJax(),
       shiny::sidebarLayout(
         shiny::sidebarPanel(
+          shiny::tags$h4("\\(\\text{Independent samples t-test}\\)"),
           # Mode selection
           shinyWidgets::prettyRadioButtons(
             inputId = "Modet2",
@@ -264,7 +285,7 @@ ui <-
                 label = shiny::em("\\(\\mathcal{H}_0:\\)"),
                 choices = list(
                   "\\(\\delta = 0\\)" = 1,
-                  "\\(\\delta \\in \\{-\\epsilon, \\epsilon\\}\\)" = 2
+                  "\\(\\delta \\in [-\\epsilon, \\epsilon]\\)" = 2
                 ),
                 selected = 1,
                 inline = TRUE
@@ -292,7 +313,7 @@ ui <-
                   inputId = "h1t2e",
                   label = shiny::em("\\(\\mathcal{H}_1:\\)"),
                   choices = list(
-                    "\\(\\delta \\not\\in \\{-\\epsilon, \\epsilon\\}\\)" = 1,
+                    "\\(\\delta \\not\\in [-\\epsilon, \\epsilon]\\)" = 1,
                     "\\(\\delta > \\epsilon\\)" = 2,
                     "\\(\\delta < \\epsilon\\)" = 3
                   ),
@@ -417,10 +438,27 @@ ui <-
 
           # Controls for sample size determination
           shiny::conditionalPanel("input.Modet2 == 1",
+                                  shinyWidgets::prettyRadioButtons(
+                                    inputId = "t2_direct",
+                                    label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                                    choices = list(
+                                      "\\(\\mathrm{BF}_{10}\\)" = 1,
+                                      "\\(\\mathrm{BF}_{01}\\)" = 0
+                                    ),
+                                    selected = 1,
+                                    inline = TRUE
+                                  ),
                            shiny::em("\\(\\text{Controlling for the probability of}\\)"),
                            shiny::fluidRow(
-                             shiny::column(6, shiny::sliderInput("powert2", "\\(\\text{True Positive Evidence:}\\)", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)),
-                             shiny::column(6, shiny::sliderInput("alphat2", "\\(\\text{False Positive Evidence:}\\)", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE))
+                             shiny::column(6,
+
+                                           shiny::conditionalPanel("input.t2_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                                           shiny::conditionalPanel("input.t2_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
+                                           shiny::sliderInput("powert2", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)),
+                             shiny::column(6,
+                                           shiny::conditionalPanel("input.t2_direct == 1",shiny::em("\\(\\text{False positive:}\\)")),
+                                           shiny::conditionalPanel("input.t2_direct == 0",shiny::em("\\(\\text{False negative:}\\)")),
+                                           shiny::sliderInput("alphat2", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE))
                            )
           ),
 
@@ -457,7 +495,7 @@ ui <-
               choices = list("\\(\\text{Power Curve}\\)" = 1, "\\(\\text{Relationship between BF and data}\\)" = 2),
               selected = NULL
             ),
-            shiny::downloadButton("export_t2", "Download result as PDF")
+            shiny::downloadButton("export_t2", "Download result as HTML")
           )
 
 
@@ -483,6 +521,7 @@ ui <-
 shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
          shiny::sidebarLayout(
            shiny::sidebarPanel(
+             shiny::tags$h4("\\(\\text{Correlation}\\)"),
              shinyWidgets::prettyRadioButtons(
                inputId = "Moder",
                label = "\\(\\text{Select Mode}\\)",
@@ -503,7 +542,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                         label = shiny::em("\\(\\mathcal{H}_0:\\)"),
                         choices = list(
                           "\\(\\rho = \\rho_0\\)" = 1,
-                          "\\(\\rho \\in (\\rho_0 - \\epsilon, \\rho_0 + \\epsilon)\\)" = 2
+                          "\\(\\rho \\in [\\rho_0 - \\epsilon, \\rho_0 + \\epsilon]\\)"= 2
                         ),
                         selected = 1,
                         inline = TRUE
@@ -530,7 +569,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                           inputId = "h1re",
                           label = shiny::em("\\(\\mathcal{H}_1:\\)"),
                           choices = list(
-                            "\\(\\rho \\not\\in \\{\\rho_0 -\\epsilon, \\rho_0 +\\epsilon\\}\\)" = 1,
+                            "\\(\\rho \\not\\in [\\rho_0 -\\epsilon, \\rho_0 +\\epsilon]\\)" = 1,
                             "\\(\\rho > \\rho_0 + \\epsilon\\)" = 2,
                             "\\(\\rho < \\rho_0 - \\epsilon\\)" = 3
                           ),
@@ -652,15 +691,28 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
 
              # Power planning
              shiny::conditionalPanel("input.Moder == 1",
+                                     shinyWidgets::prettyRadioButtons(
+                                       inputId = "r_direct",
+                                       label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                                       choices = list(
+                                         "\\(\\mathrm{BF}_{10}\\)" = 1,
+                                         "\\(\\mathrm{BF}_{01}\\)" = 0
+                                       ),
+                                       selected = 1,
+                                       inline = TRUE
+                                     ),
                               shiny::em("\\(\\text{Controlling for the probability of}\\)"),
                               shiny::fluidRow(
                                 shiny::column(6,
-                                       shiny::sliderInput("powerr", "\\( \\text{True Positive Evidence:} \\)", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
+                                              shiny::conditionalPanel("input.r_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                                              shiny::conditionalPanel("input.r_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
+                                       shiny::sliderInput("powerr", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
                                 ),
-                                shiny::column(6,
-                                       shiny::conditionalPanel("input.h0r == 1 | input.h0r == 2",
-                                                        shiny::sliderInput("alphapr", "\\( \\text{False Positive Evidence:} \\)", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
-                                       )
+                              shiny::column(6,
+                                            shiny::conditionalPanel("input.r_direct == 1",shiny::em("\\(\\text{False positive:}\\)")),
+                                            shiny::conditionalPanel("input.r_direct == 0",shiny::em("\\(\\text{False negative:}\\)")),
+                                        shiny::sliderInput("alphapr", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
+
                                 )
                               )
              ),
@@ -702,7 +754,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                  choices = list("\\(\\text{Power Curve}\\)" = 1, "\\(\\text{Relationship between BF and data}\\)" = 2),
                  selected = NULL
                ),
-               shiny::downloadButton("export_r", "Download result as PDF")
+               shiny::downloadButton("export_r", "Download result as HTML")
              )
            ),
 
@@ -838,7 +890,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                         label = shiny::em("$$\\mathcal{H}_0:$$"),
                         choices = list(
                           "\\(\\lambda^2 = 0 \\)" = 1,
-                          "\\(\\lambda^2 \\in \\{0, \\epsilon\\}\\)" = 2
+                          "\\(\\lambda^2 \\in [0, \\epsilon]\\)" = 2
                         ),
                         inline = TRUE,
                         selected = 1
@@ -949,12 +1001,27 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
 
              # Sample size determination controls
              shiny::conditionalPanel(condition = "input.Modef == 1",
+                                     shinyWidgets::prettyRadioButtons(
+                                       inputId = "f_direct",
+                                       label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                                       choices = list(
+                                         "\\(\\mathrm{BF}_{10}\\)" = 1,
+                                         "\\(\\mathrm{BF}_{01}\\)" = 0
+                                       ),
+                                       selected = 1,
+                                       inline = TRUE
+                                     ),
                               shiny::fluidRow(
                                 shiny::column(width = 6,
-                                       shiny::sliderInput("powerf", "\\( \\text{True Positive Evidence:} \\)", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
+
+                                              shiny::conditionalPanel("input.f_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                                              shiny::conditionalPanel("input.f_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
+                                              shiny::sliderInput("powerf", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
                                 ),
                                 shiny::column(width = 6,
-                                       shiny::sliderInput("alphaf", "\\( \\text{False Positive Evidence:} \\)", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
+                                              shiny::conditionalPanel("input.f_direct == 1",shiny::em("\\(\\text{False positive:}\\)")),
+                                              shiny::conditionalPanel("input.f_direct == 0",shiny::em("\\(\\text{False negative:}\\)")),
+                                              shiny::sliderInput("alphaf", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
                                 )
                               )
              ),
@@ -993,7 +1060,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                  choices = list("\\(\\text{Power Curve}\\)" = 1, "\\(\\text{Relationship between BF and data}\\)" = 2),
                  selected = NULL
                ),
-               shiny::downloadButton("export_f", "Download result as PDF")
+               shiny::downloadButton("export_f", "Download result as HTML")
              )
            ),
 
@@ -1015,6 +1082,7 @@ shiny::navbarMenu(
   shiny::tabPanel("\\(\\text{One proportion - binomial}\\)", shiny::withMathJax(),
            shiny::sidebarLayout(
              shiny::sidebarPanel(
+               shiny::tags$h4("\\(\\text{One proportion - binomial}\\)"),
                shinyWidgets::prettyRadioButtons(
                  "Modebin", "\\(\\text{Select Mode}\\)",
                  choices = list(
@@ -1030,8 +1098,8 @@ shiny::navbarMenu(
                         shinyWidgets::prettyRadioButtons(
                           inputId = "h0bin", label = shiny::em("\\(\\mathcal{H}_0:\\)"),
                           choices = list(
-                            "\\(p = p_0\\)" = 1,
-                            "\\(p \\in (p_0 - \\epsilon, p_0 + \\epsilon)\\)" = 2
+                            "\\(\\theta = \\theta_0\\)" = 1,
+                            "\\(\\theta \\in [\\theta_0 - \\epsilon, \\theta_0 + \\epsilon]\\)" = 2
                           ),
                           selected = 1, inline = TRUE
                         )),
@@ -1042,9 +1110,9 @@ shiny::navbarMenu(
                           shinyWidgets::prettyRadioButtons(
                             inputId = "h1bin", label = shiny::em("\\(\\mathcal{H}_1:\\)"),
                             choices = list(
-                              "\\(p ≠ p_0\\)" = 1,
-                              "\\(p > p_0\\)" = 2,
-                              "\\(p < p_0\\)" = 3
+                              "\\(\\theta ≠ \\theta_0\\)" = 1,
+                              "\\(\\theta > \\theta_0\\)" = 2,
+                              "\\(\\theta < \\theta_0\\)" = 3
                             ),
                             selected = 1, inline = TRUE
                           )
@@ -1055,9 +1123,9 @@ shiny::navbarMenu(
                           shinyWidgets::prettyRadioButtons(
                             inputId = "h1bine", label = shiny::em("\\(\\mathcal{H}_1:\\)"),
                             choices = list(
-                              "\\(p \\not\\in \\{p_0 -\\epsilon, p_0 +\\epsilon\\}\\)" = 1,
-                              "\\(p > p_0 + \\epsilon\\)" = 2,
-                              "\\(p < p_0 - \\epsilon\\)" = 3
+                              "\\(\\theta \\not\\in [\\theta_0 -\\epsilon, \\theta_0 +\\epsilon]\\)" = 1,
+                              "\\(\\theta > \\theta_0 + \\epsilon\\)" = 2,
+                              "\\(\\theta < \\theta_0 - \\epsilon\\)" = 3
                             ),
                             selected = 1, inline = TRUE
                           )
@@ -1145,10 +1213,26 @@ shiny::navbarMenu(
                ),
 
                shiny::conditionalPanel("input.Modebin == 1",
+                                       shinyWidgets::prettyRadioButtons(
+                                         inputId = "bin_direct",
+                                         label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                                         choices = list(
+                                           "\\(\\mathrm{BF}_{10}\\)" = 1,
+                                           "\\(\\mathrm{BF}_{01}\\)" = 0
+                                         ),
+                                         selected = 1,
+                                         inline = TRUE
+                                       ),
                                 shiny::em("\\(\\text{Controlling for the probability of}\\)"),
                                 shiny::fluidRow(
-                                  shiny::column(6, shiny::sliderInput("powerbin", "\\(\\text{True Positive Evidence:}\\)", min = .5, max = .99, value = .8, step = .01, ticks = FALSE)),
-                                  shiny::column(6, shiny::sliderInput("FP_bin", "\\(\\text{False Positive Evidence:}\\)", min = .001, max = .05, value = .05, step = .001, ticks = FALSE))
+                                  shiny::column(6,
+                                                shiny::conditionalPanel("input.bin_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                                                shiny::conditionalPanel("input.bin_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
+                                                shiny::sliderInput("powerbin", "", min = .5, max = .99, value = .8, step = .01, ticks = FALSE)),
+                                  shiny::column(6,
+                                                shiny::conditionalPanel("input.bin_direct == 1",shiny::em("\\(\\text{False positive:}\\)")),
+                                                shiny::conditionalPanel("input.bin_direct == 0",shiny::em("\\(\\text{False negative:}\\)")),
+                                                shiny::sliderInput("FP_bin", "", min = .001, max = .05, value = .05, step = .001, ticks = FALSE))
                                 )
                ),
 
@@ -1181,7 +1265,7 @@ shiny::navbarMenu(
                    choices = list("\\(\\text{Power Curve}\\)" = 1, "\\(\\text{Relationship between BF and data}\\)" = 2),
                    selected = NULL
                  ),
-                 shiny::downloadButton("export_bin", "Download result as PDF")
+                 shiny::downloadButton("export_bin", "Download result as HTML")
                )
 
 
@@ -1195,6 +1279,7 @@ shiny::navbarMenu(
            )
   ), shiny::tabPanel("\\(\\text{Two proportion}\\)",shiny::withMathJax(),
 shiny::sidebarLayout(shiny::sidebarPanel(
+  shiny::tags$h4("\\(\\text{Two proportion}\\)"),
   shinyWidgets::prettyRadioButtons(
     "Modep2", "\\(\\text{Select Mode}\\)",
     choices = list(
@@ -1205,9 +1290,9 @@ shiny::sidebarLayout(shiny::sidebarPanel(
     selected = 1, inline = TRUE
   ) ,shiny::fluidRow(
     shiny::column(5,
-           shiny::em("\\(\\mathcal{H}_0: p_0 = p_1 = p_2\\)"),
+           shiny::em("\\(\\mathcal{H}_0: \\theta_0 = \\theta_1 = \\theta_2\\)"),
            shiny::br(),
-           shiny::em("\\(p_0 \\sim \\text{Beta}(\\alpha_0, \\beta_0)\\)")
+           shiny::em("\\(\\theta_0 \\sim \\text{Beta}(\\alpha_0, \\beta_0)\\)")
 
 
 
@@ -1218,11 +1303,11 @@ shiny::sidebarLayout(shiny::sidebarPanel(
 
 
     shiny::column(5,
-           shiny::em("\\(\\mathcal{H}_1: p_1 \\neq p_2\\)"),
+           shiny::em("\\(\\mathcal{H}_1: \\theta_1 \\neq \\theta_2\\)"),
            shiny::br(),
-           shiny::em("\\(p_1 \\sim \\text{Beta}(\\alpha_1, \\beta_1)\\)"),
+           shiny::em("\\(\\theta_1 \\sim \\text{Beta}(\\alpha_1, \\beta_1)\\)"),
            shiny::br(),
-           shiny::em("\\(p_2 \\sim \\text{Beta}(\\alpha_2, \\beta_2)\\)")
+           shiny::em("\\(\\theta_2 \\sim \\text{Beta}(\\alpha_2, \\beta_2)\\)")
     )
   ),shiny::fluidRow(
 
@@ -1308,11 +1393,26 @@ shiny::sidebarLayout(shiny::sidebarPanel(
   )),
 
   shiny::conditionalPanel("input.Modep2 == 1",
+                          shinyWidgets::prettyRadioButtons(
+                            inputId = "p2_direct",
+                            label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                            choices = list(
+                              "\\(\\mathrm{BF}_{10}\\)" = 1,
+                              "\\(\\mathrm{BF}_{01}\\)" = 0
+                            ),
+                            selected = 1,
+                            inline = TRUE
+                          ),
+
                    shiny::em("\\(\\text{Controlling for the probability of}\\)"),
-                   shiny::fluidRow(
-                     shiny::column(12, shiny::sliderInput("powerp2", "\\(\\text{True Positive Evidence:}\\)", min = .5, max = .99, value = .8, step = .01, ticks = FALSE)),
+
+                     shiny::conditionalPanel("input.p2_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                     shiny::conditionalPanel("input.p2_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
+                    shiny::sliderInput("powerp2", "", min = .5, max = .99, value = .8, step = .01, ticks = FALSE)
+
+                     #shiny::column(12, shiny::sliderInput("powerp2", "", min = .5, max = .99, value = .8, step = .01, ticks = FALSE)),
                      #shiny::column(6, shiny::sliderInput("FP_p2", "\\(\\text{False Positive Evidence:}\\)", min = .001, max = .05, value = .05, step = .001, ticks = FALSE))
-                   )
+
   ),
   shiny::conditionalPanel("input.Modep2 == 1 || input.Modep2 == 2",
                    shiny::sliderInput("bp2", "\\(\\text{Bound of compelling evidence:}\\)", min = 1, max = 20, value = 3, ticks = FALSE)),
@@ -1349,7 +1449,7 @@ shiny::sidebarLayout(shiny::sidebarPanel(
       choices = list("\\(\\text{Power Curve}\\)" = 1, "\\(\\text{Relationship between BF and data}\\)" = 2),
       selected = NULL
     ),
-    shiny::downloadButton("export_p2", "Download result as PDF")
+    shiny::downloadButton("export_p2", "Download result as HTML")
   )
 ),shiny::mainPanel(
 
