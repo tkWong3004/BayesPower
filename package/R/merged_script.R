@@ -3917,12 +3917,12 @@ t1_N_finder <- function(D, target, model, location, scale, dff, hypothesis,
     t1_TPE(t2, df = lower, model, location, scale, dff ) else
       t1_TPE(t2, df = lower, model_d, location_d, scale_d, dff_d)
   if (p2 > target) return(lower)
-
   Power_root <- function(df) {
     t <- t1_BF10_bound(D, df, model, location, scale, dff,hypothesis)
-    if (de_an_prior == 1)
-      t1_TPE(t, df, model, location, scale, dff) - target else
-        t1_TPE(t, df, model_d, location_d, scale_d, dff_d) - target
+    pro <- if (de_an_prior == 1)
+      t1_TPE(t, df, model, location, scale, dff)  else
+        t1_TPE(t, df, model_d, location_d, scale_d, dff_d)
+    pro-target
   }
 
   ## finding the required df, i will do the plus one to get the N in the later function.
@@ -3980,9 +3980,10 @@ t1_N_01_finder <- function(D, target, model, location, scale, dff, hypothesis,
 
   FN.root <- function(df) {
     t <- t1_BF01_bound(D, df, model, location, scale, dff, hypothesis)
-    if (de_an_prior == 1)
+    pro = if (de_an_prior == 1)
       t1_FNE(t, df = df, model, location, scale, dff ) - alpha else
-        t1_FNE(t, df = df, model_d, location_d, scale_d, dff_d) - alpha
+        t1_FNE(t, df = df, model_d, location_d, scale_d, dff_d)
+    pro- alpha
   }
   df.FN <- stats::uniroot(FN.root, lower = df.TN, upper = upper)$root
   return(df.FN + 1)
@@ -4205,6 +4206,7 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
          bty = "n")
 
 }
+
 
 
 # ---- onesample_e.r ----
@@ -4589,6 +4591,7 @@ t1e_N_01_finder<-function(D,target,model,scale,dff, hypothesis,e ,
                           model_d,scale_d,dff_d, de_an_prior,location_d  ,alpha){
 
   lower <- 10
+  upper <- 10000
   t2 <-t1e_BF01_bound(D, lower,model,scale,dff , hypothesis,e)
   TNE_lo <-t1e_TNE(t2,lower,model ,scale,dff , hypothesis ,e)
   if (TNE_lo > target) return(lower)
@@ -4619,7 +4622,7 @@ t1e_N_01_finder<-function(D,target,model,scale,dff, hypothesis,e ,
     }
     return(pro - alpha)
   }
-  df.FN <- stats::uniroot(FN.root, lower = df.TN, upper = upper)$root
+  df.FN <- robust_uniroot(FN.root, lower = df.TN )
   return(df.FN+1)
 
 }
@@ -5366,7 +5369,7 @@ shiny::observeEvent(input$runbin, {
                   })}, error = function(e) {
                     "Error"
                   })
-
+  output$result_bin <-shiny::renderText({ show_bin_code(bin) })
   output$prior_bin <- shiny::renderPlot({
     switch(bin$interval,
            "1" = {bin_prior_plot(bin$alpha,bin$beta,bin$location,bin$scale,bin$model,
@@ -5700,7 +5703,7 @@ shiny::observeEvent(input$runf, {
   }, error = function(e) {
     "Error"
   })
-
+  output$result_f <-shiny::renderText({ show_f_code(ff) })
   output$priorff <- shiny::renderPlot({
 
     switch(ff$inter,
@@ -5950,6 +5953,7 @@ shiny::observeEvent(input$runp2, {
     grid  <- dat[[2]]
 
   }
+  output$result_p2 <- shiny::renderText({ show_props_code(p2) })
 
 
 
@@ -6096,8 +6100,8 @@ server_r<- function(input, output, session) {
 input_r <- shiny::reactive({
   mode_bf <- switch(input$Moder,
                     "1" = 1,
-                    "2" = 2,
-                    "3" = 3)# mode
+                    "2" = 0,
+                    "3" = 0)# mode
   direct <- switch(input$r_direct,
                    "1" = "h1",
                    "0" = "h0")
@@ -6277,7 +6281,7 @@ shiny::observeEvent(input$runr, {
   }, error = function(e) {
     "Error"
   })
-
+  output$result_r <-shiny::renderText({ show_cor_code(rr) })
   output$prior_r <- shiny::renderPlot({
 
     switch(rr$interval,
@@ -6538,7 +6542,7 @@ shiny::observeEvent(input$runt1, {
                                                         x$alpha,x$direct),"2" = t1e_table(x$D,x$target,x$model,x$scale,x$dff, x$hypothesis,x$e ,
                                                                                  x$model_d,x$scale_d,x$dff_d, x$de_an_prior,x$N,x$mode_bf,x$location_d ,x$alpha,x$direct)))
 
-
+  output$result_t1 <- shiny::renderText({ show_t1_code(x) })
   output$priort1 <- shiny::renderPlot({
     suppressWarnings(switch(x$interval,
            "1"= t1_prior_plot(
@@ -6700,7 +6704,42 @@ shiny::observeEvent(input$cal1, {
   })
 
 })
+# Reactive expression to calculate t-value
+t_value <- shiny::reactive({
+  # Extract inputs
+  x_bar <- input$t1_s_mean
+  mu <- input$t1_mean
+  s <- input$t1_sd
+  n <- input$t1_sample_size
 
+  # Avoid division by zero
+  if (s <= 0 || n <= 0) return(NA)
+
+  # Compute t-value
+  t <- (x_bar - mu) / (s / sqrt(n))
+  t
+})
+
+# Render LaTeX output
+output$cal_t1 <- shiny::renderUI({
+  t <- t_value()
+  n <- input$t1_sample_size
+  df <- n - 1  # Degrees of freedom
+
+  if (is.na(t)) return(shiny::HTML("Invalid input"))
+
+  # LaTeX formula with df
+  shiny::withMathJax(
+    shiny::HTML(
+      paste0(
+        "\\( t = \\frac{\\bar{x} - \\mu}{s / \\sqrt{n}} = ",
+        round(t, 4),
+        ", \\quad df = ", df,
+        "\\)"
+      )
+    )
+  )
+})
 
 }
 
@@ -6818,6 +6857,8 @@ shiny::observeEvent(input$runt2, {
   }, error = function(e) {
     "Error"
   })
+  output$result_t2 <- shiny::renderText({ show_t2_code(t2) })
+
   output$priort2 <- shiny::renderPlot({
     suppressWarnings(switch(t2$interval,
            "1"=
@@ -6985,7 +7026,55 @@ shiny::observeEvent(input$cal1, {
 
 })
 
+# Reactive calculation for independent t-test (equal variance)
+t2_value <- shiny::reactive({
+  x1 <- input$t2_mean1
+  x2 <- input$t2_mean2
+  s1 <- input$t2_sd1
+  s2 <- input$t2_sd2
+  n1 <- input$t2_n1
+  n2 <- input$t2_n2
+
+  # Pooled standard deviation
+  s_p <- sqrt(((n1-1)*s1^2 + (n2-1)*s2^2) / (n1 + n2 - 2))
+
+  # t-value
+  t <- (x1 - x2) / (s_p * sqrt(1/n1 + 1/n2))
+  t
+})
+
+# Degrees of freedom
+df <- shiny::reactive({
+  input$t2_n1 + input$t2_n2 - 2
+})
+
+# Render LaTeX output
+output$cal_t2 <- shiny::renderUI({
+  t <- t2_value()
+  d <- df()
+
+  shiny::withMathJax(
+    shiny::HTML(
+      paste0(
+        "\\( t = \\frac{\\bar{x}_1 - \\bar{x}_2}{s_p \\sqrt{1/n_1 + 1/n_2}} = ",
+        round(t, 4),
+        ", \\quad df = ", d,
+        "\\)"
+      )
+    )
+  )
+})
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

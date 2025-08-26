@@ -2,14 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 BF_grid_rcpp <- function(D, a0, b0, a1, b1, n1, a2, b2, n2, model1, da1, db1, dp1, model2, da2, db2, dp2) {
-    .Call('_BayesPower_BF_grid_rcpp', PACKAGE = 'BayesPower', D, a0, b0, a1, b1, n1, a2, b2, n2, model1, da1, db1, dp1, model2, da2, db2, dp2)
+    .Call(`_BayesPower_BF_grid_rcpp`, D, a0, b0, a1, b1, n1, a2, b2, n2, model1, da1, db1, dp1, model2, da2, db2, dp2)
 }
 
 pnct <- function(x, df, ncp = as.numeric( c(0.0)), lower = TRUE) {
-    .Call('_BayesPower_pnct', PACKAGE = 'BayesPower', x, df, ncp, lower)
+    .Call(`_BayesPower_pnct`, x, df, ncp, lower)
 }
 
 sum_rcpp <- function(log_h1, PE) {
-    .Call('_BayesPower_sum_rcpp', PACKAGE = 'BayesPower', log_h1, PE)
+    .Call(`_BayesPower_sum_rcpp`, log_h1, PE)
 }
 

@@ -234,7 +234,33 @@ ui <-
                              shiny::column(6, shiny::numericInput("t1tval", "\\(\\text{t-value:}\\)", value = 2))
                            ),
                            shiny::actionButton("cal1", label = "\\(\\text{Calculate}\\)"),
-                           shiny::htmlOutput("BFt1")
+                           shiny::htmlOutput("BFt1"),
+                           shiny::em("\\(t\\text{-value calculator}\\)"),
+
+                           shiny::fluidRow(
+                             shiny::column(
+                               3,
+                               shiny::numericInput("t1_mean", label = "\\(\\mu:\\)", value = 0)
+                             ),
+                             shiny::column(
+                               3,
+                               shiny::numericInput("t1_sample_size", label = "\\(n:\\)", value = 50)
+                             ),
+                             shiny::column(
+                               3,
+                               shiny::numericInput("t1_s_mean", label = "\\(\\bar{x}:\\)", value = 0)
+                             ),
+                             shiny::column(
+                               3,
+                               shiny::numericInput("t1_sd", label = "\\(s:\\)", value = 1)
+                             )
+                           ),
+
+                           shiny::htmlOutput("cal_t1")
+
+
+
+
 
           ),
 
@@ -247,7 +273,9 @@ ui <-
               selected = NULL
             ),
             shiny::downloadButton("export_t1", "Download result as HTML")
-          )
+          ),
+          shiny::conditionalPanel(
+            condition = "input.Modet1 == 1||input.Modet1 == 2",shiny::verbatimTextOutput("result_t1"))
         ),
 
         # Main panel with result tabs
@@ -476,7 +504,22 @@ ui <-
                              ),
                            shiny::conditionalPanel("input.Modet2 == 3",
                                                    shiny::actionButton("cal1", label = "\\(\\text{Calculate}\\)"),
-                                                   shiny::htmlOutput("BFt2"))
+                                                   shiny::htmlOutput("BFt2"),
+                                                   shiny::em("\\(t\\text{-value calculator}\\)"),
+
+                                                   shiny::fluidRow(
+                                                     # Group 1
+                                                     shiny::column(3, shiny::numericInput("t2_mean1", label = "\\(\\bar{x}_1:\\)", value = 0)),
+                                                     shiny::column(3, shiny::numericInput("t2_sd1", label = "\\(s_1:\\)", value = 1)),
+                                                     shiny::column(3, shiny::numericInput("t2_n1", label = "\\(n_1:\\)", value = 50))),
+                                                   shiny::fluidRow(
+                                                     # Group 2
+                                                     shiny::column(3, shiny::numericInput("t2_mean2", label = "\\(\\bar{x}_2:\\)", value = 0)),
+                                                     shiny::column(3, shiny::numericInput("t2_sd2", label = "\\(s_2:\\)", value = 1)),
+                                                     shiny::column(3, shiny::numericInput("t2_n2", label = "\\(n_2:\\)", value = 50))
+                                                   ),
+
+                                                   shiny::htmlOutput("cal_t2"))
 
 
 
@@ -496,7 +539,9 @@ ui <-
               selected = NULL
             ),
             shiny::downloadButton("export_t2", "Download result as HTML")
-          )
+          ),shiny::conditionalPanel(
+            condition = "input.Modet2 == 1||input.Modet2 == 2",shiny::verbatimTextOutput("result_t2"))
+
 
 
 
@@ -755,7 +800,8 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                  selected = NULL
                ),
                shiny::downloadButton("export_r", "Download result as HTML")
-             )
+             ),shiny::conditionalPanel(
+               condition = "input.Moder == 1||input.Moder == 2",shiny::verbatimTextOutput("result_r"))
            ),
 
            # Main panel with output tabs
@@ -1061,7 +1107,9 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                  selected = NULL
                ),
                shiny::downloadButton("export_f", "Download result as HTML")
-             )
+             ),
+            shiny::conditionalPanel(
+              condition = "input.Modef == 1||input.Modef == 2",shiny::verbatimTextOutput("result_f"))
            ),
 
            # Main Panel
@@ -1266,7 +1314,8 @@ shiny::navbarMenu(
                    selected = NULL
                  ),
                  shiny::downloadButton("export_bin", "Download result as HTML")
-               )
+               ),shiny::conditionalPanel(
+                 condition = "input.Modebin == 1||input.Modebin == 2",shiny::verbatimTextOutput("result_bin"))
 
 
              ),
@@ -1450,7 +1499,9 @@ shiny::sidebarLayout(shiny::sidebarPanel(
       selected = NULL
     ),
     shiny::downloadButton("export_p2", "Download result as HTML")
-  )
+  ),
+  shiny::conditionalPanel(
+    condition = "input.Modep2 == 1||input.Modep2 == 2",shiny::verbatimTextOutput("result_p2"))
 ),shiny::mainPanel(
 
   shiny::fluidRow(
