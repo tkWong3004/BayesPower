@@ -109,8 +109,8 @@ show_cor_code <- function(x) {
 
   # List of all arguments for correlation function
   args <- c("hypothesis","h0","e","interval", "D","target","FP",
-            "model","k","alpha","beta","scale","dff",
-            "model_d","alpha_d","beta_d","location_d","k_d","scale_d","dff_d",
+            "model","k","alpha","beta","scale",
+            "model_d","alpha_d","beta_d","location_d","k_d","scale_d",
             "de_an_prior",
             "N","mode_bf","direct")
 
@@ -189,6 +189,7 @@ show_cor_code <- function(x) {
 
   return(code)
 }
+
 show_f_code <- function(x) {
 
   # List of all arguments for bpf

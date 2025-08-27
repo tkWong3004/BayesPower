@@ -1,8 +1,58 @@
+#' Sample size determination for one-sample Bayesian t-test
+#'
+#' Perform sample size determination or the calculation of compelling and misleading evidence.
+#'
+#' @param hypothesis The hypothesis being tested (e.g., two-sided \code{"!="}, right-sided \code{">"}, left-sided \code{"<"}).
+#' @param e The bounds for the interval Bayes factor (used when \code{interval = 0}).
+#' @param interval Integer (1 or 0). If \code{1}, Bayes factor with a point null against a composite alternative hypothesis;
+#'   otherwise Bayes factor with interval null and alternative hypotheses.
+#' @param D The bound of compelling evidence.
+#' @param target The targeted true positive rate (if \code{direct = "h1"}) or true negative rate (if \code{direct = "h0"}).
+#' @param alpha The targeted false positive rate (if \code{direct = "h1"}) or false negative rate (if \code{direct = "h0"}).
+#' @param model Statistical model of the analysis prior under the alternative hypothesis: Normal distribution (\code{"Normal"}), Normal moment (\code{"NLP"}), or scaled t (\code{"t-distribution"}).
+#' @param location Location parameter for the analysis prior under the alternative hypothesis.
+#' @param scale Scale parameter for the analysis prior under the alternative hypothesis.
+#' @param dff Degrees of freedom for the analysis prior under the alternative hypothesis (if applicable).
+#' @param model_d Statistical model of the design prior under the alternative hypothesis: Normal distribution (\code{"Normal"}), Normal moment (\code{"NLP"}), or scaled t (\code{"t-distribution"}).
+#' @param location_d Location parameter for the design prior under the alternative hypothesis.
+#' @param scale_d Scale parameter for the design prior under the alternative hypothesis.
+#' @param dff_d Degrees of freedom parameter for the design prior under the alternative hypothesis.
+#' @param de_an_prior Integer (0 or 1). If 1, analysis and design priors under the alternative are the same; if 0, they are not.
+#' @param N Sample size.
+#' @param mode_bf Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N} is needed for the calculation of probabilities of compelling and misleading evidence.
+#' @param direct If \code{"h1"}, controlling true/false positive rates; if \code{"h0"}, controlling true/false negative rates.
+#'
+#' @examples
+#' \dontrun{
+#' bp_t.test_one_sample(
+#'   hypothesis = "!=",
+#'   e = NULL,
+#'   interval = "1",
+#'   D = 3,
+#'   target = 0.8,
+#'   alpha = 0.05,
+#'   model = "t-distribution",
+#'   location = 0,
+#'   scale = 0.707,
+#'   dff = 1,
+#'   model_d = NULL,
+#'   location_d = NULL,
+#'   scale_d = NULL,
+#'   dff_d = NULL,
+#'   de_an_prior = 1,
+#'   N = NULL,
+#'   mode_bf = 1,
+#'   direct = "h1"
+#' )
+#' }
+#'
 #' @export
-bp_t.test_one_sample <- function(interval,
-                                         D, target, model, location, scale, dff, hypothesis,
-                                         model_d, location_d, scale_d, dff_d, de_an_prior,
-                                         N, mode_bf, alpha, direct, e) {
+bp_t.test_one_sample <- function(hypothesis, e, interval,
+                                 D, target, alpha,
+                                 model, location, scale, dff,
+                                 model_d, location_d, scale_d, dff_d,
+                                 de_an_prior,
+                                 N, mode_bf, direct) {
 
   # Automatically assign 1 to any NULL argument
   args <- list(D = D, target = target, model = model, location = location, scale = scale,
@@ -41,11 +91,66 @@ bp_t.test_one_sample <- function(interval,
   }
 }
 
-
+#' Sample size determination for two-sample Bayesian t-test
+#'
+#' Perform sample size determination or the calculation of compelling and misleading evidence
+#' for a two-sample Bayesian t-test.
+#'
+#' @param hypothesis The hypothesis being tested (e.g., two-sided \code{"!="}, right-sided \code{">"}, left-sided \code{"<"}).
+#' @param e The bounds for the interval Bayes factor (used when \code{interval = 0}).
+#' @param interval Character or integer (0 or 1). If \code{"1"}, Bayes factor with a point null against a composite alternative hypothesis;
+#'   otherwise Bayes factor with interval null and alternative hypotheses.
+#' @param D The bound of compelling evidence.
+#' @param target The targeted true positive rate (if \code{direct = "h1"}) or true negative rate (if \code{direct = "h0"}).
+#' @param alpha The targeted false positive rate (if \code{direct = "h1"}) or false negative rate (if \code{direct = "h0"}).
+#' @param model Statistical model of the analysis prior under the alternative hypothesis: Normal distribution (\code{"Normal"}), Normal moment (\code{"NLP"}), or scaled t (\code{"t-distribution"}).
+#' @param location Location parameter for the analysis prior under the alternative hypothesis.
+#' @param scale Scale parameter for the analysis prior under the alternative hypothesis.
+#' @param dff Degrees of freedom for the analysis prior under the alternative hypothesis (if applicable).
+#' @param model_d Statistical model of the design prior under the alternative hypothesis: Normal distribution (\code{"Normal"}), Normal moment (\code{"NLP"}), or scaled t (\code{"t-distribution"}).
+#' @param location_d Location parameter for the design prior under the alternative hypothesis.
+#' @param scale_d Scale parameter for the design prior under the alternative hypothesis.
+#' @param dff_d Degrees of freedom parameter for the design prior under the alternative hypothesis.
+#' @param de_an_prior Integer (0 or 1). If 1, analysis and design priors under the alternative are the same; if 0, they are not.
+#' @param N1 Sample size of group 1.
+#' @param N2 Sample size of group 2.
+#' @param r Ratio of the sample size of group 2 over group 1 (N2 / N1).
+#' @param mode_bf Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N1} and \code{N2} are needed for the calculation of probabilities of compelling and misleading evidence.
+#' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
+#'
+#' @examples
+#' \dontrun{
+#' bp_t.test_two_sample(
+#'   hypothesis = "!=",
+#'   e = NULL,
+#'   interval = "1",
+#'   D = 3,
+#'   target = 0.8,
+#'   alpha = 0.05,
+#'   model = "t-distribution",
+#'   location = 0,
+#'   scale = 0.707,
+#'   dff = 1,
+#'   model_d = NULL,
+#'   location_d = NULL,
+#'   scale_d = NULL,
+#'   dff_d = NULL,
+#'   de_an_prior = 1,
+#'   N1 = NULL,
+#'   N2 = NULL,
+#'   r = 1,
+#'   mode_bf = 1,
+#'   direct = "h1"
+#' )
+#' }
+#'
 #' @export
-bp_t.test_two_sample <- function(D, r, target, model, location, scale, dff, hypothesis,
-                                         model_d, location_d, scale_d, dff_d, de_an_prior,
-                                         N1, N2, mode_bf, alpha, direct, e , interval) {
+bp_t.test_two_sample <- function(hypothesis, e, interval,
+                                 D, target, alpha,
+                                 model, location, scale, dff,
+                                 model_d, location_d, scale_d, dff_d,
+                                 de_an_prior,
+                                 N1, N2, r, mode_bf, direct) {
 
   if (interval == "1") {
     t2_Table(D, r, target, model, location, scale, dff, hypothesis,
@@ -55,12 +160,74 @@ bp_t.test_two_sample <- function(D, r, target, model, location, scale, dff, hypo
               model_d, scale_d, dff_d, de_an_prior, mode_bf, location, N1, N2, alpha, direct)
   }
 }
+
+#' Sample size determination for Bayesian correlation test
+#'
+#' Perform sample size determination or the calculation of compelling and misleading evidence
+#' for a Bayesian correlation test.
+#'
+#' @param hypothesis The hypothesis being tested (e.g., two-sided \code{"!="}, right-sided \code{">"}, left-sided \code{"<"}).
+#' @param h0 Null value of the correlation.
+#' @param e The bounds for the interval Bayes factor (used when \code{interval = 0}).
+#' @param interval Character or integer (0 or 1). If \code{"1"}, Bayes factor with a point null against a composite alternative hypothesis;
+#'   otherwise Bayes factor with interval null and alternative hypotheses.
+#' @param D The bound of compelling evidence.
+#' @param target The targeted true positive rate (if \code{direct = "h1"}) or true negative rate (if \code{direct = "h0"}).
+#' @param FP The targeted false positive rate (if \code{direct = "h1"}) or false negative rate (if \code{direct = "h0"}).
+#' @param model Statistical model of the analysis prior under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"NLP"})
+#' @param k Parameter for the analysis default beta prior under the alternative hypothesis.
+#' @param alpha Parameter for the analysis beta prior under the alternative hypothesis.
+#' @param beta Parameter for the analysis beta prior under the alternative hypothesis.
+#' @param scale Scale parameter for the analysis normal moment prior under the alternative hypothesis.
+#' @param model_d Statistical model of the design prior under the alternative hypothesis:default beta (\code{"d_beta"}), beta (\code{"beta"}), normal moment (\code{"NLP"} , or point \code{"Point"})
+#' @param alpha_d Parameter for the design beta prior under the alternative hypothesis.
+#' @param beta_d Parameter for the design beta prior under the alternative hypothesis.
+#' @param location_d Location parameter for the design point prior under the alternative hypothesis.
+#' @param k_d Parameter for the design default beta prior under the alternative hypothesis.
+#' @param scale_d Scale parameter for the design normal moment prior under the alternative hypothesis.
+#' @param de_an_prior Integer (0 or 1). If 1, analysis and design priors under the alternative are the same; if 0, they are not.
+#' @param N Sample size.
+#' @param mode_bf Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N} is needed for the calculation of probabilities of compelling and misleading evidence.
+#' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
+#'
+#' @examples
+#' \dontrun{
+#' bp_cor(
+#'   hypothesis = "!=",
+#'   h0 = 0,
+#'   e = NULL,
+#'   interval = "1",
+#'   D = 3,
+#'   target = 0.8,
+#'   FP = 0.05,
+#'   model = "d_beta",
+#'   k = 1,
+#'   alpha = NULL,
+#'   beta = NULL,
+#'   scale = NULL
+#'   model_d = NULL,
+#'   alpha_d = NULL,
+#'   beta_d = NULL,
+#'   location_d = NULL,
+#'   k_d = NULL,
+#'   scale_d = NULL,
+#'   de_an_prior = 1,
+#'   N = NULL,
+#'   mode_bf = 1,
+#'   direct = "h1"
+#' )
+#' }
+#'
 #' @export
-bp_cor <- function(interval,
-                           D, target, model, k, alpha, beta, h0,  scale, dff,
-                           hypothesis, model_d, location_d, k_d, alpha_d, beta_d, scale_d, dff_d,
-                           de_an_prior, N, mode_bf, FP, e, direct) {
+bp_cor <- function(hypothesis, h0, e, interval,
+                   D, target, FP,
+                   model, k, alpha, beta, scale,
+                   model_d, alpha_d, beta_d, location_d, k_d, scale_d,
+                   de_an_prior,
+                   N, mode_bf, direct) {
+
   location = h0
+  dff=dff_d=1
   if (interval == "1") {
     r_table(D, target, model, k, alpha, beta, h0, location, scale, dff,
             hypothesis, model_d, location_d, k_d, alpha_d, beta_d, scale_d,
@@ -72,29 +239,139 @@ bp_cor <- function(interval,
              dff_d, de_an_prior, N, mode_bf, FP, e, direct)
   }
 }
+
+#' Sample size determination for Bayesian F-test
+#'
+#' Perform sample size determination or the calculation of compelling and misleading evidence
+#' for a Bayesian F-test.
+#'
+#' @param interval Character or integer (0 or 1). If \code{"1"}, Bayes factor with a point null against a composite alternative hypothesis;
+#'   otherwise Bayes factor with interval null and alternative hypotheses.
+#' @param e The bounds for the interval Bayes factor (used when \code{interval = 0}).
+#' @param D The bound of compelling evidence.
+#' @param target The targeted true positive rate (if \code{direct = "h1"}) or true negative rate (if \code{direct = "h0"}).
+#' @param FP The targeted false positive rate (if \code{direct = "h1"}) or false negative rate (if \code{direct = "h0"}).
+#' @param p Number of predictors in the reduced model.
+#' @param k Number of predictors in the full model.
+#' @param model Statistical model of the analysis prior under the alternative hypothesis.
+#' @param dff Degrees of freedom for the analysis prior under the alternative hypothesis.
+#' @param rscale Scaling parameter for the analysis prior.
+#' @param f_m Cohen's f² effect size for the analysis prior.
+#' @param model_d Statistical model of the design prior under the alternative hypothesis.
+#' @param dff_d Degrees of freedom for the design prior under the alternative hypothesis.
+#' @param rscale_d Scaling parameter for the design prior.
+#' @param f_m_d Cohen's f² effect size for the design prior.
+#' @param de_an_prior Integer (0 or 1). If 1, analysis and design priors under the alternative are the same; if 0, they are not.
+#' @param N Sample size.
+#' @param mode_bf Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N} is needed for the calculation of probabilities of compelling and misleading evidence.
+#' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
+#'
+#' @examples
+#' \dontrun{
+#' bp_f(
+#'   interval = "1",
+#'   e = NULL,
+#'   D = 3,
+#'   target = 0.8,
+#'   FP = 0.05,
+#'   p = 2,
+#'   k = 3,
+#'   model = "f-distribution",
+#'   dff = 1,
+#'   rscale = 0.5,
+#'   f_m = 0.15,
+#'   model_d = NULL,
+#'   dff_d = NULL,
+#'   rscale_d = NULL,
+#'   f_m_d = NULL,
+#'   de_an_prior = 1,
+#'   N = NULL,
+#'   mode_bf = 1,
+#'   direct = "h1"
+#' )
+#' }
+#'
 #' @export
 bp_f <- function(interval,
-                         D, target, p, k, dff, rscale, f_m, model,
-                         dff_d, rscale_d, f_m_d, model_d, de_an_prior, n,
-                         mode_bf, FP, e, direct) {
+                 D, target, FP, p, k,
+                 model, dff, rscale, f_m,
+                 model_d, dff_d, rscale_d, f_m_d,
+                 de_an_prior,
+                 N, mode_bf, direct) {
 
   if (interval == "1") {
     f_table(D, target, p, k, dff, rscale, f_m, model,
-            dff_d, rscale_d, f_m_d, model_d, de_an_prior, n,
+            dff_d, rscale_d, f_m_d, model_d, de_an_prior, N,
             mode_bf, FP, direct)
 
   } else {
     fe_table(D, target, p, k, dff, rscale, f_m, model,
-             dff_d, rscale_d, f_m_d, model_d, de_an_prior, n,
+             dff_d, rscale_d, f_m_d, model_d, de_an_prior, N,
              mode_bf, e, FP, direct)
   }
 }
 
+
+#' Sample size determination for Bayesian one-proportion test
+#'
+#' Perform sample size determination or the calculation of compelling and misleading evidence
+#' for a Bayesian test of a single proportion.
+#'
+#' @param hypothesis The hypothesis being tested (e.g., two-sided \code{"!="}, right-sided \code{">"}, left-sided \code{"<"}).
+#' @param interval Character or integer (0 or 1). If \code{"1"}, Bayes factor with a point null against a composite alternative hypothesis;
+#'   otherwise Bayes factor with interval null and alternative hypotheses.
+#' @param D The bound of compelling evidence.
+#' @param target The targeted true positive rate (if \code{direct = "h1"}) or true negative rate (if \code{direct = "h0"}).
+#' @param FP The targeted false positive rate (if \code{direct = "h1"}) or false negative rate (if \code{direct = "h0"}).
+#' @param location Null proportion value.
+#' @param model Statistical model of the analysis prior under the alternative hypothesis.
+#' @param alpha Parameter for the analysis prior under the alternative hypothesis.
+#' @param beta Parameter for the analysis prior under the alternative hypothesis.
+#' @param scale Scale parameter for the analysis prior under the alternative hypothesis.
+#' @param model_d Statistical model of the design prior under the alternative hypothesis.
+#' @param alpha_d Parameter for the design prior under the alternative hypothesis.
+#' @param beta_d Parameter for the design prior under the alternative hypothesis.
+#' @param location_d Null proportion value for the design prior.
+#' @param scale_d Scale parameter for the design prior under the alternative hypothesis.
+#' @param de_an_prior Integer (0 or 1). If 1, analysis and design priors under the alternative are the same; if 0, they are not.
+#' @param N Sample size.
+#' @param mode_bf Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N} is needed for the calculation of probabilities of compelling and misleading evidence.
+#' @param e The bounds for the interval Bayes factor (used when \code{interval = 0}).
+#' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
+#'
+#' @examples
+#' \dontrun{
+#' bp_bin(
+#'   hypothesis = "!=",
+#'   interval = "1",
+#'   D = 3,
+#'   target = 0.8,
+#'   FP = 0.05,
+#'   location = 0.5,
+#'   model = "beta",
+#'   alpha = 1,
+#'   beta = 1,
+#'   scale = NULL,
+#'   model_d = NULL,
+#'   alpha_d = NULL,
+#'   beta_d = NULL,
+#'   location_d = NULL,
+#'   scale_d = NULL,
+#'   de_an_prior = 1,
+#'   N = NULL,
+#'   mode_bf = 1,
+#'   e = NULL,
+#'   direct = "h1"
+#' )
+#' }
+#'
 #' @export
-bp_bin <- function(interval,
-                           D, target, alpha, beta, location, scale, model, hypothesis,
-                           alpha_d, beta_d, location_d, scale_d, model_d, de_an_prior, N,
-                           mode_bf, FP, e = NULL, direct) {
+bp_bin <- function(hypothesis, interval,
+                   D, target, FP, location,
+                   model, alpha, beta, scale,
+                   model_d, alpha_d, beta_d, location_d, scale_d,
+                   de_an_prior,
+                   N, mode_bf, e = NULL, direct) {
 
   if (interval == "1") {
     bin_table(D, target, alpha, beta, location, scale, model, hypothesis,
@@ -108,11 +385,66 @@ bp_bin <- function(interval,
   }
 }
 
-#' @export
-bp_props <- function(D,target, a0, b0, a1, b1, a2, b2,model1,
-                             da1,db1,dp1,model2,da2,db2,dp2,mode_bf,n1,n2,direct) {
-r=1
-  pro_table_p2(D,target, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,model2,da2,db2,dp2,mode_bf,n1,n2,direct)
 
-  }
+#' Sample size determination for Bayesian test of two proportions
+#'
+#' Perform sample size determination or the calculation of compelling and misleading evidence
+#' for a Bayesian comparison of two proportions.
+#'
+#' @param D The bound of compelling evidence.
+#' @param target The targeted true positive rate (if \code{direct = "h1"}) or true negative rate (if \code{direct = "h0"}).
+#' @param a0 Alpha parameter of the null distribution (group proportion under the null).
+#' @param b0 Beta parameter of the null distribution (group proportion under the null).
+#' @param model1 Statistical model of the analysis prior for group 1.
+#' @param a1 Alpha parameter for group 1 under the alternative hypothesis.
+#' @param b1 Beta parameter for group 1 under the alternative hypothesis.
+#' @param a2 Alpha parameter for group 2 under the alternative hypothesis.
+#' @param b2 Beta parameter for group 2 under the alternative hypothesis.
+#' @param model2 Statistical model of the analysis prior for group 2.
+#' @param a1d Alpha parameter for the design prior of group 1.
+#' @param b1d Beta parameter for the design prior of group 1.
+#' @param dp1 True proportion for group 1 in the design prior.
+#' @param a2d Alpha parameter for the design prior of group 2.
+#' @param b2d Beta parameter for the design prior of group 2.
+#' @param dp2 True proportion for group 2 in the design prior.
+#' @param mode_bf Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{n1} and \code{n2} are used for the calculation of probabilities of compelling and misleading evidence.
+#' @param n1 Sample size for group 1.
+#' @param n2 Sample size for group 2.
+#' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
+#'
+#' @examples
+#' \dontrun{
+#' bp_props(
+#'   D = 3,
+#'   target = 0.8,
+#'   a0 = 1,
+#'   b0 = 1,
+#'   model1 = "same",
+#'   a1 = 1,
+#'   b1 = 1,
+#'   a2 = 1,
+#'   b2 = 1,
+#'   model2 = "same",
+#'   a1d = NULL,
+#'   b1d = NULL,
+#'   dp1 = NULL,
+#'   a2d = NULL,
+#'   b2d = NULL,
+#'   dp2 = NULL,
+#'   mode_bf = 1,
+#'   n1 = NULL,
+#'   n2 = NULL,
+#'   direct = "h1"
+#' )
+#' }
+#'
+#' @export
+bp_props <- function(D, target, a0, b0, a1, b1, a2, b2, model1,
+                     a1d, b1d, dp1, model2, a2d, b2d, dp2, mode_bf, n1, n2, direct) {
+
+  r = 1
+  pro_table_p2(D, target, a0, b0, a1, b1, a2, b2, r, model1,
+               a1d, b1d, dp1, model2, a2d, b2d, dp2, mode_bf, n1, n2, direct)
+}
+
 
