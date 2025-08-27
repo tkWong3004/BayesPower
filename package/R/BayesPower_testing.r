@@ -275,7 +275,9 @@ ui <-
             shiny::downloadButton("export_t1", "Download result as HTML")
           ),
           shiny::conditionalPanel(
-            condition = "input.Modet1 == 1||input.Modet1 == 2",shiny::verbatimTextOutput("result_t1"))
+            condition = "input.Modet1 == 1||input.Modet1 == 2",
+
+            shiny::verbatimTextOutput("result_t1"))
         ),
 
         # Main panel with result tabs

@@ -13,7 +13,7 @@ F_prior<- function(fsq,q,dff,rscale,f,model) {
 
 
   switch(model,
-         "tdis" = {gamma((q + dff) / 2) / gamma(dff / 2) /gamma(q / 2) *
+         "effectsize" = {gamma((q + dff) / 2) / gamma(dff / 2) /gamma(q / 2) *
     (dff * rscale^2)^(dff / 2) * fsq^(q / 2 - 1) *
     (dff * rscale^2 + f^2 + fsq)^(-dff / 2 - q / 2) *
     hypergeo::genhypergeo(c((dff + q) / 4, (2 + dff + q) / 4),
@@ -5369,7 +5369,10 @@ shiny::observeEvent(input$runbin, {
                   })}, error = function(e) {
                     "Error"
                   })
-  output$result_bin <-shiny::renderText({ show_bin_code(bin) })
+
+  output$result_bin <-  shiny::renderText({
+    paste("# Function to be used in R", show_bin_code(bin), sep = "\n")
+  })
   output$prior_bin <- shiny::renderPlot({
     switch(bin$interval,
            "1" = {bin_prior_plot(bin$alpha,bin$beta,bin$location,bin$scale,bin$model,
@@ -5564,7 +5567,7 @@ input_f <- shiny::reactive({
 
 
   model <- switch(input$modelf,
-                  "1" = "tdis",
+                  "1" = "effectsize",
                   "2" = "Moment")
 
   rscale <- input$rf
@@ -5575,7 +5578,7 @@ input_f <- shiny::reactive({
                         "2" = 0)
 
   model_d <- switch(input$modelfd,
-                    "1" = "tdis",
+                    "1" = "effectsize",
                     "2" = "Moment",
                     "3" = "Point")
 
@@ -5669,7 +5672,7 @@ input_f <- shiny::reactive({
 
 output$prior_suggest <- shiny::renderUI({
   ff = input_f()
-  if (ff$model == "tdis"){
+  if (ff$model == "effectsize"){
 
   table_html <- paste0('
 \\textit{df} = ', 3, ', \\textit{r} = \\sqrt{\\frac{df - 2}{dfq}} \\times f = ',round(sqrt((3 - 2) / 3*ff$q) * sqrt(ff$f_m),2),'
@@ -5703,7 +5706,10 @@ shiny::observeEvent(input$runf, {
   }, error = function(e) {
     "Error"
   })
-  output$result_f <-shiny::renderText({ show_f_code(ff) })
+
+  output$result_f <-  shiny::renderText({
+    paste("# Function to be used in R", show_f_code(ff), sep = "\n")
+  })
   output$priorff <- shiny::renderPlot({
 
     switch(ff$inter,
@@ -5953,7 +5959,10 @@ shiny::observeEvent(input$runp2, {
     grid  <- dat[[2]]
 
   }
-  output$result_p2 <- shiny::renderText({ show_props_code(p2) })
+
+  output$result_p2 <-   shiny::renderText({
+    paste("# Function to be used in R", show_props_code(p2), sep = "\n")
+  })
 
 
 
@@ -6281,7 +6290,10 @@ shiny::observeEvent(input$runr, {
   }, error = function(e) {
     "Error"
   })
-  output$result_r <-shiny::renderText({ show_cor_code(rr) })
+
+  output$result_r <-  shiny::renderText({
+    paste("# Function to be used in R", show_cor_code(rr), sep = "\n")
+  })
   output$prior_r <- shiny::renderPlot({
 
     switch(rr$interval,
@@ -6542,7 +6554,9 @@ shiny::observeEvent(input$runt1, {
                                                         x$alpha,x$direct),"2" = t1e_table(x$D,x$target,x$model,x$scale,x$dff, x$hypothesis,x$e ,
                                                                                  x$model_d,x$scale_d,x$dff_d, x$de_an_prior,x$N,x$mode_bf,x$location_d ,x$alpha,x$direct)))
 
-  output$result_t1 <- shiny::renderText({ show_t1_code(x) })
+  output$result_t1 <- shiny::renderText({
+    paste("# Function to be used in R", show_t1_code(x), sep = "\n")
+  })
   output$priort1 <- shiny::renderPlot({
     suppressWarnings(switch(x$interval,
            "1"= t1_prior_plot(
@@ -6857,7 +6871,7 @@ shiny::observeEvent(input$runt2, {
   }, error = function(e) {
     "Error"
   })
-  output$result_t2 <- shiny::renderText({ show_t2_code(t2) })
+  output$result_t2 <- shiny::renderText({ paste("# Function to be used in R", show_t2_code(t2), sep = "\n") })
 
   output$priort2 <- shiny::renderPlot({
     suppressWarnings(switch(t2$interval,
