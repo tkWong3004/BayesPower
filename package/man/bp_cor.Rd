@@ -5,30 +5,28 @@
 \title{Sample size determination for Bayesian correlation test}
 \usage{
 bp_cor(
-  hypothesis,
-  h0,
-  e,
-  interval,
-  D,
-  target,
-  FP,
-  model,
-  k,
-  alpha,
-  beta,
-  scale,
-  dff,
-  model_d,
-  alpha_d,
-  beta_d,
-  location_d,
-  k_d,
-  scale_d,
-  dff_d,
-  de_an_prior,
-  N,
-  mode_bf,
-  direct
+  hypothesis = NULL,
+  h0 = NULL,
+  e = NULL,
+  interval = NULL,
+  D = NULL,
+  target = NULL,
+  FP = NULL,
+  model = NULL,
+  k = NULL,
+  alpha = NULL,
+  beta = NULL,
+  scale = NULL,
+  model_d = NULL,
+  alpha_d = NULL,
+  beta_d = NULL,
+  location_d = NULL,
+  k_d = NULL,
+  scale_d = NULL,
+  de_an_prior = NULL,
+  N = NULL,
+  mode_bf = NULL,
+  direct = NULL
 )
 }
 \arguments{
@@ -47,31 +45,27 @@ otherwise Bayes factor with interval null and alternative hypotheses.}
 
 \item{FP}{The targeted false positive rate (if \code{direct = "h1"}) or false negative rate (if \code{direct = "h0"}).}
 
-\item{model}{Statistical model of the analysis prior under the alternative hypothesis.}
+\item{model}{Statistical model of the analysis prior under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"NLP"})}
 
-\item{k}{Parameter for the analysis prior under the alternative hypothesis.}
+\item{k}{Parameter for the analysis default beta prior under the alternative hypothesis.}
 
-\item{alpha}{Parameter for the analysis prior under the alternative hypothesis.}
+\item{alpha}{Parameter for the analysis beta prior under the alternative hypothesis.}
 
-\item{beta}{Parameter for the analysis prior under the alternative hypothesis.}
+\item{beta}{Parameter for the analysis beta prior under the alternative hypothesis.}
 
-\item{scale}{Scale parameter for the analysis prior under the alternative hypothesis.}
+\item{scale}{Scale parameter for the analysis normal moment prior under the alternative hypothesis.}
 
-\item{dff}{Degrees of freedom for the analysis prior under the alternative hypothesis (if applicable).}
+\item{model_d}{Statistical model of the design prior under the alternative hypothesis:default beta (\code{"d_beta"}), beta (\code{"beta"}), normal moment (\code{"NLP"} , or point \code{"Point"})}
 
-\item{model_d}{Statistical model of the design prior under the alternative hypothesis.}
+\item{alpha_d}{Parameter for the design beta prior under the alternative hypothesis.}
 
-\item{alpha_d}{Parameter for the design prior under the alternative hypothesis.}
+\item{beta_d}{Parameter for the design beta prior under the alternative hypothesis.}
 
-\item{beta_d}{Parameter for the design prior under the alternative hypothesis.}
+\item{location_d}{Location parameter for the design point prior under the alternative hypothesis.}
 
-\item{location_d}{Location parameter for the design prior under the alternative hypothesis.}
+\item{k_d}{Parameter for the design default beta prior under the alternative hypothesis.}
 
-\item{k_d}{Parameter for the design prior under the alternative hypothesis.}
-
-\item{scale_d}{Scale parameter for the design prior under the alternative hypothesis.}
-
-\item{dff_d}{Degrees of freedom for the design prior under the alternative hypothesis.}
+\item{scale_d}{Scale parameter for the design normal moment prior under the alternative hypothesis.}
 
 \item{de_an_prior}{Integer (0 or 1). If 1, analysis and design priors under the alternative are the same; if 0, they are not.}
 
@@ -97,19 +91,7 @@ bp_cor(
   FP = 0.05,
   model = "d_beta",
   k = 1,
-  alpha = NULL,
-  beta = NULL,
-  scale = NULL,
-  dff = NULL,
-  model_d = NULL,
-  alpha_d = NULL,
-  beta_d = NULL,
-  location_d = NULL,
-  k_d = NULL,
-  scale_d = NULL,
-  dff_d = NULL,
   de_an_prior = 1,
-  N = NULL,
   mode_bf = 1,
   direct = "h1"
 )

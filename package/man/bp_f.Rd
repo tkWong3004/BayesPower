@@ -5,24 +5,25 @@
 \title{Sample size determination for Bayesian F-test}
 \usage{
 bp_f(
-  interval,
-  D,
-  target,
-  FP,
-  p,
-  k,
-  model,
-  dff,
-  rscale,
-  f_m,
-  model_d,
-  dff_d,
-  rscale_d,
-  f_m_d,
-  de_an_prior,
-  N,
-  mode_bf,
-  direct
+  interval = NULL,
+  D = NULL,
+  target = NULL,
+  FP = NULL,
+  p = NULL,
+  k = NULL,
+  model = NULL,
+  dff = NULL,
+  rscale = NULL,
+  f_m = NULL,
+  model_d = NULL,
+  dff_d = NULL,
+  rscale_d = NULL,
+  f_m_d = NULL,
+  de_an_prior = NULL,
+  N = NULL,
+  mode_bf = NULL,
+  direct = NULL,
+  e = NULL
 )
 }
 \arguments{
@@ -39,21 +40,21 @@ otherwise Bayes factor with interval null and alternative hypotheses.}
 
 \item{k}{Number of predictors in the full model.}
 
-\item{model}{Statistical model of the analysis prior under the alternative hypothesis.}
+\item{model}{Statistical model of the analysis prior under the alternative hypothesis: effect size prior  (\code{"effectsize"}) or Moment prior (\code{"Moment"})}
 
-\item{dff}{Degrees of freedom for the analysis prior under the alternative hypothesis.}
+\item{dff}{Degrees of freedom for the analysis prior under the alternative hypothesis.(must be >3 if moment prior is used)}
 
-\item{rscale}{Scaling parameter for the analysis prior.}
+\item{rscale}{Scaling parameter for the analysis effect size prior.}
 
-\item{f_m}{Cohen's f² effect size for the analysis prior.}
+\item{f_m}{Cohen's f effect size parameter for the analysis prior.}
 
-\item{model_d}{Statistical model of the design prior under the alternative hypothesis.}
+\item{model_d}{Statistical model of the design prior under the alternative hypothesis:: effect size prior  (\code{"effectsize"}), Moment prior (\code{"Moment"}), or Point prior (\code{"Point"})}
 
-\item{dff_d}{Degrees of freedom for the design prior under the alternative hypothesis.}
+\item{dff_d}{Degrees of freedom for the design prior under the alternative hypothesis. (must be >3 if moment prior is used)}
 
-\item{rscale_d}{Scaling parameter for the design prior.}
+\item{rscale_d}{Scaling parameter for the design effect size prior.}
 
-\item{f_m_d}{Cohen's f² effect size for the design prior.}
+\item{f_m_d}{Cohen's f effect size parameter for the design prior or the point design prior.}
 
 \item{de_an_prior}{Integer (0 or 1). If 1, analysis and design priors under the alternative are the same; if 0, they are not.}
 
@@ -83,12 +84,7 @@ bp_f(
   dff = 1,
   rscale = 0.5,
   f_m = 0.15,
-  model_d = NULL,
-  dff_d = NULL,
-  rscale_d = NULL,
-  f_m_d = NULL,
   de_an_prior = 1,
-  N = NULL,
   mode_bf = 1,
   direct = "h1"
 )

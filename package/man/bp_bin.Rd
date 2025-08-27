@@ -5,26 +5,26 @@
 \title{Sample size determination for Bayesian one-proportion test}
 \usage{
 bp_bin(
-  hypothesis,
-  interval,
-  D,
-  target,
-  FP,
-  location,
-  model,
-  alpha,
-  beta,
-  scale,
-  model_d,
-  alpha_d,
-  beta_d,
-  location_d,
-  scale_d,
-  de_an_prior,
-  N,
-  mode_bf,
+  hypothesis = NULL,
+  interval = NULL,
+  D = NULL,
+  target = NULL,
+  FP = NULL,
+  location = NULL,
+  model = NULL,
+  alpha = NULL,
+  beta = NULL,
+  scale = NULL,
+  model_d = NULL,
+  alpha_d = NULL,
+  beta_d = NULL,
+  location_d = NULL,
+  scale_d = NULL,
+  de_an_prior = NULL,
+  N = NULL,
+  mode_bf = NULL,
   e = NULL,
-  direct
+  direct = NULL
 )
 }
 \arguments{
@@ -41,7 +41,7 @@ otherwise Bayes factor with interval null and alternative hypotheses.}
 
 \item{location}{Null proportion value.}
 
-\item{model}{Statistical model of the analysis prior under the alternative hypothesis.}
+\item{model}{Statistical model of the analysis prior under the alternative hypothesis: beta prior  (\code{"beta"}) or Moment prior (\code{"Moment"})}
 
 \item{alpha}{Parameter for the analysis prior under the alternative hypothesis.}
 
@@ -49,13 +49,13 @@ otherwise Bayes factor with interval null and alternative hypotheses.}
 
 \item{scale}{Scale parameter for the analysis prior under the alternative hypothesis.}
 
-\item{model_d}{Statistical model of the design prior under the alternative hypothesis.}
+\item{model_d}{Statistical model of the design prior under the alternative hypothesis:beta prior  (\code{"beta"}) , Moment prior (\code{"Moment"}), or Point prior (\code{"Point"})}
 
 \item{alpha_d}{Parameter for the design prior under the alternative hypothesis.}
 
 \item{beta_d}{Parameter for the design prior under the alternative hypothesis.}
 
-\item{location_d}{Null proportion value for the design prior.}
+\item{location_d}{The proportion value for the design point prior.}
 
 \item{scale_d}{Scale parameter for the design prior under the alternative hypothesis.}
 
@@ -85,16 +85,8 @@ bp_bin(
   model = "beta",
   alpha = 1,
   beta = 1,
-  scale = NULL,
-  model_d = NULL,
-  alpha_d = NULL,
-  beta_d = NULL,
-  location_d = NULL,
-  scale_d = NULL,
   de_an_prior = 1,
-  N = NULL,
   mode_bf = 1,
-  e = NULL,
   direct = "h1"
 )
 }

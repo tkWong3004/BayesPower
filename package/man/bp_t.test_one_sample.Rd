@@ -5,24 +5,24 @@
 \title{Sample size determination for one-sample Bayesian t-test}
 \usage{
 bp_t.test_one_sample(
-  hypothesis,
-  e,
-  interval,
-  D,
-  target,
-  alpha,
-  model,
-  location,
-  scale,
-  dff,
-  model_d,
-  location_d,
-  scale_d,
-  dff_d,
-  de_an_prior,
-  N,
-  mode_bf,
-  direct
+  hypothesis = NULL,
+  e = NULL,
+  interval = NULL,
+  D = NULL,
+  target = NULL,
+  alpha = NULL,
+  model = NULL,
+  location = NULL,
+  scale = NULL,
+  dff = NULL,
+  model_d = NULL,
+  location_d = NULL,
+  scale_d = NULL,
+  dff_d = NULL,
+  de_an_prior = NULL,
+  N = NULL,
+  mode_bf = NULL,
+  direct = NULL
 )
 }
 \arguments{
@@ -70,7 +70,6 @@ Perform sample size determination or the calculation of compelling and misleadin
 \dontrun{
 bp_t.test_one_sample(
   hypothesis = "!=",
-  e = NULL,
   interval = "1",
   D = 3,
   target = 0.8,
@@ -79,10 +78,6 @@ bp_t.test_one_sample(
   location = 0,
   scale = 0.707,
   dff = 1,
-  model_d = NULL,
-  location_d = NULL,
-  scale_d = NULL,
-  dff_d = NULL,
   de_an_prior = 1,
   N = NULL,
   mode_bf = 1,

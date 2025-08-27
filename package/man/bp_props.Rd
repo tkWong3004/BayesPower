@@ -5,26 +5,26 @@
 \title{Sample size determination for Bayesian test of two proportions}
 \usage{
 bp_props(
-  D,
-  target,
-  a0,
-  b0,
-  a1,
-  b1,
-  a2,
-  b2,
-  model1,
-  a1d,
-  b1d,
-  dp1,
-  model2,
-  a2d,
-  b2d,
-  dp2,
-  mode_bf,
-  n1,
-  n2,
-  direct
+  D = NULL,
+  target = NULL,
+  a0 = NULL,
+  b0 = NULL,
+  a1 = NULL,
+  b1 = NULL,
+  a2 = NULL,
+  b2 = NULL,
+  model1 = NULL,
+  a1d = NULL,
+  b1d = NULL,
+  dp1 = NULL,
+  model2 = NULL,
+  a2d = NULL,
+  b2d = NULL,
+  dp2 = NULL,
+  mode_bf = NULL,
+  n1 = NULL,
+  n2 = NULL,
+  direct = NULL
 )
 }
 \arguments{
@@ -32,19 +32,19 @@ bp_props(
 
 \item{target}{The targeted true positive rate (if \code{direct = "h1"}) or true negative rate (if \code{direct = "h0"}).}
 
-\item{a0}{Alpha parameter of the null distribution (group proportion under the null).}
+\item{a0}{Alpha parameter of the beta distribution under the null .}
 
-\item{b0}{Beta parameter of the null distribution (group proportion under the null).}
+\item{b0}{Beta parameter of the beta distribution  under the null.}
 
-\item{a1}{Alpha parameter for group 1 under the alternative hypothesis.}
+\item{a1}{Alpha parameter of the analysis beta prior  distribution for group 1 under the alternative hypothesis.}
 
-\item{b1}{Beta parameter for group 1 under the alternative hypothesis.}
+\item{b1}{Beta parameter of the analysis beta prior  distribution for group 1 under the alternative hypothesis.}
 
-\item{a2}{Alpha parameter for group 2 under the alternative hypothesis.}
+\item{a2}{Alpha parameter of the analysis beta prior distribution for group 2 under the alternative hypothesis.}
 
-\item{b2}{Beta parameter for group 2 under the alternative hypothesis.}
+\item{b2}{Beta parameter  of the analysis beta prior  distribution for group 2 under the alternative hypothesis.}
 
-\item{model1}{Statistical model of the analysis prior for group 1.}
+\item{model1}{Statistical model of the design prior for group 1: beta (\code{"beta"}), Point prior (\code{"Point"}, or same as analysis prior \code{"same"})}
 
 \item{a1d}{Alpha parameter for the design prior of group 1.}
 
@@ -52,7 +52,7 @@ bp_props(
 
 \item{dp1}{True proportion for group 1 in the design prior.}
 
-\item{model2}{Statistical model of the analysis prior for group 2.}
+\item{model2}{Statistical model of the design prior for group 1: beta (\code{"beta"}), or Point prior (\code{"Point"}, or same as analysis prior \code{"same"})}
 
 \item{a2d}{Alpha parameter for the design prior of group 2.}
 
@@ -85,15 +85,7 @@ bp_props(
   a2 = 1,
   b2 = 1,
   model2 = "same",
-  a1d = NULL,
-  b1d = NULL,
-  dp1 = NULL,
-  a2d = NULL,
-  b2d = NULL,
-  dp2 = NULL,
   mode_bf = 1,
-  n1 = NULL,
-  n2 = NULL,
   direct = "h1"
 )
 }
