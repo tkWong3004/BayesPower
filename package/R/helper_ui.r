@@ -232,7 +232,7 @@ show_f_code <- function(x) {
     }
 
     # Skip NULL args
-    if (is.null(val) || val == "NULL") return(NULL)
+    if (is.null(val)) return(NULL)
 
     if (is.character(val)) val <- shQuote(val, type = "cmd")
     else if (is.vector(val) && length(val) > 1) val <- paste0("c(", paste(val, collapse = ", "), ")")
@@ -268,7 +268,7 @@ show_bin_code <- function(x) {
     else if (!is.null(x$interval) && x$interval == "1" && arg == "e") val <- "NULL"
 
     # Skip NULL args
-    if (is.null(val) || val == "NULL") return(NULL)
+    if (is.null(val)) return(NULL)
 
     if (is.character(val)) val <- shQuote(val, type = "cmd")
     else if (is.vector(val) && length(val) > 1) val <- paste0("c(", paste(val, collapse = ", "), ")")
@@ -301,7 +301,7 @@ show_props_code <- function(x) {
     }
 
     # Skip NULL args
-    if (is.null(val) || val == "NULL") return(NULL)
+    if (is.null(val)) return(NULL)
 
     if (is.character(val)) val <- shQuote(val, type = "cmd")
     else if (is.vector(val) && length(val) > 1) val <- paste0("c(", paste(val, collapse = ", "), ")")

@@ -379,11 +379,15 @@ Power_f<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model_
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(n,FPE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-         legend = c("True positive", "False positive"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True positive", "False positive"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
   plot(n, TNE, type = "l",
        xlab = "Total sample size",
@@ -391,11 +395,15 @@ Power_f<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model_
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(n,FNE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-         legend = c("True negative", "False negative"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True negative", "False negative"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
 }
 
@@ -806,11 +814,16 @@ Power_fe<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(sdf,FPE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-         legend = c("True positive", "False positive"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True positive", "False positive"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
+
 
   plot(sdf, TNE, type = "l",
        xlab = "Total sample size",
@@ -818,11 +831,15 @@ Power_fe<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(sdf,FNE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-         legend = c("True negative", "False negative"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True positive", "False positive"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
 }
 
@@ -1435,22 +1452,32 @@ Power_bin<-function(D,alpha,beta,location,scale,model,hypothesis,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(Ns,FPE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-         legend = c("True positive", "False positive"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True positive", "False positive"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
+
   plot(Ns, TNE, type = "l",
        xlab = "Sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(Ns,FNE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-         legend = c("True negative", "False negative"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True negative", "False negative"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
+
 
 }
 
@@ -2211,22 +2238,30 @@ Power_e_bin<-function(D,alpha,beta,location,scale,model,hypothesis,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(sN,FPE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-         legend = c("True positive", "False positive"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True positive", "False positive"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
   plot(sN, TNE, type = "l",
        xlab = "Sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(sN,FNE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-         legend = c("True negative", "False negative"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True negative", "False negative"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
 }
 
@@ -2904,11 +2939,15 @@ Power_r<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(Ns,FPE,col = "grey")
-  graphics::legend(x = N.max*.4,y=.5,              # position of the legend
-         legend = c("True positive", "False positive"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = N.max*-.1,y=1.1,
+                   legend = c("True positive", "False positive"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
   plot(Ns, TNE, type = "l",
        xlab = "Total sample size",
@@ -2916,11 +2955,15 @@ Power_r<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(Ns,FNE,col = "grey")
-  graphics::legend(x = N.max*.4,y=.5,              # position of the legend
-         legend = c("True negative", "False negative"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = N.max*-.1,y=1.1,
+                   legend = c("True negative", "False negative"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
 
 
@@ -3678,11 +3721,15 @@ Power_re<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(Ns,FPE,col = "grey")
-  graphics::legend(x = N.max*.4,y=.5,              # position of the legend
-         legend = c("True positive", "False positive"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = N.max*-.1,y=1.1,
+                   legend = c("True positive", "False positive"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
   plot(Ns, TNE, type = "l",
        xlab = "Total sample size",
@@ -3690,11 +3737,15 @@ Power_re<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(Ns,FNE,col = "grey")
-  graphics::legend(x = N.max*.4,y=.5,              # position of the legend
-         legend = c("True negative", "False negative"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = N.max*-.1,y=1.1,
+                   legend = c("True negative", "False negative"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
 }
 
@@ -4153,8 +4204,8 @@ bf10_t1 <-function(D = 3, df, target, model = "NA", location = 0, scale = 0.707,
 
 # Power curve function for BF10 > D under H1:
 Power_t1 <- function(D, model, location, scale, dff, hypothesis,
-                     model_d, location_d, scale_d, dff_d,
-                     de_an_prior, N) {
+                      model_d, location_d, scale_d, dff_d,
+                      de_an_prior, N) {
   # df range to evaluate power:
   df.min     <- 2
   df.max     <- ceiling(N * 1.2)
@@ -4187,11 +4238,16 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(dfs+1,FPE,col = "grey")
-  graphics::legend(x = df.max*.1,y=.5,              # position of the legend
-         legend = c("True positive", "False positive"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = df.max*-.1,y=1.1,
+                   legend = c("True positive", "False positive"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
+
 
   plot(dfs+1, TNE, type = "l",
        xlab = "Total sample size",
@@ -4199,11 +4255,15 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(dfs+1,FNE,col = "grey")
-  graphics::legend(x = df.max*.1,y=.5,              # position of the legend
-         legend = c("True negative", "False negative"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = df.max*-.1,y=1.1,
+                   legend = c("True negative", "false negative"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
 }
 
@@ -4887,11 +4947,15 @@ Power_t1e<-function(D,model,location,scale,dff, hypothesis,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(dfs+1,FPE,col = "grey")
-  graphics::legend(x = df.max*.1,y=.5,              # position of the legend
-         legend = c("True positive", "False positive"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = df.max*-.1,y=1.1,
+                   legend = c("True positive", "False positive"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
   plot(dfs+1, TNE, type = "l",
        xlab = "Total sample size",
@@ -4899,11 +4963,15 @@ Power_t1e<-function(D,model,location,scale,dff, hypothesis,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(dfs+1,FNE,col = "grey")
-  graphics::legend(x = df.max*.1,y=.5,              # position of the legend
-         legend = c("True negative", "False negative"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = df.max*-.1,y=1.1,
+                   legend = c("True negative", "False negative"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
 
 }
@@ -5322,7 +5390,7 @@ output$bin_lower<-shiny::renderUI({
 
 
   table_html <-  paste0('
-                        p_0 - \\epsilon = ', bin$location+bin$lbbin,'')
+                        \\theta_0 - \\epsilon = ', bin$location+bin$lbbin,'')
 
   shiny::tagList(
     # Render the table using MathJax
@@ -5338,7 +5406,7 @@ output$bin_upper<-shiny::renderUI({
  bin = input_bin()
 
   table_html <-  paste0('
-                        \\rho_0 - \\epsilon = ', bin$location+bin$ubbin,'')
+                        \\theta_0 - \\epsilon = ', bin$location+bin$ubbin,'')
 
   shiny::tagList(
     # Render the table using MathJax
@@ -5390,19 +5458,19 @@ shiny::observeEvent(input$runbin, {
 
   output$resultbin <- shiny::renderUI({
     if (identical(dat, "Error")){
-      table_html <- "Required sample size is more than the upper limit."
+      table_html <- shiny::span("\\(\\text{Note: Error when the required N > 10,000}\\)", style = "color: red;")
     }else{
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('$$', '
     \\begin{array}{l c}
     \\textbf{Probability of Compelling Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{10} > ', bin$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
-    \\text{p(BF}_{01} > ', bin$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
+    p\\text{(BF}_{10} > ', bin$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
+    p\\text{(BF}_{01} > ', bin$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
     \\textbf{Probability of Misleading Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{01} > ', bin$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
-    \\text{p(BF}_{10} > ', bin$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
+    p\\text{(BF}_{01} > ', bin$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
+    p\\text{(BF}_{10} > ', bin$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
     \\textbf{Required Sample Size} & \\\\
     \\hline
     \\text{N} & ', dat[5], ' \\\\
@@ -5722,19 +5790,20 @@ shiny::observeEvent(input$runf, {
 
   output$resultf <- shiny::renderUI({
     if (identical(dat, "Error")){
-      table_html <- "Required sample size is more than the upper limit."
+      table_html <- shiny::span("\\(\\text{Error: the required N > 5,000} \\)", style = "color: red;")
+
     }else{
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('$$','
     \\begin{array}{l c}
     \\textbf{Probability of Compelling Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{10} > ', ff$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
-    \\text{p(BF}_{01} > ', ff$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
+    p\\text{(BF}_{10} > ', ff$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
+    p\\text{(BF}_{01} > ', ff$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
     \\textbf{Probability of Misleading Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{01} > ', ff$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
-    \\text{p(BF}_{10} > ', ff$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
+    p\\text{(BF}_{01} > ', ff$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
+    p\\text{(BF}_{10} > ', ff$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
     \\textbf{Required Sample Size} & \\\\
     \\hline
     \\text{N} & ', dat[5], ' \\\\
@@ -5826,6 +5895,15 @@ shiny::observeEvent(input$runf, {
 shiny::observeEvent(input$calf, {
   ff = input_f()
   m = ff$df2+ff$df1
+  output$priorff <- shiny::renderPlot({
+
+    switch(ff$inter,
+           "1" =prior_plot_f(ff$q,ff$dff,ff$rscale,ff$f_m,ff$model,ff$dff_d
+                             ,ff$rscale_d,ff$f_m_d,ff$model_d,1),
+           "2" = prior_plot_fe(ff$q,ff$dff,ff$rscale,ff$f_m,ff$model,ff$dff_d
+                               ,ff$rscale_d,ff$f_m_d,ff$model_d,1,ff$e))
+
+  })
   BF10 <- F_BF(ff$fval,ff$df1,m,ff$dff,ff$rscale,ff$f_m,ff$model)
 
   output$BFcalf <- shiny::renderUI({
@@ -5979,19 +6057,19 @@ shiny::observeEvent(input$runp2, {
 
   output$resultp2 <- shiny::renderUI({
     if (identical(dat, "Error")){
-      table_html <- "Required sample size is more than the upper limit."
+      table_html <- span("\\(\\text{Note: Error when required } N > 5,000\\)", style = "color: red;")
     }else{
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('$$', '
     \\begin{array}{l c}
     \\textbf{Probability of Compelling Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(table[1,1], 3), ' \\\\
-    \\text{p(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(table[1,3], 3), ' \\\\
+    p\\text{(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(table[1,1], 3), ' \\\\
+    p\\text{(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(table[1,3], 3), ' \\\\
     \\textbf{Probability of Misleading Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(table[1,2], 3), ' \\\\
-    \\text{p(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(table[1,4], 3), ' \\\\
+    p\\text{(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(table[1,2], 3), ' \\\\
+    p\\text{(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(table[1,4], 3), ' \\\\
     \\textbf{Required Sample Size} & \\\\
     \\hline
     \\text{N}_1 & ', table[1,5], ' \\\\
@@ -6316,19 +6394,20 @@ shiny::observeEvent(input$runr, {
 
   output$resultr <- shiny::renderUI({
     if (identical(dat, "Error")){
-      table_html <- "Required sample size is more than the upper limit."
+      table_html <- shiny::span("\\(\\text{Note: Potential Error when the required N > 5,000} \\)", style = "color: red;")
+
     }else{
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('$$','
     \\begin{array}{l c}
     \\textbf{Probability of Compelling Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{10} > ', rr$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
-    \\text{p(BF}_{01} > ', rr$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
+    p\\text{(BF}_{10} > ', rr$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
+    p\\text{(BF}_{01} > ', rr$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
     \\textbf{Probability of Misleading Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{01} > ', rr$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
-    \\text{p(BF}_{10} > ', rr$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
+    p\\text{(BF}_{01} > ', rr$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
+    p\\text{(BF}_{10} > ', rr$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
     \\textbf{Required Sample Size} & \\\\
     \\hline
     \\text{N} & ', dat[5], ' \\\\
@@ -6424,6 +6503,25 @@ shiny::observeEvent(input$runr, {
 
 shiny::observeEvent(input$calr, {
   rr = input_r()
+  output$prior_r <- shiny::renderPlot({
+
+    switch(rr$interval,
+           "1" = r_prior_plot(rr$k, rr$alpha, rr$beta,
+                              rr$h0,rr$location,rr$scale,
+                              rr$dff,rr$model,1,
+                              rr$k_d, rr$alpha_d, rr$beta_d,
+                              rr$location_d,rr$scale_d,rr$dff_d,
+                              rr$model_d,rr$hypothesis),
+           "2" = re_prior_plot(rr$k, rr$alpha, rr$beta,
+                               rr$h0,rr$location,rr$scale,
+                               rr$dff,rr$model,1,
+                               rr$k_d, rr$alpha_d, rr$beta_d,
+                               rr$location_d,rr$scale_d,rr$dff_d,
+                               rr$model_d,rr$hypothesis,rr$e))
+
+
+
+  })
   BF10 <- switch(rr$interval ,
                  "1" = r_BF10(rr$rval,rr$N,rr$k, rr$alpha, rr$beta,rr$h0,rr$hypothesis,rr$location,rr$scale,rr$dff,rr$model),
                  "2" = re_BF10(rr$rval,rr$N,rr$k, rr$alpha, rr$beta,rr$h0,rr$hypothesis,rr$location,rr$scale,rr$dff,rr$model,rr$e))
@@ -6549,10 +6647,13 @@ input_t1 <- shiny::reactive({
 shiny::observeEvent(input$runt1, {
   x = input_t1()
 
-  dat = suppressWarnings(switch(x$interval, "1" =  t1_Table(x$D,x$target,x$model,x$location,x$scale,x$dff, x$hypothesis,
+  dat = tryCatch({suppressWarnings(switch(x$interval, "1" =  t1_Table(x$D,x$target,x$model,x$location,x$scale,x$dff, x$hypothesis,
                                                         x$model_d,x$location_d,x$scale_d,x$dff_d, x$de_an_prior,x$N, x$mode_bf ,
                                                         x$alpha,x$direct),"2" = t1e_table(x$D,x$target,x$model,x$scale,x$dff, x$hypothesis,x$e ,
                                                                                  x$model_d,x$scale_d,x$dff_d, x$de_an_prior,x$N,x$mode_bf,x$location_d ,x$alpha,x$direct)))
+  }, error = function(e) {
+    "Error"
+  })
 
   output$result_t1 <- shiny::renderText({
     paste("# Function to be used in R", show_t1_code(x), sep = "\n")
@@ -6592,19 +6693,19 @@ shiny::observeEvent(input$runt1, {
 
   output$resultt1 <- shiny::renderUI({
     if (identical(dat, "Error")){
-      table_html <- "Required sample size is more than the upper limit."
+      table_html <- shiny::span("\\(\\text{Error: the required N > 10,000}\\)", style = "color: red;")
     }else{
     # Create the LaTeX formatted strings for the table
     table_html <- paste0( '$$','
     \\begin{array}{l c}
     \\textbf{Probability of Compelling Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{10} > ', x$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
-    \\text{p(BF}_{01} > ', x$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
+    p\\text{(BF}_{10} > ', x$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
+    p\\text{(BF}_{01} > ', x$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
     \\textbf{Probability of Misleading Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{01} > ', x$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
-    \\text{p(BF}_{10} > ', x$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
+    p\\text{(BF}_{01} > ', x$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
+    p\\text{(BF}_{10} > ', x$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
     \\textbf{Required Sample Size} & \\\\
     \\hline
     \\text{N} & ', dat[5], ' \\\\
@@ -6697,6 +6798,36 @@ shiny::observeEvent(input$runt1, {
 
 shiny::observeEvent(input$cal1, {
   x = input_t1()
+  output$priort1 <- shiny::renderPlot({
+    suppressWarnings(switch(x$interval,
+                            "1"= t1_prior_plot(
+                              D = x$D,                  # Access 'D' explicitly
+                              target = x$target,        # Access 'target' explicitly
+                              model = x$model,          # Access 'model' explicitly
+                              location = x$location,    # Access 'location' explicitly
+                              scale = x$scale,          # Access 'scale' explicitly
+                              dff = x$dff,              # Access 'dff' explicitly
+                              hypothesis = x$hypothesis,  # Access 'hypothesis' explicitly
+                              model_d = x$model_d,        # Access 'model_d' explicitly
+                              location_d = x$location_d,  # Access 'location_d' explicitly
+                              scale_d = x$scale_d,        # Access 'scale_d' explicitly
+                              dff_d = x$dff_d,            # Access 'dff_d' explicitly
+                              de_an_prior = 1   # Access 'de_an_prior' explicitly
+                            ),
+                            "2" = t1e_prior_plot(x$model,
+                                                 x$scale,
+                                                 x$dff ,
+                                                 x$hypothesis,
+                                                 x$e,
+                                                 1,
+                                                 x$model_d,
+                                                 x$scale_d,
+                                                 x$dff_d,
+                                                 x$location )
+
+    ))
+
+  })
   BF10 <- switch(x$interval,
                  "1" = t1_BF10(x$tval,x$N,x$model ,x$location,x$scale,x$dff , x$hypothesis ),
                  "2" = t1e_BF10(x$tval,x$N,x$model,x$scale,x$dff , x$hypothesis,x$e ))
@@ -6910,18 +7041,19 @@ shiny::observeEvent(input$runt2, {
   output$resultt2 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     if (identical(dat, "Error")){
-      table_html <- "Required sample size is more than the upper limit."
+      table_html <- shiny::em(shiny::span("\\(\\text{Error: the required } N > 10,000\\)", style = "color: red;"))
+
     }else{
     table_html <- paste0("$$",'
     \\begin{array}{l c}
     \\textbf{Probability of Compelling Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{10} > ', t2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1,1], 3), ' \\\\
-    \\text{p(BF}_{01} > ', t2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[1,3], 3), ' \\\\
+    p\\text{(BF}_{10} > ', t2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1,1], 3), ' \\\\
+    p\\text{(BF}_{01} > ', t2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[1,3], 3), ' \\\\
     \\textbf{Probability of Misleading Evidence} & \\\\
     \\hline
-    \\text{p(BF}_{01} > ', t2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1,2], 3), ' \\\\
-    \\text{p(BF}_{10} > ', t2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[1,4], 3), ' \\\\
+    p\\text{(BF}_{01} > ', t2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1,2], 3), ' \\\\
+    p\\text{(BF}_{10} > ', t2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[1,4], 3), ' \\\\
     \\textbf{Required Sample Size} & \\\\
     \\hline
     \\text{N}_1 & ', dat[1,5], ' \\\\
@@ -7014,6 +7146,37 @@ shiny::observeEvent(input$runt2, {
 
 shiny::observeEvent(input$cal1, {
   t2 = input_t2()
+  output$priort2 <- shiny::renderPlot({
+    suppressWarnings(switch(t2$interval,
+                            "1"=
+                              t1_prior_plot(
+                                D = t2$D,                  # Access 'D' explicitly
+                                target = t2$target,        # Access 'target' explicitly
+                                model = t2$model,          # Access 'model' explicitly
+                                location = t2$location,    # Access 'location' explicitly
+                                scale = t2$scale,          # Access 'scale' explicitly
+                                dff = t2$dff,              # Access 'dff' explicitly
+                                hypothesis = t2$hypothesis,  # Access 'hypothesis' explicitly
+                                model_d = t2$model_d,        # Access 'model_d' explicitly
+                                location_d = t2$location_d,  # Access 'location_d' explicitly
+                                scale_d = t2$scale_d,        # Access 'scale_d' explicitly
+                                dff_d = t2$dff_d,            # Access 'dff_d' explicitly
+                                de_an_prior = 1   # Access 'de_an_prior' explicitly
+                              ), "2" =
+                              t1e_prior_plot(t2$model,
+                                             t2$scale,
+                                             t2$dff ,
+                                             t2$hypothesis,
+                                             t2$e,
+                                             1,
+                                             t2$model_d,
+                                             t2$scale_d,
+                                             t2$dff_d,
+                                             t2$location )
+
+    ))
+
+  })
   r = t2$N2/t2$N1
   N1 = t2$N1
   ddff = t2$N1+t2$N2-2
@@ -7518,11 +7681,15 @@ Power_t2<-function(D,model,location,scale,dff, hypothesis,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(sdf,FPE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-         legend = c("True positive", "False positive"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True positive", "False positive"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
   plot(sdf, TNE, type = "l",
        xlab = "Total sample size",
@@ -7530,11 +7697,15 @@ Power_t2<-function(D,model,location,scale,dff, hypothesis,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(sdf,FNE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-         legend = c("True negative", "False negative"),  # labels
-         col = c("black", "grey"),   # colors matching lines
-         lty = 1,                   # line type (solid)
-         bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True negative", "False negative"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
 }
 
@@ -8080,11 +8251,15 @@ Power_t2e<-function(D,model,location,scale,dff, hypothesis,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
   graphics::lines(sdf,FPE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-                   legend = c("True positive", "False positive"),  # labels
-                   col = c("black", "grey"),   # colors matching lines
-                   lty = 1,                   # line type (solid)
-                   bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True positive", "False positive"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
   plot(sdf, TNE, type = "l",
        xlab = "Total sample size",
@@ -8092,10 +8267,14 @@ Power_t2e<-function(D,model,location,scale,dff, hypothesis,
        ylim = c(0, 1), frame.plot = FALSE,
        main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
   graphics::lines(sdf,FNE,col = "grey")
-  graphics::legend(x = smax*.1,y=.5,              # position of the legend
-                   legend = c("True negative", "False negative"),  # labels
-                   col = c("black", "grey"),   # colors matching lines
-                   lty = 1,                   # line type (solid)
-                   bty = "n")
+  graphics::legend(x = smax*-.1,y=1.1,
+                   legend = c("True negative", "False negative"),
+                   col = c("black", "grey"),
+                   lty = 1,
+                   bty = "n",        # no box around legend
+                   seg.len = .8,    # shorter line segment
+                   x.intersp = 0.3,  # closer text to line
+                   y.intersp = 0.4,
+                   inset = c(0.01, 0.01))  # push legend toward margin
 
 }

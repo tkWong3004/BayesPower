@@ -221,10 +221,7 @@ ui <-
 
           # Run button + error message
           shiny::conditionalPanel("input.Modet1 == 1 || input.Modet1 == 2",
-                           shiny::actionButton("runt1", label = "\\(\\text{Run}\\)"),
-                           shiny::conditionalPanel("input.Modet1 == 1",
-                                            shiny::em(shiny::span("\\(\\text{Note: Error when the required N > 10,000}\\)", style = "color: red;"))
-                           )
+                           shiny::actionButton("runt1", label = "\\(\\text{Run}\\)")
           ),
 
           # BF calculator mode
@@ -283,8 +280,11 @@ ui <-
         # Main panel with result tabs
         shiny::mainPanel( shiny::fluidRow(
           shiny::column(6, shiny::plotOutput("priort1")),
-          shiny::column(6, shiny::htmlOutput("resultt1"))),
-          shiny::uiOutput("Optional_Plots_t1"))
+          shiny::column(6, shiny::conditionalPanel(condition = "input.Modet1 == 1||input.Modet1 == 2",
+                                                   shiny::htmlOutput("resultt1"))
+
+                        )),
+          shiny::conditionalPanel(condition = "input.Modet1 == 1||input.Modet1 == 2",shiny::uiOutput("Optional_Plots_t1")))
       )
     )
     ,shiny::tabPanel(
@@ -529,8 +529,8 @@ ui <-
 
           # Action buttons
           shiny::conditionalPanel("input.Modet2 == 1 || input.Modet2 == 2",
-                           shiny::actionButton("runt2", label = "\\(\\text{Run}\\)"),
-                           shiny::conditionalPanel("input.Modet2 == 1", shiny::em(shiny::span("\\(\\text{Note: Error when required } N > 10,000\\)", style = "color: red;")))
+                           shiny::actionButton("runt2", label = "\\(\\text{Run}\\)")
+
           ),
           shiny::conditionalPanel(
             condition = "input.Modet2 == 1",
@@ -553,8 +553,11 @@ ui <-
 
         shiny::mainPanel(shiny::fluidRow(
           shiny::column(6, shiny::plotOutput("priort2")),
-          shiny::column(6, shiny::htmlOutput("resultt2"))),
-          shiny::uiOutput("Optional_Plots_t2")
+          shiny::column(6, shiny::conditionalPanel(condition = "input.Modet2 == 1||input.Modet2 == 2",shiny::htmlOutput("resultt2"))
+
+
+                        )),
+          shiny::conditionalPanel(condition = "input.Modet2 == 1||input.Modet2 == 2",shiny::uiOutput("Optional_Plots_t2"))
 
 
 
@@ -633,6 +636,8 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                       shiny::sliderInput("h0pho", "\\(\\rho_0\\)", min = -.99, max = .99, value = 0, step = 0.01, ticks = FALSE)
                ),
                shiny::column(4,
+                             shiny::conditionalPanel("(input.h1re == 2) && input.h0r == 2", shiny::em("\\(-\\epsilon = 0\\)")),
+
                       shiny::conditionalPanel(
                         condition = "(input.h1re == 1 || input.h1re == 3) && input.h0r == 2",
                         shiny::sliderInput("lbre", "\\( -\\epsilon \\)", min = -0.5, max = -0.01, value = -0.2, step = 0.01, ticks = FALSE),
@@ -640,6 +645,8 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                       )
                ),
                shiny::column(4,
+                             shiny::conditionalPanel("(input.h1re == 3) && input.h0r == 2", shiny::em("\\(\\epsilon = 0\\)")),
+
                       shiny::conditionalPanel(
                         condition = "(input.h1re == 1 || input.h1re == 2) && input.h0r == 2",
                         shiny::sliderInput("ubre", "\\(\\epsilon \\)", min = 0.01, max = 0.5, value = 0.2, step = 0.01, ticks = FALSE),
@@ -774,10 +781,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
              ),
 
              shiny::conditionalPanel("input.Moder == 1 | input.Moder == 2",
-                              shiny::actionButton("runr", label = "\\( \\text{Run} \\)"),
-                              shiny::conditionalPanel("input.Moder == 1",
-                                               shiny::em(shiny::span("\\(\\text{Note: Potential Error when the required N > 5,000} \\)", style = "color: red;"))
-                              )
+                              shiny::actionButton("runr", label = "\\( \\text{Run} \\)")
              ),
 
              # BF calculator
@@ -810,8 +814,12 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
            shiny::mainPanel(
              shiny::fluidRow(
                shiny::column(6, shiny::plotOutput("prior_r")),
-               shiny::column(6, shiny::htmlOutput("resultr"))),
-             shiny::uiOutput("Optional_Plots_r")
+               shiny::column(6, shiny::conditionalPanel(
+                 condition = "input.Moder == 1||input.Moder == 2",shiny::htmlOutput("resultr"))
+
+                             )),
+             shiny::conditionalPanel(
+               condition = "input.Moder == 1||input.Moder == 2",shiny::uiOutput("Optional_Plots_r"))
 
            )
          )
@@ -1081,10 +1089,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                               shiny::numericInput("nf", "\\( \\text{Sample Size } N: \\)", value = 50)
              ),
              shiny::conditionalPanel(condition = "input.Modef == 1|input.Modef == 2",
-                              shiny::actionButton("runf", label = "\\( \\text{Run} \\)"),
-                              shiny::conditionalPanel(condition = "input.Modef == 1",
-                                               shiny::em(shiny::span("\\(\\text{Note: Potential Error when the required N > 5,000} \\)", style = "color: red;"))
-                              )
+                              shiny::actionButton("runf", label = "\\( \\text{Run} \\)")
              ),
 
              # BF calculator mode
@@ -1117,9 +1122,12 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
            # Main Panel
            shiny::mainPanel(shiny::fluidRow(
              shiny::column(6, shiny::plotOutput("priorff")),
-             shiny::column(6, shiny::htmlOutput("resultf"))
+             shiny::column(6,
+                           shiny::conditionalPanel(condition = "input.Modef == 1||input.Modef == 2",shiny::htmlOutput("resultf")
+                           ))
 
-           ),shiny::uiOutput("Optional_Plots_f")
+           ),
+           shiny::conditionalPanel(condition = "input.Modef == 1||input.Modef == 2",shiny::uiOutput("Optional_Plots_f"))
            )
          )
 )
@@ -1187,12 +1195,16 @@ shiny::navbarMenu(
                  shiny::column(4, shiny::sliderInput("h0prop", "\\(p_0\\)", min = .01, max = .99, value = .5, step = .01, ticks = FALSE)),
 
                  shiny::column(4,
+                               shiny::conditionalPanel("(input.h1bine == 2) && input.h0bin == 2", shiny::em("\\(-\\epsilon = 0\\)")),
+
                         shiny::conditionalPanel("input.h0bin == 2 && (input.h1bine == 1 || input.h1bine == 3)",
                                          shiny::sliderInput("lbbine", "\\(-\\epsilon\\)", min = -0.5, max = -0.01, value = -0.2, step = 0.01, ticks = FALSE),
                                          shiny::htmlOutput("bin_lower"))
                  ),
 
                  shiny::column(4,
+                               shiny::conditionalPanel("(input.h1bine == 3) && input.h0bin == 2", shiny::em("\\(\\epsilon = 0\\)")),
+
                         shiny::conditionalPanel("input.h0bin == 2 && (input.h1bine == 1 || input.h1bine == 2)",
                                          shiny::sliderInput("ubbine", "\\(\\epsilon\\)", min = 0.01, max = 0.5, value = 0.2, step = 0.01, ticks = FALSE),
                                          shiny::htmlOutput("bin_upper"))
@@ -1299,9 +1311,7 @@ shiny::navbarMenu(
                ),
 
                shiny::conditionalPanel("input.Modebin == 1 || input.Modebin == 2",
-                                shiny::actionButton("runbin", label = "\\(\\text{Run}\\)"),
-                                shiny::conditionalPanel("input.Modebin == 1",
-                                                 shiny::em(shiny::span("\\(\\text{Note: Error when the required N > 10,000}\\)", style = "color: red;")))
+                                shiny::actionButton("runbin", label = "\\(\\text{Run}\\)")
                ),
 
                shiny::conditionalPanel("input.Modebin == 3",
@@ -1324,9 +1334,13 @@ shiny::navbarMenu(
 
              shiny::mainPanel(shiny::fluidRow(
                shiny::column(6, shiny::plotOutput("prior_bin")),
-               shiny::column(6, shiny::htmlOutput("resultbin"))
+               shiny::column(6,
+                             shiny::conditionalPanel(
+                               condition = "input.Modebin == 1||input.Modebin == 2",shiny::htmlOutput("resultbin"))
+                             )
              ),
-             shiny::uiOutput("Optional_Plots_bin"))
+             shiny::conditionalPanel(
+               condition = "input.Modebin == 1||input.Modebin == 2",shiny::uiOutput("Optional_Plots_bin")))
            )
   ), shiny::tabPanel("\\(\\text{Two proportion}\\)",shiny::withMathJax(),
 shiny::sidebarLayout(shiny::sidebarPanel(
@@ -1484,8 +1498,7 @@ shiny::sidebarLayout(shiny::sidebarPanel(
                    )) ,
 
   shiny::conditionalPanel("input.Modep2 == 1 || input.Modep2 == 2",
-                   shiny::actionButton("runp2", label = "\\(\\text{Run}\\)"),
-                   shiny::conditionalPanel("input.Modep2 == 1", shiny::em(shiny::span("\\(\\text{Note: Error when required } N > 5,000\\)", style = "color: red;")))
+                   shiny::actionButton("runp2", label = "\\(\\text{Run}\\)")
   ),
   shiny::conditionalPanel("input.Modep2 == 3",
                    shiny::actionButton("calp2", label = "\\(\\text{Calculate}\\)"),
