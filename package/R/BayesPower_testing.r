@@ -183,16 +183,16 @@ ui <-
           shiny::conditionalPanel("input.Modet1 == 1",
                                   shinyWidgets::prettyRadioButtons(
                                     inputId = "t1_direct",
-                                    label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                                    label = shiny::em("\\(\\text{ Controllering for:}\\)"),
                                     choices = list(
-                                      "\\(\\mathrm{BF}_{10}\\)" = 1,
-                                      "\\(\\mathrm{BF}_{01}\\)" = 0
+                                      "\\(\\text{Positive rates}\\)" = 1,
+                                      "\\(\\text{Negative rates}\\)" = 0
                                     ),
                                     selected = 1,
                                     inline = TRUE
                                   ),
 
-                           shiny::em("\\(\\text{Controlling for the probability of}\\)"),
+                           shiny::em("\\(\\text{The targeted probabilities of}\\)"),
                            shiny::fluidRow(
                              shiny::column(6,
                                            shiny::conditionalPanel("input.t1_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
@@ -470,15 +470,15 @@ ui <-
           shiny::conditionalPanel("input.Modet2 == 1",
                                   shinyWidgets::prettyRadioButtons(
                                     inputId = "t2_direct",
-                                    label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                                    label = shiny::em("\\(\\text{ Controllering for:}\\)"),
                                     choices = list(
-                                      "\\(\\mathrm{BF}_{10}\\)" = 1,
-                                      "\\(\\mathrm{BF}_{01}\\)" = 0
+                                      "\\(\\text{Positive rates}\\)" = 1,
+                                      "\\(\\text{Negative rates}\\)" = 0
                                     ),
                                     selected = 1,
                                     inline = TRUE
                                   ),
-                           shiny::em("\\(\\text{Controlling for the probability of}\\)"),
+                           shiny::em("\\(\\text{The targeted probabilities of}\\)"),
                            shiny::fluidRow(
                              shiny::column(6,
 
@@ -714,21 +714,25 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                                                  selected = 1,
                                                  inline = TRUE
                                                ),
-                                               shiny::conditionalPanel("input.modelrd == 4",
-                                                                shiny::sliderInput("h0phod", "\\(\\rho_1\\)", min = -1, max = 1, value = 0.3, step = 0.01, ticks = FALSE)
-                                               ),
+
                                                shiny::fluidRow(
                                                  shiny::column(4,
                                                         shiny::conditionalPanel("input.modelrd == 1",
                                                                          shiny::sliderInput("rkd", "\\( k \\)", min = 0.01, max = 10, value = 1, step = 0.01, ticks = FALSE)
+
+                                                                         ),
+                                                        shiny::conditionalPanel("input.modelrd == 4||input.modelrd == 3",
+                                                                                shiny::sliderInput("h0phod", "\\(\\rho_1\\)", min = -1, max = 1, value = 0.3, step = 0.01, ticks = FALSE)
+
                                                         ),
-                                                        shiny::conditionalPanel("input.modelrd == 3",
-                                                                         shiny::sliderInput("rsd", "\\( Scale \\)", min = 0.01, max = 1, value = 0.1, step = 0.01, ticks = FALSE)
-                                                        )
                                                  ),
                                                  shiny::column(4,
                                                         shiny::conditionalPanel("input.modelrd == 2",
                                                                          shiny::sliderInput("ralphad", "\\(\\alpha \\)", min = 0.01, max = 10, value = 0.1, step = 0.01, ticks = FALSE)
+                                                        ),
+
+                                                        shiny::conditionalPanel("input.modelrd == 3",
+                                                                                shiny::sliderInput("rsd", "\\( \\text{Scale} \\)", min = 0.01, max = 1, value = 0.1, step = 0.01, ticks = FALSE)
                                                         )
                                                  ),
                                                  shiny::column(4,
@@ -747,15 +751,15 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
              shiny::conditionalPanel("input.Moder == 1",
                                      shinyWidgets::prettyRadioButtons(
                                        inputId = "r_direct",
-                                       label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                                       label = shiny::em("\\(\\text{ Controllering for:}\\)"),
                                        choices = list(
-                                         "\\(\\mathrm{BF}_{10}\\)" = 1,
-                                         "\\(\\mathrm{BF}_{01}\\)" = 0
+                                         "\\(\\text{Positive rates}\\)" = 1,
+                                         "\\(\\text{Negative rates}\\)" = 0
                                        ),
                                        selected = 1,
                                        inline = TRUE
                                      ),
-                              shiny::em("\\(\\text{Controlling for the probability of}\\)"),
+                              shiny::em("\\(\\text{The targeted probabilities of}\\)"),
                               shiny::fluidRow(
                                 shiny::column(6,
                                               shiny::conditionalPanel("input.r_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
@@ -1059,10 +1063,10 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
              shiny::conditionalPanel(condition = "input.Modef == 1",
                                      shinyWidgets::prettyRadioButtons(
                                        inputId = "f_direct",
-                                       label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                                       label = shiny::em("\\(\\text{ Controllering for:}\\)"),
                                        choices = list(
-                                         "\\(\\mathrm{BF}_{10}\\)" = 1,
-                                         "\\(\\mathrm{BF}_{01}\\)" = 0
+                                         "\\(\\text{Positive rates}\\)" = 1,
+                                         "\\(\\text{Negative rates}\\)" = 0
                                        ),
                                        selected = 1,
                                        inline = TRUE
@@ -1277,15 +1281,15 @@ shiny::navbarMenu(
                shiny::conditionalPanel("input.Modebin == 1",
                                        shinyWidgets::prettyRadioButtons(
                                          inputId = "bin_direct",
-                                         label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                                         label = shiny::em("\\(\\text{ Controllering for:}\\)"),
                                          choices = list(
-                                           "\\(\\mathrm{BF}_{10}\\)" = 1,
-                                           "\\(\\mathrm{BF}_{01}\\)" = 0
+                                           "\\(\\text{Positive rates}\\)" = 1,
+                                           "\\(\\text{Negative rates}\\)" = 0
                                          ),
                                          selected = 1,
                                          inline = TRUE
                                        ),
-                                shiny::em("\\(\\text{Controlling for the probability of}\\)"),
+                                shiny::em("\\(\\text{The targeted probabilities of}\\)"),
                                 shiny::fluidRow(
                                   shiny::column(6,
                                                 shiny::conditionalPanel("input.bin_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
@@ -1377,18 +1381,18 @@ shiny::sidebarLayout(shiny::sidebarPanel(
   ),shiny::fluidRow(
 
   shiny::column(4,
-  shiny::sliderInput("alpha0", "\\(\\alpha_0\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE),
-  shiny::sliderInput("beta0", "\\(\\beta_0\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE)
+  shiny::numericInput("alpha0", "\\(\\alpha_0\\)", min = 0.01, max = 100, value = 1, step = 1),
+  shiny::numericInput("beta0", "\\(\\beta_0\\)", min = 0.01, max = 100, value = 1, step = 1)
 
 
            ),
   shiny::column(4,
-         shiny::sliderInput("alpha1", "\\(\\alpha_1\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE),
-         shiny::sliderInput("beta1", "\\(\\beta_1\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE)
+         shiny::numericInput("alpha1", "\\(\\alpha_1\\)", min = 0.01, max = 100, value = 1, step = 1),
+         shiny::numericInput("beta1", "\\(\\beta_1\\)", min = 0.01, max = 100, value = 1, step = 1)
            ),
   shiny::column(4,
-         shiny::sliderInput("alpha2", "\\(\\alpha_2\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE),
-         shiny::sliderInput("beta2", "\\(\\beta_2\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE)
+         shiny::numericInput("alpha2", "\\(\\alpha_2\\)", min = 0.01, max = 100, value = 1, step = 1),
+         shiny::numericInput("beta2", "\\(\\beta_2\\)", min = 0.01, max = 100, value = 1, step = 1)
 
   )
 
@@ -1406,7 +1410,7 @@ shiny::sidebarLayout(shiny::sidebarPanel(
     shiny::column(4,
            shinyWidgets::prettyRadioButtons(
              "model_p1",
-             label = "\\( \\text{Model for } p_1: \\)",
+             label = "\\( \\text{Model for } \\theta_1: \\)",
              choices = list(
                "\\( \\text{Fixed } p_1 \\)" = 1,
                "\\( p_1 \\sim \\text{Beta}(\\alpha_{1d}, \\beta_{1d}) \\)" = 2
@@ -1416,7 +1420,7 @@ shiny::sidebarLayout(shiny::sidebarPanel(
            ),
            shinyWidgets::prettyRadioButtons(
              "model_p2",
-             label = "\\( \\text{Model for } p_2: \\)",
+             label = "\\( \\text{Model for } \\theta_2: \\)",
              choices = list(
                "\\( \\text{Fixed } p_1 \\)" = 1,
                "\\( p_1 \\sim \\text{Beta}(\\alpha_{2d}, \\beta_{2d}) \\)" = 2
@@ -1432,24 +1436,24 @@ shiny::sidebarLayout(shiny::sidebarPanel(
   shiny::column(4,
          shiny::conditionalPanel(
            condition = "input.model_p1 == 1",
-           shiny::sliderInput("location1d", "\\(p_1 =\\)", min = 0.01, max = 0.99, value = 0.5, step = 0.01, ticks = FALSE)
+           shiny::sliderInput("location1d", "\\(\\theta_1 =\\)", min = 0.01, max = 0.99, value = 0.5, step = 0.01, ticks = FALSE)
          ),
          shiny::conditionalPanel(
            condition = "input.model_p1 == 2",
-           shiny::sliderInput("alpha1d", "\\(\\alpha_{1d}\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE),
-           shiny::sliderInput("beta1d", "\\(\\beta_{1d}\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE)
+           shiny::numericInput("alpha1d", "\\(\\alpha_{1d}\\)", min = 0.01, max = 100, value = 1, step = 1),
+           shiny::numericInput("beta1d", "\\(\\beta_{1d}\\)", min = 0.01, max = 100, value = 1, step = 1)
          )
   )
   ,
   shiny::column(4,
          shiny::conditionalPanel(
            condition = "input.model_p2 == 1",
-           shiny::sliderInput("location2d", "\\(p_2 =\\)", min = 0.01, max = 0.99, value = 0.5, step = 0.01, ticks = FALSE)
+           shiny::sliderInput("location2d", "\\(\\theta_2 =\\)", min = 0.01, max = 0.99, value = 0.5, step = 0.01, ticks = FALSE)
          ),
          shiny::conditionalPanel(
            condition = "input.model_p2 == 2",
-           shiny::sliderInput("alpha2d", "\\(\\alpha_{2d}\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE),
-           shiny::sliderInput("beta2d", "\\(\\beta_{2d}\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE)
+           shiny::numericInput("alpha2d", "\\(\\alpha_{2d}\\)", min = 0.01, max = 100, value = 1, step = 1),
+           shiny::numericInput("beta2d", "\\(\\beta_{2d}\\)", min = 0.01, max = 100, value = 1, step = 1)
          )
   )
 
@@ -1460,16 +1464,16 @@ shiny::sidebarLayout(shiny::sidebarPanel(
   shiny::conditionalPanel("input.Modep2 == 1",
                           shinyWidgets::prettyRadioButtons(
                             inputId = "p2_direct",
-                            label = shiny::em("\\(\\text{The direction of Bayes factor}\\)"),
+                            label = shiny::em("\\(\\text{ Controllering for:}\\)"),
                             choices = list(
-                              "\\(\\mathrm{BF}_{10}\\)" = 1,
-                              "\\(\\mathrm{BF}_{01}\\)" = 0
+                              "\\(\\text{True Positive rate}\\)" = 1,
+                              "\\(\\text{True Negative rate}\\)" = 0
                             ),
                             selected = 1,
                             inline = TRUE
                           ),
 
-                   shiny::em("\\(\\text{Controlling for the probability of}\\)"),
+                   shiny::em("\\(\\text{The targeted probability of}\\)"),
 
                      shiny::conditionalPanel("input.p2_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
                      shiny::conditionalPanel("input.p2_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),

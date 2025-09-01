@@ -7718,12 +7718,12 @@ t2e_BF10i <-function(t,n1,r,model ,scale,dff , hypothesis,e ){
   constant = sqrt((n1*n2)/(n1+n2))
   bound_h1  <- switch(hypothesis,
                       ">" = c(a = e, b = Inf),
-                      "<" = c(a = -Inf, b = -e),
+                      "<" = c(a = -Inf, b = e),
                       "!=" = c(a = e[1], b = e[2])
   )
   bound_h0  <- switch(hypothesis,
                       ">" = c(a = 0, b = e),
-                      "<" = c(a = -e, b = 0),
+                      "<" = c(a = e, b = 0),
                       "!=" = c(a = e[1], b = e[2])
   )
   normalizationh1 <- switch(hypothesis,
@@ -7828,7 +7828,7 @@ t2e_TPE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
 
   bound_h1  <- switch(hypothesis,
                       ">" = c(a = e, b = Inf),
-                      "<" = c(a = -Inf, b = -e),
+                      "<" = c(a = -Inf, b = e),
                       "!=" = c(a = e[1], b = e[2])
   )
 
@@ -7897,7 +7897,7 @@ t2e_FNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
   }
   bound_h1  <- switch(hypothesis,
                       ">" = c(a = e, b = Inf),
-                      "<" = c(a = -Inf, b = -e),
+                      "<" = c(a = -Inf, b = e),
                       "!=" = c(a = e[1], b = e[2])
   )
 
@@ -7957,7 +7957,7 @@ t2e_TNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e){
 
   bound_h0  <- switch(hypothesis,
                       ">" = c(a = 0, b = e),
-                      "<" = c(a = -e, b = 0),
+                      "<" = c(a = e, b = 0),
                       "!=" = c(a = e[1], b = e[2])
   )
 
@@ -7998,7 +7998,7 @@ t2e_FPE <-function(t,n1,r,model ,scale,dff , hypothesis ,e){
 
   bound_h0  <- switch(hypothesis,
                       ">" = c(a = 0, b = e),
-                      "<" = c(a = -e, b = 0),
+                      "<" = c(a = e, b = 0),
                       "!=" = c(a = e[1], b = e[2])
   )
 
