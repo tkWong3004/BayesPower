@@ -36,7 +36,7 @@ sim_delta <-function(iter, location, scale, dff, model,hypothesis){
   sim_p=runif(iter,min(p_bound),max(p_bound))
   switch(model,
          "Normal"         = qnorm (sim_p, location, scale),
-         "NLP"            = qmom(sim_p-location,  tau = scale^2),
+         "NLP"            = qmom(sim_p,  tau = scale^2)+location,
          "t-distribution" = (rt(length(sim_p),df=dff)-location)/scale)
 
 
@@ -96,7 +96,7 @@ sim_delta_e_out <- function(iter, location, scale, dff, model, hypothesis, e = N
   # --- Transform back ---
   switch(model,
          "Normal"         = qnorm(sim_p, mean = location, sd = scale),
-         "NLP"            = qmom(sim_p - location, tau = scale^2),
+         "NLP"            = qmom(sim_p , tau = scale^2)+location,
          "t-distribution" = location+ scale * qt(sim_p, df = dff)
          )
 }
@@ -132,7 +132,7 @@ sim_delta_e_in <- function(iter, location, scale, dff, model, hypothesis, e = NU
   # --- Transform back ---
   switch(model,
          "Normal"         = qnorm(sim_p, mean = location, sd = scale),
-         "NLP"            = qmom(sim_p - location, tau = scale^2),
+         "NLP"            = qmom(sim_p, tau = scale^2)+location,
          "t-distribution" = location+ scale * qt(sim_p, df = dff)
          )
 }

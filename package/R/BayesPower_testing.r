@@ -708,7 +708,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                                                  choices = list(
                                                    "\\( \\text{Default Stretched Beta} \\)" = 1,
                                                    "\\( \\text{Stretched Beta} \\)" = 2,
-                                                   "\\( \\text{Moment} \\)" = 3,
+                                                  "\\( \\text{Moment} \\)" = 3,
                                                    "\\( \\text{Point} \\)" = 4
                                                  ),
                                                  selected = 1,

@@ -2386,7 +2386,7 @@ r_sd <-function(N){
 #prior
 d_strechted_beta <-function(rho,k,a,b){
   alpha = beta=1/k
-  d_beta(rho, alpha, beta,a,b)
+  d_beta(rho, alpha, beta,-1,1)
   #2^((k-2)/k)*(1-rho^2)^((1-k)/k)/beta(1/k,1/k)
 
 }
@@ -2396,8 +2396,8 @@ p_beta <-function(rho, alpha, beta,a,b){
     rho,
     shape1 = alpha,
     shape2 = beta,
-    a = a,
-    b = b
+    a = -1,
+    b = 1
   )
 }
 
@@ -2406,7 +2406,9 @@ d_beta <- function(rho, alpha, beta,a,b) {
 
   # Beta function
   B_ab <- beta(alpha, beta)
-
+  #
+  a=-1
+  b=1
   # Compute the PDF
   pdf_value <- ((rho - a)^(alpha - 1) * (b - rho)^(beta - 1)) / ((b - a)^(alpha + beta - 1) * B_ab)
 
@@ -2464,12 +2466,18 @@ r_BF10<-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model){
                    "<" = c(a = -1, b = h0),
                    "!=" = c(a = -1, b = 1)
   )
-  normalization <- if (hypothesis == "!=") 1 else
+  normalization <- if (hypothesis == "!=") {
+    switch(model,
+           "d_beta"   = 1,
+           "beta" = 1,
+           "NLP"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+
+  }else{
     switch(model,
            "d_beta"   = p_beta(bound[2], 1/k, 1/k,-1,1)-p_beta(bound[1], 1/k,1/k,-1,1) ,
            "beta" = p_beta(bound[2], alpha, beta,-1,1)-p_beta(bound[1], alpha, beta,-1,1),
            "NLP"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
-
+}
 
   # Define the integrand function for marginal likelihood under H1
   int <- function(rho, ri) {
@@ -2535,14 +2543,18 @@ r_TPE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model){
                    "<" = c(a = -1, b = h0),
                    "!=" = c(a = -1, b = 1)
   )
-  normalization <- if (hypothesis == "!=") 1 else
+  normalization <-   normalization <- if (hypothesis == "!=") {
     switch(model,
-           "Normal" = stats::pnorm(bound[2],location,scale)-stats::pnorm(bound[1],location,scale),
-           "d_beta"   = p_beta(bound[2], 1/k, 1/k,min(bound),max(bound))-p_beta(bound[1], 1/k,1/k,min(bound),max(bound)) ,
-           "NLP"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
-           "t_dis" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0),
-           "beta" = p_beta(bound[2], alpha, beta,min(bound),max(bound))-p_beta(bound[1], alpha, beta,min(bound),max(bound)))
+           "d_beta"   = 1,
+           "beta" = 1,
+           "NLP"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
 
+  }else{
+    switch(model,
+           "d_beta"   = p_beta(bound[2], 1/k, 1/k,-1,1)-p_beta(bound[1], 1/k,1/k,-1,1) ,
+           "beta" = p_beta(bound[2], alpha, beta,-1,1)-p_beta(bound[1], alpha, beta,-1,1),
+           "NLP"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+  }
   int <- function(rho) {
     prob <- switch(hypothesis,
                    "!=" = p_cor(max(r), rho, n, lower.tail = FALSE) +
@@ -2579,14 +2591,18 @@ r_FNE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model){
                    "!=" = c(a = -1, b = 1)
   )
 
-  normalization <- if (hypothesis == "!=") 1 else
+  normalization <-  normalization <- if (hypothesis == "!=") {
     switch(model,
-           "Normal" = stats::pnorm(bound[2],location,scale)-stats::pnorm(bound[1],location,scale),
-           "d_beta"   = p_beta(bound[2], 1/k, 1/k,min(bound),max(bound))-p_beta(bound[1], 1/k,1/k,min(bound),max(bound)) ,
-           "NLP"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
-           "t_dis" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0),
-           "beta" = p_beta(bound[2], alpha, beta,min(bound),max(bound))-p_beta(bound[1], alpha, beta,min(bound),max(bound)))
+           "d_beta"   = 1,
+           "beta" = 1,
+           "NLP"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
 
+  }else{
+    switch(model,
+           "d_beta"   = p_beta(bound[2], 1/k, 1/k,-1,1)-p_beta(bound[1], 1/k,1/k,-1,1) ,
+           "beta" = p_beta(bound[2], alpha, beta,-1,1)-p_beta(bound[1], alpha, beta,-1,1),
+           "NLP"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+  }
   int <- function(rho) {
     prob <- switch(hypothesis,
                    "!=" = p_cor(max(r), rho, n, lower.tail = TRUE) -
