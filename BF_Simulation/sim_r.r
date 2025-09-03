@@ -19,14 +19,14 @@ sim_rho <-function(iter, h0,k,alpha,beta,scale, model,hypothesis){
   p_bound<-switch(model,
          "d_beta"   = {pBeta_ab(rho_bound,shape1 = 1/k,shape2 = 1/k,a = -1,b = 1)},
          "NLP"   = {  BayesPower:::pmom(rho_bound-h0, tau = scale^2)},
-         "beta" = {pBeta_ab(rho_bound,shape1 = alpha,shape2 = alpha,a = -1,b = 1)})
+         "beta" = {pBeta_ab(rho_bound,shape1 = alpha,shape2 = beta,a = -1,b = 1)})
 
 
   sim_p=runif(iter,min(p_bound),max(p_bound))
   switch(model,
                   "d_beta"   = {qBeta_ab(sim_p,shape1 = 1/k,shape2 = 1/k,a = -1,b = 1)},
                   "NLP"   = {  qmom(sim_p, tau = scale^2)+h0},
-                  "beta" = {qBeta_ab(sim_p,shape1 = alpha,shape2 = alpha,a =-1,b = 1)})
+                  "beta" = {qBeta_ab(sim_p,shape1 = alpha,shape2 = beta,a =-1,b = 1)})
 
   }
 
@@ -43,7 +43,7 @@ sim_rho_out <-function(iter, h0,k,alpha,beta,scale, model,hypothesis, e = NULL){
   p_bound<-switch(model,
                   "d_beta"   = {pBeta_ab(rho_bound,shape1 = 1/k,shape2 = 1/k,a = -1,b = 1)},
                   "NLP"   = {  BayesPower:::pmom(rho_bound-h0, tau = scale^2)},
-                  "beta" = {pBeta_ab(rho_bound,shape1 = alpha,shape2 = alpha,a =-1,b = 1)})
+                  "beta" = {pBeta_ab(rho_bound,shape1 = alpha,shape2 = beta,a =-1,b = 1)})
 
 
 
@@ -53,7 +53,7 @@ sim_rho_out <-function(iter, h0,k,alpha,beta,scale, model,hypothesis, e = NULL){
                    ">" = runif(iter, max(p_bound), BayesPower:::pmom(1-h0, tau = scale^2)),
                    "<" = runif(iter, BayesPower:::pmom(-1-h0, tau = scale^2), min(p_bound)),
                    "!=" = {
-                     ratio <- (1 - p_bound[2]) / p_bound[1]
+                     ratio <- 1/((1 - p_bound[2]) / p_bound[1])
                      n1 <- round(iter * ratio / (1 + ratio))
                      n2 <- iter - n1
                      c(
@@ -66,7 +66,7 @@ sim_rho_out <-function(iter, h0,k,alpha,beta,scale, model,hypothesis, e = NULL){
                    ">" = runif(iter, max(p_bound), 1),
                    "<" = runif(iter, 0, min(p_bound)),
                    "!=" = {
-                     ratio <- (1 - p_bound[2]) / p_bound[1]
+                     ratio <- 1/((1 - p_bound[2]) / p_bound[1])
                      n1 <- round(iter * ratio / (1 + ratio))
                      n2 <- iter - n1
                      c(
@@ -79,7 +79,7 @@ sim_rho_out <-function(iter, h0,k,alpha,beta,scale, model,hypothesis, e = NULL){
   switch(model,
          "d_beta"   = {qBeta_ab(sim_p,shape1 = 1/k,shape2 = 1/k,a = -1,b = 1)},
          "NLP"   = {  qmom(sim_p, tau = scale^2)+h0},
-         "beta" = {qBeta_ab(sim_p,shape1 = alpha,shape2 = alpha,a = -1,b = 1)})
+         "beta" = {qBeta_ab(sim_p,shape1 = alpha,shape2 = beta,a = -1,b = 1)})
 
   }
 
@@ -96,14 +96,14 @@ sim_rho_in <-function(iter, h0,k,alpha,beta,scale, model,hypothesis, e = NULL){
   p_bound<-switch(model,
                   "d_beta"   = {pBeta_ab(rho_bound,shape1 = 1/k,shape2 = 1/k,a = -1,b = 1)},
                   "NLP"   = {  BayesPower:::pmom(rho_bound-h0, tau = scale^2)},
-                  "beta" = {pBeta_ab(rho_bound,shape1 = alpha,shape2 = alpha,a =-1,b = 1)})
+                  "beta" = {pBeta_ab(rho_bound,shape1 = alpha,shape2 = beta,a =-1,b = 1)})
 
   sim_p <- runif(iter, min(p_bound), max(p_bound))
 
   switch(model,
          "d_beta"   = {qBeta_ab(sim_p,shape1 = 1/k,shape2 = 1/k,a = -1,b = 1)},
          "NLP"   = {  qmom(sim_p, tau = scale^2)+h0},
-         "beta" = {qBeta_ab(sim_p,shape1 = alpha,shape2 = alpha,a = -1,b = 1)})
+         "beta" = {qBeta_ab(sim_p,shape1 = alpha,shape2 = beta,a = -1,b = 1)})
 }
 
 # functions to simulate data and  the pro(BF>k|h_i)

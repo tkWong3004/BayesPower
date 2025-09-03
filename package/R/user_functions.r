@@ -377,11 +377,11 @@ bp_bin <- function(hypothesis = NULL, interval = NULL,
   tryCatch({
     suppressWarnings({
       if (!is.null(interval) && interval == "1") {
-        bin_table(D, target, alpha, beta, location, scale, model, hypothesis,
+        bin_table(D, target,h0, alpha, beta, location, scale, model, hypothesis,
                   alpha_d, beta_d, location_d, scale_d, model_d, de_an_prior, N,
                   mode_bf, FP, direct)
       } else {
-        bin_e_table(D, target, alpha, beta, location, scale, model, hypothesis,
+        bin_e_table(D, target, h0,alpha, beta, location, scale, model, hypothesis,
                     alpha_d, beta_d, location_d, scale_d, model_d, de_an_prior, N,
                     mode_bf, FP, e, direct)
       }

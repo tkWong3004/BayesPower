@@ -246,7 +246,7 @@ show_f_code <- function(x) {
 }
 
 show_bin_code <- function(x) {
-  args <- c("hypothesis","interval", "D", "target", "FP","location",
+  args <- c("hypothesis","interval", "D", "target", "FP","h0","location",
             "model","alpha", "beta", "scale",
             "model_d","alpha_d", "beta_d", "location_d", "scale_d",
             "de_an_prior",

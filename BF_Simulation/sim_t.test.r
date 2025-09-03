@@ -184,7 +184,7 @@ sim_t <- function(iter, D, n, r = NULL,
     else BayesPower:::t2e_BF01_bound(D, n, r, model, scale, dff, hypothesis, e)
   }
 
-  # --- posterior & null evidence ---
+  # --- P(BF>k) ---
   PE_sim <- switch(hypothesis,
                    "!=" = mean(sim_vals > max(BF10_B) | sim_vals < min(BF10_B)),
                    ">"  = mean(sim_vals > max(BF10_B)),
