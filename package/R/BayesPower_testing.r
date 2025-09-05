@@ -272,7 +272,7 @@ ui <-
             shiny::downloadButton("export_t1", "Download result as HTML")
           ),
           shiny::conditionalPanel(
-            condition = "input.Modet1 == 1||input.Modet1 == 2",
+            condition = "input.Modet1 == 1||input.Modet1 == 2||input.Modet1 == 3",
 
             shiny::verbatimTextOutput("result_t1"))
         ),
@@ -542,7 +542,7 @@ ui <-
             ),
             shiny::downloadButton("export_t2", "Download result as HTML")
           ),shiny::conditionalPanel(
-            condition = "input.Modet2 == 1||input.Modet2 == 2",shiny::verbatimTextOutput("result_t2"))
+            condition = "input.Modet2 == 1||input.Modet2 == 2||input.Modet2 == 3",shiny::verbatimTextOutput("result_t2"))
 
 
 
@@ -811,7 +811,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                ),
                shiny::downloadButton("export_r", "Download result as HTML")
              ),shiny::conditionalPanel(
-               condition = "input.Moder == 1||input.Moder == 2",shiny::verbatimTextOutput("result_r"))
+               condition = "input.Moder == 1||input.Moder == 2||input.Moder == 3",shiny::verbatimTextOutput("result_r"))
            ),
 
            # Main panel with output tabs
@@ -1120,7 +1120,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                shiny::downloadButton("export_f", "Download result as HTML")
              ),
             shiny::conditionalPanel(
-              condition = "input.Modef == 1||input.Modef == 2",shiny::verbatimTextOutput("result_f"))
+              condition = "input.Modef == 1||input.Modef == 2||input.Modef == 3",shiny::verbatimTextOutput("result_f"))
            ),
 
            # Main Panel
@@ -1331,7 +1331,7 @@ shiny::navbarMenu(
                  ),
                  shiny::downloadButton("export_bin", "Download result as HTML")
                ),shiny::conditionalPanel(
-                 condition = "input.Modebin == 1||input.Modebin == 2",shiny::verbatimTextOutput("result_bin"))
+                 condition = "input.Modebin == 1||input.Modebin == 2||input.Modebin == 3",shiny::verbatimTextOutput("result_bin"))
 
 
              ),
@@ -1520,7 +1520,7 @@ shiny::sidebarLayout(shiny::sidebarPanel(
     shiny::downloadButton("export_p2", "Download result as HTML")
   ),
   shiny::conditionalPanel(
-    condition = "input.Modep2 == 1||input.Modep2 == 2",shiny::verbatimTextOutput("result_p2"))
+    condition = "input.Modep2 == 1||input.Modep2 == 2||input.Modep2 == 3",shiny::verbatimTextOutput("result_p2"))
 ),shiny::mainPanel(
 
   shiny::fluidRow(
@@ -1561,7 +1561,7 @@ server <- function(input, output, session) {
 # Run the application
 
 #' @export
-BayesPower_testing <- function(){
+BayesPower_BayesFactor <- function(){
   # Run the application
  shiny::shinyApp(ui = ui, server = server)
 

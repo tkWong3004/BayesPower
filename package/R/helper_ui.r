@@ -1,7 +1,7 @@
 
 show_t1_code <- function(x) {
 
-  # List of all arguments for bp_t.test_one_sample
+  # List of all arguments for BFpower.t.test_one_sample
   args <- c("hypothesis","e","interval", "D", "target", "alpha",
             "model", "location", "scale", "dff",
             "model_d", "location_d", "scale_d", "dff_d",
@@ -47,7 +47,7 @@ show_t1_code <- function(x) {
   code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
 
   # Combine into multi-line function call
-  code <- paste0("bp_t.test_one_sample(\n",
+  code <- paste0("BFpower.t.test_one_sample(\n",
                  paste(code_lines, collapse = "\n"),
                  "\n)")
 
@@ -110,7 +110,7 @@ show_t2_code <- function(x) {
   }
 
   # Combine into multi-line function call
-  code <- paste0("bp_t.test_two_sample(\n",
+  code <- paste0("BFpower.t.test_two_sample(\n",
                  paste(code_lines, collapse = "\n"),
                  "\n)")
 
@@ -202,7 +202,7 @@ show_cor_code <- function(x) {
   }
 
   # Combine into multi-line function call
-  code <- paste0("bp_cor(\n",
+  code <- paste0("BFpower.cor(\n",
                  paste(code_lines, collapse = "\n"),
                  "\n)")
 
@@ -242,7 +242,7 @@ show_f_code <- function(x) {
 
   code_lines <- code_lines[!sapply(code_lines, is.null)]
   code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
-  paste0("bp_f(\n", paste(code_lines, collapse = "\n"), "\n)")
+  paste0("BFpower.f(\n", paste(code_lines, collapse = "\n"), "\n)")
 }
 
 show_bin_code <- function(x) {
@@ -278,7 +278,7 @@ show_bin_code <- function(x) {
 
   code_lines <- code_lines[!sapply(code_lines, is.null)]
   code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
-  paste0("bp_bin(\n", paste(code_lines, collapse = "\n"), "\n)")
+  paste0("BFpower.bin(\n", paste(code_lines, collapse = "\n"), "\n)")
 }
 
 show_props_code <- function(x) {
@@ -311,7 +311,21 @@ show_props_code <- function(x) {
 
   code_lines <- code_lines[!sapply(code_lines, is.null)]
   code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
-  paste0("bp_props(\n", paste(code_lines, collapse = "\n"), "\n)")
+  paste0("BFpower.props(\n", paste(code_lines, collapse = "\n"), "\n)")
 }
+
+fmt_val <- function(val) {
+  if (is.character(val)) {
+    sprintf('"%s"', val)
+  } else if (is.numeric(val) && length(val) > 1) {
+    paste0("c(", paste(val, collapse = ","), ")")
+  } else {
+    as.character(val)
+  }
+}
+
+
+
+
 
 

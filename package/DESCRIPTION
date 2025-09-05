@@ -17,11 +17,11 @@ Imports:
     gsl,
     shinyWidgets,
     Rcpp,
-    mombf,
     ExtDist,
     ggplot2,
     patchwork,
-    rmarkdown
+    rmarkdown,
+    glue
 LinkingTo:
     Rcpp,
     BH

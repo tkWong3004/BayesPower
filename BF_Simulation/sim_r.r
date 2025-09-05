@@ -150,7 +150,7 @@ sim_cor <- function(iter, D,model,k, alpha, beta,h0,scale,dff, hypothesis ,model
     BayesPower:::re_BF_bound_01(D,N,k,alpha,beta,h0,hypothesis ,location,scale ,dff ,model ,e)
 
 
-  # --- posterior & null evidence ---
+  # --- P(BF>k) ---
   PE_sim <- switch(hypothesis,
                    "!=" = mean(sim_vals > max(BF10_B) | sim_vals < min(BF10_B)),
                    ">"  = mean(sim_vals > max(BF10_B)),

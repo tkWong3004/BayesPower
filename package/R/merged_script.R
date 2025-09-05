@@ -60,7 +60,7 @@ F_TPE<-function(f,q,m,dff,rscale,f_m,model){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
   if (model == "Point"){
-    x = stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = F)
+    x = stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = F)
     return(x)
   }
   int  <- function(fsq){
@@ -76,7 +76,7 @@ F_FNE<-function(f,q,m,dff,rscale,f_m,model){
 
   if (model == "Point"){
 
-    x = stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = T)
+    x = stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = T)
     return(x)
   }
   int  <- function(fsq){
@@ -450,7 +450,7 @@ Fe_TPE<-function(f,q,m,dff,rscale,f_m,model,e){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
 
-  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = F))
+  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = F))
 
   normalizationh1  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-5)$value
   int  <- function(fsq){
@@ -466,7 +466,7 @@ Fe_FNE<-function(f,q,m,dff,rscale,f_m,model,e){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
 
-  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = T))
+  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = T))
 
   normalizationh1  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
   int  <- function(fsq){
@@ -635,7 +635,7 @@ fe_table<-function(D,target,p,k,dff,rscale,f_m,model,
     TPR_f_m   <- f_m
     TPR_model <- model
   } else {
-    TPE       <- Fe_TPE(f,q,m,dff_d,rscale_d,f_m_d,model_d,e)
+    TPE       <- Fe_TPE(f10,q,m,dff_d,rscale_d,f_m_d,model_d,e)
     TPR_dff   <- dff_d
     TPR_rscale<- rscale_d
     TPR_f_m   <- f_m_d
@@ -5591,6 +5591,38 @@ shiny::observeEvent(input$calbin, {
     N = ', bin$N, ', x = ', bin$Suc, '; \\textit{BF}_{10} = ', round(BF10, 4), '
 ')
 
+    output$result_bin <- shiny::renderText({
+
+
+      args <- list(
+        x = bin$Suc,
+        n = bin$N,
+        alpha = bin$alpha,
+        beta = bin$beta,
+        location = bin$location,
+        scale = bin$scale,
+        model = bin$model,
+        hypothesis = bin$hypothesis
+      )
+
+      if (bin$interval !=1) {
+        args$e <- bin$e
+      }
+
+      # Build string with each argument on a new line
+      arg_strings <- sapply(names(args), function(nm) {
+        sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+      })
+
+      call_string <- paste0(
+        "# Function to be used in R\n",
+        "BF10.bin.test(\n",
+        paste(arg_strings, collapse = ",\n"),
+        "\n)"
+      )
+
+      call_string
+    })
 
 
 
@@ -5673,7 +5705,7 @@ input_f <- shiny::reactive({
   f_m_d <- sqrt(input$fsdfd)
 
   if ( input$modelfd == "3"){
-    f_m_d <-sqrt(input$lfd)
+    f_m_d <-input$lfd
   }
 
   dff_d <- input$dffd
@@ -5923,7 +5955,40 @@ shiny::observeEvent(input$calf, {
                                ,ff$rscale_d,ff$f_m_d,ff$model_d,1,ff$e))
 
   })
-  BF10 <- F_BF(ff$fval,ff$df1,m,ff$dff,ff$rscale,ff$f_m,ff$model)
+  BF10 <- if (ff$inter==1) F_BF(ff$fval,ff$df1,m,ff$dff,ff$rscale,ff$f_m,ff$model) else
+    Fe_BF(ff$fval,ff$df1,m,ff$dff,ff$rscale,ff$f_m,ff$model,ff$e)
+
+  output$result_f <- shiny::renderText({
+
+    args <- list(
+      fval = ff$fval,
+      df1 = ff$df1,
+      df2 = ff$df2,
+      dff = ff$dff,
+      rscale = ff$rscale,
+      f_m = ff$f_m,
+      model = ff$model
+    )
+
+    if (ff$inter!=1) {
+      args$e <- ff$e
+    }
+
+    # Build string with each argument on a new line
+    arg_strings <- sapply(names(args), function(nm) {
+      sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+    })
+
+    call_string <- paste0(
+      "# Function to be used in R\n",
+      "BF10.f.test(\n",
+      paste(arg_strings, collapse = ",\n"),
+      "\n)"
+    )
+
+    call_string
+  })
+
 
   output$BFcalf <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
@@ -6184,6 +6249,36 @@ shiny::observeEvent(input$calp2, {
       '\\textit{BF}_{10} = ', round(BF10, 4)
     )
 
+    output$result_p2 <- shiny::renderText({
+
+
+      args <- list(
+        a0 = p2$a0,
+        b0 = p2$b0,
+        a1 = p2$a1,
+        b1 = p2$b1,
+        a2 = p2$a2,
+        b2 = p2$b2,
+        n1 = p2$n1,
+        n2 = p2$n2,
+        y1 = p2$k1,
+        y2 = p2$k2
+      )
+
+      # Build string with each argument on a new line
+      arg_strings <- sapply(names(args), function(nm) {
+        sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+      })
+
+      call_string <- paste0(
+        "# Function to be used in R\n",
+        "BF10.props(\n",
+        paste(arg_strings, collapse = ",\n"),
+        "\n)"
+      )
+
+      call_string
+    })
 
 
 
@@ -6545,6 +6640,45 @@ shiny::observeEvent(input$calr, {
                  "1" = r_BF10(rr$rval,rr$N,rr$k, rr$alpha, rr$beta,rr$h0,rr$hypothesis,rr$location,rr$scale,rr$dff,rr$model),
                  "2" = re_BF10(rr$rval,rr$N,rr$k, rr$alpha, rr$beta,rr$h0,rr$hypothesis,rr$location,rr$scale,rr$dff,rr$model,rr$e))
 
+  output$result_r<- shiny::renderText({
+
+
+    args <- list(
+      r = rr$rval,
+      n = rr$N,
+      k = rr$k,
+      alpha = rr$alpha,
+      beta = rr$beta,
+      h0 = rr$h0,
+      hypothesis = rr$hypothesis,
+      location = rr$location,
+      scale = rr$scale,
+      dff = rr$dff,
+      model = rr$model
+    )
+
+    if (rr$interval !=1) {
+      args$e <- rr$e
+    }
+
+    # Build string with each argument on a new line
+    arg_strings <- sapply(names(args), function(nm) {
+      sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+    })
+
+    call_string <- paste0(
+      "# Function to be used in R\n",
+      "BF10.cor(\n",
+      paste(arg_strings, collapse = ",\n"),
+      "\n)"
+    )
+
+    call_string
+  })
+
+
+
+
   output$BFrv <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('
@@ -6817,6 +6951,52 @@ shiny::observeEvent(input$runt1, {
 
 shiny::observeEvent(input$cal1, {
   x = input_t1()
+
+  output$result_t1 <- shiny::renderText({
+
+    fmt_val <- function(val) {
+      if (is.character(val)) {
+        sprintf('"%s"', val)
+      } else if (is.numeric(val) && length(val) > 1) {
+        paste0("c(", paste(val, collapse = ","), ")")
+      } else {
+        as.character(val)
+      }
+    }
+
+    args <- list(
+      tval = x$tval,
+      df = x$N,
+      model = x$model,
+      location = x$location,
+      scale = x$scale,
+      dff = x$dff,
+      hypothesis = x$hypothesis
+    )
+
+    if (x$interval != 1) {
+      args$e <- x$e
+    }
+
+    # Build string with each argument on a new line
+    arg_strings <- sapply(names(args), function(nm) {
+      sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+    })
+
+    call_string <- paste0(
+      "# Function to be used in R\n",
+      "BF10.t.test.one_sample(\n",
+      paste(arg_strings, collapse = ",\n"),
+      "\n)"
+    )
+
+    call_string
+  })
+
+
+
+
+
   output$priort1 <- shiny::renderPlot({
     suppressWarnings(switch(x$interval,
                             "1"= t1_prior_plot(
@@ -7165,6 +7345,10 @@ shiny::observeEvent(input$runt2, {
 
 shiny::observeEvent(input$cal1, {
   t2 = input_t2()
+
+
+
+
   output$priort2 <- shiny::renderPlot({
     suppressWarnings(switch(t2$interval,
                             "1"=
@@ -7203,6 +7387,41 @@ shiny::observeEvent(input$cal1, {
   BF10 <- suppressWarnings(switch(t2$interval,
                  "1" = t2_BF10(t2$tval,N1,r,t2$model ,t2$location,t2$scale,t2$dff , t2$hypothesis ),
                  "2" = t2e_BF10(t2$tval,N1,r,t2$model,t2$scale,t2$dff , t2$hypothesis,t2$e )))
+
+
+  output$result_t2 <- shiny::renderText({
+
+
+    args <- list(
+      tval = t2$tval,
+      N1 = t2$N1,
+      N2 = t2$r,
+      model = t2$model,
+      location = t2$location,
+      scale = t2$scale,
+      dff = t2$dff,
+      hypothesis = t2$hypothesis
+    )
+
+    if (t2$interval != 1) {
+      args$e <- t2$e
+    }
+
+    # Build string with each argument on a new line
+    arg_strings <- sapply(names(args), function(nm) {
+      sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+    })
+
+    call_string <- paste0(
+      "# Function to be used in R\n",
+      "BF10.t.test.two_sample(\n",
+      paste(arg_strings, collapse = ",\n"),
+      "\n)"
+    )
+
+    call_string
+  })
+
 
   output$BFt2 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
