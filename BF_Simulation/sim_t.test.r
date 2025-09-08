@@ -13,7 +13,7 @@ sim_delta <-function(iter, location, scale, dff, model,hypothesis){
     "<"  = c(a = 0, b = "a"),
     "!=" = c(a = 0, b = 1)
   )
-
+  
   # function to replace 0 with probability
   replace_zero <- function(bound, model, location , scale , dff = NULL) {
     if (bound == "a") {
@@ -28,23 +28,26 @@ sim_delta <-function(iter, location, scale, dff, model,hypothesis){
       return(as.numeric(bound))
     }
   }
-
+  
   # apply to both bounds
   p_bound <- sapply(p_bound, replace_zero, model = model, location = location,
                     scale = scale, dff = dff)
-
+  
   sim_p=runif(iter,min(p_bound),max(p_bound))
   switch(model,
          "Normal"         = qnorm (sim_p, location, scale),
          "NLP"            = qmom(sim_p,  tau = scale^2)+location,
          "t-distribution" = (rt(length(sim_p),df=dff)-location)/scale)
-
-
-
+  
+  
+  
 }
 
 
 sim_delta_e_out <- function(iter, location, scale, dff, model, hypothesis, e = NULL) {
+  if(model=="Point"){
+    return(rep(location, iter))
+  }
   # --- Helper: convert bounds ---
   replace_zero <- function(bound, e, model, location, scale, dff, lower = TRUE) {
     if (bound == "f") {
@@ -59,49 +62,52 @@ sim_delta_e_out <- function(iter, location, scale, dff, model, hypothesis, e = N
     }
     return(as.numeric(bound))
   }
-
+  
   # --- Bounds setup ---
   if (length(e) == 2) {
     # two-sided interval
     upper_bounds <- c("f", 1)
     lower_bounds <- c(0, "f")
-
+    
     p_upper <- sapply(upper_bounds, replace_zero, e = max(e),
                       model = model, location = location, scale = scale, dff = dff, lower = TRUE)
     p_lower <- sapply(lower_bounds, replace_zero, e = min(e),
                       model = model, location = location, scale = scale, dff = dff, lower = TRUE)
-
+    
     ratio <-(1- p_upper[1]) / p_lower[2]
     n1 <- round(iter * ratio / (1 + ratio))
     n2 <- iter - n1
-
+    
     sim_p <- c(
       runif(n1, min(p_upper), max(p_upper)),
       runif(n2, min(p_lower), max(p_lower))
     )
-
+    
   } else {
     # one-sided interval
     bounds <- switch(hypothesis,
                      ">" = c("f", 1),
                      "<" = c(0, "f"))
-
+    
     p_bound <- sapply(bounds, replace_zero,
                       e = e, # placeholder if e not given
                       model = model, location = location, scale = scale, dff = dff)
-
+    
     sim_p <- runif(iter, min(p_bound), max(p_bound))
   }
-
+  
   # --- Transform back ---
   switch(model,
          "Normal"         = qnorm(sim_p, mean = location, sd = scale),
          "NLP"            = qmom(sim_p , tau = scale^2)+location,
          "t-distribution" = location+ scale * qt(sim_p, df = dff)
-         )
+  )
 }
 
 sim_delta_e_in <- function(iter, location, scale, dff, model, hypothesis, e = NULL) {
+  if(model=="Point"){
+    return(rep(location, iter))
+  }
   # --- Helper: convert bounds ---
   replace_zero <- function(bound, e, model, location, scale, dff, lower = TRUE) {
     if (bound == "f") {
@@ -116,25 +122,25 @@ sim_delta_e_in <- function(iter, location, scale, dff, model, hypothesis, e = NU
     }
     return(as.numeric(bound))
   }
-
+  
   # --- Bounds setup ---
   bounds <- switch(hypothesis,
                    "!=" = c("f", "f"),
                    ">"  = c(0.5, "f"),
                    "<"  = c("f", 0.5))
-
+  
   p_bound <- sapply(bounds, replace_zero,e=e,
                     model = model, location = location, scale = scale, dff = dff, lower = TRUE)
-
+  
   # then simulate
   sim_p <- runif(iter, min(p_bound), max(p_bound))
-
+  
   # --- Transform back ---
   switch(model,
          "Normal"         = qnorm(sim_p, mean = location, sd = scale),
          "NLP"            = qmom(sim_p, tau = scale^2)+location,
          "t-distribution" = location+ scale * qt(sim_p, df = dff)
-         )
+  )
 }
 
 # functions to simulate data and  the pro(BF>k|h_i)
