@@ -2852,7 +2852,7 @@ r_prior_plot <-function(k, alpha, beta,h0,location,scale,dff,model,de_an_prior,
   ylim.max <- max(finite_vals)
   # Base plot:
   plot(rho, prior.analysis, type = "l", lwd = 2,
-       xlab = expression(bold(delta)),
+       xlab = expression(bold(rho)),
        ylab = "density",
        main = bquote(bold("Prior distribution on "~rho~" under the alternative hypothesis")),
        frame.plot = FALSE,
@@ -4325,6 +4325,7 @@ te_prior<- function(delta,scale,dff,model){
 
 }
 
+
 t1e_BF10i <-function(t,df,model ,scale,dff , hypothesis,e ){
   bound_h1  <- switch(hypothesis,
                       "!=" = c(a = e[1], b = e[2]),
@@ -4347,12 +4348,12 @@ t1e_BF10i <-function(t,df,model ,scale,dff , hypothesis,e ){
                             "<"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
+                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
                                           "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
                             ">"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
+                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
                                           "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
   )
 
@@ -4455,12 +4456,12 @@ t1e_TPE <-function(t,df,model ,scale,dff , hypothesis ,e,location){
                             "<"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
+                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
                                           "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
                             ">"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
+                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
                                           "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
   )
 
@@ -4519,13 +4520,14 @@ t1e_FNE <-function(t,df,model ,scale,dff , hypothesis ,e,location){
                             "<"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
+                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
                                           "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
                             ">"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)))
+                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
+                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
+  )
   x = NULL
 
   int <- function(delta) {
@@ -4723,7 +4725,7 @@ t1e_table<-function(D,target,model,scale,dff, hypothesis,e ,
   t01 <- t1e_BF01_bound(D, df,model,scale,dff , hypothesis,e)
 
   # max BF10 possible:
-  max_BF <- 1 / t1e_BF10i(0,df,model ,scale,dff , hypothesis,e )
+  max_BF <- 1 / t1e_BF10(0,df,model ,scale,dff , hypothesis,e )
   BF_D   <- t10
 
   # FPE and TPE:
@@ -6261,8 +6263,8 @@ shiny::observeEvent(input$calp2, {
         b2 = p2$b2,
         n1 = p2$n1,
         n2 = p2$n2,
-        y1 = p2$k1,
-        y2 = p2$k2
+        x1 = p2$k1,
+        x2 = p2$k2
       )
 
       # Build string with each argument on a new line
@@ -7973,12 +7975,12 @@ t2e_BF10i <-function(t,n1,r,model ,scale,dff , hypothesis,e ){
                             "<"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
+                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
                                           "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
                             ">"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
+                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
                                           "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
   )
 
@@ -8079,12 +8081,12 @@ t2e_TPE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
                             "<"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
+                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
                                           "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
                             ">"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
+                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
                                           "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
   )
 
@@ -8148,15 +8150,14 @@ t2e_FNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
                             "<"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
+                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
                                           "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
                             ">"  = switch(model,
                                           "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
                                           "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
+                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
                                           "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
   )
-
   int <- function(delta) {
     ncp <- delta * constant
 
