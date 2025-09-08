@@ -454,6 +454,7 @@ BFpower.f <- function(interval = NULL,
 #' @param mode_bf Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N} is needed for the calculation of probabilities of compelling and misleading evidence.
 #' @param e The bounds for the interval Bayes factor (used when \code{interval = 0}).
 #' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
+#' @param h0 Null value
 #'
 #' @examples
 #' \dontrun{
@@ -874,8 +875,8 @@ BF10.bin.test <- function(x, n, alpha, beta, location, scale, model, hypothesis,
 #' @param b2 Beta parameter of the analysis beta prior distribution for group 2 under the alternative hypothesis.
 #' @param n1 Sample size for group 1.
 #' @param n2 Sample size for group 2.
-#' @param y1 Observed number of successes for group 1.
-#' @param y2 Observed number of successes for group 2.
+#' @param x1 Observed number of successes for group 1.
+#' @param x2 Observed number of successes for group 2.
 #'
 #' @return The Bayes factor (BF10) for comparing two proportions.
 #'

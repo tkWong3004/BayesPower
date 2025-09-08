@@ -69,6 +69,8 @@ otherwise Bayes factor with interval null and alternative hypotheses.}
 \item{e}{The bounds for the interval Bayes factor (used when \code{interval = 0}).}
 
 \item{direct}{If \code{"h1"}, BF10; if \code{"h0"}, BF01.}
+
+\item{h0}{Null value}
 }
 \description{
 Perform sample size determination or the calculation of compelling and misleading evidence

@@ -23,9 +23,9 @@ BF10.props(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)
 
 \item{n2}{Sample size for group 2.}
 
-\item{y1}{Observed number of successes for group 1.}
+\item{x1}{Observed number of successes for group 1.}
 
-\item{y2}{Observed number of successes for group 2.}
+\item{x2}{Observed number of successes for group 2.}
 }
 \value{
 The Bayes factor (BF10) for comparing two proportions.

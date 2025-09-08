@@ -56,7 +56,7 @@ ui <-
                                       inputId = "h1t1",
                                       label = shiny::em("\\(\\mathcal{H}_1:\\)"),
                                       choices = list(
-                                        "\\(\\delta ≠ 0\\)" = 1,
+                                        "\\(\\delta \\neq 0\\)" = 1,
                                         "\\(\\delta > 0\\)" = 2,
                                         "\\(\\delta < 0\\)" = 3
                                       ),
@@ -80,7 +80,7 @@ ui <-
             )
           ),
 
-          # ε inputs
+          # inputs
           shiny::fluidRow(
             shiny::column(6,
                    shiny::conditionalPanel("input.h1t1e == 2 && input.h0t1 == 2",
@@ -329,7 +329,7 @@ ui <-
                   inputId = "h1t2",
                   label = shiny::em("\\(\\mathcal{H}_1:\\)"),
                   choices = list(
-                    "\\(\\delta ≠ 0\\)" = 1,
+                    "\\(\\delta \\neq 0\\)" = 1,
                     "\\(\\delta > 0\\)" = 2,
                     "\\(\\delta < 0\\)" = 3
                   ),
@@ -605,7 +605,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                           inputId = "h1r",
                           label = shiny::em("\\(\\mathcal{H}_1:\\)"),
                           choices = list(
-                            "\\(\\rho ≠ \\rho_0\\)" = 1,
+                            "\\(\\rho \\neq \\rho_0\\)" = 1,
                             "\\(\\rho > \\rho_0\\)" = 2,
                             "\\(\\rho < \\rho_0\\)" = 3
                           ),
@@ -987,7 +987,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                label = shiny::em("\\(\\text{Analysis Prior Distribution}\\)"),
                choices = list(
                  "\\( \\text{Effect size prior} \\)" = 1,
-                 "\\( \\text{Moment prior (must df ≥ 3)} \\)" = 2
+                 "\\( \\text{Moment prior (must df \\geq 3)} \\)" = 2
                ),
                inline = TRUE,
                selected = 1
@@ -1020,7 +1020,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                  selected = 1,
                  inline = TRUE
                ),
-               # Design prior ≠ analysis prior
+               # Design prior != analysis prior
                shiny::conditionalPanel(
                  condition = "input.priorf == 2",
                  shinyWidgets::prettyRadioButtons(
@@ -1028,7 +1028,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                    label = shiny::em("\\(\\text{Design Prior Distribution}\\)"),
                    choices = list(
                      "\\( \\text{Effect size prior} \\)" = 1,
-                     "\\( \\text{Moment prior (must df ≥ 3)} \\)" = 2,
+                     "\\( \\text{Moment prior (must df \\geq 3)} \\)" = 2,
                      "\\( \\text{Point} \\)" = 3
                    ),
                    inline = TRUE,
@@ -1172,7 +1172,7 @@ shiny::navbarMenu(
                           shinyWidgets::prettyRadioButtons(
                             inputId = "h1bin", label = shiny::em("\\(\\mathcal{H}_1:\\)"),
                             choices = list(
-                              "\\(\\theta ≠ \\theta_0\\)" = 1,
+                              "\\(\\theta \\neq \\theta_0\\)" = 1,
                               "\\(\\theta > \\theta_0\\)" = 2,
                               "\\(\\theta < \\theta_0\\)" = 3
                             ),
@@ -1558,11 +1558,28 @@ server <- function(input, output, session) {
 
 }
 
-# Run the application
-
+#' Launch the BayesPower Shiny Application
+#'
+#' This function starts the interactive Shiny application for
+#'Bayesian power analysis using Bayes factors.
+#' The app provides a graphical user interface built with
+#' \pkg{shiny}.
+#'
+#' @details
+#' The application includes both the UI and server components,
+#' which are defined internally in the package. When run, a
+#' browser window or RStudio viewer pane will open to display
+#' the interface.
+#'
+#'
+#' @examples
+#' \dontrun{
+#' # Launch the Shiny application
+#' BayesPower_BayesFactor()
+#' }
+#'
 #' @export
 BayesPower_BayesFactor <- function(){
-  # Run the application
- shiny::shinyApp(ui = ui, server = server)
-
+  shiny::shinyApp(ui = ui, server = server)
 }
+
