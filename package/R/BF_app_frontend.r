@@ -1037,10 +1037,10 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                  shiny::fluidRow(
                    shiny::column(width = 4,
                                  shiny::conditionalPanel(condition = "input.modelfd == 1",
-                                                         shiny::sliderInput("rfd", "\\(\\text{r scale:}\\)", min = 0, max = 3, value = 1, step = 0.01, ticks = FALSE)
+                                                         shiny::sliderInput("rfd", "\\(\\text{r scale:}\\)", min = 0.01, max = 3, value = 1, step = 0.01, ticks = FALSE)
                                  ),
                                  shiny::conditionalPanel(condition = "input.modelfd == 3",
-                                                         shiny::sliderInput("lfd", "\\(\\lambda^2:\\)", min = 0, max = 0.5, value = 0.1, step = 0.01, ticks = FALSE)
+                                                         shiny::sliderInput("lfd", "\\(\\lambda^2:\\)", min = 0.01, max = 0.5, value = 0.1, step = 0.01, ticks = FALSE)
                                  )
                    ),
                    shiny::column(width = 4,
@@ -1348,7 +1348,7 @@ shiny::navbarMenu(
            )
   ), shiny::tabPanel("\\(\\text{Two proportion}\\)",shiny::withMathJax(),
 shiny::sidebarLayout(shiny::sidebarPanel(
-  shiny::tags$h4("\\(\\text{Two proportion}\\)"),
+  shiny::tags$h4("\\(\\text{Two proportion(computational intensive)}\\)"),
   shinyWidgets::prettyRadioButtons(
     "Modep2", "\\(\\text{Select Mode}\\)",
     choices = list(

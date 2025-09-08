@@ -60,7 +60,7 @@ F_TPE<-function(f,q,m,dff,rscale,f_m,model){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
   if (model == "Point"){
-    x = stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = F)
+    x = stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = F)
     return(x)
   }
   int  <- function(fsq){
@@ -76,7 +76,7 @@ F_FNE<-function(f,q,m,dff,rscale,f_m,model){
 
   if (model == "Point"){
 
-    x = stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = T)
+    x = stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = T)
     return(x)
   }
   int  <- function(fsq){
@@ -450,7 +450,7 @@ Fe_TPE<-function(f,q,m,dff,rscale,f_m,model,e){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
 
-  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = F))
+  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = F))
 
   normalizationh1  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-5)$value
   int  <- function(fsq){
@@ -466,7 +466,7 @@ Fe_FNE<-function(f,q,m,dff,rscale,f_m,model,e){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
 
-  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m,lower.tail = T))
+  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = T))
 
   normalizationh1  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
   int  <- function(fsq){
@@ -5595,7 +5595,6 @@ shiny::observeEvent(input$calbin, {
 
     output$result_bin <- shiny::renderText({
 
-
       args <- list(
         x = bin$Suc,
         n = bin$N,
@@ -5607,13 +5606,17 @@ shiny::observeEvent(input$calbin, {
         hypothesis = bin$hypothesis
       )
 
-      if (bin$interval !=1) {
+      if (bin$interval != 1) {
         args$e <- bin$e
       }
 
       # Build string with each argument on a new line
       arg_strings <- sapply(names(args), function(nm) {
-        sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+        if (nm == "e" && length(args[[nm]]) > 1) {
+          sprintf("  e = c(%s)", paste(fmt_val(args[[nm]]), collapse = ", "))
+        } else {
+          sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+        }
       })
 
       call_string <- paste0(
@@ -5625,6 +5628,7 @@ shiny::observeEvent(input$calbin, {
 
       call_string
     })
+
 
 
 
@@ -5707,7 +5711,7 @@ input_f <- shiny::reactive({
   f_m_d <- sqrt(input$fsdfd)
 
   if ( input$modelfd == "3"){
-    f_m_d <-input$lfd
+    f_m_d <-sqrt(input$lfd)
   }
 
   dff_d <- input$dffd
@@ -5819,6 +5823,11 @@ output$prior_suggest <- shiny::renderUI({
 shiny::observeEvent(input$runf, {
   ff = input_f()
 
+  output$result_f <-  shiny::renderText({
+    paste("# Function to be used in R", show_f_code(ff), sep = "\n")
+  })
+
+
   dat = tryCatch({ switch(ff$inter,
                "1" = f_table(ff$D,ff$target,ff$p,ff$k,ff$dff,ff$rscale,ff$f_m,ff$model,
                 ff$dff_d,ff$rscale_d,ff$f_m_d,ff$model_d,ff$de_an_prior,ff$N, ff$mode_bf,ff$alpha ,ff$direct),
@@ -5828,9 +5837,6 @@ shiny::observeEvent(input$runf, {
     "Error"
   })
 
-  output$result_f <-  shiny::renderText({
-    paste("# Function to be used in R", show_f_code(ff), sep = "\n")
-  })
   output$priorff <- shiny::renderPlot({
 
     switch(ff$inter,
@@ -6642,8 +6648,7 @@ shiny::observeEvent(input$calr, {
                  "1" = r_BF10(rr$rval,rr$N,rr$k, rr$alpha, rr$beta,rr$h0,rr$hypothesis,rr$location,rr$scale,rr$dff,rr$model),
                  "2" = re_BF10(rr$rval,rr$N,rr$k, rr$alpha, rr$beta,rr$h0,rr$hypothesis,rr$location,rr$scale,rr$dff,rr$model,rr$e))
 
-  output$result_r<- shiny::renderText({
-
+  output$result_r <- shiny::renderText({
 
     args <- list(
       r = rr$rval,
@@ -6659,13 +6664,17 @@ shiny::observeEvent(input$calr, {
       model = rr$model
     )
 
-    if (rr$interval !=1) {
+    if (rr$interval != 1) {
       args$e <- rr$e
     }
 
     # Build string with each argument on a new line
     arg_strings <- sapply(names(args), function(nm) {
-      sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+      if (nm == "e" && length(args[[nm]]) > 1) {
+        sprintf("  e = c(%s)", paste(fmt_val(args[[nm]]), collapse = ", "))
+      } else {
+        sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+      }
     })
 
     call_string <- paste0(
@@ -6677,6 +6686,7 @@ shiny::observeEvent(input$calr, {
 
     call_string
   })
+
 
 
 
@@ -7393,11 +7403,10 @@ shiny::observeEvent(input$cal1, {
 
   output$result_t2 <- shiny::renderText({
 
-
     args <- list(
       tval = t2$tval,
       N1 = t2$N1,
-      N2 = t2$r,
+      N2 = t2$N2,
       model = t2$model,
       location = t2$location,
       scale = t2$scale,
@@ -7411,7 +7420,11 @@ shiny::observeEvent(input$cal1, {
 
     # Build string with each argument on a new line
     arg_strings <- sapply(names(args), function(nm) {
-      sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+      if (nm == "e" && length(args[[nm]]) > 1) {
+        sprintf("  e = c(%s)", paste(fmt_val(args[[nm]]), collapse = ", "))
+      } else {
+        sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+      }
     })
 
     call_string <- paste0(
@@ -7423,6 +7436,7 @@ shiny::observeEvent(input$cal1, {
 
     call_string
   })
+
 
 
   output$BFt2 <- shiny::renderUI({
