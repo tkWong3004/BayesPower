@@ -1,5 +1,6 @@
 #' @useDynLib BayesPower, .registration = TRUE
 #' @importFrom Rcpp evalCpp
+#' @importFrom rlang .data
 NULL
 
 # ---- ANOVA.r ----
@@ -506,7 +507,7 @@ Fe_FPE<-function(f,q,m,dff,rscale,f_m,model,e){
   return(x)
 }
 
-fe_N_finder<-function(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,de_an_prior,e,FP ){
+fe_N_finder<-function(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,model_d,de_an_prior,e,FP ){
   q     <- k-p
   lower <- 2*k-p+1
   m     <- lower-p
@@ -545,7 +546,7 @@ fe_N_finder<-function(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,de_
     return(N.alpha)
 }
 
-fe_N_01_finder<-function(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,de_an_prior,e,FP ){
+fe_N_01_finder<-function(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,model_d,de_an_prior,e,FP ){
   q     <- k-p
   lower <- 2*k-p+1
   m     <- lower-p
@@ -609,8 +610,8 @@ fe_table<-function(D,target,p,k,dff,rscale,f_m,model,
   if (mode_bf == 1){
 
     n = switch(direct,
-               "h1" = ceiling(fe_N_finder(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,de_an_prior,e ,FP)),
-               "h0" = ceiling(fe_N_01_finder(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,de_an_prior,e ,FP)))
+               "h1" = ceiling(fe_N_finder(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,model_d,de_an_prior,e ,FP)),
+               "h0" = ceiling(fe_N_01_finder(D,target,p,k,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,model_d,de_an_prior,e ,FP)))
   } else {
     n=n
   }
@@ -2063,7 +2064,7 @@ bin_e_N_01_finder <-function(D,target,h0,alpha,beta,location,scale,model,hypothe
 
   while(TRUE) {
     b10 <- bin_e_BF_bound_01(D,N.TN,alpha,beta,location,scale,model,hypothesis,e)
-    pro <- bin_e_TNE(x,N,h0,alpha,beta,location,scale,model,hypothesis,e)
+    pro <- bin_e_TNE(b10,N.TN,h0,alpha,beta,location,scale,model,hypothesis,e)
 
     if (pro > target) break
     N.TN <- N.TN + 1
@@ -2733,13 +2734,14 @@ r_N_01_finder<-function(D,target,model,k, alpha, beta,h0,location,scale,dff, hyp
   ## checking if the N lead to an acceptable alpha level
   r = r_BF_bound_01(D,N.TN,k, alpha, beta,h0,hypothesis,location,scale,dff,model)
 
-  FNE =   if (de_an_prior==0){ r_FNE(r, N.TN, k_d, alpha_d, beta_d, h0, hypothesis, location_d, scale_d, dff_d, model_d) }else r_FNE(r, N, k, alpha, beta, h0, hypothesis, location, scale, dff, model)
+  FNE =   if (de_an_prior==0){ r_FNE(r, N.TN, k_d, alpha_d, beta_d, h0, hypothesis, location_d, scale_d, dff_d, model_d) }else r_FNE(r, N.TN, k, alpha, beta, h0, hypothesis, location, scale, dff, model)
 
   if (FNE <= FP) return(N.TN)
 
   FN.root <- function(n) {
     r   <- r_BF_bound_10(D,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model)
-    FNE <- if (de_an_prior==0){ r_FNE(r, n, k_d, alpha_d, beta_d, h0, hypothesis, location_d, scale_d, dff_d, model_d) }else r_FNE(r, n, k, alpha, beta, h0, hypothesis, location, scale, dff, model)
+    FNE <- if (de_an_prior==0){ r_FNE(r, n, k_d, alpha_d, beta_d, h0, hypothesis, location_d, scale_d, dff_d, model_d)
+      }else r_FNE(r, n, k, alpha, beta, h0, hypothesis, location, scale, dff, model)
     FNE-FP
   }
   N.FN = stats::uniroot(FN.root,lower = N.TN,upper = upper)$root
@@ -3405,7 +3407,7 @@ re_N_01_finder<-function(D,target,model,k, alpha, beta,h0,location,scale,dff, hy
       re_FNE(r,lo,k_d, alpha_d, beta_d,h0,hypothesis,location_d,scale_d,dff_d,model_d,e)
 
 
-  if (TNE_lo > target && FPE_lo < FP) {
+  if (TNE_lo > target && FNE_lo < FP) {
     return(lo)
   } else if (TNE_lo > target) {
     FN.root <- function(n) {
@@ -3428,12 +3430,7 @@ re_N_01_finder<-function(D,target,model,k, alpha, beta,h0,location,scale,dff, hy
     pro = re_TNE(r,N,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e)
     return(pro-target)
   }
-  if (de_an_prior == 0 ){
-    pro = re_TPE(r,N,k_d, alpha_d, beta_d,h0,hypothesis,location_d,scale_d,dff_d,model_d,e)
-  }else {
-    pro = re_TPE(r,N,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e)
 
-  }
   N.TN <- robust_uniroot(TN_root, lower = lo)
   r    <- re_BF_bound_01(D, N.TN,k,alpha, beta,h0,hypothesis,location,scale,dff,model,e)
   FNE  <- re_FNE(r, N.TN,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e)
@@ -4116,7 +4113,7 @@ t1_Table <- function(D, target, model, location, scale, dff, hypothesis,
     sprintf("p(BF10 > %0.f | H0)", D),
     "Required N"
   )
-  table <- data.frame(TPE, FNE, TNE, FPE, df, check.names = FALSE, row.names = NULL)
+  table <- data.frame(TPE, FNE, TNE, FPE, df+1, check.names = FALSE, row.names = NULL)
   colnames(table) <- tab.names
   table
 }
@@ -5187,8 +5184,8 @@ Power_p2<-function(D,n1, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,model2,da2
 
 
 
-heatmap_p2_0<-function(x,D){
-  # Pregraphics::pare data
+heatmap_p2_0 <- function(x, D) {
+  # Prepare data
   df <- data.frame(
     k1 = x$k1,
     k2 = x$k2,
@@ -5201,50 +5198,56 @@ heatmap_p2_0<-function(x,D){
   df$effect <- with(df, ifelse(PE == 1, "PE",
                                ifelse(NE == 1, "NE", "None")))
 
-  # Use bquote to fix the math expressions in legend labels
+  # Legend labels using bquote for math
   labels <- c(
     "PE"   = bquote(BF[10] > .(D)),
     "NE"   = bquote(BF[0][1] > .(D)),
     "None" = bquote(1 / .(D) < BF[10] ~ "<" ~ .(D))
   )
 
-  # Plot
-  ggplot2::ggplot(df, ggplot2::aes(x = k1, y = k2, fill = effect)) +
+  # ---- First heatmap: classification ----
+  p1 <- ggplot2::ggplot(
+    df,
+    ggplot2::aes(x = .data$k1, y = .data$k2, fill = .data$effect)
+  ) +
     ggplot2::geom_tile() +
-    ggplot2::scale_fill_manual(name ="classification",
-                      values = c("PE" = "#440154", "NE" = "#21908C", "None" = "#FDE725"),
-
+    ggplot2::scale_fill_manual(
+      name = "classification",
+      values = c("PE" = "#440154", "NE" = "#21908C", "None" = "#FDE725"),
       labels = labels
     ) +
-    ggplot2::labs(title = "BF and number of success",
-                  x = "x1", y = "x2") +
+    ggplot2::labs(
+      title = "BF and number of success",
+      x = "x1",
+      y = "x2"
+    ) +
     ggplot2::coord_fixed() +
     ggplot2::theme_minimal()
 
-
-
-
-
-  ggplot2::ggplot(df, ggplot2::aes(x = k1, y = k2, fill = BF)) +
+  # ---- Second heatmap: BF values ----
+  p2 <- ggplot2::ggplot(
+    df,
+    ggplot2::aes(x = .data$k1, y = .data$k2, fill = .data$BF)
+  ) +
     ggplot2::geom_tile() +
-    ggplot2::scale_fill_viridis_c(name = "BF") +   # continuous Viridis color scale
+    ggplot2::scale_fill_viridis_c(name = "BF") +
     ggplot2::labs(
       title = "Heatmap of BF",
       x = "k1",
       y = "k2"
     ) +
-    ggplot2::coord_fixed() +  # equal aspect ratio
+    ggplot2::coord_fixed() +
     ggplot2::theme_minimal()
 
-
-
-
+  # Return both plots as a list
+  list(classification = p1, BF = p2)
 }
 
 
 
-heatmap_p2<-function(x,D){
-  # Pregraphics::pare data
+
+heatmap_p2 <- function(x, D) {
+  # Prepare data
   df <- data.frame(
     k1 = x$k1,
     k2 = x$k2,
@@ -5257,42 +5260,52 @@ heatmap_p2<-function(x,D){
   df$effect <- with(df, ifelse(PE == 1, "PE",
                                ifelse(NE == 1, "NE", "None")))
 
-  # Use bquote to fix the math expressions in legend labels
+  # Legend labels (math expressions)
   labels <- c(
     "PE"   = bquote(BF[10] > .(D)),
     "NE"   = bquote(BF[0][1] > .(D)),
     "None" = bquote(1 / .(D) < BF[10] ~ "<" ~ .(D))
   )
 
-  # First plot: categorical heatmap with custom colors and math labels
-  p1 <- ggplot2::ggplot(df, ggplot2::aes(x = k1, y = k2, fill = effect)) +
+  # First plot: categorical heatmap
+  p1 <- ggplot2::ggplot(
+    df,
+    ggplot2::aes(x = .data$k1, y = .data$k2, fill = .data$effect)
+  ) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_manual(
       name = "Classification",
       values = c("PE" = "#FDE725", "NE" = "#440154", "None" = "#21908C"),
       labels = labels
     ) +
-    ggplot2::labs(title = "BF and number of success", x = "x1", y = "x2") +
+    ggplot2::labs(
+      title = "BF and number of success",
+      x = "x1", y = "x2"
+    ) +
     ggplot2::coord_fixed() +
     ggplot2::theme_minimal()
 
   # Second plot: continuous heatmap of BF
-  p2 <- ggplot2::ggplot(df, ggplot2::aes(x = k1, y = k2, fill = BF)) +
+  p2 <- ggplot2::ggplot(
+    df,
+    ggplot2::aes(x = .data$k1, y = .data$k2, fill = .data$BF)
+  ) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_viridis_c(name = "log BF10") +
-    ggplot2::labs(title = "Heatmap of BF", x = "k1", y = "k2") +
+    ggplot2::labs(
+      title = "Heatmap of BF",
+      x = "k1", y = "k2"
+    ) +
     ggplot2::coord_fixed() +
     ggplot2::theme_minimal()
 
-  # Combine side by side
+  # Combine plots side by side
   combined_plot <- p1 + p2 + patchwork::plot_layout(ncol = 2)
 
-  # Display
-  print(combined_plot)
-
-
-
+  # Return combined plot (print when called interactively)
+  combined_plot
 }
+
 
 
 # ---- Server_bin.r ----
