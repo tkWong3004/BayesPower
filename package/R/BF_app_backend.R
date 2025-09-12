@@ -3852,13 +3852,13 @@ t1_BF01_bound <- function(D, df, model, location, scale, dff, hypothesis) {
 
 # p(BF01>D|H0)
 # t is the t-value lead to BF = b based on the bound functions (stats::optimized):
-t1_TNE <- function(t, df) {
+t1_TNE <- function(t, df,hypothesis) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
   if (length(t) == 2) return(stats::pt(max(t), df) - stats::pt(min(t), df))
 
   # length(t) = 1:
-  return(if (t > 0) stats::pt(t, df,0) else 1 - stats::pt(t, df))
+  return(if (hypothesis==">") stats::pt(t, df,0) else 1 - stats::pt(t, df))
 }
 
 # p(BF10>D|H1)
@@ -3908,17 +3908,15 @@ t1_TPE <- function(t, df, model, location, scale, dff) {
 
 # p(BF01>D|H1)
 # Similar as above:
-t1_FNE <- function(t, df, model, location, scale, dff){
+t1_FNE <- function(t, df, model, location, scale, dff,hypothesis){
 
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
-
-  hypothesis <- if (length(t) == 2) "!=" else if (t >= 0) ">" else "<"
 
   if (model == "Point") {
     ncp <- location * sqrt(df + 1)
     if (length(t) == 2) return(pnct(max(t), df, ncp) - pnct(min(t), df, ncp))
     # Length 1:
-    return(if (t >= 0) pnct(t, df, ncp) else 1 - pnct(t, df, ncp))
+    return(if (hypothesis==">") pnct(t, df, ncp) else 1 - pnct(t, df, ncp))
   }
 
   bound  <- switch(hypothesis,
@@ -3934,13 +3932,13 @@ t1_FNE <- function(t, df, model, location, scale, dff){
            "NLP"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
            "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
-  int <- if (length(t) == 2) { # two-sided test
+  int <- if (hypothesis =="!=") { # two-sided test
     function(delta) {
       pro1 <- pnct(max(t), df, delta * sqrt(df + 1))
       pro2 <- pnct(min(t), df, delta * sqrt(df + 1))
       (pro1 - pro2) * t1_prior(delta, location, scale, dff, model) / normalization
     }
-  } else if (t >= 0) { # one-sided test with delta > 0
+  } else if (hypothesis ==">") { # one-sided test with delta > 0
     function(delta) pnct(t, df, delta * sqrt(df + 1)) * t1_prior(delta, location, scale, dff, model) / normalization
   } else {             # one-sided test with delta < 0
     function(delta) (1 - pnct(t, df, delta * sqrt(df + 1))) * t1_prior(delta, location, scale, dff, model) / normalization
@@ -3953,7 +3951,7 @@ t1_FNE <- function(t, df, model, location, scale, dff){
 }
 
 # p(BF10>D|H0)
-t1_FPE <- function(t, df) {
+t1_FPE <- function(t, df,hypothesis) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
   # if (length(t) == 4) t <- t[2:3]
@@ -3961,7 +3959,7 @@ t1_FPE <- function(t, df) {
   if (length(t) == 2) return(stats::pt(min(t), df) + (1 - stats::pt(max(t), df)))
 
   # length(t) = 1:
-  return(if (t > 0) 1 - stats::pt(t, df) else stats::pt(t, df))
+  return(if (hypothesis==">") 1 - stats::pt(t, df) else stats::pt(t, df))
 }
 
 
@@ -4000,14 +3998,14 @@ t1_N_finder <- function(D, target, model, location, scale, dff, hypothesis,
 
   ## checking if the N lead to an acceptable alpha level
   t   <- t1_BF10_bound(D, df.power, model, location, scale, dff,hypothesis)
-  FPE <- t1_FPE(t, df.power)
+  FPE <- t1_FPE(t, df.power,hypothesis)
   if (FPE <= alpha) return(df.power + 1)
 
   # if the FPE > alpha, then we search for another df
   # Jorge: 'alpha.root' is better than 'alpha_bound'.
   alpha.root <- function(df) {
     t <- t1_BF10_bound(D, df, model, location, scale, dff, hypothesis)
-    t1_FPE(t, df) - alpha
+    t1_FPE(t, df,hypothesis) - alpha
   }
 
   # Jorge: 'df.alpha' is better than 'NN'.
@@ -4021,34 +4019,34 @@ t1_N_01_finder <- function(D, target, model, location, scale, dff, hypothesis,
   upper <- 10000
 
   t2 <- t1_BF01_bound(D, df = lower, model, location, scale, dff,hypothesis)
-  TNE_lo <- t1_TNE(t2, df = lower)
+  TNE_lo <- t1_TNE(t2, df = lower,hypothesis)
   if (TNE_lo > target) return(lower)
 
   FNE_lo <-  if (de_an_prior == 1)
-    t1_FNE(t2, df = lower, model, location, scale, dff ) else
-      t1_FNE(t2, df = lower, model_d, location_d, scale_d, dff_d)
+    t1_FNE(t2, df = lower, model, location, scale, dff,hypothesis ) else
+      t1_FNE(t2, df = lower, model_d, location_d, scale_d, dff_d,hypothesis)
   if (TNE_lo > target&FNE_lo<alpha) return(lower)
 
 
   TN_root <- function(df) {
     t <- t1_BF01_bound(D, df, model, location, scale, dff,hypothesis)
-    t1_TNE(t, df = df) - target
+    t1_TNE(t, df = df,hypothesis) - target
   }
 
   df.TN <- stats::uniroot(TN_root, lower = lower, upper = upper)$root
 
   t   <- t1_BF01_bound(D, df.TN, model, location, scale, dff,hypothesis)
   FNE <- if (de_an_prior == 1)
-    t1_FNE(t, df = df.TN, model, location, scale, dff ) else
-      t1_FNE(t, df = df.TN, model_d, location_d, scale_d, dff_d)
+    t1_FNE(t, df = df.TN, model, location, scale, dff,hypothesis ) else
+      t1_FNE(t, df = df.TN, model_d, location_d, scale_d, dff_d,hypothesis)
 
   if (FNE <= alpha) return(df.TN + 1)
 
   FN.root <- function(df) {
     t <- t1_BF01_bound(D, df, model, location, scale, dff, hypothesis)
     pro = if (de_an_prior == 1)
-      t1_FNE(t, df = df, model, location, scale, dff ) - alpha else
-        t1_FNE(t, df = df, model_d, location_d, scale_d, dff_d)
+      t1_FNE(t, df = df, model, location, scale, dff ,hypothesis) - alpha else
+        t1_FNE(t, df = df, model_d, location_d, scale_d, dff_d,hypothesis)
     pro- alpha
   }
   df.FN <- stats::uniroot(FN.root, lower = df.TN, upper = upper)$root
@@ -4071,7 +4069,6 @@ t1_Table <- function(D, target, model, location, scale, dff, hypothesis,
                 model_d, location_d, scale_d, dff_d, de_an_prior, alpha)) - 1
   }
 
-
   # t bounds:
   t10 <- t1_BF10_bound(D, df, model, location, scale, dff, hypothesis)
   t01 <- t1_BF01_bound(D, df, model, location, scale, dff, hypothesis)
@@ -4081,7 +4078,7 @@ t1_Table <- function(D, target, model, location, scale, dff, hypothesis,
   BF_D   <- t10
 
   # FPE and TPE:
-  FPE       <- t1_FPE(t10, df)
+  FPE       <- t1_FPE(t10, df,hypothesis)
   if (de_an_prior == 1) {
     TPE       <- t1_TPE(t10, df, model, location, scale, dff)
     TPR_model <- model
@@ -4101,8 +4098,8 @@ t1_Table <- function(D, target, model, location, scale, dff, hypothesis,
     FNE <- 0
     TNE <- 0
   } else {
-    FNE <- t1_FNE(t01, df, TPR_model, TPR_loc, TPR_scale, TPR_dff)
-    TNE <- t1_TNE(t01, df)
+    FNE <- t1_FNE(t01, df, TPR_model, TPR_loc, TPR_scale, TPR_dff,hypothesis)
+    TNE <- t1_TNE(t01, df,hypothesis)
   }
 
   # table:
@@ -4238,12 +4235,12 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
     TPE[i] <- if (de_an_prior == 1)
       t1_TPE(t10, dfs[i], model, location, scale, dff) else
         t1_TPE(t10, dfs[i], model_d, location_d, scale_d, dff_d)
-    FPE[i] <- t1_FPE(t10, dfs[i])
+    FPE[i] <- t1_FPE(t10, dfs[i],hypothesis)
 
-    TNE[i] <-t1_TNE(t01, dfs[i])
+    TNE[i] <-t1_TNE(t01, dfs[i],hypothesis)
     FNE[i] <- if (de_an_prior == 1)
-      t1_FNE(t01, dfs[i], model, location, scale, dff) else
-        t1_FNE(t01, dfs[i], model_d, location_d, scale_d, dff_d)
+      t1_FNE(t01, dfs[i], model, location, scale, dff,hypothesis) else
+        t1_FNE(t01, dfs[i], model_d, location_d, scale_d, dff_d,hypothesis)
   }
 
   graphics::par(mfrow = c(1, 2))
