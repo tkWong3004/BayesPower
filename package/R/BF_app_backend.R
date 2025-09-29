@@ -305,13 +305,13 @@ bf10_f <-function(D,n,k,p,dff,rscale,f_m,model){
 
 
   if (length(f.BF10) == 1){
-    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(f.BF10, digits = 4))))
+    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(round(f.BF10,digits = 2)))))
   } else {
-    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(f.BF10[1], digits = 4))~"or"~.(format(f.BF10[2], digits = 4))))
+    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(round(f.BF10[1],digits = 2)))~"or"~.(format(round(f.BF10[2],digits = 2)))))
   }
 
   graphics::par(mfrow = c(1, 2))
-  plot(ff,BF10,log = "y",xlim=c(0,10),xlab= "f-value",type="l", ylab = expression("logarithm of BF"[10]),main =   main,frame.plot = FALSE,xaxt = "n")
+  plot(ff,BF10,log = "y",xlim=c(0,10),xlab= "f-value",type="l", ylab = expression(BF[10] * " (log scale)"),main =   main,frame.plot = FALSE,xaxt = "n")
   graphics::abline(v = f.BF10)
   graphics::axis(1, c(0,10))
 
@@ -323,7 +323,7 @@ bf10_f <-function(D,n,k,p,dff,rscale,f_m,model){
 
 
 
-  plot(ff,1/BF10,log = "y",xlab= "f-value",type="l",main = "",frame.plot = FALSE,ylab = bquote("logarithm of BF"[0][1]),xaxt = "n")
+  plot(ff,1/BF10,log = "y",xlab= "f-value",type="l",main = "",frame.plot = FALSE,ylab = bquote("BF"[0][1]* " (log scale)"),xaxt = "n")
   graphics::axis(1, c(0,10))
   if (any(max_BF<D |f.BF01 == "bound cannot be found" ) ) {
     main = bquote(bold("It is impossible to have BF"[0][1]~"="~.(D)))
@@ -333,10 +333,10 @@ bf10_f <-function(D,n,k,p,dff,rscale,f_m,model){
     graphics::abline(v = f.BF01)
     graphics::axis(1, round(f.BF01,2))
     if (length(f.BF01) == 1){
-      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(f.BF01, digits = 4))))
+      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(round(f.BF01,digits = 2)))))
       graphics::title(main = main)
     } else {
-      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(f.BF01[1], digits = 4))~"or"~.(format(f.BF01[2], digits = 4))))
+      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(round(f.BF01[1],digits = 2)))~"or"~.(format(round(f.BF01[2],digits = 2)))))
       graphics::title(main = main)
     }}
 
@@ -734,12 +734,12 @@ bf10_fe <-function(D,n,k,p,dff,rscale,f_m,model,e){
   BF10    <- Fe_BF(ff,q,m,dff,rscale,f_m,model,e)
 
   if (length(f.BF10) == 1){
-    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(f.BF10, digits = 4))))
+    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(round(f.BF10,digits = 2)))))
   } else {
-    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(f.BF10[1], digits = 4))~"or"~.(format(f.BF10[2], digits = 4))))
+    main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(round(f.BF10[1],digits = 2)))~"or"~.(format(round(f.BF10[2],digits = 2)))))
   }
   graphics::par(mfrow = c(1, 2))
-  plot(ff,BF10,log = "y",xlim=c(0,10),xlab= "f-value",type="l", ylab = expression("BF"[10]),main =   main,frame.plot = FALSE,xaxt = "n")
+  plot(ff,BF10,log = "y",xlim=c(0,10),xlab= "f-value",type="l", ylab = expression("BF"[10]* " (log scale)"),main =   main,frame.plot = FALSE,xaxt = "n")
   graphics::abline(v = f.BF10)
   graphics::axis(1, c(0,10))
 
@@ -751,7 +751,7 @@ bf10_fe <-function(D,n,k,p,dff,rscale,f_m,model,e){
 
 
 
-  plot(ff,1/BF10,log = "y",xlab= "f-value",type="l",main = "",frame.plot = FALSE,ylab = bquote("BF"[0][1]),xaxt = "n")
+  plot(ff,1/BF10,log = "y",xlab= "f-value",type="l",main = "",frame.plot = FALSE,ylab = bquote("BF"[0][1]* " (log scale)"),xaxt = "n")
   graphics::axis(1, c(0,10))
 
   if (any(max_BF<D |f.BF01 == "bound cannot be found" ) ) {
@@ -762,10 +762,10 @@ bf10_fe <-function(D,n,k,p,dff,rscale,f_m,model,e){
     graphics::abline(v = f.BF01)
     graphics::axis(1, round(f.BF01,2))
     if (length(f.BF01) == 1){
-      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(f.BF01, digits = 4))))
+      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(round(f.BF01,digits = 2)))))
       graphics::title(main = main)
     } else {
-      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(f.BF01[1], digits = 4))~"or"~.(format(f.BF01[2], digits = 4))))
+      main =  bquote(bold("BF"[0][1]~"="~.(D) ~"when f = "~.(format(round(f.BF01[1],digits = 2)))~"or"~.(format(round(f.BF01[2],digits = 2)))))
       graphics::title(main = main)
     }}
 
@@ -1364,7 +1364,7 @@ bin_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis){
   x= seq(from = 0,to =n,by= 3)
 
   # Compute BF10 and x-bounds:
-  b.BF10 <- bin_BF_bound_10(D,n,alpha,beta,location,scale,model,hypothesis)
+  b.BF10 <- round(bin_BF_bound_10(D,n,alpha,beta,location,scale,model,hypothesis),2)
   BF10_at_b <- round(bin_BF(b.BF10,n,alpha,beta,location,scale,model,hypothesis),2)
   BF10 <- bin_BF(x,n,alpha,beta,location,scale,model,hypothesis)
 
@@ -1376,7 +1376,7 @@ bin_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis){
 
   main <- bquote(bold(.(part1) ~ .(part2)))
 
-  plot(x, BF10, type = "l", log = "y", xlab = "Number of success", ylab = expression("BF"[10]),
+  plot(x, BF10, type = "l", log = "y", xlab = "Number of success", ylab = expression("BF"[10]* " (log scale)"),
        main = main, frame.plot = FALSE, xaxt = "n")
   graphics::abline(v = b.BF10)
   graphics::axis(1, c(0, n))
@@ -1385,14 +1385,14 @@ bin_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis){
 
   # right plot - BF01:
   BF01   <- 1 / BF10
-  b.BF01 <- bin_BF_bound_01(D,n,alpha,beta,location,scale,model,hypothesis)
+  b.BF01 <- round(bin_BF_bound_01(D,n,alpha,beta,location,scale,model,hypothesis),2)
   BF01_at_b <- round(1/bin_BF(b.BF01,n,alpha,beta,location,scale,model,hypothesis),2)
 
   # Check if BF01 = D is possible:
   max.BF01 <- 1 / bin_BF(round(location*n),n,alpha,beta,location,scale,model,hypothesis)
   impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(b.BF01, "bound cannot be found"))
 
-  plot(x, BF01, type = "l", log = "y", xlab = "Number of success", ylab = bquote("BF"['01']),
+  plot(x, BF01, type = "l", log = "y", xlab = "Number of success", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
   graphics::axis(1, c(0, n))
 
@@ -1403,11 +1403,11 @@ bin_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis){
     graphics::axis(1, round(b.BF01, 2))
 
     if (length(b.BF10) == 2) {
-      part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])) / bold(.(BF10_at_b[2])))
-      part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1])) / bold(.(b.BF10[2]))))
+      part1 <- bquote("BF"[0][1] == bold(.(BF01_at_b[1])) / bold(.(BF01_at_b[2])))
+      part2 <- bquote(bold("when x = " ~ bold(.(b.BF01[1])) / bold(.(b.BF01[2]))))
     } else {
-      part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])))
-      part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1]))))
+      part1 <- bquote("BF"[01] == bold(.(BF01_at_b[1])))
+      part2 <- bquote(bold("when x = " ~ bold(.(b.BF01[1]))))
     }
 
     main.bf01 = bquote(bold(.(part1) ~ .(part2)))
@@ -2147,7 +2147,7 @@ bin_e_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis,e){
   x= seq(from = 0,to =n,by= 3)
 
   # Compute BF10 and x-bounds:
-  b.BF10     <- bin_e_BF_bound_10(D,n,alpha,beta,location,scale,model,hypothesis,e)
+  b.BF10     <- round(bin_e_BF_bound_10(D,n,alpha,beta,location,scale,model,hypothesis,e),2)
   BF10_at_b  <- round(bin_e_BF(b.BF10,n,alpha,beta,location,scale,model,hypothesis,e),2)
   BF10       <- bin_e_BF(x,n,alpha,beta,location,scale,model,hypothesis,e)
 
@@ -2158,7 +2158,7 @@ bin_e_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis,e){
   main <- bquote(bold(.(part1) ~ .(part2)))
 
   graphics::par(mfrow = c(1, 2))
-  plot(x, BF10, type = "l", log = "y", xlab = "Number of success", ylab = expression("BF"[10]),
+  plot(x, BF10, type = "l", log = "y", xlab = "Number of success", ylab = expression("BF"[10]* " (log scale)"),
        main = main, frame.plot = FALSE, xaxt = "n")
   graphics::abline(v = b.BF10)
   graphics::axis(1, c(0, n))
@@ -2166,14 +2166,14 @@ bin_e_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis,e){
 
   # right plot - BF01:
   BF01   <- 1 / BF10
-  b.BF01 <- bin_e_BF_bound_01(D,n,alpha,beta,location,scale,model,hypothesis,e)
+  b.BF01 <- round(bin_e_BF_bound_01(D,n,alpha,beta,location,scale,model,hypothesis,e),2)
   BF01_at_b <- round(1/bin_e_BF(b.BF01,n,alpha,beta,location,scale,model,hypothesis,e),2)
 
   # Check if BF01 = D is possible:
   max.BF01 <- 1 / bin_e_BF(round(n/2),n,alpha,beta,location,scale,model,hypothesis,e)
   impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(b.BF01, "bound cannot be found"))
 
-  plot(x, BF01, type = "l", log = "y", xlab = "Number of success", ylab = bquote("BF"['01']),
+  plot(x, BF01, type = "l", log = "y", xlab = "Number of success", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
   graphics::axis(1, c(0, n))
 
@@ -2184,11 +2184,11 @@ bin_e_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis,e){
     graphics::axis(1, round(b.BF01, 2))
 
     if (length(b.BF10) == 2) {
-      part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])) / bold(.(BF10_at_b[2])))
-      part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1])) / bold(.(b.BF10[2]))))
+      part1 <- bquote("BF"[0][1] == bold(.(BF01_at_b[1])) / bold(.(BF01_at_b[2])))
+      part2 <- bquote(bold("when x = " ~ bold(.(b.BF01[1])) / bold(.(b.BF01[2]))))
     } else {
-      part1 <- bquote("BF"[10] == bold(.(BF10_at_b[1])))
-      part2 <- bquote(bold("when x = " ~ bold(.(b.BF10[1]))))
+      part1 <- bquote("BF"[0][1] == bold(.(BF01_at_b[1])))
+      part2 <- bquote(bold("when x = " ~ bold(.(b.BF01[1]))))
     }
     main.bf01 = bquote(bold(.(part1) ~ .(part2)))
     graphics::title(main = main.bf01)
@@ -2889,11 +2889,11 @@ r_bf10_p <-function(D,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model){
   graphics::par(mfrow = c(1, 2))
   # Left plot - BF10:
   main.bf10 <- if (length(r.BF10) == 1) {
-    bquote(bold("BF"[10]~"="~.(D)~"when r = "~.(format(r.BF10, digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when r = "~.(format(round(r.BF10, digits = 2)))))
   } else {
-    bquote(bold("BF"[10]~"="~.(D)~"when r = "~.(format(r.BF10[1], digits = 4))~"or"~.(format(r.BF10[2], digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when r = "~.(format(round(r.BF10[1], digits = 2)))~"or"~.(format(round(r.BF10[2], digits = 2)))))
   }
-  plot(rr, BF10, type = "l", log = "y", xlab = "Correlation", ylab = expression("BF"[10]),
+  plot(rr, BF10, type = "l", log = "y", xlab = "Correlation", ylab = expression("BF"[10]* " (log scale)"),
        main = main.bf10, frame.plot = FALSE, xaxt = "n")
   graphics::abline(v = r.BF10)
   graphics::axis(1, c(-1, 1))
@@ -2907,7 +2907,7 @@ r_bf10_p <-function(D,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model){
   max.BF01   <- 1 / r_BF10(h0,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model)
   impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(r.BF01, "bound cannot be found"))
 
-  plot(rr, BF01, type = "l", log = "y", xlab = "Correlation", ylab = bquote("BF"['01']),
+  plot(rr, BF01, type = "l", log = "y", xlab = "Correlation", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
   graphics::axis(1, c(-1, 1))
   if (impossible) {
@@ -2916,9 +2916,9 @@ r_bf10_p <-function(D,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model){
     graphics::abline(v = r.BF01)
     graphics::axis(1, round(r.BF01, 2))
     main.bf01 <- if (length(r.BF01) == 1) {
-      bquote(bold("BF"['01']~"="~.(D)~"when r = "~.(format(r.BF01, digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when r = "~.(format(round(r.BF01, digits = 2)))))
     } else {
-      bquote(bold("BF"['01']~"="~.(D)~"when r = "~.(format(r.BF01[1], digits = 4))~"or"~.(format(r.BF01[2], digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when r = "~.(format(round(r.BF01[1], digits = 2)))~"or"~.(format(round(r.BF01[2], digits = 2)))))
     }
     graphics::title(main = main.bf01)
   }
@@ -3665,11 +3665,11 @@ re_bf10_p <-function(D,n,k,alpha,beta,h0,hypothesis,location,scale,dff,model,e){
   graphics::par(mfrow = c(1, 2))
   # Left plot - BF10:
   main.bf10 <- if (length(r.BF10) == 1) {
-    bquote(bold("BF"[10]~"="~.(D)~"when r = "~.(format(r.BF10, digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when r = "~.(format(round(r.BF10, digits = 2)))))
   } else {
-    bquote(bold("BF"[10]~"="~.(D)~"when r = "~.(format(r.BF10[1], digits = 4))~"or"~.(format(r.BF10[2], digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when r = "~.(format(round(r.BF10[1], digits = 2)))~"or"~.(format(round(r.BF10[2], digits = 2)))))
   }
-  plot(rr, BF10, type = "l", log = "y", xlab = "Correlation", ylab = expression("BF"[10]),
+  plot(rr, BF10, type = "l", log = "y", xlab = "Correlation", ylab = expression("BF"[10]* " (log scale)"),
        main = main.bf10, frame.plot = FALSE, xaxt = "n")
   graphics::abline(v = r.BF10)
   graphics::axis(1, c(-1, 1))
@@ -3683,7 +3683,7 @@ re_bf10_p <-function(D,n,k,alpha,beta,h0,hypothesis,location,scale,dff,model,e){
   max.BF01   <- 1 / re_BF10(h0,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model,e)
   impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(r.BF01, "bound cannot be found"))
 
-  plot(rr, BF01, type = "l", log = "y", xlab = "Correlation", ylab = bquote("BF"['01']),
+  plot(rr, BF01, type = "l", log = "y", xlab = "Correlation", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
   graphics::axis(1, c(-1, 1))
   if (impossible) {
@@ -3692,9 +3692,9 @@ re_bf10_p <-function(D,n,k,alpha,beta,h0,hypothesis,location,scale,dff,model,e){
     graphics::abline(v = r.BF01)
     graphics::axis(1, round(r.BF01, 2))
     main.bf01 <- if (length(r.BF01) == 1) {
-      bquote(bold("BF"['01']~"="~.(D)~"when r = "~.(format(r.BF01, digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when r = "~.(format(round(r.BF01, digits = 2)))))
     } else {
-      bquote(bold("BF"['01']~"="~.(D)~"when r = "~.(format(r.BF01[1], digits = 4))~"or"~.(format(r.BF01[2], digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when r = "~.(format(round(r.BF01[1], digits = 2)))~"or"~.(format(round(r.BF01[2], digits = 2)))))
     }
     graphics::title(main = main.bf01)
   }
@@ -4179,11 +4179,11 @@ bf10_t1 <-function(D = 3, df, target, model = "NA", location = 0, scale = 0.707,
   graphics::par(mfrow = c(1, 2))
   # Left plot - BF10:
   main.bf10 <- if (length(t.BF10) == 1) {
-    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10, digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(round(t.BF10, digits = 2)))))
   } else {
-    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10[1], digits = 4))~"or"~.(format(t.BF10[2], digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(round(t.BF10[1], digits = 2)))~"or"~.(format(round(t.BF10[2], digits = 2)))))
   }
-  plot(tt, BF10, type = "l", log = "y", xlab = "t-value", ylab = expression("BF"[10]),
+  plot(tt, BF10, type = "l", log = "y", xlab = "t-value", ylab = expression("BF"[10]* " (log scale)"),
        main = main.bf10, frame.plot = FALSE, xaxt = "n")
   graphics::abline(v = t.BF10)
   graphics::axis(1, c(-5, 5))
@@ -4197,7 +4197,7 @@ bf10_t1 <-function(D = 3, df, target, model = "NA", location = 0, scale = 0.707,
   max.BF01   <- 1 / t1_BF10(0, df, model, location, scale, dff, hypothesis = "!=")
   impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
 
-  plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']),
+  plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
   graphics::axis(1, c(-5, 5))
   if (impossible) {
@@ -4206,9 +4206,9 @@ bf10_t1 <-function(D = 3, df, target, model = "NA", location = 0, scale = 0.707,
     graphics::abline(v = t.BF01)
     graphics::axis(1, round(t.BF01, 2))
     main.bf01 <- if (length(t.BF01) == 1) {
-      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01, digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(round(t.BF01, digits = 2)))))
     } else {
-      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01[1], digits = 4))~"or"~.(format(t.BF01[2], digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(round(t.BF01[1], digits = 2)))~"or"~.(format(round(t.BF01[2], digits = 2)))))
     }
     graphics::title(main = main.bf01)
   }
@@ -4893,11 +4893,11 @@ te1_BF <-function(D,df,model ,scale,dff , hypothesis ,e){
 
   # Left plot - BF10:
   main.bf10 <- if (length(t.BF10) == 1) {
-    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10, digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(round(format(t.BF10, digits = 2)))))
   } else {
-    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10[1], digits = 4))~"or"~.(format(t.BF10[2], digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(round(t.BF10[1], digits = 2)))~"or"~.(format(round(t.BF10[2], digits = 2)))))
   }
-  plot(tt, BF10, type = "l", log = "y", xlab = "t-value", ylab = expression("BF"[10]),
+  plot(tt, BF10, type = "l", log = "y", xlab = "t-value", ylab = expression("BF"[10]* " (log scale)"),
        main = main.bf10, frame.plot = FALSE, xaxt = "n",xlim = c(-5,5))
   graphics::abline(v = t.BF10)
   graphics::axis(1, c(-5, 5))
@@ -4910,7 +4910,7 @@ te1_BF <-function(D,df,model ,scale,dff , hypothesis ,e){
   max.BF01   <- 1 / t1e_BF10(0,df,model,scale,dff , hypothesis,e )
   impossible <- (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
 
-  plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']),
+  plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
   graphics::axis(1, c(-5, 5))
   if (impossible) {
@@ -4919,9 +4919,9 @@ te1_BF <-function(D,df,model ,scale,dff , hypothesis ,e){
     graphics::abline(v = t.BF01)
     graphics::axis(1, round(t.BF01, 2))
     main.bf01 <- if (length(t.BF01) == 1) {
-      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01, digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(round(t.BF01, digits = 2)))))
     } else {
-      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01[1], digits = 4))~"or"~.(format(t.BF01[2], digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(round(t.BF01[1], digits = 2)))~"or"~.(format(round(t.BF01[2], digits = 2)))))
     }
     graphics::title(main = main.bf01)
   }
@@ -5605,7 +5605,7 @@ shiny::observeEvent(input$calbin, {
   output$BFbin <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('
-    N = ', bin$N, ', x = ', bin$Suc, '; \\textit{BF}_{10} = ', round(BF10, 4), '
+    N = ', bin$N, ', x = ', bin$Suc, '; \\textit{BF}_{10} = ', round(BF10, 4), ', \\textit{BF}_{01} = ',round(1/BF10, 4),'
 ')
 
     output$result_bin <- shiny::renderText({
@@ -6020,7 +6020,7 @@ shiny::observeEvent(input$calf, {
       table_latex <- paste0(
         "$$ \\textit{F}(", ff$df1, ",", ff$df2,
         ") = ", round(ff$fval, 3),
-        ",\\ \\textit{BF}_{10} = ", round(BF10, 4), " $$"
+        ",\\ \\textit{BF}_{10} = ", round(BF10, 4),", \\textit{BF}_{01} =" ,round(1/BF10, 4)," $$"
       )
 
       shiny::tagList(
@@ -6268,9 +6268,11 @@ shiny::observeEvent(input$calp2, {
       'n_1 = ', p2$n1, ', ',
       'n_2 = ', p2$n2, ', ',
       'x_1 = ', p2$k1, ', ',
-      'x_2 = ', p2$k2, ', ',
-      '\\textit{BF}_{10} = ', round(BF10, 4)
+      'x_2 = ', p2$k2, ' \\\\ ',
+      '\\textit{BF}_{10} = ', round(BF10, 4),
+      ', \\textit{BF}_{01} = ', round(1/BF10, 4)
     )
+
 
     output$result_p2 <- shiny::renderText({
 
@@ -6709,7 +6711,7 @@ shiny::observeEvent(input$calr, {
   output$BFrv <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('
-    \\textit{r}(n = ', rr$N , ') = ',rr$rval,', \\textit{BF}_{10} = ', round(BF10, 4), '
+    \\textit{r}(n = ', rr$N , ') = ',rr$rval,', \\textit{BF}_{10} = ', round(BF10, 4),", \\textit{BF}_{01} = ",round(1/BF10, 4), '
 ')
 
 
@@ -7061,7 +7063,7 @@ shiny::observeEvent(input$cal1, {
   output$BFt1 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('
-    \\textit{t}(', x$N , ') = ',x$tval,', \\textit{BF}_{10} = ', round(BF10, 4), '
+    \\textit{t}(', x$N , ') = ',x$tval,', \\textit{BF}_{10} = ', round(BF10, 4),", \\textit{BF}_{01} = ",round(1/BF10, 4), '
 ')
 
 
@@ -7370,7 +7372,7 @@ shiny::observeEvent(input$runt2, {
 
 })
 
-shiny::observeEvent(input$cal1, {
+shiny::observeEvent(input$cal2, {
   t2 = input_t2()
 
 
@@ -7457,7 +7459,7 @@ shiny::observeEvent(input$cal1, {
   output$BFt2 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('
-    \\textit{t}(', ddff, ') = ',t2$tval,', \\textit{BF}_{10} = ', round(BF10, 4), '
+    \\textit{t}(', ddff, ') = ',t2$tval,', \\textit{BF}_{10} = ', round(BF10, 4),", \\textit{BF}_{01} = " ,round(1/BF10, 4),'
 ')
 
 
@@ -7880,11 +7882,11 @@ t2_bf10 <-function(D ,n1,r, target,model ,location ,scale,dff  , hypothesis ){
   t.BF10 <- t2_BF10_bound(D, n1,r,model ,location ,scale,dff , hypothesis)
   # Left plot - BF10:
   main.bf10 <- if (length(t.BF10) == 1) {
-    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10, digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10, digits = 3))))
   } else {
-    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10[1], digits = 4))~"or"~.(format(t.BF10[2], digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10[1], digits = 3))~"or"~.(format(t.BF10[2], digits = 3))))
   }
-  plot(tt, BF10, type = "l", log = "y", xlab = "t-value", ylab = expression("BF"[10]),
+  plot(tt, BF10, type = "l", log = "y", xlab = "t-value", ylab = expression("BF"[10]* " (log scale)"),
        main = main.bf10, frame.plot = FALSE, xaxt = "n")
   graphics::abline(v = t.BF10)
   graphics::axis(1, c(-5, 5))
@@ -7898,7 +7900,7 @@ t2_bf10 <-function(D ,n1,r, target,model ,location ,scale,dff  , hypothesis ){
   max.BF01   <- 1 / t2_BF10 (0,n1,r,model ,location,scale,dff ,"!=")
   impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
 
-  plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']),
+  plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
   graphics::axis(1, c(-5, 5))
   if (impossible) {
@@ -7907,9 +7909,9 @@ t2_bf10 <-function(D ,n1,r, target,model ,location ,scale,dff  , hypothesis ){
     graphics::abline(v = t.BF01)
     graphics::axis(1, round(t.BF01, 2))
     main.bf01 <- if (length(t.BF01) == 1) {
-      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01, digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01, digits = 3))))
     } else {
-      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01[1], digits = 4))~"or"~.(format(t.BF01[2], digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01[1], digits = 3))~"or"~.(format(t.BF01[2], digits = 3))))
     }
     graphics::title(main = main.bf01)
   }
@@ -8451,11 +8453,11 @@ t2e_BF <-function(D,n1,r,model ,scale,dff , hypothesis ,e){
 
   # Left plot - BF10:
   main.bf10 <- if (length(t.BF10) == 1) {
-    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10, digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10, digits = 3))))
   } else {
-    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10[1], digits = 4))~"or"~.(format(t.BF10[2], digits = 4))))
+    bquote(bold("BF"[10]~"="~.(D)~"when t = "~.(format(t.BF10[1], digits = 3))~"or"~.(format(t.BF10[2], digits = 3))))
   }
-  plot(tt, BF10, type = "l", log = "y", xlab = "t-value", ylab = expression("BF"[10]),
+  plot(tt, BF10, type = "l", log = "y", xlab = "t-value", ylab = expression("BF"[10]* " (log scale)"),
        main = main.bf10, frame.plot = FALSE, xaxt = "n",xlim = c(-5,5))
   graphics::abline(v = t.BF10)
   graphics::axis(1, c(-5, 5))
@@ -8468,7 +8470,7 @@ t2e_BF <-function(D,n1,r,model ,scale,dff , hypothesis ,e){
   max.BF01   <- 1 / t2e_BF10i(0,n1,r,model ,scale,dff , hypothesis,e )
   impossible <- (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
 
-  plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']),
+  plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
   graphics::axis(1, c(-5, 5))
   if (impossible) {
@@ -8477,9 +8479,9 @@ t2e_BF <-function(D,n1,r,model ,scale,dff , hypothesis ,e){
     graphics::abline(v = t.BF01)
     graphics::axis(1, round(t.BF01, 2))
     main.bf01 <- if (length(t.BF01) == 1) {
-      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01, digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01, digits = 3))))
     } else {
-      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01[1], digits = 4))~"or"~.(format(t.BF01[2], digits = 4))))
+      bquote(bold("BF"['01']~"="~.(D)~"when t = "~.(format(t.BF01[1], digits = 3))~"or"~.(format(t.BF01[2], digits = 3))))
     }
     graphics::title(main = main.bf01)
   }

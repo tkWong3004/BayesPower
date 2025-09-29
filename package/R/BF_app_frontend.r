@@ -183,7 +183,7 @@ ui <-
           shiny::conditionalPanel("input.Modet1 == 1",
                                   shinyWidgets::prettyRadioButtons(
                                     inputId = "t1_direct",
-                                    label = shiny::em("\\(\\text{ Controllering for:}\\)"),
+                                    label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                                     choices = list(
                                       "\\(\\text{Positive rates}\\)" = 1,
                                       "\\(\\text{Negative rates}\\)" = 0
@@ -470,7 +470,7 @@ ui <-
           shiny::conditionalPanel("input.Modet2 == 1",
                                   shinyWidgets::prettyRadioButtons(
                                     inputId = "t2_direct",
-                                    label = shiny::em("\\(\\text{ Controllering for:}\\)"),
+                                    label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                                     choices = list(
                                       "\\(\\text{Positive rates}\\)" = 1,
                                       "\\(\\text{Negative rates}\\)" = 0
@@ -505,7 +505,7 @@ ui <-
                                                      shiny::column(4, shiny::numericInput("t2tval", "\\(\\text{t-value:}\\)", value = 2)))
                              ),
                            shiny::conditionalPanel("input.Modet2 == 3",
-                                                   shiny::actionButton("cal1", label = "\\(\\text{Calculate}\\)"),
+                                                   shiny::actionButton("cal2", label = "\\(\\text{Calculate}\\)"),
                                                    shiny::htmlOutput("BFt2"),
                                                    shiny::em("\\(t\\text{-value calculator}\\)"),
 
@@ -751,7 +751,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
              shiny::conditionalPanel("input.Moder == 1",
                                      shinyWidgets::prettyRadioButtons(
                                        inputId = "r_direct",
-                                       label = shiny::em("\\(\\text{ Controllering for:}\\)"),
+                                       label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                                        choices = list(
                                          "\\(\\text{Positive rates}\\)" = 1,
                                          "\\(\\text{Negative rates}\\)" = 0
@@ -987,7 +987,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                label = shiny::em("\\(\\text{Analysis Prior Distribution}\\)"),
                choices = list(
                  "\\( \\text{Effect size prior} \\)" = 1,
-                 "\\( \\text{Moment prior (must df \\geq 3)} \\)" = 2
+                 "\\(\\text{Moment prior (must df }\\ge 3\\text{)}\\)" = 2
                ),
                inline = TRUE,
                selected = 1
@@ -1028,7 +1028,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                    label = shiny::em("\\(\\text{Design Prior Distribution}\\)"),
                    choices = list(
                      "\\( \\text{Effect size prior} \\)" = 1,
-                     "\\( \\text{Moment prior (must df \\geq 3)} \\)" = 2,
+                     "\\(\\text{Moment prior (must df }\\ge 3\\text{)}\\)" = 2,
                      "\\( \\text{Point} \\)" = 3
                    ),
                    inline = TRUE,
@@ -1063,7 +1063,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
              shiny::conditionalPanel(condition = "input.Modef == 1",
                                      shinyWidgets::prettyRadioButtons(
                                        inputId = "f_direct",
-                                       label = shiny::em("\\(\\text{ Controllering for:}\\)"),
+                                       label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                                        choices = list(
                                          "\\(\\text{Positive rates}\\)" = 1,
                                          "\\(\\text{Negative rates}\\)" = 0
@@ -1281,7 +1281,7 @@ shiny::navbarMenu(
                shiny::conditionalPanel("input.Modebin == 1",
                                        shinyWidgets::prettyRadioButtons(
                                          inputId = "bin_direct",
-                                         label = shiny::em("\\(\\text{ Controllering for:}\\)"),
+                                         label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                                          choices = list(
                                            "\\(\\text{Positive rates}\\)" = 1,
                                            "\\(\\text{Negative rates}\\)" = 0
@@ -1346,9 +1346,9 @@ shiny::navbarMenu(
              shiny::conditionalPanel(
                condition = "input.Modebin == 1||input.Modebin == 2",shiny::uiOutput("Optional_Plots_bin")))
            )
-  ), shiny::tabPanel("\\(\\text{Two proportion}\\)",shiny::withMathJax(),
+  ), shiny::tabPanel("\\(\\text{Two proportions}\\)",shiny::withMathJax(),
 shiny::sidebarLayout(shiny::sidebarPanel(
-  shiny::tags$h4("\\(\\text{Two proportion(computational intensive)}\\)"),
+  shiny::tags$h4("\\(\\text{Two proportions (computationally intensive)}\\)"),
   shinyWidgets::prettyRadioButtons(
     "Modep2", "\\(\\text{Select Mode}\\)",
     choices = list(
@@ -1464,7 +1464,7 @@ shiny::sidebarLayout(shiny::sidebarPanel(
   shiny::conditionalPanel("input.Modep2 == 1",
                           shinyWidgets::prettyRadioButtons(
                             inputId = "p2_direct",
-                            label = shiny::em("\\(\\text{ Controllering for:}\\)"),
+                            label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                             choices = list(
                               "\\(\\text{True Positive rate}\\)" = 1,
                               "\\(\\text{True Negative rate}\\)" = 0
