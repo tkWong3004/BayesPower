@@ -17,7 +17,7 @@ BayesPower can be downloaded and launched using the following R commands:
 ```r
 install.packages("devtools")
 devtools::install_github(repo = "tkWong3004/BayesPower", subdir = "package")
-BayesPower::BayesPower_testing()
+BayesPower::BayesPower_BayesFactor()
 ```
 
 ## Tutorial Paper

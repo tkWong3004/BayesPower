@@ -116,10 +116,10 @@ ui <-
           # Location/scale/df
           shiny::fluidRow(
             shiny::column(4,
-                   shiny::conditionalPanel("input.h0t1 == 1",
+                   shiny::conditionalPanel("input.h0t1 == 1||input.h0t1 == 2",
                                     shiny::sliderInput("lt1", "\\(\\text{Location}\\)", min = -2, max = 2, value = 0, step = 0.01, ticks = FALSE)
-                   ),
-                   shiny::conditionalPanel("input.h0t1 == 2", shiny::em("\\(\\text{Location = 0}\\)"))
+                   )
+                   #,shiny::conditionalPanel("input.h0t1 == 2", shiny::em("\\(\\text{Location = 0}\\)"))
             ),
             shiny::column(4,
                    shiny::sliderInput("st1", "\\(\\text{Scale}\\)", min = 0.01, max = 3, value = 0.707, step = 0.001, ticks = FALSE)
@@ -155,10 +155,10 @@ ui <-
                                             ),
                                             shiny::fluidRow(
                                               shiny::column(4,
-                                                     shiny::conditionalPanel("input.h0t1 == 1 || input.modelt1d == 4",
+                                                     shiny::conditionalPanel("input.h0t1 == 1 || input.modelt1d == 4||input.h0t1 == 2",
                                                                       shiny::sliderInput("lt1d", "\\(\\text{Location}\\)", min = -2, max = 2, value = 0, step = 0.01, ticks = FALSE)
-                                                     ),
-                                                     shiny::conditionalPanel("input.h0t1 == 2 && input.modelt1d != 4", shiny::em("\\(\\text{Location = 0}\\)"))
+                                                     )
+                                                     #,shiny::conditionalPanel("input.h0t1 == 2 && input.modelt1d != 4", shiny::em("\\(\\text{Location = 0}\\)"))
                                               ),
                                               shiny::column(4,
                                                      shiny::conditionalPanel("input.modelt1d != 4",
@@ -391,10 +391,10 @@ ui <-
             shiny::column(
               width = 4,
               shiny::conditionalPanel(
-                "input.h0t2 == 1",
+                "input.h0t2 == 1||input.h0t2 == 2",
                 shiny::sliderInput("lt2", label = "\\(\\text{Location}\\)", min = -2, max = 2, value = 0, step = 0.01, ticks = FALSE)
-              ),
-              shiny::conditionalPanel("input.h0t2 == 2", shiny::em("\\(\\text{Location = 0}\\)"))
+              )
+              #,shiny::conditionalPanel("input.h0t2 == 2", shiny::em("\\(\\text{Location = 0}\\)"))
             ),
             shiny::column(
               width = 4,
@@ -437,10 +437,10 @@ ui <-
                 shiny::column(
                   width = 4,
                   shiny::conditionalPanel(
-                    "input.h0t2 == 1 || input.modelt2d == 4",
+                    "input.h0t2 == 1 || input.modelt2d == 4||input.h0t2 == 2",
                     shiny::sliderInput("lt2d", label = "\\(\\text{Location}\\)", min = -2, max = 2, value = 0, step = 0.01, ticks = FALSE)
-                  ),
-                  shiny::conditionalPanel("input.h0t2 == 2 && input.modelt2d != 4", shiny::em("\\(\\text{Location = 0}\\)"))
+                  )
+                  #,shiny::conditionalPanel("input.h0t2 == 2 && input.modelt2d != 4", shiny::em("\\(\\text{Location = 0}\\)"))
                 ),
                 shiny::column(
                   width = 4,

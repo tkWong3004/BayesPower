@@ -43,7 +43,7 @@ sim_delta <-function(iter, location, scale, dff, model,hypothesis){
          #"t-distribution" = (qt(sim_p,df=dff)+location)/(scale)
          "t-distribution" = qtt(sim_p, location = location, scale = scale, dff, left = -Inf, right = Inf,
                                 lower.tail = TRUE, log.p = FALSE)
-  )
+         )
 
 }
 
@@ -105,7 +105,7 @@ sim_delta_e_out <- function(iter, location, scale, dff, model, hypothesis, e = N
          "Normal"         = qnorm(sim_p, mean = location, sd = scale),
          "NLP"            = qmom(sim_p , tau = scale^2)+location,
          "t-distribution" = location+ scale * qt(sim_p, df = dff)
-  )
+         )
 }
 
 sim_delta_e_in <- function(iter, location, scale, dff, model, hypothesis, e = NULL) {
@@ -144,7 +144,7 @@ sim_delta_e_in <- function(iter, location, scale, dff, model, hypothesis, e = NU
          "Normal"         = qnorm(sim_p, mean = location, sd = scale),
          "NLP"            = qmom(sim_p, tau = scale^2)+location,
          "t-distribution" = location+ scale * qt(sim_p, df = dff)
-  )
+         )
 }
 
 # functions to simulate data and  the pro(BF>k|h_i)
@@ -169,7 +169,7 @@ sim_t <- function(iter, D, n, r = NULL,
 
   }
 
-  # --- df and scaling ---
+# --- df and scaling ---
   if (t1_T2) {
     df <- n - 1
     constant <- n
@@ -183,17 +183,17 @@ sim_t <- function(iter, D, n, r = NULL,
   # --- bounds ---
   BF10_B <- if (t1_T2){
     if (is.null(e)) {BayesPower:::t1_BF10_bound(D, df, model, location, scale, dff, hypothesis)}
-    else {BayesPower:::t1e_BF10_bound(D, df, model, scale, dff, hypothesis, e)}
-  } else{
+              else {BayesPower:::t1e_BF10_bound(D, df, model,location, scale, dff, hypothesis, e)}
+    } else{
     if (is.null(e)) {BayesPower:::t2_BF10_bound(D, n, r, model, location, scale, dff, hypothesis)}
-    else {BayesPower:::t2e_BF10_bound(D, n, r, model, scale, dff, hypothesis, e)}
+    else {BayesPower:::t2e_BF10_bound(D, n, r, model, location,scale, dff, hypothesis, e)}
   }
   BF01_B <- if (t1_T2){
     if (is.null(e)) BayesPower:::t1_BF01_bound(D, df, model, location, scale, dff, hypothesis)
-    else BayesPower:::t1e_BF01_bound(D, df, model, scale, dff, hypothesis, e)} else{
-      if (is.null(e)) BayesPower:::t2_BF01_bound(D, n, r, model, location, scale, dff, hypothesis)
-      else BayesPower:::t2e_BF01_bound(D, n, r, model, scale, dff, hypothesis, e)
-    }
+    else BayesPower:::t1e_BF01_bound(D, df, model,location, scale, dff, hypothesis, e)} else{
+    if (is.null(e)) BayesPower:::t2_BF01_bound(D, n, r, model, location, scale, dff, hypothesis)
+    else BayesPower:::t2e_BF01_bound(D, n, r, model, location,scale, dff, hypothesis, e)
+  }
 
   # --- P(BF>k) ---
   PE_sim <- switch(hypothesis,
@@ -211,25 +211,25 @@ sim_t <- function(iter, D, n, r = NULL,
 
 # comparing the results with the numeric method and simulation
 sim_method_t<-function(iter,D,  model, location, scale, dff, hypothesis,
-                       model_d, location_d, scale_d, dff_d, de_an_prior, n,r,t1_T2,e=NULL){
+                        model_d, location_d, scale_d, dff_d, de_an_prior, n,r,t1_T2,e=NULL){
 
   results <-
     if(t1_T2){
 
-      if (is.null(e)) {
-        BayesPower:::t1_Table(
-          D, target = 0.8, model, location, scale, dff, hypothesis,
-          model_d, location_d, scale_d, dff_d, de_an_prior,
-          N = n, mode_bf = 0, alpha = 0.05, direct = "h1"
-        )
-      } else {
-        BayesPower:::t1e_table(
-          D, target = 0.8, model, scale, dff, hypothesis, e,
-          model_d, scale_d, dff_d, de_an_prior, N = n,
-          mode_bf = 0, location_d = location_d,
-          alpha = 0.05, direct = "h1"
-        )
-      }
+    if (is.null(e)) {
+    BayesPower:::t1_Table(
+      D, target = 0.8, model, location, scale, dff, hypothesis,
+      model_d, location_d, scale_d, dff_d, de_an_prior,
+      N = n, mode_bf = 0, alpha = 0.05, direct = "h1"
+    )
+  } else {
+    BayesPower:::t1e_table(
+      D, target = 0.8, model, location,scale, dff, hypothesis, e,
+      model_d, location_d = location_d,scale_d, dff_d, de_an_prior, N = n,
+      mode_bf = 0,
+      alpha = 0.05, direct = "h1"
+    )
+  }
     }else{
 
 
@@ -237,13 +237,13 @@ sim_method_t<-function(iter,D,  model, location, scale, dff, hypothesis,
         N1=n
         N2 = N1 * r
         BayesPower:::t2_Table(D, r, target=.8, model, location, scale, dff, hypothesis,
-                              model_d, location_d, scale_d, dff_d, de_an_prior, N1, N2,
-                              mode_bf=0, alpha=.8, direct="h1")
+                  model_d, location_d, scale_d, dff_d, de_an_prior, N1, N2,
+                  mode_bf=0, alpha=.8, direct="h1")
       } else {
         N1=n
         N2 = N1 * r
-        BayesPower:::t2e_table(D, r, target=.8, model, scale, dff, hypothesis, e, model_d,
-                               scale_d, dff_d, de_an_prior, mode_bf=0, location_d, N1, N2, alpha=.05,
+        BayesPower:::t2e_table(D, r, target=.8, model,location, scale, dff, hypothesis, e, model_d,location_d,
+                               scale_d, dff_d, de_an_prior, mode_bf=0,  N1, N2, alpha=.05,
                                direct="h1")
       }
 
@@ -251,10 +251,10 @@ sim_method_t<-function(iter,D,  model, location, scale, dff, hypothesis,
 
 
   pro_h1<-sim_t(iter, D, n, r, model, location, scale, dff, hypothesis,
-                model_d, location_d, scale_d, dff_d, de_an_prior, t1_T2,e,h0=F)
+            model_d, location_d, scale_d, dff_d, de_an_prior, t1_T2,e,h0=F)
   if(is.null(e)) model_d ="Point"
   pro_h0<-sim_t(iter, D, n, r, model, location, scale, dff, hypothesis,
-                model_d=model_d, location_d=0, scale_d, dff_d, de_an_prior=0, t1_T2,e,h0=T)
+            model_d=model_d, location_d=0, scale_d, dff_d, de_an_prior=0, t1_T2,e,h0=T)
   pro_h0<-c(pro_h0[2],pro_h0[1])
   results = as.vector(unlist(results))
   out_matrix = c(results[1:4], pro_h1, pro_h0)
@@ -267,7 +267,7 @@ t_ver<-function(iter,D,  model, location, scale, dff, hypothesis,
   if(t1_T2){
     n = seq(100,1000,100)
     total = n
-  }else{
+    }else{
     n = seq(100,1000,100)
     n2= n*r
     total = n+n2
@@ -306,25 +306,26 @@ t_ver<-function(iter,D,  model, location, scale, dff, hypothesis,
 
 }
 
-
 # input
 iter =10000 # number of iteration
 
-D =3 # bound of evidence
+D = 3  # bound of evidence
 model = "t-distribution"   # "Normal" or "t-distribution" or "NLP"
 location = 0
 scale = .707
 dff = 1
 hypothesis = "!="  # "!="   ">"   "<"
-e= c(-.2,.2)
+e=   NULL
 # e for equivalence testing
 # length have to 2 when hypothesis = "!="
 # one should be >0 another one should be <0
 # e should <0 when hypothesis = "<"
 # e should >0 when hypothesis = ">"
-de_an_prior=1     # whether design and analysis priors are the same
-model_d="Point" # "Normal" or "t-distribution" or "NLP" or "Point"
-location_d = 2
+# set e to be NULL if testing a point null of 0
+
+de_an_prior= 1    # whether design and analysis priors are the same
+model_d="Normal" # "Normal" or "t-distribution" or "NLP" or "Point"
+location_d = 0.2
 scale_d = 1
 dff_d = 1
 

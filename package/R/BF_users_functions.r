@@ -85,7 +85,7 @@ BFpower.t.test_one_sample <- function(hypothesis = NULL, e = NULL, interval = NU
         t1_Table(D, target, model, location, scale, dff, hypothesis,
                  model_d, location_d, scale_d, dff_d, de_an_prior, N, mode_bf, alpha, direct)
       } else {
-        t1e_table(D, target, model, scale, dff, hypothesis, e,
+        t1e_table(D, target, model,location, scale, dff, hypothesis, e,
                   model_d, scale_d, dff_d, de_an_prior, N, mode_bf, location_d, alpha, direct)
       }
     }),
@@ -189,8 +189,8 @@ BFpower.t.test_two_sample <- function(hypothesis = NULL, e = NULL, interval = NU
         t2_Table(D, r, target, model, location, scale, dff, hypothesis,
                  model_d, location_d, scale_d, dff_d, de_an_prior, N1, N2, mode_bf, alpha, direct)
       } else {
-        t2e_table(D, r, target, model, scale, dff, hypothesis, e,
-                  model_d, scale_d, dff_d, de_an_prior, mode_bf, location, N1, N2, alpha, direct)
+        t2e_table(D, r, target, model,location, scale, dff, hypothesis, e,
+                  model_d,location_d, scale_d, dff_d, de_an_prior, mode_bf, N1, N2, alpha, direct)
       }
     }),
     error = function(e) {
@@ -683,7 +683,7 @@ BF10.t.test.one_sample <- function(tval, df, model, location, scale, dff, hypoth
     if (is.null(e)) {
       t1_BF10(tval, df, model, location, scale, dff, hypothesis)
     } else {
-      t1e_BF10(tval, df,model,scale,dff , hypothesis,e )
+      t1e_BF10(tval, df,model,location,scale,dff , hypothesis,e )
     }
   )
 }
@@ -727,7 +727,7 @@ BF10.t.test.two_sample <- function(tval, N1, N2, model, location, scale, dff, hy
     if (is.null(e)) {
       t2_BF10(tval, n1, r, model, location, scale, dff, hypothesis)
     } else {
-      t2e_BF10(tval, n1, r, model, scale, dff, hypothesis, e)
+      t2e_BF10(tval, n1, r, model,location, scale, dff, hypothesis, e)
     }
   )
 }
@@ -892,6 +892,6 @@ BF10.bin.test <- function(x, n, alpha, beta, location, scale, model, hypothesis,
 #' }
 #' @export
 BF10.props <- function(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2) {
-  BF10_p2(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)
+  BF10_p2(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)[[1]]
 }
 

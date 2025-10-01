@@ -4309,19 +4309,79 @@ robust_uniroot <- function(f, lower, upper_start = 500, max_attempts = 20, step 
   }
 }
 
-te_prior<- function(delta,scale,dff,model){
+te_prior<- function(delta,location,scale,dff,model){
 
   switch(model,
-        "Cauchy"        = tstude(delta,0, scale,1),
-        "Normal"        = stats::dnorm(delta,0,scale),
-        "NLP"            = dnlp(delta,0,scale),
-        "t-distribution" = tstude(delta,0,scale,dff))
+        "Cauchy"        = tstude(delta,location, scale,1),
+        "Normal"        = stats::dnorm(delta,location,scale),
+        "NLP"            = dnlp(delta,location,scale),
+        "t-distribution" = tstude(delta,location,scale,dff))
 
 
 }
+norm_h1 <- function(hypothesis, model, bound_h1, location, scale, dff = NULL) {
+  normalizationh1 <- switch(
+    hypothesis,
+
+    "!=" = 1 - switch(
+      model,
+      "Cauchy"         = stats::pcauchy(bound_h1[2], location, scale) -
+        stats::pcauchy(bound_h1[1], location, scale),
+      "Normal"         = stats::pnorm(bound_h1[2], location, scale) -
+        stats::pnorm(bound_h1[1], location, scale),
+      "NLP"            = pmom(bound_h1[2] - location, tau = scale^2) -
+        pmom(bound_h1[1] - location, tau = scale^2),
+      "t-distribution" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
+        stats::pt((bound_h1[1] - location)/scale, df = dff)
+    ),
+
+    "<" = switch(
+      model,
+      "Cauchy"         = stats::pcauchy(bound_h1[2], location, scale) -
+        stats::pcauchy(bound_h1[1], location, scale),
+      "Normal"         = stats::pnorm(bound_h1[2], location, scale) -
+        stats::pnorm(bound_h1[1], location, scale),
+      "NLP"            = pmom(bound_h1[2] - location, tau = scale^2),
+      "t-distribution" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
+        stats::pt((bound_h1[1] - location)/scale, df = dff)
+    ),
+
+    ">" = switch(
+      model,
+      "Cauchy"         = stats::pcauchy(bound_h1[2], location, scale) -
+        stats::pcauchy(bound_h1[1], location, scale),
+      "Normal"         = stats::pnorm(bound_h1[2], location, scale) -
+        stats::pnorm(bound_h1[1], location, scale),
+      "NLP"            = 1 - pmom(bound_h1[1] - location, tau = scale^2),
+      "t-distribution" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
+        stats::pt((bound_h1[1] - location)/scale, df = dff)
+    )
+  )
+
+  return(normalizationh1)
+}
+norm_h0 <- function(model, bound_h0, location, scale, dff = NULL) {
+  normalizationh0 <- switch(
+    model,
+
+    "Cauchy"         = stats::pcauchy(bound_h0[2], location, scale) -
+      stats::pcauchy(bound_h0[1], location, scale),
+
+    "Normal"         = stats::pnorm(bound_h0[2], location, scale) -
+      stats::pnorm(bound_h0[1], location, scale),
+
+    "NLP"            = pmom(bound_h0[2] - location, tau = scale^2) -
+      pmom(bound_h0[1] - location, tau = scale^2),
+
+    "t-distribution" = stats::pt((bound_h0[2] - location)/scale, df = dff) -
+      stats::pt((bound_h0[1] - location)/scale, df = dff)
+  )
+
+  return(normalizationh0)
+}
 
 
-t1e_BF10i <-function(t,df,model ,scale,dff , hypothesis,e ){
+t1e_BF10i <-function(t,df,model ,location, scale,dff , hypothesis,e ){
   bound_h1  <- switch(hypothesis,
                       "!=" = c(a = e[1], b = e[2]),
                       ">" = c(a = e, b = Inf),
@@ -4334,35 +4394,16 @@ t1e_BF10i <-function(t,df,model ,scale,dff , hypothesis,e ){
                       "<" = c(a = e, b = 0)
                       )
 
-  normalizationh1 <- switch(hypothesis,
-                            "!=" = 1 - switch(model,
-                                              "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                              "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                              "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
-                                              "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            "<"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            ">"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
-  )
+  normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
+
 
 
   # H0 Normalization
-  normalizationh0 <- switch(model,
-                            "Cauchy"         = stats::pcauchy(bound_h0[2], 0, scale) - stats::pcauchy(bound_h0[1], 0, scale),
-                            "Normal"         = stats::pnorm  (bound_h0[2], 0, scale) - stats::pnorm  (bound_h0[1], 0, scale),
-                            "NLP"            = pmom   (bound_h0[2], tau = scale^2) - pmom   (bound_h0[1], tau = scale^2),
-                            "t-distribution" = stats::pt(bound_h0[2] / scale, df = dff) - stats::pt(bound_h0[1] / scale, df = dff)
-  )
+  normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
 
   int  <- function(delta){
-    stats::dt(t,df,ncp = delta *sqrt(df+1))* te_prior(delta,scale,dff,model)/normalizationh1}
+    stats::dt(t,df,ncp = delta *sqrt(df+1))* te_prior(delta,location,scale,dff,model)/normalizationh1
+    }
 
    error = 1e-4
 
@@ -4375,22 +4416,22 @@ t1e_BF10i <-function(t,df,model ,scale,dff , hypothesis,e ){
 
 
   int  <- function(delta){
-    stats::dt(t,df,ncp = delta *sqrt(df+1))* te_prior(delta,scale,dff,model)/normalizationh0}
+    stats::dt(t,df,ncp = delta *sqrt(df+1))* te_prior(delta,location,scale,dff,model)/normalizationh0}
 
   lh0 = stats::integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=error,stop.on.error = F)$value
   return(lh1/lh0)
 }
 
-t1e_BF10 <-function(t,df,model,scale,dff , hypothesis,e ){
+t1e_BF10 <-function(t,df,model,location, scale,dff , hypothesis,e ){
 
-  x <- sapply(t, function(ti) t1e_BF10i(ti, df, model, scale, dff, hypothesis, e))
+  x <- sapply(t, function(ti) t1e_BF10i(ti, df, model,location, scale, dff, hypothesis, e))
   return(x)
 }
 #
-t1e_BF10_bound <-function(D, df,model,scale,dff , hypothesis,e){
+t1e_BF10_bound <-function(D, df,model,location,scale,dff , hypothesis,e){
   y <- numeric(0)
   Bound_finding <-function(t){
-    t1e_BF10(t,df,model,scale,dff , hypothesis,e )- D
+    t1e_BF10(t,df,model,location,scale,dff , hypothesis,e )- D
   }
 
   switch(hypothesis,
@@ -4411,7 +4452,7 @@ t1e_BF10_bound <-function(D, df,model,scale,dff , hypothesis,e){
   results <- results[!is.na(results)]
   if (length(results) == 0) return("bound cannot be found")
 
-  BF.vals  <- t1e_BF10(results,df,model,scale,dff , hypothesis,e )
+  BF.vals  <- t1e_BF10(results,df,model,location,scale,dff , hypothesis,e )
   BF.close <- which(round(BF.vals, 2) == round(D, 2))
   if (length(BF.close) == 0) return("bound cannot be found")
   return(results[BF.close])
@@ -4419,13 +4460,13 @@ t1e_BF10_bound <-function(D, df,model,scale,dff , hypothesis,e){
 }
 
 
-t1e_BF01_bound <-function(D, df,model,scale,dff , hypothesis,e){
-  t1e_BF10_bound(1/D, df,model,scale,dff , hypothesis,e)
+t1e_BF01_bound <-function(D, df,model,location,scale,dff , hypothesis,e){
+  t1e_BF10_bound(1/D, df,model,location,scale,dff , hypothesis,e)
 }
 
 
 
-t1e_TPE <-function(t,df,model ,scale,dff , hypothesis ,e,location){
+t1e_TPE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
   if (model == "Point") {
@@ -4442,23 +4483,7 @@ t1e_TPE <-function(t,df,model ,scale,dff , hypothesis ,e,location){
                       "!=" = c(a = e[1], b = e[2])
   )
 
-  normalizationh1 <- switch(hypothesis,
-                            "!=" = 1 - switch(model,
-                                              "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                              "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                              "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
-                                              "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            "<"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            ">"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
-  )
+  normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
 
 
   x = NULL
@@ -4473,7 +4498,7 @@ t1e_TPE <-function(t,df,model ,scale,dff , hypothesis ,e,location){
                   "<"  = pnct(t, df, ncp = ncp, lower  = TRUE)
     )
 
-    pro * te_prior(delta, scale, dff, model) / normalizationh1
+    pro * te_prior(delta, location,scale, dff, model) / normalizationh1
   }
 
    error = 1e-4
@@ -4489,7 +4514,7 @@ t1e_TPE <-function(t,df,model ,scale,dff , hypothesis ,e,location){
 
 }
 
-t1e_FNE <-function(t,df,model ,scale,dff , hypothesis ,e,location){
+t1e_FNE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
 
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
@@ -4506,23 +4531,8 @@ t1e_FNE <-function(t,df,model ,scale,dff , hypothesis ,e,location){
                       "!=" = c(a = e[1], b = e[2])
   )
 
-  normalizationh1 <- switch(hypothesis,
-                            "!=" = 1 - switch(model,
-                                              "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                              "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                              "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
-                                              "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            "<"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            ">"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
-  )
+  normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
+
   x = NULL
 
   int <- function(delta) {
@@ -4535,7 +4545,7 @@ t1e_FNE <-function(t,df,model ,scale,dff , hypothesis ,e,location){
                    "<"  = pnct(t,df, ncp = ncp, lower  = FALSE)
     )
 
-    pro * te_prior(delta, scale, dff, model) / normalizationh1
+    pro * te_prior(delta,location, scale, dff, model) / normalizationh1
   }
 
    error = 1e-4
@@ -4548,7 +4558,7 @@ t1e_FNE <-function(t,df,model ,scale,dff , hypothesis ,e,location){
 
 }
 
-t1e_TNE <-function(t,df,model ,scale,dff , hypothesis ,e){
+t1e_TNE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
 
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
@@ -4557,12 +4567,7 @@ t1e_TNE <-function(t,df,model ,scale,dff , hypothesis ,e){
                       "<" = c(a = e, b = 0),
                       "!=" = c(a = e[1], b = e[2])
   )
-  normalizationh0 <- switch(model,
-                            "Cauchy"         = stats::pcauchy(bound_h0[2], 0, scale) - stats::pcauchy(bound_h0[1], 0, scale),
-                            "Normal"         = stats::pnorm  (bound_h0[2], 0, scale) - stats::pnorm  (bound_h0[1], 0, scale),
-                            "NLP"            = pmom   (bound_h0[2], tau = scale^2) - pmom   (bound_h0[1], tau = scale^2),
-                            "t-distribution" = stats::pt(bound_h0[2] / scale, df = dff) - stats::pt(bound_h0[1] / scale, df = dff)
-  )
+  normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
 
   x = NULL
 
@@ -4576,7 +4581,7 @@ t1e_TNE <-function(t,df,model ,scale,dff , hypothesis ,e){
                    stop("Unsupported hypothesis")
     )
 
-    pro * te_prior(delta, scale, dff, model) / normalizationh0
+    pro * te_prior(delta,location, scale, dff, model) / normalizationh0
   }
 
    error = 1e-4
@@ -4587,7 +4592,7 @@ t1e_TNE <-function(t,df,model ,scale,dff , hypothesis ,e){
 
 }
 
-t1e_FPE <-function(t,df,model ,scale,dff , hypothesis ,e){
+t1e_FPE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
   bound_h0  <- switch(hypothesis,
                       ">" = c(a = 0, b = e),
@@ -4595,12 +4600,7 @@ t1e_FPE <-function(t,df,model ,scale,dff , hypothesis ,e){
                       "!=" = c(a = e[1], b = e[2])
   )
 
-  normalizationh0 <- switch(model,
-                            "Cauchy"         = stats::pcauchy(bound_h0[2], 0, scale) - stats::pcauchy(bound_h0[1], 0, scale),
-                            "Normal"         = stats::pnorm  (bound_h0[2], 0, scale) - stats::pnorm  (bound_h0[1], 0, scale),
-                            "NLP"            = pmom   (bound_h0[2], tau = scale^2) - pmom   (bound_h0[1], tau = scale^2),
-                            "t-distribution" = stats::pt(bound_h0[2] / scale, df = dff) - stats::pt  (bound_h0[1] / scale, df = dff)
-  )
+  normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
   x = NULL
   int <- function(delta) {
     ncp <- delta * sqrt(df + 1)
@@ -4612,7 +4612,7 @@ t1e_FPE <-function(t,df,model ,scale,dff , hypothesis ,e){
                    stop("Unsupported hypothesis")
     )
 
-    pro * te_prior(delta, scale, dff, model) / normalizationh0
+    pro * te_prior(delta,location, scale, dff, model) / normalizationh0
   }
 
    error = 1e-4
@@ -4623,38 +4623,38 @@ t1e_FPE <-function(t,df,model ,scale,dff , hypothesis ,e){
 
 }
 
-t1e_N_finder<-function(D,target,model,scale,dff, hypothesis,e ,
+t1e_N_finder<-function(D,target,model,location,scale,dff, hypothesis,e ,
                    model_d,scale_d,dff_d, de_an_prior,location_d  ,alpha){
 
   lower <- 2
   upper <- 10000
-  t2 <-t1e_BF10_bound(D, lower,model,scale,dff , hypothesis,e)
+  t2 <-t1e_BF10_bound(D, lower,model,location,scale,dff , hypothesis,e)
   p2 <- if (de_an_prior == 1)
-    t1e_TPE(t2,lower,model ,scale,dff , hypothesis ,e,location=0) else
-    t1e_TPE(t2,lower,model ,scale_d,dff_d , hypothesis ,e,location_d)
+    t1e_TPE(t2,lower,model ,location,scale,dff , hypothesis ,e) else
+    t1e_TPE(t2,lower,model,location_d ,scale_d,dff_d , hypothesis ,e,location_d)
   if (p2 > target) return(lower)
 
   Power_root <- function(df) {
 
-    t <- t1e_BF10_bound(D, df, model, scale, dff, hypothesis, e)
+    t <- t1e_BF10_bound(D, df, model,location, scale, dff, hypothesis, e)
 
     pro <- if (de_an_prior == 1) {
-      t1e_TPE(t, df, model, scale, dff, hypothesis, e)
+      t1e_TPE(t, df, model,location, scale, dff, hypothesis, e)
     } else {
-      t1e_TPE(t, df, model_d, scale_d, dff_d, hypothesis, e, location_d)
+      t1e_TPE(t, df, model_d,,location_d, scale_d, dff_d, hypothesis, e)
     }
 
     target - pro
   }
 
   df.power <- robust_uniroot(Power_root, lower = 2)
-  t <- t1e_BF10_bound(D,df.power,model,scale,dff,hypothesis ,e )
-  FPE <-t1e_FPE(t,df.power,model ,scale,dff , hypothesis ,e)
+  t <- t1e_BF10_bound(D,df.power,model,location,scale,dff,hypothesis ,e )
+  FPE <-t1e_FPE(t,df.power,model,location ,scale,dff , hypothesis ,e)
   if (FPE <= alpha) return(df.power + 1)
 
   alpha.root <- function(df) {
-      t <- t1e_BF10_bound(D,df,model,scale,dff,hypothesis ,e )
-      pro <- t1e_FPE(t , df , model=model , scale=scale,dff=dff, hypothesis,e)
+      t <- t1e_BF10_bound(D,df,model,location,scale,dff,hypothesis ,e )
+      pro <- t1e_FPE(t , df , model,location , scale,dff, hypothesis,e)
       return(pro - alpha)
     }
   df.alpha <- stats::uniroot(alpha.root, lower = df.power, upper = upper)$root
@@ -4662,38 +4662,38 @@ t1e_N_finder<-function(D,target,model,scale,dff, hypothesis,e ,
 
 }
 
-t1e_N_01_finder<-function(D,target,model,scale,dff, hypothesis,e ,
+t1e_N_01_finder<-function(D,target,model,location,scale,dff, hypothesis,e ,
                           model_d,scale_d,dff_d, de_an_prior,location_d  ,alpha){
 
   lower <- 10
   upper <- 10000
-  t2 <-t1e_BF01_bound(D, lower,model,scale,dff , hypothesis,e)
-  TNE_lo <-t1e_TNE(t2,lower,model ,scale,dff , hypothesis ,e)
+  t2 <-t1e_BF01_bound(D, lower,model,location,scale,dff , hypothesis,e)
+  TNE_lo <-t1e_TNE(t2,lower,model,location ,scale,dff , hypothesis ,e)
   if (TNE_lo > target) return(lower)
 
   FNE_lo <- if (de_an_prior == 1)
-    t1e_FPE(t2,lower,model ,scale,dff , hypothesis ,e) else
-      t1e_FPE(t2,lower,model ,scale_d,dff_d , hypothesis ,e)
+    t1e_FPE(t2,lower,model,location ,scale,dff , hypothesis ,e) else
+      t1e_FPE(t2,lower,model,location_d ,scale_d,dff_d , hypothesis ,e)
   if (TNE_lo > target&FNE_lo<alpha) return(lower)
 
   TN_root <- function(df) {
-    t <- t1e_BF01_bound(D, df, model, scale, dff, hypothesis, e)
+    t <- t1e_BF01_bound(D, df, model,location, scale, dff, hypothesis, e)
 
-    pro <-t1e_TNE(t,df,model ,scale,dff , hypothesis ,e)
+    pro <-t1e_TNE(t,df,model,location ,scale,dff , hypothesis ,e)
     target-pro
   }
 
   df.TN <- robust_uniroot(TN_root, lower = lower)
-  t <- t1e_BF01_bound(D,df.TN,model,scale,dff,hypothesis ,e )
-  FNE <-t1e_FNE(t,df.TN,model ,scale,dff , hypothesis ,e)
+  t <- t1e_BF01_bound(D,df.TN,model,location,scale,dff,hypothesis ,e )
+  FNE <-t1e_FNE(t,df.TN,model,location ,scale,dff , hypothesis ,e)
   if (FNE <= alpha) return(df.TN + 1)
 
   FN.root <- function(df) {
-    t <- t1e_BF01_bound(D,df,model,scale,dff,hypothesis ,e )
+    t <- t1e_BF01_bound(D,df,model,location,scale,dff,hypothesis ,e )
     pro <-   if (de_an_prior == 1) {
-      t1e_FNE(t, df, model, scale, dff, hypothesis, e)
+      t1e_FNE(t, df, model,location, scale, dff, hypothesis, e)
     } else {
-      t1e_FNE(t, df, model_d, scale_d, dff_d, hypothesis, e, location_d)
+      t1e_FNE(t, df, model_d,location_d, scale_d, dff_d, hypothesis, e, location_d)
     }
     return(pro - alpha)
   }
@@ -4701,7 +4701,7 @@ t1e_N_01_finder<-function(D,target,model,scale,dff, hypothesis,e ,
   return(df.FN+1)
 
 }
-t1e_table<-function(D,target,model,scale,dff, hypothesis,e ,
+t1e_table<-function(D,target,model,location,scale,dff, hypothesis,e ,
                     model_d,scale_d,dff_d, de_an_prior,N,mode_bf,location_d ,alpha,direct ){
   bound01 = as.numeric(0)
   bound10 = as.numeric(0)
@@ -4710,29 +4710,30 @@ t1e_table<-function(D,target,model,scale,dff, hypothesis,e ,
     N - 1
   } else {
     fun <- if (direct == "h1") t1e_N_finder else t1e_N_01_finder
-    ceiling(fun(D,target,model,scale,dff, hypothesis,e ,
+    ceiling(fun(D,target,model,location,scale,dff, hypothesis,e ,
                 model_d,scale_d,dff_d, de_an_prior ,location_d,alpha )) - 1
   }
 
 
 
   # t bounds:
-  t10 <- t1e_BF10_bound(D, df,model,scale,dff , hypothesis,e)
-  t01 <- t1e_BF01_bound(D, df,model,scale,dff , hypothesis,e)
+  t10 <- t1e_BF10_bound(D, df,model,location,scale,dff , hypothesis,e)
+  t01 <- t1e_BF01_bound(D, df,model,location,scale,dff , hypothesis,e)
 
   # max BF10 possible:
-  max_BF <- 1 / t1e_BF10(0,df,model ,scale,dff , hypothesis,e )
+  max_BF <- 1 / t1e_BF10(0,df,model,location ,scale,dff , hypothesis,e )
   BF_D   <- t10
 
   # FPE and TPE:
-  FPE       <- t1e_FPE(t10,df,model ,scale,dff , hypothesis ,e)
+  FPE       <- t1e_FPE(t10,df,model ,location,scale,dff , hypothesis ,e)
   if (de_an_prior == 1) {
-    TPE       <- t1e_TPE(t10,df,model ,scale,dff , hypothesis ,e,location_d)
-    TPR_model <- model
-    TPR_scale <- scale
-    TPR_dff   <- dff
+    TPE         <- t1e_TPE(t10,df,model ,location,scale,dff , hypothesis ,e)
+    TPR_model   <- model
+    TPR_scale   <- scale
+    TPR_dff     <- dff
+    TPR_location<- location
   } else {
-    TPE       <- t1e_TPE(t10,df,model_d ,scale_d,dff_d , hypothesis ,e,location_d)
+    TPE       <- t1e_TPE(t10,df,model_d ,location_d,scale_d,dff_d , hypothesis ,e)
     TPR_model <- model_d
     TPR_location   <- location_d
     TPR_scale <- scale_d
@@ -4744,8 +4745,8 @@ t1e_table<-function(D,target,model,scale,dff, hypothesis,e ,
     FNE <- 0
     TNE <- 0
   } else {
-    FNE <- t1e_FNE(t01,df,TPR_model ,TPR_scale,TPR_dff , hypothesis ,e,TPR_location)
-    TNE <-  t1e_TNE(t01,df,model ,scale,dff , hypothesis ,e)
+    FNE <- t1e_FNE(t01,df,TPR_model,TPR_location ,TPR_scale,TPR_dff , hypothesis ,e)
+    TNE <-  t1e_TNE(t01,df,model,location ,scale,dff , hypothesis ,e)
   }
   # table:
   tab.names <- c(
@@ -4761,7 +4762,7 @@ t1e_table<-function(D,target,model,scale,dff, hypothesis,e ,
 
 }
 
-compute.prior.density.te.h1 <- function(tt, model, scale, dff, hypothesis,e,location) {
+compute.prior.density.te.h1 <- function(tt, model,location, scale, dff, hypothesis,e) {
   if (model == "Point") return(rep(NA, length(tt)))
   bound_h1  <- switch(hypothesis,
                       ">" = c(a = e, b = Inf),
@@ -4769,27 +4770,11 @@ compute.prior.density.te.h1 <- function(tt, model, scale, dff, hypothesis,e,loca
                       "!=" = c(a = e[1], b = e[2])
   )
 
-  normalizationh1 <- switch(hypothesis,
-                            "!=" = 1 - switch(model,
-                                              "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                              "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                              "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
-                                              "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            "<"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            ">"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
-  )
+  normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
 
 
   #prior_h1<-te_prior(tt,scale,dff,model) / normalizationh1
-  prior_h1<-te_prior(tt,scale,dff,model)
+  prior_h1<-te_prior(tt,location,scale,dff,model)
   switch(hypothesis,
          "!=" = { prior_h1[tt>min(bound_h1)&tt<max(bound_h1)]=0 },
          ">" = { prior_h1[tt<bound_h1[1]]=0 },
@@ -4797,7 +4782,7 @@ compute.prior.density.te.h1 <- function(tt, model, scale, dff, hypothesis,e,loca
          )
   prior_h1
 }
-compute.prior.density.te.h0 <- function(tt, model, scale, dff, hypothesis,e,location) {
+compute.prior.density.te.h0 <- function(tt, model,location, scale, dff, hypothesis,e) {
   if (model == "Point") return(rep(NA, length(tt)))
   bound_h0  <- switch(hypothesis,
                       "!=" = c(a = e[1], b = e[2]),
@@ -4805,16 +4790,11 @@ compute.prior.density.te.h0 <- function(tt, model, scale, dff, hypothesis,e,loca
                       "<" = c(a = e, b = 0)
   )
   # H0 Normalization
-  normalizationh0 <- switch(model,
-                            "Cauchy"         = stats::pcauchy(bound_h0[2], 0, scale) - stats::pcauchy(bound_h0[1], 0, scale),
-                            "Normal"         = stats::pnorm  (bound_h0[2], 0, scale) - stats::pnorm  (bound_h0[1], 0, scale),
-                            "NLP"            = pmom   (bound_h0[2], tau = scale^2) - pmom   (bound_h0[1], tau = scale^2),
-                            "t-distribution" = pnct(bound_h0[2] / scale, df = dff) - pnct  (bound_h0[1] / scale, df = dff)
-  )
+  normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
 
 
   #prior_h0 <- te_prior(tt,scale,dff,model) / normalizationh0
-  prior_h0 <- te_prior(tt,scale,dff,model)
+  prior_h0 <- te_prior(tt,location,scale,dff,model)
   switch(hypothesis,
          "!=" = { prior_h0[!(tt>min(bound_h0)&tt<max(bound_h0))]=0},
          ">" = { prior_h0[tt>bound_h0[2]]=0 },
@@ -4825,7 +4805,7 @@ compute.prior.density.te.h0 <- function(tt, model, scale, dff, hypothesis,e,loca
 }
 
 
-t1e_prior_plot <- function(model, scale, dff, hypothesis, e,
+t1e_prior_plot <- function(model,location, scale, dff, hypothesis, e,
                            de_an_prior, model_d, scale_d, dff_d, location_d) {
   graphics::par(mfrow = c(1, 1))
 
@@ -4835,10 +4815,10 @@ t1e_prior_plot <- function(model, scale, dff, hypothesis, e,
                         "!=" = c(-5, 5))
   tt <- seq(plot.bounds[1], plot.bounds[2], 0.01)
 
-  prior.analysis.h1 <- compute.prior.density.te.h1(tt, model, scale, dff, hypothesis, e, location_d)
-  prior.analysis.h0 <- compute.prior.density.te.h0(tt, model, scale, dff, hypothesis, e)
+  prior.analysis.h1 <- compute.prior.density.te.h1(tt, model,location, scale, dff, hypothesis, e)
+  prior.analysis.h0 <- compute.prior.density.te.h0(tt, model,location, scale, dff, hypothesis, e)
   prior.design <- if (de_an_prior == 0 && model_d != "Point") {
-    compute.prior.density.te.h1(tt, model_d, scale_d, dff_d, hypothesis, e, location_d)
+    compute.prior.density.te.h1(tt, model_d,location_d, scale_d, dff_d, hypothesis, e)
   } else {
     rep(NA, length(tt))
   }
@@ -4884,12 +4864,12 @@ t1e_prior_plot <- function(model, scale, dff, hypothesis, e,
          bty = "n")
 }
 
-te1_BF <-function(D,df,model ,scale,dff , hypothesis ,e){
+te1_BF <-function(D,df,model ,location,scale,dff , hypothesis ,e){
   tt <- seq(-5, 5, 0.2)
   graphics::par(mfrow = c(1, 2))
   # Compute BF10 and t-bounds:
-  BF10   <- t1e_BF10(tt,df,model,scale,dff , hypothesis,e )
-  t.BF10 <- t1e_BF10_bound(D, df,model,scale,dff , hypothesis,e)
+  BF10   <- t1e_BF10(tt,df,model,location,scale,dff , hypothesis,e )
+  t.BF10 <- t1e_BF10_bound(D, df,model,location,scale,dff , hypothesis,e)
 
   # Left plot - BF10:
   main.bf10 <- if (length(t.BF10) == 1) {
@@ -4905,9 +4885,9 @@ te1_BF <-function(D,df,model ,scale,dff , hypothesis ,e){
 
   # right plot - BF01:
   BF01   <- 1 / BF10
-  t.BF01 <- t1e_BF01_bound(D, df,model,scale,dff , hypothesis,e)
+  t.BF01 <- t1e_BF01_bound(D, df,model,location,scale,dff , hypothesis,e)
   # Check if BF01 = D is possible:
-  max.BF01   <- 1 / t1e_BF10(0,df,model,scale,dff , hypothesis,e )
+  max.BF01   <- 1 / t1e_BF10(0,df,model,location,scale,dff , hypothesis,e )
   impossible <- (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
 
   plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']* " (log scale)"),
@@ -4941,18 +4921,18 @@ Power_t1e<-function(D,model,location,scale,dff, hypothesis,
 
 
   for (i in seq_along(dfs)) {
-    t10 <- t1e_BF10_bound(D, dfs[i],model,scale,dff , hypothesis,e)
-    t01 <- t1e_BF01_bound(D, dfs[i],model,scale,dff , hypothesis,e)
+    t10 <- t1e_BF10_bound(D, dfs[i],model,location,scale,dff , hypothesis,e)
+    t01 <- t1e_BF01_bound(D, dfs[i],model,location,scale,dff , hypothesis,e)
 
     # Choose correct design prior:
     TPE[i] <- if (de_an_prior == 1)
-      t1e_TPE(t10,dfs[i],model ,scale,dff , hypothesis ,e,location_d) else
-        t1e_TPE(t,dfs[i],model_d ,scale_d,dff_d , hypothesis ,e,location_d)
-    FPE[i] <- t1e_FPE(t10,dfs[i],model ,scale,dff , hypothesis ,e)
-    TNE[i] <- t1e_TNE(t01,dfs[i],model ,scale,dff , hypothesis ,e)
+      t1e_TPE(t10,dfs[i],model ,location,scale,dff , hypothesis ,e) else
+        t1e_TPE(t,dfs[i],model_d ,location_d,scale_d,dff_d , hypothesis ,e)
+    FPE[i] <- t1e_FPE(t10,dfs[i],model ,location,scale,dff , hypothesis ,e)
+    TNE[i] <- t1e_TNE(t01,dfs[i],model ,location,scale,dff , hypothesis ,e)
     FNE[i] <- if (de_an_prior == 1)
-      t1e_FNE(t01,dfs[i],model ,scale,dff , hypothesis ,e,location_d) else
-        t1e_FNE(t01,dfs[i],model_d ,scale_d,dff_d , hypothesis ,e,location_d)
+      t1e_FNE(t01,dfs[i],model ,location,scale,dff , hypothesis ,e) else
+        t1e_FNE(t01,dfs[i],model_d ,location_d,scale_d,dff_d , hypothesis ,e)
 
     }
   graphics::par(mfrow = c(1, 2))
@@ -6771,9 +6751,7 @@ input_t1 <- shiny::reactive({
                   "2" = "Normal",
                   "3" = "NLP")
 
-  location <- switch(input$h0t1,
-                     "1" =input$lt1,
-                     "2" = 0)
+  location <- input$lt1
   scale <- input$st1
   dff <- input$dft1
   de_an_prior <- switch(input$prior,
@@ -6831,7 +6809,8 @@ shiny::observeEvent(input$runt1, {
 
   dat = tryCatch({suppressWarnings(switch(x$interval, "1" =  t1_Table(x$D,x$target,x$model,x$location,x$scale,x$dff, x$hypothesis,
                                                         x$model_d,x$location_d,x$scale_d,x$dff_d, x$de_an_prior,x$N, x$mode_bf ,
-                                                        x$alpha,x$direct),"2" = t1e_table(x$D,x$target,x$model,x$scale,x$dff, x$hypothesis,x$e ,
+                                                        x$alpha,x$direct),
+                                          "2" = t1e_table(x$D,x$target,x$model,x$location,x$scale,x$dff, x$hypothesis,x$e ,
                                                                                  x$model_d,x$scale_d,x$dff_d, x$de_an_prior,x$N,x$mode_bf,x$location_d ,x$alpha,x$direct)))
   }, error = function(e) {
     "Error"
@@ -6857,6 +6836,7 @@ shiny::observeEvent(input$runt1, {
       de_an_prior = x$de_an_prior   # Access 'de_an_prior' explicitly
     ),
     "2" = t1e_prior_plot(x$model,
+                  x$location,
                    x$scale,
                    x$dff ,
                    x$hypothesis,
@@ -6865,7 +6845,7 @@ shiny::observeEvent(input$runt1, {
                    x$model_d,
                    x$scale_d,
                    x$dff_d,
-                   x$location )
+                   x$location_d )
 
   ))
 
@@ -6925,7 +6905,7 @@ shiny::observeEvent(input$runt1, {
                                 scale = x$scale,          # Access 'scale' explicitly
                                 dff = x$dff,              # Access 'dff' explicitly again, if required
                                 hypothesis = x$hypothesis # Access 'hypothesis' explicitly
-                              ), "2"= te1_BF (x$D,dat[1,5],x$model ,x$scale,x$dff , x$hypothesis ,x$e)))
+                              ), "2"= te1_BF (x$D,dat[1,5],x$model ,x$location,x$scale,x$dff , x$hypothesis ,x$e)))
     rela_t1 <- grDevices::recordPlot()
   } else rela_t1 <- NA
 
@@ -7043,6 +7023,7 @@ shiny::observeEvent(input$cal1, {
                               de_an_prior = 1   # Access 'de_an_prior' explicitly
                             ),
                             "2" = t1e_prior_plot(x$model,
+                                                 x$location,
                                                  x$scale,
                                                  x$dff ,
                                                  x$hypothesis,
@@ -7051,14 +7032,14 @@ shiny::observeEvent(input$cal1, {
                                                  x$model_d,
                                                  x$scale_d,
                                                  x$dff_d,
-                                                 x$location )
+                                                 x$location_d )
 
     ))
 
   })
   BF10 <- switch(x$interval,
                  "1" = t1_BF10(x$tval,x$N,x$model ,x$location,x$scale,x$dff , x$hypothesis ),
-                 "2" = t1e_BF10(x$tval,x$N,x$model,x$scale,x$dff , x$hypothesis,x$e ))
+                 "2" = t1e_BF10(x$tval,x$N,x$model,x$location,x$scale,x$dff , x$hypothesis,x$e ))
 
   output$BFt1 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
@@ -7155,10 +7136,7 @@ input_t2 <- shiny::reactive({
                   "2" = "Normal",
                   "3" = "NLP")
 
-  location <- switch(input$h0t2,
-                     "1" =input$lt2,
-                     "2" = 0,
-                     "3" = 0)
+  location <- input$lt2
   scale <- input$st2
   dff <- input$dft2
   de_an_prior <- switch(input$priort2,
@@ -7224,8 +7202,8 @@ shiny::observeEvent(input$runt2, {
     suppressWarnings(switch(t2$interval,
                             "1" = t2_Table(t2$D, t2$r, t2$target, t2$model, t2$location, t2$scale, t2$dff, t2$hypothesis,
                                            t2$model_d, t2$location_d, t2$scale_d, t2$dff_d, t2$de_an_prior, t2$N1, t2$N2, t2$mode_bf, t2$alpha,t2$direct),
-                            "2" = t2e_table(t2$D, t2$r, t2$target, t2$model, t2$scale, t2$dff, t2$hypothesis, t2$e,
-                                            t2$model_d, t2$scale_d, t2$dff_d, t2$de_an_prior, t2$mode_bf, t2$location_d, t2$N1, t2$N2, t2$alpha,t2$direct)
+                            "2" = t2e_table(t2$D, t2$r, t2$target, t2$model,t2$location, t2$scale, t2$dff, t2$hypothesis, t2$e,
+                                            t2$model_d,t2$location_d, t2$scale_d, t2$dff_d, t2$de_an_prior, t2$mode_bf,  t2$N1, t2$N2, t2$alpha,t2$direct)
     ))
   }, error = function(e) {
     "Error"
@@ -7250,6 +7228,7 @@ shiny::observeEvent(input$runt2, {
                de_an_prior = t2$de_an_prior   # Access 'de_an_prior' explicitly
              ), "2" =
              t1e_prior_plot(t2$model,
+                            t2$location,
                             t2$scale,
                             t2$dff ,
                             t2$hypothesis,
@@ -7315,7 +7294,7 @@ shiny::observeEvent(input$runt2, {
   if (t2$rela) {
     suppressWarnings(switch(t2$interval,
                             "1"= t2_bf10(t2$D ,dat[1,5],t2$r, t2$target,t2$model ,t2$location ,t2$scale,t2$dff  , t2$hypothesis ),
-                            "2" =t2e_BF (t2$D,dat[1,5],t2$r,t2$model ,t2$scale,t2$dff , t2$hypothesis ,t2$e) ))
+                            "2" =t2e_BF (t2$D,dat[1,5],t2$r,t2$model ,t2$location,t2$scale,t2$dff , t2$hypothesis ,t2$e) ))
     rela_t2 <- grDevices::recordPlot()
   } else rela_t2 <- NA
 
@@ -7396,6 +7375,7 @@ shiny::observeEvent(input$cal2, {
                                 de_an_prior = 1   # Access 'de_an_prior' explicitly
                               ), "2" =
                               t1e_prior_plot(t2$model,
+                                             t2$location,
                                              t2$scale,
                                              t2$dff ,
                                              t2$hypothesis,
@@ -7404,7 +7384,7 @@ shiny::observeEvent(input$cal2, {
                                              t2$model_d,
                                              t2$scale_d,
                                              t2$dff_d,
-                                             t2$location )
+                                             t2$location_d )
 
     ))
 
@@ -7415,7 +7395,7 @@ shiny::observeEvent(input$cal2, {
 
   BF10 <- suppressWarnings(switch(t2$interval,
                  "1" = t2_BF10(t2$tval,N1,r,t2$model ,t2$location,t2$scale,t2$dff , t2$hypothesis ),
-                 "2" = t2e_BF10(t2$tval,N1,r,t2$model,t2$scale,t2$dff , t2$hypothesis,t2$e )))
+                 "2" = t2e_BF10(t2$tval,N1,r,t2$model,t2$location,t2$scale,t2$dff , t2$hypothesis,t2$e )))
 
 
   output$result_t2 <- shiny::renderText({
@@ -7983,7 +7963,7 @@ Power_t2<-function(D,model,location,scale,dff, hypothesis,
 
 # ---- twosample_e.r ----
 
-t2e_BF10i <-function(t,n1,r,model ,scale,dff , hypothesis,e ){
+t2e_BF10i <-function(t,n1,r,model ,location,scale,dff , hypothesis,e ){
   n2 = n1*r
   df = n1+n2-2
   constant = sqrt((n1*n2)/(n1+n2))
@@ -7997,36 +7977,14 @@ t2e_BF10i <-function(t,n1,r,model ,scale,dff , hypothesis,e ){
                       "<" = c(a = e, b = 0),
                       "!=" = c(a = e[1], b = e[2])
   )
-  normalizationh1 <- switch(hypothesis,
-                            "!=" = 1 - switch(model,
-                                              "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                              "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                              "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
-                                              "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            "<"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            ">"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
-  )
+  normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
 
 
-
-  normalizationh0 <- switch(model,
-                            "Cauchy"         = stats::pcauchy(bound_h0[2], 0, scale) - stats::pcauchy(bound_h0[1], 0, scale),
-                            "Normal"         = stats::pnorm  (bound_h0[2], 0, scale) - stats::pnorm  (bound_h0[1], 0, scale),
-                            "NLP"            = pmom   (bound_h0[2], tau = scale^2) - pmom   (bound_h0[1], tau = scale^2),
-                            "t-distribution" = stats::pt(bound_h0[2] / scale, df = dff) - stats::pt(bound_h0[1] / scale, df = dff))
-
+  normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
 
 
   int  <- function(delta){
-    stats::dt(t,df,ncp = delta *constant)* te_prior(delta,scale,dff,model)/normalizationh1}
+    stats::dt(t,df,ncp = delta *constant)* te_prior(delta,location,scale,dff,model)/normalizationh1}
 
   error = 1e-4
 
@@ -8037,21 +7995,21 @@ t2e_BF10i <-function(t,n1,r,model ,scale,dff , hypothesis,e ){
 
 
   int  <- function(delta){
-    stats::dt(t,df,ncp = delta *constant)* te_prior(delta,scale,dff,model)/normalizationh0}
+    stats::dt(t,df,ncp = delta *constant)* te_prior(delta,location,scale,dff,model)/normalizationh0}
 
   lh0 = stats::integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=error,stop.on.error = F)$value
   return(lh1/lh0)
 }
 
-t2e_BF10 <-function(t,n1,r,model,scale,dff , hypothesis,e ){
-  sapply(t, function(ti) t2e_BF10i(ti,n1,r,model ,scale,dff , hypothesis,e ))
+t2e_BF10 <-function(t,n1,r,model,location,scale,dff , hypothesis,e ){
+  sapply(t, function(ti) t2e_BF10i(ti,n1,r,model ,location,scale,dff , hypothesis,e ))
 }
 
-t2e_BF10_bound <-function(D, n1,r,model,scale,dff , hypothesis,e){
+t2e_BF10_bound <-function(D, n1,r,model,location,scale,dff , hypothesis,e){
 
   y <- numeric(0)
   Bound_finding <-function(t){
-    t2e_BF10(t,n1,r,model,scale,dff , hypothesis,e )- D
+    t2e_BF10(t,n1,r,model,location,scale,dff , hypothesis,e )- D
   }
 
   switch(hypothesis,
@@ -8069,19 +8027,19 @@ t2e_BF10_bound <-function(D, n1,r,model,scale,dff , hypothesis,e){
   results <- c(x, y)
   results <- results[!is.na(results)]
   if (length(results) == 0) return("bound cannot be found")
-  BF.vals  <- t2e_BF10(results,n1,r,model,scale,dff , hypothesis,e )
+  BF.vals  <- t2e_BF10(results,n1,r,model,location,scale,dff , hypothesis,e )
   BF.close <- which(round(BF.vals, 2) == round(D, 2))
   if (length(BF.close) == 0) return("bound cannot be found")
   return(results[BF.close])
 }
 
 # finding the t that correspond to BF10=D
-t2e_BF01_bound <-function(D, n1,r,model,scale,dff , hypothesis,e){
-  t2e_BF10_bound(1/D, n1,r,model,scale,dff , hypothesis,e)
+t2e_BF01_bound <-function(D, n1,r,model,location,scale,dff , hypothesis,e){
+  t2e_BF10_bound(1/D, n1,r,model,location,scale,dff , hypothesis,e)
 
 }
 
-t2e_TPE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
+t2e_TPE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
   n2 = n1*r
@@ -8103,23 +8061,9 @@ t2e_TPE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
                       "!=" = c(a = e[1], b = e[2])
   )
 
-  normalizationh1 <- switch(hypothesis,
-                            "!=" = 1 - switch(model,
-                                              "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                              "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                              "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
-                                              "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            "<"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            ">"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
-  )
+  normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
+
+
 
   int <- function(delta) {
     ncp <- delta * constant
@@ -8134,7 +8078,7 @@ t2e_TPE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
                   "<" = pnct(t, df, ncp = ncp, lower = TRUE)
     )
 
-    pro * te_prior(delta, scale, dff, model) / normalizationh1
+    pro * te_prior(delta,location, scale, dff, model) / normalizationh1
   }
 
 
@@ -8150,7 +8094,7 @@ t2e_TPE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
 
 }
 
-t2e_FNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
+t2e_FNE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
 
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
@@ -8172,23 +8116,9 @@ t2e_FNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
                       "!=" = c(a = e[1], b = e[2])
   )
 
-  normalizationh1 <- switch(hypothesis,
-                            "!=" = 1 - switch(model,
-                                              "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                              "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                              "NLP"            = pmom(bound_h1[2], tau = scale^2) - pmom(bound_h1[1], tau = scale^2),
-                                              "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            "<"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = pmom(bound_h1[2], tau = scale^2) - 0,
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff)),
-                            ">"  = switch(model,
-                                          "Cauchy"         = stats::pcauchy(bound_h1[2], 0, scale) - stats::pcauchy(bound_h1[1], 0, scale),
-                                          "Normal"         = stats::pnorm (bound_h1[2], 0, scale) - stats::pnorm (bound_h1[1], 0, scale),
-                                          "NLP"            = 1 - pmom(bound_h1[1], tau = scale^2),
-                                          "t-distribution" = stats::pt(bound_h1[2] / scale, df = dff) - stats::pt(bound_h1[1] / scale, df = dff))
-  )
+  normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
+
+
   int <- function(delta) {
     ncp <- delta * constant
 
@@ -8202,7 +8132,7 @@ t2e_FNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
                   "<" = pnct(t, df, ncp = ncp, lower = FALSE)
     )
 
-    pro * te_prior(delta, scale, dff, model) / normalizationh1
+    pro * te_prior(delta, location,scale, dff, model) / normalizationh1
   }
 
   error = 1e-4
@@ -8217,7 +8147,7 @@ t2e_FNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e,location){
 }
 
 
-t2e_TNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e){
+t2e_TNE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
   n2 = n1*r
@@ -8231,11 +8161,7 @@ t2e_TNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e){
                       "!=" = c(a = e[1], b = e[2])
   )
 
-  normalizationh0 <- switch(model,
-                            "Cauchy"         = stats::pcauchy(bound_h0[2], 0, scale) - stats::pcauchy(bound_h0[1], 0, scale),
-                            "Normal"         = stats::pnorm  (bound_h0[2], 0, scale) - stats::pnorm  (bound_h0[1], 0, scale),
-                            "NLP"            = pmom   (bound_h0[2], tau = scale^2) - pmom   (bound_h0[1], tau = scale^2),
-                            "t-distribution" = stats::pt(bound_h0[2] / scale, df = dff) - stats::pt  (bound_h0[1] / scale, df = dff))
+  normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
 
 
   int <- function(delta) {
@@ -8251,7 +8177,7 @@ t2e_TNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e){
                   "<" = pnct(t, df, ncp = ncp, lower = FALSE)
     )
 
-    pro * te_prior(delta, scale, dff, model) / normalizationh0
+    pro * te_prior(delta,location, scale, dff, model) / normalizationh0
   }
   error = 1e-4
     x = stats::integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=error,stop.on.error = F)$value
@@ -8259,7 +8185,7 @@ t2e_TNE <-function(t,n1,r,model ,scale,dff , hypothesis ,e){
 
 }
 
-t2e_FPE <-function(t,n1,r,model ,scale,dff , hypothesis ,e){
+t2e_FPE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
   n2 = n1*r
@@ -8272,12 +8198,7 @@ t2e_FPE <-function(t,n1,r,model ,scale,dff , hypothesis ,e){
                       "!=" = c(a = e[1], b = e[2])
   )
 
-  normalizationh0 <- switch(model,
-                            "Cauchy"         = stats::pcauchy(bound_h0[2], 0, scale) - stats::pcauchy(bound_h0[1], 0, scale),
-                            "Normal"         = stats::pnorm  (bound_h0[2], 0, scale) - stats::pnorm  (bound_h0[1], 0, scale),
-                            "NLP"            = pmom   (bound_h0[2], tau = scale^2) - pmom   (bound_h0[1], tau = scale^2),
-                            "t-distribution" = stats::pt(bound_h0[2] / scale, df = dff) - stats::pt(bound_h0[1] / scale, df = dff))
-
+  normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
 
 
   int <- function(delta) {
@@ -8293,7 +8214,7 @@ t2e_FPE <-function(t,n1,r,model ,scale,dff , hypothesis ,e){
                   "<" = pnct(t, df, ncp = ncp, lower = TRUE)
     )
 
-    pro * te_prior(delta, scale, dff, model) / normalizationh0
+    pro * te_prior(delta,location, scale, dff, model) / normalizationh0
   }
   error = 1e-4
   x = stats::integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=error,stop.on.error = F)$value
@@ -8304,74 +8225,74 @@ t2e_FPE <-function(t,n1,r,model ,scale,dff , hypothesis ,e){
 
 
 
-t2e_N_finder<-function(D,r,target,model,scale,dff, hypothesis,e ,
-                   model_d,scale_d,dff_d, de_an_prior,location,alpha ){
+t2e_N_finder<-function(D,r,target,model,location,scale,dff, hypothesis,e ,
+                   model_d,location_d,scale_d,dff_d, de_an_prior,alpha ){
 
   lower <- 2
-  t2 <-t2e_BF10_bound(D, lower,r,model,scale,dff , hypothesis,e)
+  t2 <-t2e_BF10_bound(D, lower,r,model,location,scale,dff , hypothesis,e)
   p2 <- if (de_an_prior == 1)
-    t2e_TPE (t2,lower,r,model ,scale,dff , hypothesis,e ,location) else
-      t2e_TPE (t2,lower,r,model_d ,scale_d,dff_d , hypothesis,e ,location)
+    t2e_TPE (t2,lower,r,model ,location,scale,dff , hypothesis,e) else
+      t2e_TPE (t2,lower,r,model_d ,location_d,scale_d,dff_d , hypothesis,e)
   if (p2 > target) return(lower)
 
   Power_root <- function(n1) {
 
-    t <- t2e_BF10_bound(D, n1,r,model,scale,dff , hypothesis,e)
+    t <- t2e_BF10_bound(D, n1,r,model,location,scale,dff , hypothesis,e)
 
     pro <- if (de_an_prior == 1) {
-      t2e_TPE (t,n1,r,model ,scale,dff , hypothesis,e )
+      t2e_TPE (t,n1,r,model ,location,scale,dff , hypothesis,e )
     } else {
-      t2e_TPE (t,n1,r,model_d ,scale_d,dff_d , hypothesis,e ,location)
+      t2e_TPE (t,n1,r,model_d ,location_d,scale_d,dff_d , hypothesis,e)
     }
 
     target - pro
   }
   N1.power <- robust_uniroot(Power_root, lower = 2)
-  t <- t2e_BF10_bound(D, N1.power,r,model,scale,dff , hypothesis,e)
-  FPE <-t2e_FPE(t,N1.power,r,model ,scale,dff , hypothesis ,e)
+  t <- t2e_BF10_bound(D, N1.power,r,model,location,scale,dff , hypothesis,e)
+  FPE <-t2e_FPE(t,N1.power,r,model,location,scale,dff , hypothesis ,e)
 
   if (FPE <= alpha) return(N1.power + 1)
 
   alpha.root <- function(n1) {
-    t <- t2e_BF10_bound(D, n1,r,model,scale,dff , hypothesis,e)
-    pro <- t2e_FPE(t,n1,r,model ,scale,dff , hypothesis ,e)
+    t <- t2e_BF10_bound(D, n1,r,model,location,scale,dff , hypothesis,e)
+    pro <- t2e_FPE(t,n1,r,model,location ,scale,dff , hypothesis ,e)
     return(pro - alpha)
   }
   N1.alpha <- robust_uniroot(alpha.root , lower = N1.power)
   return(N1.alpha)
   }
-t2e_N_01_finder<-function(D,r,target,model,scale,dff, hypothesis,e ,
-                          model_d,scale_d,dff_d, de_an_prior,location,alpha ){
+t2e_N_01_finder<-function(D,r,target,model,location,scale,dff, hypothesis,e ,
+                          model_d,location_d,scale_d,dff_d, de_an_prior,alpha ){
 
   lower <- 10
-  t2 <-t2e_BF01_bound(D, lower,r,model,scale,dff , hypothesis,e)
-  TNE_lo <- t2e_TNE(t2,lower,r,model ,scale,dff , hypothesis,e)
+  t2 <-t2e_BF01_bound(D, lower,r,mode,locationl,scale,dff , hypothesis,e)
+  TNE_lo <- t2e_TNE(t2,lower,r,model ,location,scale,dff , hypothesis,e)
   if (TNE_lo > target) return(lower)
   FNE_lo <- if (de_an_prior == 1)
-    t2e_FNE (t2,lower,r,model ,scale,dff , hypothesis,e ,location) else
-      t2e_FNE (t2,lower,r,model_d ,scale_d,dff_d , hypothesis,e ,location)
+    t2e_FNE (t2,lower,r,model,location ,scale,dff , hypothesis,e ) else
+      t2e_FNE (t2,lower,r,model_d ,location_d,scale_d,dff_d , hypothesis,e )
   if (TNE_lo > target&FNE_lo<alpha) return(lower)
 
   TN_root <- function(n1) {
 
-    t <- t2e_BF01_bound(D, n1,r,model,scale,dff , hypothesis,e)
+    t <- t2e_BF01_bound(D, n1,r,model,location,scale,dff , hypothesis,e)
 
-    pro <- t2e_TNE(t,n1,r,model ,scale,dff , hypothesis,e)
+    pro <- t2e_TNE(t,n1,r,model ,location,scale,dff , hypothesis,e)
 
     target - pro
   }
   N1.TN <- robust_uniroot(TN_root, lower = 2)
-  t <- t2e_BF01_bound(D, N1.TN,r,model,scale,dff , hypothesis,e)
-  FNE <-t2e_FNE(t,N1.TN,r,model ,scale,dff , hypothesis ,e)
+  t <- t2e_BF01_bound(D, N1.TN,r,model,location,scale,dff , hypothesis,e)
+  FNE <-t2e_FNE(t,N1.TN,r,model ,location,scale,dff , hypothesis ,e)
 
   if (FNE <= alpha) return(N1.TN + 1)
 
   FN.root <- function(n1) {
-    t <- t2e_BF01_bound(D, n1,r,model,scale,dff , hypothesis,e)
+    t <- t2e_BF01_bound(D, n1,r,model,location,scale,dff , hypothesis,e)
     pro <- if (de_an_prior == 1) {
-      t2e_FNE (t,n1,r,model ,scale,dff , hypothesis,e )
+      t2e_FNE (t,n1,r,model ,location,scale,dff , hypothesis,e )
     } else {
-      t2e_FNE (t,n1,r,model_d ,scale_d,dff_d , hypothesis,e ,location)
+      t2e_FNE (t,n1,r,model_d ,location_d,scale_d,dff_d , hypothesis,e)
     }
     return(pro - alpha)
   }
@@ -8379,18 +8300,18 @@ t2e_N_01_finder<-function(D,r,target,model,scale,dff, hypothesis,e ,
   return(N1.FN)
 }
 
-t2e_table<-function(D,r,target,model,scale,dff, hypothesis,e ,
-                    model_d,scale_d,dff_d, de_an_prior,mode_bf,location,N1,N2,alpha ,direct){
+t2e_table<-function(D,r,target,model,location,scale,dff, hypothesis,e ,
+                    model_d,location_d,scale_d,dff_d, de_an_prior,mode_bf,N1,N2,alpha ,direct){
   bound01 = as.numeric(0)
   bound10 = as.numeric(0)
 
   if (mode_bf == 1){
 
     n1 = switch(direct,
-                "h1" = ceiling(t2e_N_finder(D,r,target,model,scale,dff, hypothesis,e ,
-                      model_d,scale_d,dff_d, de_an_prior,location,alpha )),
-                "h0" = ceiling(t2e_N_01_finder(D,r,target,model,scale,dff, hypothesis,e ,
-                                           model_d,scale_d,dff_d, de_an_prior,location,alpha ) ))
+                "h1" = ceiling(t2e_N_finder(D,r,target,model,location,scale,dff, hypothesis,e ,
+                                                      model_d,location_d,scale_d,dff_d, de_an_prior,alpha )),
+                "h0" = ceiling(t2e_N_01_finder(D,r,target,model,location,scale,dff, hypothesis,e ,
+                                                         model_d,location_d,scale_d,dff_d, de_an_prior,alpha ) ))
     n2 = n1*r
   } else {
     n1 = N1
@@ -8398,25 +8319,25 @@ t2e_table<-function(D,r,target,model,scale,dff, hypothesis,e ,
     r= n2/n1
   }
   # t bounds:
-  t10 <- t2e_BF10_bound(D, n1,r,model,scale,dff , hypothesis,e)
-  t01 <- t2e_BF01_bound(D, n1,r,model,scale,dff , hypothesis,e)
+  t10 <- t2e_BF10_bound(D, n1,r,model,location,scale,dff , hypothesis,e)
+  t01 <- t2e_BF01_bound(D, n1,r,model,location,scale,dff , hypothesis,e)
 
   # max BF10 possible:
-  max_BF <- 1 / t2e_BF10i(0,n1,r,model ,scale,dff , hypothesis,e )
+  max_BF <- 1 / t2e_BF10i(0,n1,r,model ,location,scale,dff , hypothesis,e )
   BF_D   <- t10
 
   # FPE and TPE:
-  FPE       <- t2e_FPE(t10,n1,r,model ,scale,dff , hypothesis ,e)
+  FPE       <- t2e_FPE(t10,n1,r,model,location ,scale,dff , hypothesis ,e)
   if (de_an_prior == 1) {
-    TPE       <- t2e_TPE(t10,n1,r,model ,scale,dff , hypothesis,e ,location)
+    TPE       <- t2e_TPE(t10,n1,r,model ,location,scale,dff , hypothesis,e )
     TPR_model <- model
     TPR_location   <- location
     TPR_scale <- scale
     TPR_dff   <- dff
   } else {
-    TPE       <- t2e_TPE(t10,n1,r,model_d ,scale_d,dff_d , hypothesis,e ,location)
+    TPE       <- t2e_TPE(t10,n1,r,model_d ,location_d,scale_d,dff_d , hypothesis,e )
     TPR_model <- model_d
-    TPR_location   <- location
+    TPR_location   <- location_d
     TPR_scale <- scale_d
     TPR_dff   <- dff_d
   }
@@ -8426,8 +8347,8 @@ t2e_table<-function(D,r,target,model,scale,dff, hypothesis,e ,
     FNE <- 0
     TNE <- 0
   } else {
-    FNE <- t2e_FNE(t01,n1,r,TPR_model ,TPR_scale,TPR_dff , hypothesis ,e,TPR_location)
-    TNE <- t2e_TNE(t01,n1,r,model ,scale,dff , hypothesis ,e)
+    FNE <- t2e_FNE(t01,n1,r,TPR_model ,TPR_location,TPR_scale,TPR_dff , hypothesis ,e)
+    TNE <- t2e_TNE(t01,n1,r,model,location ,scale,dff , hypothesis ,e)
   }
 
   # table:
@@ -8444,12 +8365,12 @@ t2e_table<-function(D,r,target,model,scale,dff, hypothesis,e ,
   table
 }
 
-t2e_BF <-function(D,n1,r,model ,scale,dff , hypothesis ,e){
+t2e_BF <-function(D,n1,r,model ,location,scale,dff , hypothesis ,e){
   tt <- seq(-5, 5, 0.2)
   graphics::par(mfrow = c(1, 2))
   # Compute BF10 and t-bounds:
-  BF10   <- t2e_BF10(tt, n1,r,model,scale,dff , hypothesis,e)
-  t.BF10 <- t2e_BF10_bound(D, n1,r,model,scale,dff , hypothesis,e)
+  BF10   <- t2e_BF10(tt, n1,r,model,location,scale,dff , hypothesis,e)
+  t.BF10 <- t2e_BF10_bound(D, n1,r,model,location,scale,dff , hypothesis,e)
 
   # Left plot - BF10:
   main.bf10 <- if (length(t.BF10) == 1) {
@@ -8465,9 +8386,9 @@ t2e_BF <-function(D,n1,r,model ,scale,dff , hypothesis ,e){
 
   # right plot - BF01:
   BF01   <- 1 / BF10
-  t.BF01 <- t2e_BF01_bound(D, n1,r,model,scale,dff , hypothesis,e)
+  t.BF01 <- t2e_BF01_bound(D, n1,r,model,location,scale,dff , hypothesis,e)
   # Check if BF01 = D is possible:
-  max.BF01   <- 1 / t2e_BF10i(0,n1,r,model ,scale,dff , hypothesis,e )
+  max.BF01   <- 1 / t2e_BF10i(0,n1,r,model,location ,scale,dff , hypothesis,e )
   impossible <- (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
 
   plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']* " (log scale)"),
@@ -8502,16 +8423,16 @@ Power_t2e<-function(D,model,location,scale,dff, hypothesis,
   FNE  =  array(NA, dim = c(length(sdf)))
 
   for ( i in 1:length(sdf)){
-    t10 = t2e_BF10_bound(D, sn1[i],r,model,scale,dff , hypothesis,e)
-    t01 = t2e_BF01_bound(D, sn1[i],r,model,scale,dff , hypothesis,e)
+    t10 = t2e_BF10_bound(D, sn1[i],r,model,location,scale,dff , hypothesis,e)
+    t01 = t2e_BF01_bound(D, sn1[i],r,model,location,scale,dff , hypothesis,e)
     TPE[i] = switch(as.character(de_an_prior),
-                    "1" = t2e_TPE(t10,sn1[i],r,model ,scale,dff , hypothesis ,e,location),
-                    "0" = t2e_TPE(t10,sn1[i],r,model_d ,scale_d,dff_d , hypothesis ,e,location_d))
-    FPE[i] = t2e_FPE(t10,sn1[i],r,model ,scale,dff , hypothesis ,e)
-    TNE[i] = t2e_TNE(t01,sn1[i],r,model ,scale,dff , hypothesis ,e)
+                    "1" = t2e_TPE(t10,sn1[i],r,model ,location,scale,dff , hypothesis ,e),
+                    "0" = t2e_TPE(t10,sn1[i],r,model_d,location_d, ,scale_d,dff_d , hypothesis ,e))
+    FPE[i] = t2e_FPE(t10,sn1[i],r,model,location ,scale,dff , hypothesis ,e)
+    TNE[i] = t2e_TNE(t01,sn1[i],r,model ,location,scale,dff , hypothesis ,e)
     FNE[i] = switch(as.character(de_an_prior),
-                    "1" = t2e_FNE(t01,sn1[i],r,model ,scale,dff , hypothesis ,e,location),
-                    "0" = t2e_FNE(t01,sn1[i],r,model_d ,scale_d,dff_d , hypothesis ,e,location_d))
+                    "1" = t2e_FNE(t01,sn1[i],r,model ,location,scale,dff , hypothesis ,e),
+                    "0" = t2e_FNE(t01,sn1[i],r,model_d ,location_d,scale_d,dff_d , hypothesis ,e))
 
   }
   graphics::par(mfrow = c(1, 2))
