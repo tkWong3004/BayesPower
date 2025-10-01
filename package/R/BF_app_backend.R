@@ -4631,7 +4631,7 @@ t1e_N_finder<-function(D,target,model,location,scale,dff, hypothesis,e ,
   t2 <-t1e_BF10_bound(D, lower,model,location,scale,dff , hypothesis,e)
   p2 <- if (de_an_prior == 1)
     t1e_TPE(t2,lower,model ,location,scale,dff , hypothesis ,e) else
-    t1e_TPE(t2,lower,model,location_d ,scale_d,dff_d , hypothesis ,e,location_d)
+    t1e_TPE(t2,lower,model,location_d ,scale_d,dff_d , hypothesis ,e)
   if (p2 > target) return(lower)
 
   Power_root <- function(df) {
@@ -4641,7 +4641,7 @@ t1e_N_finder<-function(D,target,model,location,scale,dff, hypothesis,e ,
     pro <- if (de_an_prior == 1) {
       t1e_TPE(t, df, model,location, scale, dff, hypothesis, e)
     } else {
-      t1e_TPE(t, df, model_d,,location_d, scale_d, dff_d, hypothesis, e)
+      t1e_TPE(t, df, model_d,location_d, scale_d, dff_d, hypothesis, e)
     }
 
     target - pro
@@ -4693,7 +4693,7 @@ t1e_N_01_finder<-function(D,target,model,location,scale,dff, hypothesis,e ,
     pro <-   if (de_an_prior == 1) {
       t1e_FNE(t, df, model,location, scale, dff, hypothesis, e)
     } else {
-      t1e_FNE(t, df, model_d,location_d, scale_d, dff_d, hypothesis, e, location_d)
+      t1e_FNE(t, df, model_d,location_d, scale_d, dff_d, hypothesis, e)
     }
     return(pro - alpha)
   }
@@ -8265,7 +8265,7 @@ t2e_N_01_finder<-function(D,r,target,model,location,scale,dff, hypothesis,e ,
                           model_d,location_d,scale_d,dff_d, de_an_prior,alpha ){
 
   lower <- 10
-  t2 <-t2e_BF01_bound(D, lower,r,mode,locationl,scale,dff , hypothesis,e)
+  t2 <-t2e_BF01_bound(D, lower,r,mode,location,scale,dff , hypothesis,e)
   TNE_lo <- t2e_TNE(t2,lower,r,model ,location,scale,dff , hypothesis,e)
   if (TNE_lo > target) return(lower)
   FNE_lo <- if (de_an_prior == 1)
@@ -8427,7 +8427,7 @@ Power_t2e<-function(D,model,location,scale,dff, hypothesis,
     t01 = t2e_BF01_bound(D, sn1[i],r,model,location,scale,dff , hypothesis,e)
     TPE[i] = switch(as.character(de_an_prior),
                     "1" = t2e_TPE(t10,sn1[i],r,model ,location,scale,dff , hypothesis ,e),
-                    "0" = t2e_TPE(t10,sn1[i],r,model_d,location_d, ,scale_d,dff_d , hypothesis ,e))
+                    "0" = t2e_TPE(t10,sn1[i],r,model_d,location_d,scale_d,dff_d , hypothesis ,e))
     FPE[i] = t2e_FPE(t10,sn1[i],r,model,location ,scale,dff , hypothesis ,e)
     TNE[i] = t2e_TNE(t01,sn1[i],r,model ,location,scale,dff , hypothesis ,e)
     FNE[i] = switch(as.character(de_an_prior),

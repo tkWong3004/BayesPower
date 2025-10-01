@@ -1,7 +1,6 @@
 library(BayesPower)
 
 
-
 d_fes <- function(fsq, q, dff, rscale, f_m) {
   gamma((q + dff) / 2) / (gamma(dff / 2) * gamma(q / 2)) *
     (dff * rscale^2)^(dff / 2) * fsq^(q / 2 - 1) *
@@ -15,17 +14,23 @@ d_fes <- function(fsq, q, dff, rscale, f_m) {
 
 p_fes <- function(fsq, q, dff, rscale, f_m) {
   sapply(fsq, function(x) {
-    integrate(
-      d_fes,
-      lower = 0,
-      upper = x,
-      q = q,
-      dff = dff,
-      rscale = rscale,
-      f_m = f_m,
-      rel.tol = 1e-10,
-      stop.on.error = F
-    )$value
+    if (x == 0) {
+      return(0)  # probability is 0 if fsq = 0
+    } else if (is.infinite(x)) {
+      return(1)  # probability is 1 if fsq = Inf
+    } else {
+      integrate(
+        d_fes,
+        lower = 0,
+        upper = x,
+        q = q,
+        dff = dff,
+        rscale = rscale,
+        f_m = f_m,
+        rel.tol = 1e-10,
+        stop.on.error = FALSE
+      )$value
+    }
   })
 }
 
@@ -39,7 +44,7 @@ q_fes <- function(p, q, dff, rscale, f_m) {
 
     }
 
-    opt <- uniroot(objfun,lower=0,upper=100000)$root
+    opt <- uniroot(objfun,lower=0,upper=Inf)$root
 
     return(opt)
   })
@@ -86,8 +91,8 @@ q_fmoment <- function(p, q, dff, f_m) {
 # functions to simulate delta
 sim_fsq_h0 <-function(iter,q, dff, rscale, f_m,model,e ){
 
-  if (model=="Point") return(rep(0,iter))
-
+  if (is.null(e)) return(rep(0,iter))
+  if (is.null(e)){e=1}
   f_bound <- c(0,e)
   p_bound<-switch(model,
                   "effectsize"   = {p_fes(f_bound, q, dff, rscale, f_m)},
@@ -129,16 +134,20 @@ sim_f_value<-function(iter,D,p,k,dff,rscale,f_m,model,
   q= k-p
   m=n-k
 
-
   if(h0) lambda=sim_fsq_h0(iter,q, dff, rscale, f_m,model,e ) else{
 
     if (de_an_prior ==1 ) lambda=sim_fsq_h1(iter,q, dff, rscale, f_m,model,e )else
       lambda=sim_fsq_h1(iter,q, dff_d, rscale_d, f_m_d,model_d,e )
   }
+  h0=T
+  if (length(unique(lambda)) == 1) {
+    f_value <- sapply(1:iter, function(i) {rf(1, q, n - k, (n - k) * lambda[i]^2)})
+    } else {
+    f_value <- sapply(1:iter, function(i) {rf(1, q, n - k, (n - k) * lambda[i])})
+    }
 
-  f_value<-sapply(1:iter, function(i) {
-    rf(1,q,n-k,(n-k)*lambda[i])
-  })
+
+
 
   BF10 = if(is.null(e)) BayesPower:::F_BF_bound_10(D, q, m, dff, rscale, f_m, model) else
     BayesPower:::Fe_BF_bound_10(D, q, m, dff, rscale, f_m, model,e)
@@ -146,8 +155,8 @@ sim_f_value<-function(iter,D,p,k,dff,rscale,f_m,model,
     BayesPower:::Fe_BF_bound_01(D, q, m, dff, rscale, f_m, model,e)
 
   # --- Pro(BF>k) ---
-  PE_sim <- sum(f_value>=BF10)/iter
-  NE_sim <- sum(f_value<=BF01)/iter
+  PE_sim <-  if(BF10=="no bound is found"){0} else sum(f_value>=BF10)/iter
+  NE_sim <- if(BF01=="no bound is found"){0} else sum(f_value<=BF01)/iter
 
   return(c(PE_sim, NE_sim))
 
@@ -164,6 +173,7 @@ sim_method_F<-function(iter,D,p,k,dff,rscale,f_m,model,
 
   pro_h1 <- sim_f_value(iter,D,p,k,dff,rscale,f_m,model,
                                  dff_d,rscale_d,f_m_d,model_d,de_an_prior,n, h0=F,e)
+  if(is.null(e)) model_d ="Point"
   pro_h0 <- sim_f_value(iter,D,p,k,dff,rscale,f_m,model,
                        dff_d,rscale_d,f_m_d,model_d,de_an_prior,n, h0=T,e)
 
@@ -217,23 +227,23 @@ f_ver<-function(iter,D,p,k,dff,rscale,f_m,model,
 }
 ### !!! computationally demanding simulation !!! ###
 # input
-iter = 1000 # number of iteration
+iter = 500 # number of iteration
 
 D=3
 p=3       # number of predictor from the reduced model
-k=8       # number of predictor from the full model
+k=4       # number of predictor from the full model
 
 # the analysis prior
 model="effectsize"    # "Moment" "effectsize"
 dff=3
-rscale=.18
+rscale=1
 f_m=sqrt(.01)
-e = .05
+e = NULL
 
 
 #the design prior
-de_an_prior=  0   # design and analysis prior being the same :1 ,not the same :2
-model_d="Moment"      # "Moment" "effectsize" "Point"
+de_an_prior=  1   # design and analysis prior being the same :1 ,not the same :2
+model_d="Point"      # "Moment" "effectsize" "Point"
 dff_d=7                   # must be > 3 if "Moment"
 rscale_d=1.8
 f_m_d= .10
