@@ -5,7 +5,7 @@ Authors@R: c(
     person("Tsz Keung", "Wong", email = "t.k.wong3004@gmail.com", role = c("aut", "cre")),
     person("Jorge", "Tendeiro", role = c("aut")),
     person("Samuel", "Pawel", role = c("aut")))
-Description: This package provides tools for sample size determination and power calculation in a variety of common testing problems using Bayes factors.
+Description: Tools are provided within the package for sample size determination and power calculation in a variety of common testing problems using Bayes factors The main function of the package is BayesPower_BayesFactor() for starting the shiny app.
 BugReports: https://github.com/tkWong3004/BayesPower/issues
 License: GPL (>= 3)
 Encoding: UTF-8

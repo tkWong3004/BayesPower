@@ -639,7 +639,7 @@ BFpower.props <- function(D = NULL, target = NULL, a0 = NULL, b0 = NULL, a1 = NU
   tryCatch({
     suppressWarnings({
       pro_table_p2(D, target, a0, b0, a1, b1, a2, b2, r, model1,
-                   a1d, b1d, dp1, model2, a2d, b2d, dp2, mode_bf, n1, n2, direct)
+                   a1d, b1d, dp1, model2, a2d, b2d, dp2, mode_bf, n1, n2, direct)[[1]]
     })
   }, error = function(e) {
     message("Sample size cannot be determined")
@@ -892,6 +892,6 @@ BF10.bin.test <- function(x, n, alpha, beta, location, scale, model, hypothesis,
 #' }
 #' @export
 BF10.props <- function(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2) {
-  BF10_p2(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)[[1]]
+  BF10_p2(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)
 }
 

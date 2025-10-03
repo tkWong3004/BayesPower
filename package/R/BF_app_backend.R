@@ -4984,31 +4984,32 @@ BF10_p2<-function(a0, b0, a1, b1, a2, b2,n1,n2,k1,k2){
   1/exp(logBF)
 }
 
-
-ps_N_finder<-function(D,target, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,model2,da2,db2,dp2) {
+ps_N_finder <- function(D, target, a0, b0, a1, b1, a2, b2, r,
+                        model1, da1, db1, dp1, model2, da2, db2, dp2) {
 
   lo_n1 <- 10
-  n2 <- round(lo_n1)*r
-  grid <- BF_grid_rcpp(D, a0, b0, a1, b1, lo_n1, a2, b2, n2,model1,da1,db1,dp1,model2,da2,db2,dp2)
-  pro <- sum_rcpp(grid$log_h1_dp,grid$PE)
+  n2 <- round(lo_n1 * r)
+  grid <- BF_grid_rcpp(D, a0, b0, a1, b1, lo_n1, a2, b2, n2,
+                       model1, da1, db1, dp1, model2, da2, db2, dp2)
 
-  if ( pro>target){
-    return(list(grid,lo_n1))
+  pro <- sum_rcpp(grid$log_h1_dp, grid$PE)
+  if (pro > target) return(list(grid, lo_n1))
+
+  # Function for uniroot
+  power_fun <- function(n1){
+    n1 <- round(n1)
+    n2 <- n1 * r
+    g <- BF_grid_rcpp(D, a0, b0, a1, b1, n1, a2, b2, n2,
+                      model1, da1, db1, dp1, model2, da2, db2, dp2)
+    sum_rcpp(g$log_h1_dp, g$PE) - target - 0.005
   }
-  power<-function(n1){
-    n1 = round(n1)
-    n2 = n1*r
-    grid <<- BF_grid_rcpp(D, a0, b0, a1, b1, n1, a2, b2, n2,model1,da1,db1,dp1,model2,da2,db2,dp2)
-    pro <- sum_rcpp(grid$log_h1_dp,grid$PE)
-    return(pro - target - .01)
-  }
-  n1 <- suppressWarnings(round(stats::uniroot(power, lower = lo_n1, upper = 5000,maxiter = 10)$root))
-  grid_power <- grid
 
+  n1 <- suppressWarnings(round(stats::uniroot(power_fun, lower = lo_n1, upper = 5000, maxiter = 10)$root))
+  n2 <- round(n1 * r)
+  grid <- BF_grid_rcpp(D, a0, b0, a1, b1, n1, a2, b2, n2,
+                       model1, da1, db1, dp1, model2, da2, db2, dp2)
 
-
-  return(list(grid_power,n1))
-
+  list(grid, n1)
 }
 
 
@@ -5277,7 +5278,7 @@ heatmap_p2 <- function(x, D) {
     ggplot2::theme_minimal()
 
   # Combine plots side by side
-  combined_plot <- p1 + p2 + patchwork::plot_layout(ncol = 2)
+  combined_plot <- patchwork::wrap_plots(p1, p2, ncol = 2)
 
   # Return combined plot (print when called interactively)
   combined_plot
@@ -6109,105 +6110,106 @@ input_p2 <- shiny::reactive({
 
 
 shiny::observeEvent(input$runp2, {
-  p2  <- input_p2()
-  gc()
-  dat <- tryCatch({pro_table_p2(p2$D,p2$target, p2$a0, p2$b0,
-                      p2$a1, p2$b1, p2$a2, p2$b2, p2$r,
-                      p2$model1,p2$a1d,p2$b1d,p2$dp1,
-                      p2$model2,p2$a2d,p2$b2d,p2$dp2,
-                      p2$mode_bf,p2$n1,p2$n2,p2$direct)},
-    error = function(e) {
-                        "Error"
-                      })
-  if (any(dat != "Error")){
-    table <- dat[[1]]
-    grid  <- dat[[2]]
 
-  }
+  p2 <- input_p2()
 
-  output$result_p2 <-   shiny::renderText({
+  # Compute data safely
+
+  dat <- tryCatch({
+    pro_table_p2(
+      p2$D, p2$target, p2$a0, p2$b0,
+      p2$a1, p2$b1, p2$a2, p2$b2, p2$r,
+      p2$model1, p2$a1d, p2$b1d, p2$dp1,
+      p2$model2, p2$a2d, p2$b2d, p2$dp2,
+      p2$mode_bf, p2$n1, p2$n2, p2$direct
+    )
+  }, error = function(e) "Error")
+
+
+  # If dat is NULL, skip processing
+  shiny::req(!is.null(dat))
+  table <- dat[[1]]
+
+  # Render function code
+  output$result_p2 <- shiny::renderText({
     paste("# Function to be used in R", show_props_code(p2), sep = "\n")
   })
 
-
-
+  # Render priors
   output$prior_p0 <- shiny::renderPlot({
-    p2_prior_plot(p2$a0,p2$b0,1,1,0,"same",0)
+    p2_prior_plot(p2$a0, p2$b0, 1, 1, 0, "same", 0)
   })
-
   output$prior_p1 <- shiny::renderPlot({
-    p2_prior_plot(p2$a1,p2$b1,p2$a1d,p2$b1d,p2$dp1,p2$model1,1)
+    p2_prior_plot(p2$a1, p2$b1, p2$a1d, p2$b1d, p2$dp1, p2$model1, 1)
   })
   output$prior_p2 <- shiny::renderPlot({
-    p2_prior_plot(p2$a2,p2$b2,p2$a2d,p2$b2d,p2$dp2,p2$model2,2)
+    p2_prior_plot(p2$a2, p2$b2, p2$a2d, p2$b2d, p2$dp2, p2$model2, 2)
   })
 
+  # Render results table
   output$resultp2 <- shiny::renderUI({
-    if (identical(dat, "Error")){
-      table_html <- shiny::span("\\(\\text{Note: Error when required } N > 5,000\\)", style = "color: red;")
-    }else{
-    # Create the LaTeX formatted strings for the table
-    table_html <- paste0('$$', '
-    \\begin{array}{l c}
-    \\textbf{Probability of Compelling Evidence} & \\\\
-    \\hline
-    p\\text{(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(table[1,1], 3), ' \\\\
-    p\\text{(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(table[1,3], 3), ' \\\\
-    \\textbf{Probability of Misleading Evidence} & \\\\
-    \\hline
-    p\\text{(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(table[1,2], 3), ' \\\\
-    p\\text{(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(table[1,4], 3), ' \\\\
-    \\textbf{Required Sample Size} & \\\\
-    \\hline
-    \\text{N}_1 & ', table[1,5], ' \\\\
-    \\text{N}_2 & ', table[1,6], ' \\\\
-    \\end{array}
-  ', '$$')
-    }
-    # Render the table using MathJax
-    shiny::tagList(
-      # Render the table using MathJax
+    if (identical(dat, "Error")) {
       shiny::withMathJax(
-        shiny::em(table_html)
+        shiny::span("\\(\\text{Note: Error when required } N > 5,000\\)", style = "color: red;")
       )
-    )
+    } else {
+      table <- dat[[1]]
+      table_html <- paste0('$$',
+                           '\\begin{array}{l c}
+      \\textbf{Probability of Compelling Evidence} & \\\\
+      \\hline
+      p\\text{(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_1) & ', round(table[1,1], 3), ' \\\\
+      p\\text{(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_0) & ', round(table[1,3], 3), ' \\\\
+      \\textbf{Probability of Misleading Evidence} & \\\\
+      \\hline
+      p\\text{(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_1) & ', round(table[1,2], 3), ' \\\\
+      p\\text{(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_0) & ', round(table[1,4], 3), ' \\\\
+      \\textbf{Required Sample Size} & \\\\
+      \\hline
+      \\text{N}_1 & ', table[1,5], ' \\\\
+      \\text{N}_2 & ', table[1,6], ' \\\\
+      \\end{array}
+      $$'
+      )
+      shiny::withMathJax(shiny::em(table_html))
+    }
   })
-  # Save plots based on conditions
 
-  if (p2$pc) {
-    Power_p2(p2$D, table[1,5], p2$a0, p2$b0, p2$a1, p2$b1, p2$a2,
-             p2$b2, table[1,6] / table[1,5], p2$model1, p2$a1d, p2$b1d, p2$dp1,
-             p2$model2, p2$a2d, p2$b2d, p2$dp2)
-    pc_p2 <- grDevices::recordPlot()
-  } else pc_p2 <- NA
 
-  # Render plots OUTSIDE shiny::renderUI
+
+  # Compute power plot if needed
+  pc_p2 <- if (p2$pc) {
+    Power_p2(
+      p2$D, table[1,5], p2$a0, p2$b0, p2$a1, p2$b1, p2$a2,
+      p2$b2, table[1,6] / table[1,5], p2$model1, p2$a1d, p2$b1d, p2$dp1,
+      p2$model2, p2$a2d, p2$b2d, p2$dp2
+    )
+    grDevices::recordPlot()
+  } else NULL
+
   output$PCp2 <- shiny::renderPlot({
+    shiny::req(pc_p2)
     pc_p2
   })
 
-
-
-  if (p2$rela) {
-
-    rela_p2 <-heatmap_p2(grid, p2$D)
-  } else rela_p2 <- NA
-
+  # Compute heatmap if needed
+  rela_p2 <- if (p2$rela) heatmap_p2(dat[[2]], p2$D) else NULL
 
   output$bfrp2 <- shiny::renderPlot({
-    print(rela_p2)
+    shiny::req(rela_p2)
+    rela_p2
   })
 
-  # Render the UI with proper plotOutput
+  # Optional plots UI
   output$Optional_Plots_p2 <- shiny::renderUI({
     shiny::tagList(
-      if (p2$pc) {
+      if (!is.null(pc_p2)) {
         shiny::tagList(
           shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$")),
           shiny::plotOutput("PCp2")
         )
       },
-      if (p2$rela) {
+      if (!is.null(rela_p2)) {
         shiny::tagList(
           shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$")),
           shiny::plotOutput("bfrp2")
@@ -6216,26 +6218,25 @@ shiny::observeEvent(input$runp2, {
     )
   })
 
+  # Download handler
   output$export_p2 <- shiny::downloadHandler(
-    filename = function() {
-      "BayesPower-report.html"
-    },
+    filename = function() "BayesPower-report.html",
     content = function(file) {
       template_path <- system.file("report_templates", "report_2p.Rmd", package = "BayesPower")
-
       tempReport <- file.path(tempdir(), "report_2p.Rmd")
-      file.copy(template_path , tempReport, overwrite = TRUE)
-
+      file.copy(template_path, tempReport, overwrite = TRUE)
       rmarkdown::render(
-        input = tempReport,output_format ="html_document",
+        input = tempReport,
+        output_format = "html_document",
         output_file = file,
-        params = list(p2 = p2, dat = dat,pc_p2=pc_p2,rela_p2=rela_p2),  # ✅ pass to `params`
-        envir = new.env(parent = globalenv())  # environment still required
+        params = list(p2 = p2, dat = dat, pc_p2 = pc_p2, rela_p2 = rela_p2),
+        envir = new.env(parent = globalenv())
       )
     }
   )
 
 })
+
 
 
 shiny::observeEvent(input$calp2, {
