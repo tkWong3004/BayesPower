@@ -71,23 +71,18 @@ Perform sample size determination or the calculation of compelling and misleadin
 for a Bayesian F-test.
 }
 \examples{
-\dontrun{
 BFpower.f(
-  interval = "1",
-  e = NULL,
-  D = 3,
-  target = 0.8,
-  FP = 0.05,
-  p = 2,
-  k = 3,
-  model = "f-distribution",
-  dff = 1,
-  rscale = 0.5,
-  f_m = 0.15,
-  de_an_prior = 1,
-  mode_bf = 1,
-  direct = "h1"
+ inter = "1",
+ D = 3,
+ target = 0.8,
+ p = 1,
+ k = 2,
+ model = "Moment",
+ dff = 1,
+ f_m = 0.1,
+ de_an_prior = 1,
+ mode_bf = 1,
+ direct = "h1"
 )
-}
 
 }

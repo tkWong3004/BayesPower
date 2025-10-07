@@ -80,7 +80,6 @@ Perform sample size determination or the calculation of compelling and misleadin
 for a Bayesian correlation test.
 }
 \examples{
-\dontrun{
 BFpower.cor(
   hypothesis = "!=",
   h0 = 0,
@@ -95,6 +94,5 @@ BFpower.cor(
   mode_bf = 1,
   direct = "h1"
 )
-}
 
 }

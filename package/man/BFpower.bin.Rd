@@ -77,7 +77,6 @@ Perform sample size determination or the calculation of compelling and misleadin
 for a Bayesian test of a single proportion.
 }
 \examples{
-\dontrun{
 BFpower.bin(
   hypothesis = "!=",
   interval = "1",
@@ -92,6 +91,5 @@ BFpower.bin(
   mode_bf = 1,
   direct = "h1"
 )
-}
 
 }

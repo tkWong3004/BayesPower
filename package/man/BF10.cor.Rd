@@ -51,7 +51,6 @@ The Bayes factor (BF10) for the correlation test.
 Calculate the Bayes factor (BF10) for a correlation, either against a point null or an interval null hypothesis.
 }
 \examples{
-\dontrun{
 BF10.cor(
   r = 0.3,
   n = 50,
@@ -65,5 +64,4 @@ BF10.cor(
   dff = 49,
   model = "d_beta"
 )
-}
 }

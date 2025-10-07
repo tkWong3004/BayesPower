@@ -34,13 +34,12 @@ The Bayes factor (BF10) for comparing two proportions.
 Calculate the Bayes factor (BF10) for comparing two proportions using a Bayesian framework.
 }
 \examples{
-\dontrun{
 BF10.props(
   a0 = 2, b0 = 3,
   a1 = 2, b1 = 3,
   a2 = 2, b2 = 3,
   n1 = 50, n2 = 60,
-  y1 = 25, y2 = 30
+  x1 = 25, x2 = 30
 )
-}
+
 }

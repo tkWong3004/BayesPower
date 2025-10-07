@@ -39,7 +39,6 @@ The Bayes factor (BF10) for the one-sample t-test.
 Calculate the Bayes factor (BF10) for a one-sample Bayesian t-test, either against a point null or an interval null hypothesis.
 }
 \examples{
-\dontrun{
 BF10.t.test.one_sample(
   tval = 2.31,
   df = 29,
@@ -49,5 +48,4 @@ BF10.t.test.one_sample(
   dff = 1,
   hypothesis = "!="
 )
-}
 }

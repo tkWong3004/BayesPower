@@ -30,15 +30,13 @@ The Bayes factor (BF10) for the F-test.
 Calculate the Bayes factor (BF10) for an F-test, either against a point null or an interval null hypothesis.
 }
 \examples{
-\dontrun{
 BF10.f.test(
   fval = 4.5,
   df1 = 2,
   df2 = 12,
   dff = 12,
   rscale = 0.707,
-  f_m = "medium",
+  f_m = .1,
   model = "effectsize"
 )
-}
 }

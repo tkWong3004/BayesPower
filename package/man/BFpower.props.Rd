@@ -73,7 +73,6 @@ Perform sample size determination or the calculation of compelling and misleadin
 for a Bayesian comparison of two proportions.
 }
 \examples{
-\dontrun{
 BFpower.props(
   D = 3,
   target = 0.8,
@@ -88,6 +87,5 @@ BFpower.props(
   mode_bf = 1,
   direct = "h1"
 )
-}
 
 }

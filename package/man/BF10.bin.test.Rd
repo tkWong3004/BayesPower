@@ -32,7 +32,6 @@ The Bayes factor (BF10) for the one-proportion test.
 Calculate the Bayes factor (BF10) for a test of a single proportion, either against a point null or an interval null hypothesis.
 }
 \examples{
-\dontrun{
 BF10.bin.test(
   x = 12,
   n = 50,
@@ -43,5 +42,4 @@ BF10.bin.test(
   model = "beta",
   hypothesis = "!="
 )
-}
 }

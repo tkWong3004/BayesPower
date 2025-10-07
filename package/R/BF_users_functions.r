@@ -19,14 +19,13 @@
 #' @param dff_d Degrees of freedom parameter for the design prior under the alternative hypothesis.
 #' @param de_an_prior Integer (0 or 1). If 1, analysis and design priors under the alternative are the same; if 0, they are not.
 #' @param N Sample size.
-#' @param mode_bf Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N} is needed for the calculation of probabilities of compelling and misleading evidence.
+#' @param mode_bf Integer (1 or 2). If \code{1}, sample size determination; if \code{2}, \code{N} is used for the calculation of probabilities of compelling and misleading evidence.
 #' @param direct If \code{"h1"}, controlling true/false positive rates; if \code{"h0"}, controlling true/false negative rates.
 #'
 #' @examples
-#' \dontrun{
 #' BFpower.t.test_one_sample(
 #'   hypothesis = "!=",
-#'   interval = "1",
+#'   interval = 1,
 #'   D = 3,
 #'   target = 0.8,
 #'   alpha = 0.05,
@@ -39,7 +38,6 @@
 #'   mode_bf = 1,
 #'   direct = "h1"
 #' )
-#' }
 #'
 #' @export
 BFpower.t.test_one_sample <- function(hypothesis = NULL, e = NULL, interval = NULL,
@@ -103,7 +101,7 @@ BFpower.t.test_one_sample <- function(hypothesis = NULL, e = NULL, interval = NU
 #'
 #' @param hypothesis The hypothesis being tested (e.g., two-sided \code{"!="}, right-sided \code{">"}, left-sided \code{"<"}).
 #' @param e The bounds for the interval Bayes factor (used when \code{interval = 0}).
-#' @param interval Character or integer (0 or 1). If \code{"1"}, Bayes factor with a point null against a composite alternative hypothesis;
+#' @param interval Integer (1 or 0). If \code{1}, Bayes factor with a point null against a composite alternative hypothesis;
 #'   otherwise Bayes factor with interval null and alternative hypotheses.
 #' @param D The bound of compelling evidence.
 #' @param target The targeted true positive rate (if \code{direct = "h1"}) or true negative rate (if \code{direct = "h0"}).
@@ -119,16 +117,15 @@ BFpower.t.test_one_sample <- function(hypothesis = NULL, e = NULL, interval = NU
 #' @param de_an_prior Integer (0 or 1). If 1, analysis and design priors under the alternative are the same; if 0, they are not.
 #' @param N1 Sample size of group 1.
 #' @param N2 Sample size of group 2.
-#' @param r Ratio of the sample size of group 2 over group 1 (N2 / N1).
-#' @param mode_bf Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N1} and \code{N2} are needed for the calculation of probabilities of compelling and misleading evidence.
-#' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
+#' @param r Ratio of the sample size of group 2 over group 1 (\code{N2 / N1}).
+#' @param mode_bf Integer (1 or 0). If \code{1}, sample size determination; if \code{0}, \code{N1} and \code{N2} are used for the calculation of probabilities of compelling and misleading evidence.
+#' @param direct If \code{"h1"}, controls true/false positive rates (BF10); if \code{"h0"}, controls true/false negative rates (BF01).
 #'
 #' @examples
-#' \dontrun{
 #' BFpower.t.test_two_sample(
 #'   hypothesis = "!=",
 #'   e = NULL,
-#'   interval = "1",
+#'   interval = 1,
 #'   D = 3,
 #'   target = 0.8,
 #'   alpha = 0.05,
@@ -141,7 +138,6 @@ BFpower.t.test_one_sample <- function(hypothesis = NULL, e = NULL, interval = NU
 #'   mode_bf = 1,
 #'   direct = "h1"
 #' )
-#' }
 #'
 #' @export
 BFpower.t.test_two_sample <- function(hypothesis = NULL, e = NULL, interval = NULL,
@@ -231,7 +227,6 @@ BFpower.t.test_two_sample <- function(hypothesis = NULL, e = NULL, interval = NU
 #' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
 #'
 #' @examples
-#' \dontrun{
 #' BFpower.cor(
 #'   hypothesis = "!=",
 #'   h0 = 0,
@@ -246,7 +241,6 @@ BFpower.t.test_two_sample <- function(hypothesis = NULL, e = NULL, interval = NU
 #'   mode_bf = 1,
 #'   direct = "h1"
 #' )
-#' }
 #'
 #' @export
 BFpower.cor <- function(hypothesis = NULL, h0 = NULL, e = NULL, interval = NULL,
@@ -343,24 +337,19 @@ BFpower.cor <- function(hypothesis = NULL, h0 = NULL, e = NULL, interval = NULL,
 #' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
 #'
 #' @examples
-#' \dontrun{
-#' BFpower.f(
-#'   interval = "1",
-#'   e = NULL,
-#'   D = 3,
-#'   target = 0.8,
-#'   FP = 0.05,
-#'   p = 2,
-#'   k = 3,
-#'   model = "f-distribution",
-#'   dff = 1,
-#'   rscale = 0.5,
-#'   f_m = 0.15,
-#'   de_an_prior = 1,
-#'   mode_bf = 1,
-#'   direct = "h1"
-#' )
-#' }
+#'BFpower.f(
+#'  inter = "1",
+#'  D = 3,
+#'  target = 0.8,
+#'  p = 1,
+#'  k = 2,
+#'  model = "Moment",
+#'  dff = 1,
+#'  f_m = 0.1,
+#'  de_an_prior = 1,
+#'  mode_bf = 1,
+#'  direct = "h1"
+#')
 #'
 #' @export
 BFpower.f <- function(interval = NULL,
@@ -457,7 +446,6 @@ BFpower.f <- function(interval = NULL,
 #' @param h0 Null value
 #'
 #' @examples
-#' \dontrun{
 #' BFpower.bin(
 #'   hypothesis = "!=",
 #'   interval = "1",
@@ -472,7 +460,6 @@ BFpower.f <- function(interval = NULL,
 #'   mode_bf = 1,
 #'   direct = "h1"
 #' )
-#' }
 #'
 #' @export
 BFpower.bin <- function(hypothesis = NULL, interval = NULL,
@@ -570,7 +557,6 @@ BFpower.bin <- function(hypothesis = NULL, interval = NULL,
 #' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
 #'
 #' @examples
-#' \dontrun{
 #' BFpower.props(
 #'   D = 3,
 #'   target = 0.8,
@@ -585,7 +571,6 @@ BFpower.bin <- function(hypothesis = NULL, interval = NULL,
 #'   mode_bf = 1,
 #'   direct = "h1"
 #' )
-#' }
 #'
 #' @export
 BFpower.props <- function(D = NULL, target = NULL, a0 = NULL, b0 = NULL, a1 = NULL, b1 = NULL,
@@ -648,8 +633,6 @@ BFpower.props <- function(D = NULL, target = NULL, a0 = NULL, b0 = NULL, a1 = NU
 }
 
 
-
-
 #' Bayes factor for one-sample Bayesian t-test
 #'
 #' Calculate the Bayes factor (BF10) for a one-sample Bayesian t-test, either against a point null or an interval null hypothesis.
@@ -666,7 +649,6 @@ BFpower.props <- function(D = NULL, target = NULL, a0 = NULL, b0 = NULL, a1 = NU
 #' @return The Bayes factor (BF10) for the one-sample t-test.
 #'
 #' @examples
-#' \dontrun{
 #' BF10.t.test.one_sample(
 #'   tval = 2.31,
 #'   df = 29,
@@ -676,7 +658,6 @@ BFpower.props <- function(D = NULL, target = NULL, a0 = NULL, b0 = NULL, a1 = NU
 #'   dff = 1,
 #'   hypothesis = "!="
 #' )
-#' }
 #' @export
 BF10.t.test.one_sample <- function(tval, df, model, location, scale, dff, hypothesis, e = NULL) {
   suppressWarnings(
@@ -706,7 +687,7 @@ BF10.t.test.one_sample <- function(tval, df, model, location, scale, dff, hypoth
 #' @return The Bayes factor (BF10) for the two-sample t-test.
 #'
 #' @examples
-#' \dontrun{
+
 #' BF10.t.test.two_sample(
 #'   tval = 2.1,
 #'   N1 = 30,
@@ -717,7 +698,6 @@ BF10.t.test.one_sample <- function(tval, df, model, location, scale, dff, hypoth
 #'   dff = 1,
 #'   hypothesis = "!="
 #' )
-#' }
 #' @export
 BF10.t.test.two_sample <- function(tval, N1, N2, model, location, scale, dff, hypothesis, e = NULL) {
   n1 <- N1
@@ -752,7 +732,6 @@ BF10.t.test.two_sample <- function(tval, N1, N2, model, location, scale, dff, hy
 #' @return The Bayes factor (BF10) for the correlation test.
 #'
 #' @examples
-#' \dontrun{
 #' BF10.cor(
 #'   r = 0.3,
 #'   n = 50,
@@ -766,7 +745,6 @@ BF10.t.test.two_sample <- function(tval, N1, N2, model, location, scale, dff, hy
 #'   dff = 49,
 #'   model = "d_beta"
 #' )
-#' }
 #' @export
 BF10.cor <- function(r, n, k, alpha, beta, h0, hypothesis, location, scale, dff, model, e = NULL) {
   suppressWarnings(
@@ -795,17 +773,15 @@ BF10.cor <- function(r, n, k, alpha, beta, h0, hypothesis, location, scale, dff,
 #' @return The Bayes factor (BF10) for the F-test.
 #'
 #' @examples
-#' \dontrun{
 #' BF10.f.test(
 #'   fval = 4.5,
 #'   df1 = 2,
 #'   df2 = 12,
 #'   dff = 12,
 #'   rscale = 0.707,
-#'   f_m = "medium",
+#'   f_m = .1,
 #'   model = "effectsize"
 #' )
-#' }
 #' @export
 BF10.f.test <- function(fval, df1, df2, dff, rscale, f_m, model, e = NULL) {
 
@@ -839,7 +815,6 @@ BF10.f.test <- function(fval, df1, df2, dff, rscale, f_m, model, e = NULL) {
 #' @return The Bayes factor (BF10) for the one-proportion test.
 #'
 #' @examples
-#' \dontrun{
 #' BF10.bin.test(
 #'   x = 12,
 #'   n = 50,
@@ -850,7 +825,6 @@ BF10.f.test <- function(fval, df1, df2, dff, rscale, f_m, model, e = NULL) {
 #'   model = "beta",
 #'   hypothesis = "!="
 #' )
-#' }
 #' @export
 BF10.bin.test <- function(x, n, alpha, beta, location, scale, model, hypothesis, e = NULL) {
   suppressWarnings(
@@ -881,15 +855,14 @@ BF10.bin.test <- function(x, n, alpha, beta, location, scale, model, hypothesis,
 #' @return The Bayes factor (BF10) for comparing two proportions.
 #'
 #' @examples
-#' \dontrun{
 #' BF10.props(
 #'   a0 = 2, b0 = 3,
 #'   a1 = 2, b1 = 3,
 #'   a2 = 2, b2 = 3,
 #'   n1 = 50, n2 = 60,
-#'   y1 = 25, y2 = 30
+#'   x1 = 25, x2 = 30
 #' )
-#' }
+#'
 #' @export
 BF10.props <- function(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2) {
   BF10_p2(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)

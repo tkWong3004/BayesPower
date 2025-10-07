@@ -32,7 +32,7 @@ BFpower.t.test_two_sample(
 
 \item{e}{The bounds for the interval Bayes factor (used when \code{interval = 0}).}
 
-\item{interval}{Character or integer (0 or 1). If \code{"1"}, Bayes factor with a point null against a composite alternative hypothesis;
+\item{interval}{Integer (1 or 0). If \code{1}, Bayes factor with a point null against a composite alternative hypothesis;
 otherwise Bayes factor with interval null and alternative hypotheses.}
 
 \item{D}{The bound of compelling evidence.}
@@ -63,22 +63,21 @@ otherwise Bayes factor with interval null and alternative hypotheses.}
 
 \item{N2}{Sample size of group 2.}
 
-\item{r}{Ratio of the sample size of group 2 over group 1 (N2 / N1).}
+\item{r}{Ratio of the sample size of group 2 over group 1 (\code{N2 / N1}).}
 
-\item{mode_bf}{Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N1} and \code{N2} are needed for the calculation of probabilities of compelling and misleading evidence.}
+\item{mode_bf}{Integer (1 or 0). If \code{1}, sample size determination; if \code{0}, \code{N1} and \code{N2} are used for the calculation of probabilities of compelling and misleading evidence.}
 
-\item{direct}{If \code{"h1"}, BF10; if \code{"h0"}, BF01.}
+\item{direct}{If \code{"h1"}, controls true/false positive rates (BF10); if \code{"h0"}, controls true/false negative rates (BF01).}
 }
 \description{
 Perform sample size determination or the calculation of compelling and misleading evidence
 for a two-sample Bayesian t-test.
 }
 \examples{
-\dontrun{
 BFpower.t.test_two_sample(
   hypothesis = "!=",
   e = NULL,
-  interval = "1",
+  interval = 1,
   D = 3,
   target = 0.8,
   alpha = 0.05,
@@ -91,6 +90,5 @@ BFpower.t.test_two_sample(
   mode_bf = 1,
   direct = "h1"
 )
-}
 
 }

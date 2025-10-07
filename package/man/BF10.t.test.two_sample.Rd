@@ -42,7 +42,6 @@ The Bayes factor (BF10) for the two-sample t-test.
 Calculate the Bayes factor (BF10) for a two-sample Bayesian t-test, either against a point null or an interval null hypothesis.
 }
 \examples{
-\dontrun{
 BF10.t.test.two_sample(
   tval = 2.1,
   N1 = 30,
@@ -53,5 +52,4 @@ BF10.t.test.two_sample(
   dff = 1,
   hypothesis = "!="
 )
-}
 }

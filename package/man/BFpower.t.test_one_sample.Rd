@@ -59,7 +59,7 @@ otherwise Bayes factor with interval null and alternative hypotheses.}
 
 \item{N}{Sample size.}
 
-\item{mode_bf}{Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N} is needed for the calculation of probabilities of compelling and misleading evidence.}
+\item{mode_bf}{Integer (1 or 2). If \code{1}, sample size determination; if \code{2}, \code{N} is used for the calculation of probabilities of compelling and misleading evidence.}
 
 \item{direct}{If \code{"h1"}, controlling true/false positive rates; if \code{"h0"}, controlling true/false negative rates.}
 }
@@ -67,10 +67,9 @@ otherwise Bayes factor with interval null and alternative hypotheses.}
 Perform sample size determination or the calculation of compelling and misleading evidence.
 }
 \examples{
-\dontrun{
 BFpower.t.test_one_sample(
   hypothesis = "!=",
-  interval = "1",
+  interval = 1,
   D = 3,
   target = 0.8,
   alpha = 0.05,
@@ -83,6 +82,5 @@ BFpower.t.test_one_sample(
   mode_bf = 1,
   direct = "h1"
 )
-}
 
 }
