@@ -6,6 +6,9 @@
 \usage{
 BayesPower_BayesFactor()
 }
+\value{
+No return value, called for its side effects.
+}
 \description{
 This function starts the interactive Shiny application for
 Bayesian power analysis using Bayes factors.
@@ -19,9 +22,8 @@ browser window or RStudio viewer pane will open to display
 the interface.
 }
 \examples{
-\dontrun{
-# Launch the Shiny application
-BayesPower_BayesFactor()
+if (interactive()) {
+  # Launch the Shiny application
+  BayesPower_BayesFactor()
 }
-
 }

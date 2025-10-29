@@ -262,6 +262,8 @@ f_table<-function(D,target,p,k,dff,rscale,f_m,model,
 }
 
 prior_plot_f <-function(q,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,model_d,de_an_prior ){
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
   fsq = seq(0.001,15,.2)
 
@@ -309,6 +311,9 @@ bf10_f <-function(D,n,k,p,dff,rscale,f_m,model){
   } else {
     main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(round(f.BF10[1],digits = 2)))~"or"~.(format(round(f.BF10[2],digits = 2)))))
   }
+
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
 
   graphics::par(mfrow = c(1, 2))
   plot(ff,BF10,log = "y",xlim=c(0,10),xlab= "f-value",type="l", ylab = expression(BF[10] * " (log scale)"),main =   main,frame.plot = FALSE,xaxt = "n")
@@ -372,7 +377,8 @@ Power_f<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model_
     }
 
   }
-
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(n, TPE, type = "l",
        xlab = "Total sample size",
@@ -668,6 +674,8 @@ fe_table<-function(D,target,p,k,dff,rscale,f_m,model,
 
 
 prior_plot_fe <-function(q,dff,rscale,f,model,dff_d,rscale_d,f_m_d,model_d,de_an_prior ,e){
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
 
   normalization  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
@@ -738,6 +746,8 @@ bf10_fe <-function(D,n,k,p,dff,rscale,f_m,model,e){
   } else {
     main =  bquote(bold("BF"[10]~"="~.(D) ~"when f = "~.(format(round(f.BF10[1],digits = 2)))~"or"~.(format(round(f.BF10[2],digits = 2)))))
   }
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(ff,BF10,log = "y",xlim=c(0,10),xlab= "f-value",type="l", ylab = expression("BF"[10]* " (log scale)"),main =   main,frame.plot = FALSE,xaxt = "n")
   graphics::abline(v = f.BF10)
@@ -772,7 +782,7 @@ bf10_fe <-function(D,n,k,p,dff,rscale,f_m,model,e){
 }
 
 Power_fe<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model_d,de_an_prior,N,e){
-  graphics::par(mfrow = c(1, 1))
+
   smin = (2*k-p+1)
   smax = N*2
   sdf = seq(smin,smax , by = (smax-smin)/30)
@@ -807,6 +817,8 @@ Power_fe<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model
 
 
   }
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(sdf, TPE, type = "l",
        xlab = "Total sample size",
@@ -1368,6 +1380,8 @@ bin_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis){
   BF10_at_b <- round(bin_BF(b.BF10,n,alpha,beta,location,scale,model,hypothesis),2)
   BF10 <- bin_BF(x,n,alpha,beta,location,scale,model,hypothesis)
 
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
 
   if (length(b.BF10)== 2){  part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1]) / .(BF10_at_b[2])))}else{part1 = bquote(bold("BF"[10] ~ "=" ~ .(BF10_at_b[1])))}
@@ -1446,6 +1460,8 @@ Power_bin<-function(D,h0,alpha,beta,location,scale,model,hypothesis,
     TNE[i] = bin_TNE(x01,Ns[i],location,hypothesis)
 
   }
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(Ns, TPE, type = "l",
        xlab = "Sample size",
@@ -1505,6 +1521,8 @@ compute.prior.density.b <- function(prop,alpha,beta,location,scale,model,hypothe
 
 
 bin_prior_plot <-function(h0,alpha,beta,location,scale,model,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,de_an_prior){
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
   bound          <- switch(hypothesis,
                    ">" = c(a = h0, b = 1),
@@ -2156,7 +2174,8 @@ bin_e_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis,e){
   if (length(b.BF10)== 2){  part2 = bquote("when x = " ~ .(b.BF10[1]) / .(b.BF10[2]))}else{  part2 <- bquote("when x = " ~ .(b.BF10[1]))}
 
   main <- bquote(bold(.(part1) ~ .(part2)))
-
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(x, BF10, type = "l", log = "y", xlab = "Number of success", ylab = expression("BF"[10]* " (log scale)"),
        main = main, frame.plot = FALSE, xaxt = "n")
@@ -2232,6 +2251,8 @@ Power_e_bin<-function(D,h0,alpha,beta,location,scale,model,hypothesis,
 
 
   }
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(sN, TPE, type = "l",
        xlab = "Sample size",
@@ -2306,6 +2327,8 @@ compute.prior.density.be.h0 <- function(h0,prop,alpha,beta,location,scale,model,
 
 
 bin_e_prior_plot <-function(h0,alpha,beta,location,scale,model,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,de_an_prior,e){
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
   bounds <- switch(hypothesis,
                         ">"  = c(h0, 1),
@@ -2834,6 +2857,8 @@ compute.prior.density.r <- function(rho, k,location,scale,dff,model, alpha, beta
 
 r_prior_plot <-function(k, alpha, beta,h0,location,scale,dff,model,de_an_prior,
                         k_d, alpha_d, beta_d,location_d,scale_d,dff_d,model_d,hypothesis){
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
   bound  <- switch(hypothesis,
                    ">" = c(a = h0, b = 1),
@@ -2885,7 +2910,8 @@ r_bf10_p <-function(D,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model){
   # Compute BF10 and t-bounds:
   r.BF10 <- r_BF_bound_10(D,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model)
   BF10 <- r_BF10(rr,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model)
-
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   # Left plot - BF10:
   main.bf10 <- if (length(r.BF10) == 1) {
@@ -2951,7 +2977,10 @@ Power_r<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
       r_FNE(r01,Ns[i],k, alpha, beta,h0,hypothesis,location,scale,dff,model) else
         r_FNE(r01,Ns[i],k_d, alpha_d, beta_d,h0,hypothesis,location_d,scale_d,dff_d,model_d)
     TNE[i] <- r_TNE(r01,Ns[i],h0,hypothesis)
-    }
+  }
+
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(Ns, TPE, type = "l",
        xlab = "Total sample size",
@@ -3587,6 +3616,8 @@ compute.prior.density.re.h0 <- function(rho,h0, k,location,scale,dff,model, alph
 
 re_prior_plot <-function(k, alpha, beta,h0,location,scale,dff,model,de_an_prior,
                          k_d, alpha_d, beta_d,location_d,scale_d,dff_d,model_d,hypothesis,e){
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
 
 
@@ -3661,7 +3692,8 @@ re_bf10_p <-function(D,n,k,alpha,beta,h0,hypothesis,location,scale,dff,model,e){
   # Compute BF10 and t-bounds:
   r.BF10 <- re_BF_bound_10(D,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model,e)
   BF10 <- re_BF10(rr,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model,e)
-
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   # Left plot - BF10:
   main.bf10 <- if (length(r.BF10) == 1) {
@@ -3728,7 +3760,8 @@ Power_re<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
 
 
       }
-
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(Ns, TPE, type = "l",
        xlab = "Total sample size",
@@ -4130,6 +4163,8 @@ compute.prior.density.t <- function(tt, model, location, scale, dff, hypothesis)
 # plot for the selected prior
 t1_prior_plot <- function(D, target, model, location, scale, dff, hypothesis,
                           model_d, location_d, scale_d, dff_d, de_an_prior) {
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
 
   plot.bounds    <- switch(hypothesis,
@@ -4175,7 +4210,8 @@ bf10_t1 <-function(D = 3, df, target, model = "NA", location = 0, scale = 0.707,
   # Compute BF10 and t-bounds:
   BF10   <- t1_BF10(tt, df, model, location, scale, dff, hypothesis)
   t.BF10 <- t1_BF10_bound(D, df, model, location, scale, dff, hypothesis)
-
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   # Left plot - BF10:
   main.bf10 <- if (length(t.BF10) == 1) {
@@ -4242,7 +4278,8 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
       t1_FNE(t01, dfs[i], model, location, scale, dff,hypothesis) else
         t1_FNE(t01, dfs[i], model_d, location_d, scale_d, dff_d,hypothesis)
   }
-
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(dfs+1, TPE, type = "l",
        xlab = "Total sample size",
@@ -4807,6 +4844,8 @@ compute.prior.density.te.h0 <- function(tt, model,location, scale, dff, hypothes
 
 t1e_prior_plot <- function(model,location, scale, dff, hypothesis, e,
                            de_an_prior, model_d, scale_d, dff_d, location_d) {
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
 
   plot.bounds <- switch(hypothesis,
@@ -4866,6 +4905,8 @@ t1e_prior_plot <- function(model,location, scale, dff, hypothesis, e,
 
 te1_BF <-function(D,df,model ,location,scale,dff , hypothesis ,e){
   tt <- seq(-5, 5, 0.2)
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   # Compute BF10 and t-bounds:
   BF10   <- t1e_BF10(tt,df,model,location,scale,dff , hypothesis,e )
@@ -4909,6 +4950,8 @@ te1_BF <-function(D,df,model ,location,scale,dff , hypothesis ,e){
 }
 Power_t1e<-function(D,model,location,scale,dff, hypothesis,
                    model_d,location_d,scale_d,dff_d, de_an_prior,N,e){
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
   # df range to evaluate power:
   df.min     <- 2
@@ -4934,7 +4977,9 @@ Power_t1e<-function(D,model,location,scale,dff, hypothesis,
       t1e_FNE(t01,dfs[i],model ,location,scale,dff , hypothesis ,e) else
         t1e_FNE(t01,dfs[i],model_d ,location_d,scale_d,dff_d , hypothesis ,e)
 
-    }
+  }
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(dfs+1, TPE, type = "l",
        xlab = "Total sample size",
@@ -5065,7 +5110,8 @@ pro_table_p2<-function(D,target, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,mo
 
 
 p2_prior_plot<-function(a,b,ad,bd,dp,model,nu){
-
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
 
   prop    <- seq( 0,1,.001)
@@ -5121,7 +5167,8 @@ Power_p2<-function(D,n1, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,model2,da2
     FNE[i] <- sum_rcpp(grid$log_h1_dp,grid$NE)
 
   }
-
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
 
   plot(Nt, TPE, type = "l",
@@ -7855,6 +7902,8 @@ t2_Table <- function(D,r,target,model,location,scale,dff, hypothesis,
 # plots for showing the relationship between BF and t-values
 
 t2_bf10 <-function(D ,n1,r, target,model ,location ,scale,dff  , hypothesis ){
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   tt <- seq(-5, 5, 0.2)
 
@@ -7926,6 +7975,8 @@ Power_t2<-function(D,model,location,scale,dff, hypothesis,
 
 
   }
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(sdf, TPE, type = "l",
        xlab = "Total sample size",
@@ -8368,6 +8419,8 @@ t2e_table<-function(D,r,target,model,location,scale,dff, hypothesis,e ,
 
 t2e_BF <-function(D,n1,r,model ,location,scale,dff , hypothesis ,e){
   tt <- seq(-5, 5, 0.2)
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   # Compute BF10 and t-bounds:
   BF10   <- t2e_BF10(tt, n1,r,model,location,scale,dff , hypothesis,e)
@@ -8436,6 +8489,8 @@ Power_t2e<-function(D,model,location,scale,dff, hypothesis,
                     "0" = t2e_FNE(t01,sn1[i],r,model_d ,location_d,scale_d,dff_d , hypothesis ,e))
 
   }
+  oldpar <- graphics::par(no.readonly = TRUE)
+  base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))
   plot(sdf, TPE, type = "l",
        xlab = "Total sample size",

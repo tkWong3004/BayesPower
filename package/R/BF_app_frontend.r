@@ -1,4 +1,5 @@
 #' @useDynLib BayesPower, .registration = TRUE
+#' @importFrom shinyWidgets prettyRadioButtons
 #' @importFrom Rcpp evalCpp
 NULL
 
@@ -1572,12 +1573,13 @@ server <- function(input, output, session) {
 #' the interface.
 #'
 #'
-#' @examples
-#' \dontrun{
-#' # Launch the Shiny application
-#' BayesPower_BayesFactor()
-#' }
+#' @return No return value, called for its side effects.
 #'
+#' @examples
+#' if (interactive()) {
+#'   # Launch the Shiny application
+#'   BayesPower_BayesFactor()
+#' }
 #' @export
 BayesPower_BayesFactor <- function(){
   shiny::shinyApp(ui = ui, server = server)

@@ -22,6 +22,20 @@
 #' @param mode_bf Integer (1 or 2). If \code{1}, sample size determination; if \code{2}, \code{N} is used for the calculation of probabilities of compelling and misleading evidence.
 #' @param direct If \code{"h1"}, controlling true/false positive rates; if \code{"h0"}, controlling true/false negative rates.
 #'
+#' @return A data frame with the following columns:
+#'   \itemize{
+#'     \item \code{p(BF10 > D | H1)}: Probability of obtaining compelling evidence
+#'       in favor of the alternative hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H1)}: Probability of obtaining misleading evidence
+#'       in favor of the null hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H0)}: Probability of obtaining compelling evidence
+#'       in favor of the null hypothesis when the null is true.
+#'     \item \code{p(BF10 > D | H0)}: Probability of obtaining misleading evidence
+#'       in favor of the alternative hypothesis when the null is true.
+#'     \item \code{Required N}: The required sample size or the sample size input by the users.
+#'   }
+#'   If sample size determination fails, the function returns \code{NULL}.
+#'
 #' @examples
 #' BFpower.t.test_one_sample(
 #'   hypothesis = "!=",
@@ -120,6 +134,21 @@ BFpower.t.test_one_sample <- function(hypothesis = NULL, e = NULL, interval = NU
 #' @param r Ratio of the sample size of group 2 over group 1 (\code{N2 / N1}).
 #' @param mode_bf Integer (1 or 0). If \code{1}, sample size determination; if \code{0}, \code{N1} and \code{N2} are used for the calculation of probabilities of compelling and misleading evidence.
 #' @param direct If \code{"h1"}, controls true/false positive rates (BF10); if \code{"h0"}, controls true/false negative rates (BF01).
+#'
+#' @return A data frame with the following columns:
+#'   \itemize{
+#'     \item \code{p(BF10 > D | H1)}: Probability of obtaining compelling evidence
+#'       in favor of the alternative hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H1)}: Probability of obtaining misleading evidence
+#'       in favor of the null hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H0)}: Probability of obtaining compelling evidence
+#'       in favor of the null hypothesis when the null is true.
+#'     \item \code{p(BF10 > D | H0)}: Probability of obtaining misleading evidence
+#'       in favor of the alternative hypothesis when the null is true.
+#'     \item \code{Required N1}: The required sample size for group 1 or the sample size input by the user.
+#'     \item \code{Required N2}: The required sample size for group 1 or the sample size input by the user.
+#'   }
+#'   If sample size determination fails, the function returns \code{NULL}.
 #'
 #' @examples
 #' BFpower.t.test_two_sample(
@@ -225,6 +254,20 @@ BFpower.t.test_two_sample <- function(hypothesis = NULL, e = NULL, interval = NU
 #' @param N Sample size.
 #' @param mode_bf Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N} is needed for the calculation of probabilities of compelling and misleading evidence.
 #' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
+#'
+#' @return A data frame with the following columns:
+#'   \itemize{
+#'     \item \code{p(BF10 > D | H1)}: Probability of obtaining compelling evidence
+#'       in favor of the alternative hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H1)}: Probability of obtaining misleading evidence
+#'       in favor of the null hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H0)}: Probability of obtaining compelling evidence
+#'       in favor of the null hypothesis when the null is true.
+#'     \item \code{p(BF10 > D | H0)}: Probability of obtaining misleading evidence
+#'       in favor of the alternative hypothesis when the null is true.
+#'     \item \code{Required N}: The required sample size or the sample size input by the users.
+#'   }
+#'   If sample size determination fails, the function returns \code{NULL}.
 #'
 #' @examples
 #' BFpower.cor(
@@ -336,6 +379,20 @@ BFpower.cor <- function(hypothesis = NULL, h0 = NULL, e = NULL, interval = NULL,
 #' @param mode_bf Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{N} is needed for the calculation of probabilities of compelling and misleading evidence.
 #' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
 #'
+#' @return A data frame with the following columns:
+#'   \itemize{
+#'     \item \code{p(BF10 > D | H1)}: Probability of obtaining compelling evidence
+#'       in favor of the alternative hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H1)}: Probability of obtaining misleading evidence
+#'       in favor of the null hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H0)}: Probability of obtaining compelling evidence
+#'       in favor of the null hypothesis when the null is true.
+#'     \item \code{p(BF10 > D | H0)}: Probability of obtaining misleading evidence
+#'       in favor of the alternative hypothesis when the null is true.
+#'     \item \code{Required N}: The required sample size or the sample size input by the users.
+#'   }
+#'   If sample size determination fails, the function returns \code{NULL}.
+#'
 #' @examples
 #'BFpower.f(
 #'  inter = "1",
@@ -444,6 +501,20 @@ BFpower.f <- function(interval = NULL,
 #' @param e The bounds for the interval Bayes factor (used when \code{interval = 0}).
 #' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
 #' @param h0 Null value
+#'
+#' @return A data frame with the following columns:
+#'   \itemize{
+#'     \item \code{p(BF10 > D | H1)}: Probability of obtaining compelling evidence
+#'       in favor of the alternative hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H1)}: Probability of obtaining misleading evidence
+#'       in favor of the null hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H0)}: Probability of obtaining compelling evidence
+#'       in favor of the null hypothesis when the null is true.
+#'     \item \code{p(BF10 > D | H0)}: Probability of obtaining misleading evidence
+#'       in favor of the alternative hypothesis when the null is true.
+#'     \item \code{Required N}: The required sample size or the sample size input by the users.
+#'   }
+#'   If sample size determination fails, the function returns \code{NULL}.
 #'
 #' @examples
 #' BFpower.bin(
@@ -555,6 +626,21 @@ BFpower.bin <- function(hypothesis = NULL, interval = NULL,
 #' @param n1 Sample size for group 1.
 #' @param n2 Sample size for group 2.
 #' @param direct If \code{"h1"}, BF10; if \code{"h0"}, BF01.
+#'
+#' @return A data frame with the following columns:
+#'   \itemize{
+#'     \item \code{p(BF10 > D | H1)}: Probability of obtaining compelling evidence
+#'       in favor of the alternative hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H1)}: Probability of obtaining misleading evidence
+#'       in favor of the null hypothesis when the alternative is true.
+#'     \item \code{p(BF01 > D | H0)}: Probability of obtaining compelling evidence
+#'       in favor of the null hypothesis when the null is true.
+#'     \item \code{p(BF10 > D | H0)}: Probability of obtaining misleading evidence
+#'       in favor of the alternative hypothesis when the null is true.
+#'     \item \code{Required N1}: The required sample size for group 1 or the sample size input by the user.
+#'     \item \code{Required N2}: The required sample size for group 1 or the sample size input by the user.
+#'   }
+#'   If sample size determination fails, the function returns \code{NULL}.
 #'
 #' @examples
 #' BFpower.props(

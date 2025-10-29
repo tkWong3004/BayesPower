@@ -66,6 +66,21 @@ otherwise Bayes factor with interval null and alternative hypotheses.}
 
 \item{e}{The bounds for the interval Bayes factor (used when \code{interval = 0}).}
 }
+\value{
+A data frame with the following columns:
+\itemize{
+\item \code{p(BF10 > D | H1)}: Probability of obtaining compelling evidence
+in favor of the alternative hypothesis when the alternative is true.
+\item \code{p(BF01 > D | H1)}: Probability of obtaining misleading evidence
+in favor of the null hypothesis when the alternative is true.
+\item \code{p(BF01 > D | H0)}: Probability of obtaining compelling evidence
+in favor of the null hypothesis when the null is true.
+\item \code{p(BF10 > D | H0)}: Probability of obtaining misleading evidence
+in favor of the alternative hypothesis when the null is true.
+\item \code{Required N}: The required sample size or the sample size input by the users.
+}
+If sample size determination fails, the function returns \code{NULL}.
+}
 \description{
 Perform sample size determination or the calculation of compelling and misleading evidence
 for a Bayesian F-test.

@@ -1,16 +1,16 @@
 Package: BayesPower
-Title: Sample Size and Power Calculation Using Bayes Factor
-Version: 1.0.0
+Title: Sample Size and Power Calculation for Bayesian Testing with Bayes Factor
+Version: 1.0.1
 Authors@R: c(
     person("Tsz Keung", "Wong", email = "t.k.wong3004@gmail.com", role = c("aut", "cre")),
     person("Samuel", "Pawel", role = c("aut")),
     person("Jorge", "Tendeiro", role = c("aut")))
-Description: Tools are provided within the package for sample size determination and power calculation in a variety of common testing problems using Bayes factors The main function of the package is BayesPower_BayesFactor() for starting the shiny app.
+Description: The goal of 'BayesPower' is to provide tools for Bayesian sample size determination and power analysis across a range of common hypothesis testing scenarios using Bayes factors. The main function, BayesPower_BayesFactor(), launches an interactive 'shiny' application for performing these analyses. The application also provides command-line code for reproducibility. Details of the methods are described in the tutorial by Wong, Pawel, and Tendeiro (2025) <doi:10.31234/osf.io/pgdac_v1>.
 BugReports: https://github.com/tkWong3004/BayesPower/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports:
     rlang,
     shiny,
@@ -22,8 +22,7 @@ Imports:
     rmarkdown,
     glue,
     hypergeo,
-    rootSolve
-Suggests:
+    rootSolve,
     shinyWidgets
 LinkingTo:
     Rcpp,

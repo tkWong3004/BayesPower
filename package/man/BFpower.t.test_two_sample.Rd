@@ -69,6 +69,22 @@ otherwise Bayes factor with interval null and alternative hypotheses.}
 
 \item{direct}{If \code{"h1"}, controls true/false positive rates (BF10); if \code{"h0"}, controls true/false negative rates (BF01).}
 }
+\value{
+A data frame with the following columns:
+\itemize{
+\item \code{p(BF10 > D | H1)}: Probability of obtaining compelling evidence
+in favor of the alternative hypothesis when the alternative is true.
+\item \code{p(BF01 > D | H1)}: Probability of obtaining misleading evidence
+in favor of the null hypothesis when the alternative is true.
+\item \code{p(BF01 > D | H0)}: Probability of obtaining compelling evidence
+in favor of the null hypothesis when the null is true.
+\item \code{p(BF10 > D | H0)}: Probability of obtaining misleading evidence
+in favor of the alternative hypothesis when the null is true.
+\item \code{Required N1}: The required sample size for group 1 or the sample size input by the user.
+\item \code{Required N2}: The required sample size for group 1 or the sample size input by the user.
+}
+If sample size determination fails, the function returns \code{NULL}.
+}
 \description{
 Perform sample size determination or the calculation of compelling and misleading evidence
 for a two-sample Bayesian t-test.
