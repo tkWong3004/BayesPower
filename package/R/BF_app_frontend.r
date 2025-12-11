@@ -29,9 +29,9 @@ ui <-
             "Modet1",
             "\\(\\text{Select Mode}\\)",
             choices = list(
-              "\\(\\text{Sample size determination}\\)" = 1,
-              "\\(\\text{Fixed N}\\)" = 2,
-              "\\(\\text{BF calculator}\\)" = 3
+              "\\(\\text{Sample size determination}\\)" = "1",
+              "\\(\\text{Fixed N}\\)" = "2",
+              "\\(\\text{BF calculator}\\)" = "3"
             ),
             selected = 1,
             inline = TRUE
@@ -285,7 +285,12 @@ ui <-
                                                    shiny::htmlOutput("resultt1"))
 
                         )),
-          shiny::conditionalPanel(condition = "input.Modet1 == 1||input.Modet1 == 2",shiny::uiOutput("Optional_Plots_t1")))
+          shiny::conditionalPanel(condition = "input.Modet1 == 1||input.Modet1 == 2",
+                                  shiny::uiOutput("plot_power_t1_text"),
+                                  shiny::plotOutput("plot_power_t1"),
+                                  shiny::uiOutput("plot_rel_t1_text"),
+                                  shiny::plotOutput("plot_rel_t1")
+                                  ))
       )
     )
     ,shiny::tabPanel(
@@ -558,7 +563,14 @@ ui <-
 
 
                         )),
-          shiny::conditionalPanel(condition = "input.Modet2 == 1||input.Modet2 == 2",shiny::uiOutput("Optional_Plots_t2"))
+          shiny::conditionalPanel(condition = "input.Modet2 == 1||input.Modet2 == 2",
+                                  shiny::uiOutput("plot_power_t2_text"),
+                                  shiny::plotOutput("plot_power_t2"),
+                                  shiny::uiOutput("plot_rel_t2_text"),
+                                  shiny::plotOutput("plot_rel_t2")
+
+
+                                  )
 
 
 
@@ -637,7 +649,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                       shiny::sliderInput("h0pho", "\\(\\rho_0\\)", min = -.99, max = .99, value = 0, step = 0.01, ticks = FALSE)
                ),
                shiny::column(4,
-                             shiny::conditionalPanel("(input.h1re == 2) && input.h0r == 2", shiny::em("\\(-\\epsilon = 0\\)")),
+                             shiny::conditionalPanel("(input.h1re == 2) && input.h0r == 2", shiny::em("\\(-\\epsilon = \\rho_0\\)")),
 
                       shiny::conditionalPanel(
                         condition = "(input.h1re == 1 || input.h1re == 3) && input.h0r == 2",
@@ -646,7 +658,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                       )
                ),
                shiny::column(4,
-                             shiny::conditionalPanel("(input.h1re == 3) && input.h0r == 2", shiny::em("\\(\\epsilon = 0\\)")),
+                             shiny::conditionalPanel("(input.h1re == 3) && input.h0r == 2", shiny::em("\\(\\epsilon = \\rho_0\\)")),
 
                       shiny::conditionalPanel(
                         condition = "(input.h1re == 1 || input.h1re == 2) && input.h0r == 2",
@@ -824,7 +836,14 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
 
                              )),
              shiny::conditionalPanel(
-               condition = "input.Moder == 1||input.Moder == 2",shiny::uiOutput("Optional_Plots_r"))
+               condition = "input.Moder == 1||input.Moder == 2",
+               shiny::uiOutput("plot_power_r_text"),
+               shiny::plotOutput("plot_power_r"),
+               shiny::uiOutput("plot_rel_r_text"),
+               shiny::plotOutput("plot_rel_r")
+
+
+               )
 
            )
          )
@@ -1132,7 +1151,13 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                            ))
 
            ),
-           shiny::conditionalPanel(condition = "input.Modef == 1||input.Modef == 2",shiny::uiOutput("Optional_Plots_f"))
+           shiny::conditionalPanel(condition = "input.Modef == 1||input.Modef == 2",
+                                   shiny::uiOutput("plot_power_f_text"),
+                                   shiny::plotOutput("plot_power_f"),
+                                   shiny::uiOutput("plot_rel_f_text"),
+                                   shiny::plotOutput("plot_rel_f")
+
+                                   )
            )
          )
 )
@@ -1255,20 +1280,20 @@ shiny::navbarMenu(
                                                    selected = 1, inline = TRUE
                                                  ),
 
-                                                 shiny::conditionalPanel("input.modelbind == 3",
-                                                                  shiny::sliderInput("h0bind", "\\(p_1\\)", min = .01, max = .99, value = .5, step = .01, ticks = FALSE)),
-
                                                  shiny::fluidRow(
                                                    shiny::column(4,
                                                           shiny::conditionalPanel("input.modelbind == 1",
                                                                            shiny::sliderInput("alphabind", "\\(\\alpha\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE)),
+                                                          shiny::conditionalPanel("input.modelbind == 3||input.modelbind == 2",
+                                                                                  shiny::sliderInput("h0bind", "\\(\\theta_1\\)", min = .01, max = .99, value = .5, step = .01, ticks = FALSE))
 
-                                                          shiny::conditionalPanel("input.modelbind == 2",
-                                                                           shiny::sliderInput("sbind", "\\(\\text{Scale}\\)", min = 0.01, max = 3, value = 1, step = 0.01, ticks = FALSE))
+
                                                    ),
                                                    shiny::column(4,
                                                           shiny::conditionalPanel("input.modelbind == 1",
-                                                                           shiny::sliderInput("betabind", "\\(\\beta\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE))
+                                                                           shiny::sliderInput("betabind", "\\(\\beta\\)", min = 0.01, max = 100, value = 1, step = 1, ticks = FALSE)),
+                                                          shiny::conditionalPanel("input.modelbind == 2",
+                                                                                  shiny::sliderInput("sbind", "\\(\\text{Scale}\\)", min = 0.01, max = 3, value = 1, step = 0.01, ticks = FALSE))
                                                    )
                                                  )
                                 )
@@ -1345,7 +1370,13 @@ shiny::navbarMenu(
                              )
              ),
              shiny::conditionalPanel(
-               condition = "input.Modebin == 1||input.Modebin == 2",shiny::uiOutput("Optional_Plots_bin")))
+               condition = "input.Modebin == 1||input.Modebin == 2",
+               shiny::uiOutput("plot_power_bin_text"),
+               shiny::plotOutput("plot_power_bin"),
+               shiny::uiOutput("plot_rel_bin_text"),
+               shiny::plotOutput("plot_rel_bin")
+
+               ))
            )
   ), shiny::tabPanel("\\(\\text{Two proportions}\\)",shiny::withMathJax(),
 shiny::sidebarLayout(shiny::sidebarPanel(
@@ -1532,7 +1563,11 @@ shiny::sidebarLayout(shiny::sidebarPanel(
     shiny::column(6, shiny::plotOutput("prior_p1")),
     shiny::column(6, shiny::plotOutput("prior_p2"))
   ),
-  shiny::uiOutput("Optional_Plots_p2")
+  shiny::uiOutput("plot_power_p2_text"),
+  shiny::plotOutput("plot_power_p2"),
+  shiny::uiOutput("plot_rel_p2_text"),
+  shiny::plotOutput("plot_rel_p2")
+
 
 ))
 

@@ -5,103 +5,130 @@
 \title{Sample size determination for Bayesian test of two proportions}
 \usage{
 BFpower.props(
-  D = NULL,
-  target = NULL,
-  a0 = NULL,
-  b0 = NULL,
-  a1 = NULL,
-  b1 = NULL,
-  a2 = NULL,
-  b2 = NULL,
-  model1 = NULL,
-  a1d = NULL,
-  b1d = NULL,
-  dp1 = NULL,
-  model2 = NULL,
-  a2d = NULL,
-  b2d = NULL,
-  dp2 = NULL,
-  mode_bf = NULL,
-  n1 = NULL,
-  n2 = NULL,
-  direct = NULL
+  D,
+  true_rate,
+  a0,
+  b0,
+  a1,
+  b1,
+  a2,
+  b2,
+  model1 = "same",
+  a1d,
+  b1d,
+  dp1,
+  model2 = "same",
+  a2d,
+  b2d,
+  dp2,
+  n1 = NaN,
+  n2 = NaN,
+  positive = "positive",
+  plot_power = FALSE,
+  plot_rel = FALSE
 )
 }
 \arguments{
-\item{D}{The bound of compelling evidence.}
+\item{D}{Threshold of compelling evidence.}
 
-\item{target}{The targeted true positive rate (if \code{direct = "h1"}) or true negative rate (if \code{direct = "h0"}).}
+\item{true_rate}{Targeted true positive rate (if \code{positive = "positive"}) or true negative rate (if \code{positive = "negative"}).}
 
-\item{a0}{Alpha parameter of the beta distribution under the null .}
+\item{a0}{Alpha parameter of the Beta prior under the null hypothesis.}
 
-\item{b0}{Beta parameter of the beta distribution  under the null.}
+\item{b0}{Beta parameter of the Beta prior under the null hypothesis.}
 
-\item{a1}{Alpha parameter of the analysis beta prior  distribution for group 1 under the alternative hypothesis.}
+\item{a1}{Alpha parameter of the Beta analysis prior for group 1 under the alternative hypothesis.}
 
-\item{b1}{Beta parameter of the analysis beta prior  distribution for group 1 under the alternative hypothesis.}
+\item{b1}{Beta parameter of the Beta analysis prior for group 1 under the alternative hypothesis.}
 
-\item{a2}{Alpha parameter of the analysis beta prior distribution for group 2 under the alternative hypothesis.}
+\item{a2}{Alpha parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
 
-\item{b2}{Beta parameter  of the analysis beta prior  distribution for group 2 under the alternative hypothesis.}
+\item{b2}{Beta parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
 
-\item{model1}{Statistical model of the design prior for group 1: beta (\code{"beta"}), Point prior (\code{"Point"}, or same as analysis prior \code{"same"})}
+\item{model1}{Model for the design prior of group 1: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
-\item{a1d}{Alpha parameter for the design prior of group 1.}
+\item{a1d}{Alpha parameter of the design prior for group 1 (used if \code{model1 = "beta"}).}
 
-\item{b1d}{Beta parameter for the design prior of group 1.}
+\item{b1d}{Beta parameter of the design prior for group 1 (used if \code{model1 = "beta"}).}
 
-\item{dp1}{True proportion for group 1 in the design prior.}
+\item{dp1}{True proportion for group 1 in the design prior (used if \code{model1 = "Point"}).}
 
-\item{model2}{Statistical model of the design prior for group 1: beta (\code{"beta"}), or Point prior (\code{"Point"}, or same as analysis prior \code{"same"})}
+\item{model2}{Model for the design prior of group 2: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
-\item{a2d}{Alpha parameter for the design prior of group 2.}
+\item{a2d}{Alpha parameter of the design prior for group 2 (used if \code{model2 = "beta"}).}
 
-\item{b2d}{Beta parameter for the design prior of group 2.}
+\item{b2d}{Beta parameter of the design prior for group 2 (used if \code{model2 = "beta"}).}
 
-\item{dp2}{True proportion for group 2 in the design prior.}
-
-\item{mode_bf}{Integer (0 or 1). If \code{1}, sample size determination; if \code{2}, \code{n1} and \code{n2} are used for the calculation of probabilities of compelling and misleading evidence.}
+\item{dp2}{True proportion for group 2 in the design prior (used if \code{model2 = "Point"}).}
 
 \item{n1}{Sample size for group 1.}
 
 \item{n2}{Sample size for group 2.}
 
-\item{direct}{If \code{"h1"}, BF10; if \code{"h0"}, BF01.}
+\item{positive}{Choose \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.}
+
+\item{plot_power}{Logical; if TRUE, plot the power curve.}
+
+\item{plot_rel}{Logical; if TRUE, plot the grid for the values of BF across all possible combination of x1 and x2.}
 }
 \value{
-A data frame with the following columns:
+An object of class \code{BFpower_2p} containing:
 \itemize{
-\item \code{p(BF10 > D | H1)}: Probability of obtaining compelling evidence
-in favor of the alternative hypothesis when the alternative is true.
-\item \code{p(BF01 > D | H1)}: Probability of obtaining misleading evidence
-in favor of the null hypothesis when the alternative is true.
-\item \code{p(BF01 > D | H0)}: Probability of obtaining compelling evidence
-in favor of the null hypothesis when the null is true.
-\item \code{p(BF10 > D | H0)}: Probability of obtaining misleading evidence
-in favor of the alternative hypothesis when the null is true.
-\item \code{Required N1}: The required sample size for group 1 or the sample size input by the user.
-\item \code{Required N2}: The required sample size for group 1 or the sample size input by the user.
+\item Analysis priors under the null and alternative.
+\item Design priors for both groups.
+\item Computed probabilities of compelling and misleading evidence.
+\item Sample size results and other inputs.
 }
-If sample size determination fails, the function returns \code{NULL}.
 }
 \description{
-Perform sample size determination or the calculation of compelling and misleading evidence
+Perform sample size determination or calculate probabilities of compelling and misleading evidence
 for a Bayesian comparison of two proportions.
+}
+\details{
+\strong{1. Sample size determination mode (when \code{n1 = NaN} and \code{n2 = NaN}):}
+
+If no sample sizes are provided for the two groups, the function calculates the minimum sample sizes needed to achieve the desired configuration. The user must provide:
+\itemize{
+\item \code{positive} - either \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.
+\item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
+\item \code{D} - the Bayes factor threshold for compelling evidence (must be > 1).
+}
+
+The function iteratively finds the smallest sample sizes for which the probability of obtaining compelling evidence meets or exceeds \code{true_rate}.
+
+\strong{2. Fixed-sample analysis mode (when \code{n1} and \code{n2} are supplied):}
+
+If positive numeric sample sizes \code{n1} and \code{n2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for these fixed sample sizes. In this mode, \code{positive} and \code{true_rate} are ignored; only the Bayes factor threshold \code{D} is used.
+
+\strong{Model specification:}
+
+The user must specify the analysis priors under the null and alternative hypotheses using Beta parameters:
+\itemize{
+\item \code{a0}, \code{b0} - Beta parameters for the null hypothesis prior.
+\item \code{a1}, \code{b1} - Beta parameters for the analysis prior of group 1 under the alternative hypothesis.
+\item \code{a2}, \code{b2} - Beta parameters for the analysis prior of group 2 under the alternative hypothesis.
+}
+
+Design priors for the alternative hypothesis can optionally be specified:
+\itemize{
+\item \code{model1}, \code{a1d}, \code{b1d}, \code{dp1} - design prior for group 1 (\code{"same"} uses the analysis prior, \code{"beta"} requires Beta parameters, \code{"Point"} uses a fixed proportion).
+\item \code{model2}, \code{a2d}, \code{b2d}, \code{dp2} - design prior for group 2.
+}
+
+\strong{Plotting:}
+
+If \code{plot_power = TRUE}, a power curve is plotted showing the probability of compelling evidence as a function of sample sizes. If \code{plot_rel = TRUE}, a grid of Bayes factors across possible outcomes is plotted.
 }
 \examples{
 BFpower.props(
   D = 3,
-  target = 0.8,
+  true_rate = 0.8,
   a0 = 1,
   b0 = 1,
-  model1 = "same",
   a1 = 1,
   b1 = 1,
   a2 = 1,
-  b2 = 1,
-  model2 = "same",
-  mode_bf = 1,
-  direct = "h1"
+  b2 = 1
 )
 
 }

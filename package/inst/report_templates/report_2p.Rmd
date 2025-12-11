@@ -12,15 +12,24 @@ geometry: margin=2cm
 classoption: a4paper
 ---
 
-A Bayes Factor design analysis for testing one proportion was conducted on `r Sys.time()`.
+A Bayes Factor design analysis for testing one proportion was conducted on `r Sys.time()`.The code for reproducing the results:
+```{r, echo=FALSE, results='asis'}
+# Generate the reproducible code
+
+cat("```r\n")
+cat(show_props_code(params$p2))
+cat("\n```")
+
+
+```
 
 **Hypothesis**
 
 ```{r echo=FALSE, results='asis'}
 # Null hypothesis
-cat(sprintf("\\(\\mathcal{H}_0: p_0 = p_1 = p_2,\\quad p_0 \\sim \\mathrm{beta}(\\alpha = %s, \\beta = %s)\\) vs ", params$p2$a0, params$p2$b0))
+cat(sprintf("\\(\\mathcal{H}_0: \\theta_0 = \\theta_1 = \\theta_2,\\quad \\theta_0 \\sim \\mathrm{beta}(\\alpha = %s, \\beta = %s)\\) vs ", params$p2$a0, params$p2$b0))
 
-cat(sprintf("\\(\\mathcal{H}_1: p_1 \\neq p_2\\)"))
+cat(sprintf("\\(\\mathcal{H}_1: \\theta_1 \\neq \\theta_2\\)"))
 
 
 ```
@@ -33,7 +42,7 @@ if (params$p2$de_an_prior == 1) {
 }
 
 
- cat(sprintf("\\(p_1 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\quad p_2 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)", 
+ cat(sprintf("\\(\\theta_1 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\quad \\theta_2 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)", 
             params$p2$a1, params$p2$b1, params$p2$a2, params$p2$b2))
 
 
@@ -42,25 +51,25 @@ if (params$p2$de_an_prior != 1) {
   
 switch(params$p2$model1,
   "Point" = {
-    cat(sprintf("\\(p_1 \\sim \\mathrm{Point}(\\text{location} = %s),\\quad\\)", params$p2$dp1))
+    cat(sprintf("\\(\\theta_1 \\sim \\mathrm{Point}(\\text{location} = %s),\\quad\\)", params$p2$dp1))
   },
   "same" = {
-    cat(sprintf("\\(p_1 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\quad\\)", params$p2$a1, params$p2$b1))
+    cat(sprintf("\\(\\theta_1 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\quad\\)", params$p2$a1, params$p2$b1))
   },
   "beta" = {
-    cat(sprintf("\\(p_1 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\quad\\)", params$p2$a1d, params$p2$b1d))
+    cat(sprintf("\\(\\theta_1 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\quad\\)", params$p2$a1d, params$p2$b1d))
   }
 )
   
   switch(params$p2$model2,
   "Point" = {
-    cat(sprintf("\\(p_2 \\sim \\mathrm{Point}(\\text{location} = %s)\\)", params$p2$dp2))
+    cat(sprintf("\\(\\theta_2 \\sim \\mathrm{Point}(\\text{location} = %s)\\)", params$p2$dp2))
   },
   "same" = {
-    cat(sprintf("\\(p_2 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)", params$p2$a2, params$p2$b2))
+    cat(sprintf("\\(\\theta_2 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)", params$p2$a2, params$p2$b2))
   },
   "beta" = {
-    cat(sprintf("\\(p_2 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)", params$p2$a2d, params$p2$b2d))
+    cat(sprintf("\\(\\theta_2 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)", params$p2$a2d, params$p2$b2d))
   }
 )
   

@@ -3,6 +3,12 @@
 #' @importFrom rlang .data
 NULL
 
+fmt_val <- function(x) {
+  if (is.numeric(x) && length(x) == 1) return(as.character(x))
+  if (is.numeric(x) && length(x) > 1) return(paste(x, collapse = ", "))
+  if (is.character(x)) return(shQuote(x))
+  return(as.character(x))
+}
 # ---- ANOVA.r ----
 
 # k = number of predictor in the full model
@@ -904,7 +910,7 @@ bin_prior <-function(prop,alpha,beta,location,scale,model){
 
   switch(model,
          "beta" = stats::dbeta(prop, alpha,beta),
-         "Moment" = dnlp(prop,location,scale))
+         "Moment" = dMoment(prop,location,scale))
 }
 bin_BF<-function(x,n,alpha,beta,location,scale,model,hypothesis){
   BF = NA
@@ -1546,9 +1552,9 @@ bin_prior_plot <-function(h0,alpha,beta,location,scale,model,alpha_d,beta_d,loca
   ylim.max <- max(finite_vals)
   # Base plot:
   plot(prop, prior.analysis, type = "l", lwd = 2,
-       xlab = bquote(atop(italic("p"), "")),
+       xlab = bquote(atop(italic(theta))),
        ylab = "density",
-       main = bquote(bold("Prior distribution on "~italic(p)~"under the alternative hypothesis")),
+       main = bquote(bold("Prior distribution on "~italic(theta)~"under the alternative hypothesis")),
        frame.plot = FALSE,
        ylim = c(0, ylim.max))
 
@@ -2356,9 +2362,9 @@ bin_e_prior_plot <-function(h0,alpha,beta,location,scale,model,alpha_d,beta_d,lo
 
   # Base plot
   plot(prop, prior.analysis.h1, type = "l", lwd = 2,
-       xlab =bquote(bold(rho)),
+       xlab =bquote(atop(italic(theta))),
        ylab = "density",
-       main = bquote(bold("Prior distribution on "~rho~" under the alternative hypothesis")),
+       main = bquote(bold("Prior distribution on "~italic(theta)~"under the alternative hypothesis")),
        frame.plot = FALSE,
        ylim = c(0, ylim.max))
 
@@ -2441,7 +2447,7 @@ d_beta <- function(rho, alpha, beta,a,b) {
 
 
 # likelihood of non-local prior
-dnlp <-function(delta,mu,ta){
+dMoment <-function(delta,mu,ta){
   ((delta-mu)^2)/(sqrt(2*pi)*ta^3)*exp(-((delta-mu)^2)/(2*ta^2))
 }
 
@@ -2450,7 +2456,7 @@ r_prior<- function(rho,k,location,scale,dff,model, alpha, beta,a,b){
   switch(model,
          "Normal" = stats::dnorm(rho,location,scale),
          "d_beta"   = d_strechted_beta(rho,k,a,b),
-          "NLP"   = dnlp(rho,location,scale),
+          "Moment"   = dMoment(rho,location,scale),
           "t_dis" = tstude(rho,location,scale,dff),
          "beta" = d_beta(rho, alpha, beta,a,b))
 }
@@ -2494,13 +2500,13 @@ r_BF10<-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model){
     switch(model,
            "d_beta"   = 1,
            "beta" = 1,
-           "NLP"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "Moment"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
 
   }else{
     switch(model,
            "d_beta"   = p_beta(bound[2], 1/k, 1/k,-1,1)-p_beta(bound[1], 1/k,1/k,-1,1) ,
            "beta" = p_beta(bound[2], alpha, beta,-1,1)-p_beta(bound[1], alpha, beta,-1,1),
-           "NLP"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "Moment"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
 }
 
   # Define the integrand function for marginal likelihood under H1
@@ -2571,13 +2577,13 @@ r_TPE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model){
     switch(model,
            "d_beta"   = 1,
            "beta" = 1,
-           "NLP"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "Moment"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
 
   }else{
     switch(model,
            "d_beta"   = p_beta(bound[2], 1/k, 1/k,-1,1)-p_beta(bound[1], 1/k,1/k,-1,1) ,
            "beta" = p_beta(bound[2], alpha, beta,-1,1)-p_beta(bound[1], alpha, beta,-1,1),
-           "NLP"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "Moment"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
   }
   int <- function(rho) {
     prob <- switch(hypothesis,
@@ -2619,13 +2625,13 @@ r_FNE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model){
     switch(model,
            "d_beta"   = 1,
            "beta" = 1,
-           "NLP"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "Moment"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
 
   }else{
     switch(model,
            "d_beta"   = p_beta(bound[2], 1/k, 1/k,-1,1)-p_beta(bound[1], 1/k,1/k,-1,1) ,
            "beta" = p_beta(bound[2], alpha, beta,-1,1)-p_beta(bound[1], alpha, beta,-1,1),
-           "NLP"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "Moment"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
   }
   int <- function(rho) {
     prob <- switch(hypothesis,
@@ -2846,7 +2852,7 @@ compute.prior.density.r <- function(rho, k,location,scale,dff,model, alpha, beta
     switch(model,
            "Normal" = stats::pnorm(bound[2],location,scale)-stats::pnorm(bound[1],location,scale),
            "d_beta"   = p_beta(bound[2], 1/k, 1/k,min(bound),max(bound))-p_beta(bound[1], 1/k,1/k,min(bound),max(bound)) ,
-           "NLP"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
+           "Moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
            "t_dis" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0),
            "beta" = p_beta(bound[2], alpha, beta,min(bound),max(bound))-p_beta(bound[1], alpha, beta,min(bound),max(bound)))
 
@@ -3086,7 +3092,7 @@ re_BF10i<-function(r,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model,e){
                               "!=" = switch(model,
                                             "d_beta"       = 1-(p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                             "beta"         = 1-(p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                            "NLP"          = {
+                                            "Moment"          = {
                                               (pmom(1-location, tau = scale^2)-pmom(bound_h1[2]-location, tau = scale^2))+
                                                 (pmom(bound_h1[1]-location, tau = scale^2)-pmom(-1-location, tau = scale^2))
                                             }),
@@ -3094,20 +3100,20 @@ re_BF10i<-function(r,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model,e){
                               "<"  = switch(model,
                                             "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                             "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                            "NLP"          = {
+                                            "Moment"          = {
                                               (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                             }),
                               ">"  = switch(model,
                                             "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                             "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                            "NLP"          = {
+                                            "Moment"          = {
                                               (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                             })
     )
     normalizationh0 <- switch(model,
                               "d_beta" = p_beta(bound_h0[2], 1/k, 1/k, -1, 1) - p_beta(bound_h0[1], 1/k, 1/k, -1, 1),
                               "beta"   = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
-                              "NLP"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                              "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
                               }
     )
 
@@ -3192,7 +3198,7 @@ re_TPE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e){
                             "!=" = switch(model,
                                           "d_beta"       = 1-(p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = 1-(p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "NLP"          = {
+                                          "Moment"          = {
                                             (pmom(1-location, tau = scale^2)-pmom(bound_h1[2]-location, tau = scale^2))+
                                               (pmom(bound_h1[1]-location, tau = scale^2)-pmom(-1-location, tau = scale^2))
                                           }),
@@ -3200,13 +3206,13 @@ re_TPE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e){
                             "<"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "NLP"          = {
+                                          "Moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           }),
                             ">"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "NLP"          = {
+                                          "Moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           })
   )
@@ -3258,7 +3264,7 @@ re_FNE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e){
                             "!=" = switch(model,
                                           "d_beta"       = 1-(p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = 1-(p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "NLP"          = {
+                                          "Moment"          = {
                                             (pmom(1-location, tau = scale^2)-pmom(bound_h1[2]-location, tau = scale^2))+
                                               (pmom(bound_h1[1]-location, tau = scale^2)-pmom(-1-location, tau = scale^2))
                                           }),
@@ -3266,13 +3272,13 @@ re_FNE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e){
                             "<"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "NLP"          = {
+                                          "Moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           }),
                             ">"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "NLP"          = {
+                                          "Moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           })
   )
@@ -3314,7 +3320,7 @@ re_FPE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e){
   normalizationh0 <- switch(model,
                             "d_beta" = p_beta(bound_h0[2], 1/k, 1/k, -1, 1) - p_beta(bound_h0[1], 1/k, 1/k, -1, 1),
                             "beta"   = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
-                            "NLP"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
                             }
   )
 
@@ -3352,7 +3358,7 @@ re_TNE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e){
   normalizationh0 <- switch(model,
                             "d_beta" = p_beta(bound_h0[2], 1/k, 1/k, -1, 1) - p_beta(bound_h0[1], 1/k, 1/k, -1, 1),
                             "beta"   = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
-                            "NLP"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
                             }
   )
 
@@ -3556,7 +3562,7 @@ compute.prior.density.re.h1 <- function(rho,h0, k,location,scale,dff,model, alph
                             "!=" = switch(model,
                                           "d_beta"       = 1-(p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = 1-(p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "NLP"          = {
+                                          "Moment"          = {
                                             (pmom(1-location, tau = scale^2)-pmom(bound_h1[2]-location, tau = scale^2))+
                                               (pmom(bound_h1[1]-location, tau = scale^2)-pmom(-1-location, tau = scale^2))
                                           }),
@@ -3564,13 +3570,13 @@ compute.prior.density.re.h1 <- function(rho,h0, k,location,scale,dff,model, alph
                             "<"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "NLP"          = {
+                                          "Moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           }),
                             ">"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "NLP"          = {
+                                          "Moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           })
   )
@@ -3596,7 +3602,7 @@ compute.prior.density.re.h0 <- function(rho,h0, k,location,scale,dff,model, alph
   normalizationh0 <- switch(model,
                             "d_beta" = p_beta(bound_h0[2], 1/k, 1/k, -1, 1) - p_beta(bound_h0[1], 1/k, 1/k, -1, 1),
                             "beta"   = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
-                            "NLP"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
                             }
   )
 
@@ -3809,7 +3815,7 @@ pmom <- function(q,V1=1,tau=1) {
 }
 
 # Probability density function of non-local prior:
-dnlp <-function(delta,mu,ta){
+dMoment <-function(delta,mu,ta){
   ((delta-mu)^2)/(sqrt(2*pi)*ta^3)*exp(-((delta-mu)^2)/(2*ta^2))
 }
 # Probability density function of informed t prior:
@@ -3822,7 +3828,7 @@ t1_prior<- function(delta, location, scale, dff, model){
   switch(model,
          "Cauchy"         = tstude(delta, location, scale, 1),
          "Normal"         = stats::dnorm (delta, location, scale),
-         "NLP"            = dnlp  (delta, location, scale),
+         "Moment"            = dMoment  (delta, location, scale),
          "t-distribution" = tstude(delta, location, scale, dff))
 }
 
@@ -3843,7 +3849,7 @@ t1_BF10 <-function(t, df, model, location, scale, dff, hypothesis){
     switch(model,
            "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
            "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "NLP"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
            "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
   for(i in 1:length(t)){
@@ -3918,7 +3924,7 @@ t1_TPE <- function(t, df, model, location, scale, dff) {
     switch(model,
            "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
            "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "NLP"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
            "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
   int <- if (length(t) == 2) { # two-sided test
@@ -3934,7 +3940,7 @@ t1_TPE <- function(t, df, model, location, scale, dff) {
   }
 
   # setting error value such that error are prevented:
-  #error <- if (model == "NLP" && scale < 0.3) 1e-14 else if (scale > 0.3) .Machine$double.eps^0.25 else 1e-8
+  #error <- if (model == "Moment" && scale < 0.3) 1e-14 else if (scale > 0.3) .Machine$double.eps^0.25 else 1e-8
   error = 1e-4
   stats::integrate(int, lower = bound[1], upper = bound[2], rel.tol = error, stop.on.error = FALSE)$value
 }
@@ -3962,7 +3968,7 @@ t1_FNE <- function(t, df, model, location, scale, dff,hypothesis){
     switch(model,
            "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
            "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "NLP"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
            "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
   int <- if (hypothesis =="!=") { # two-sided test
@@ -3978,7 +3984,7 @@ t1_FNE <- function(t, df, model, location, scale, dff,hypothesis){
   }
 
   # setting error value such that error are prevented:
-  #error <- if (model == "NLP" && scale < 0.3) 1e-14 else if (scale > 0.3) .Machine$double.eps^0.25 else 1e-8
+  #error <- if (model == "Moment" && scale < 0.3) 1e-14 else if (scale > 0.3) .Machine$double.eps^0.25 else 1e-8
   error = 1e-4
   stats::integrate(int, lower = bound[1], upper = bound[2], rel.tol = error, stop.on.error = FALSE)$value
 }
@@ -4351,7 +4357,7 @@ te_prior<- function(delta,location,scale,dff,model){
   switch(model,
         "Cauchy"        = tstude(delta,location, scale,1),
         "Normal"        = stats::dnorm(delta,location,scale),
-        "NLP"            = dnlp(delta,location,scale),
+        "Moment"            = dMoment(delta,location,scale),
         "t-distribution" = tstude(delta,location,scale,dff))
 
 
@@ -4366,7 +4372,7 @@ norm_h1 <- function(hypothesis, model, bound_h1, location, scale, dff = NULL) {
         stats::pcauchy(bound_h1[1], location, scale),
       "Normal"         = stats::pnorm(bound_h1[2], location, scale) -
         stats::pnorm(bound_h1[1], location, scale),
-      "NLP"            = pmom(bound_h1[2] - location, tau = scale^2) -
+      "Moment"            = pmom(bound_h1[2] - location, tau = scale^2) -
         pmom(bound_h1[1] - location, tau = scale^2),
       "t-distribution" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
         stats::pt((bound_h1[1] - location)/scale, df = dff)
@@ -4378,7 +4384,7 @@ norm_h1 <- function(hypothesis, model, bound_h1, location, scale, dff = NULL) {
         stats::pcauchy(bound_h1[1], location, scale),
       "Normal"         = stats::pnorm(bound_h1[2], location, scale) -
         stats::pnorm(bound_h1[1], location, scale),
-      "NLP"            = pmom(bound_h1[2] - location, tau = scale^2),
+      "Moment"            = pmom(bound_h1[2] - location, tau = scale^2),
       "t-distribution" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
         stats::pt((bound_h1[1] - location)/scale, df = dff)
     ),
@@ -4389,7 +4395,7 @@ norm_h1 <- function(hypothesis, model, bound_h1, location, scale, dff = NULL) {
         stats::pcauchy(bound_h1[1], location, scale),
       "Normal"         = stats::pnorm(bound_h1[2], location, scale) -
         stats::pnorm(bound_h1[1], location, scale),
-      "NLP"            = 1 - pmom(bound_h1[1] - location, tau = scale^2),
+      "Moment"            = 1 - pmom(bound_h1[1] - location, tau = scale^2),
       "t-distribution" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
         stats::pt((bound_h1[1] - location)/scale, df = dff)
     )
@@ -4407,7 +4413,7 @@ norm_h0 <- function(model, bound_h0, location, scale, dff = NULL) {
     "Normal"         = stats::pnorm(bound_h0[2], location, scale) -
       stats::pnorm(bound_h0[1], location, scale),
 
-    "NLP"            = pmom(bound_h0[2] - location, tau = scale^2) -
+    "Moment"            = pmom(bound_h0[2] - location, tau = scale^2) -
       pmom(bound_h0[1] - location, tau = scale^2),
 
     "t-distribution" = stats::pt((bound_h0[2] - location)/scale, df = dff) -
@@ -4743,7 +4749,7 @@ t1e_table<-function(D,target,model,location,scale,dff, hypothesis,e ,
   bound01 = as.numeric(0)
   bound10 = as.numeric(0)
 
-  df <- if (mode_bf == "0") {
+  df <- if (mode_bf == 0) {
     N - 1
   } else {
     fun <- if (direct == "h1") t1e_N_finder else t1e_N_01_finder
@@ -4970,7 +4976,7 @@ Power_t1e<-function(D,model,location,scale,dff, hypothesis,
     # Choose correct design prior:
     TPE[i] <- if (de_an_prior == 1)
       t1e_TPE(t10,dfs[i],model ,location,scale,dff , hypothesis ,e) else
-        t1e_TPE(t,dfs[i],model_d ,location_d,scale_d,dff_d , hypothesis ,e)
+        t1e_TPE(t10,dfs[i],model_d ,location_d,scale_d,dff_d , hypothesis ,e)
     FPE[i] <- t1e_FPE(t10,dfs[i],model ,location,scale,dff , hypothesis ,e)
     TNE[i] <- t1e_TNE(t01,dfs[i],model ,location,scale,dff , hypothesis ,e)
     FNE[i] <- if (de_an_prior == 1)
@@ -5125,11 +5131,12 @@ p2_prior_plot<-function(a,b,ad,bd,dp,model,nu){
   ylim.max <- max(prior.analysis, prior.design, na.rm = TRUE)
 
   plot(prop, prior.analysis, type = "l", lwd = 2,
-       xlab = substitute(bold(p[nu_val]), list(nu_val = nu)),
+       xlab = substitute(bold(theta[nu_val]), list(nu_val = nu)),
        ylab = "density",
-       main = bquote(bold("Prior distribution on "~p[.(nu)]~"")),
+       main = bquote(bold("Prior distribution on "~theta[.(nu)])),
        frame.plot = FALSE,
        ylim = c(0, ylim.max))
+
 
   if (model != "same") {
     if (model == "Point")
@@ -5209,68 +5216,6 @@ Power_p2<-function(D,n1, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,model2,da2
 
 
 
-heatmap_p2_0 <- function(x, D) {
-  # Prepare data
-  df <- data.frame(
-    k1 = x$k1,
-    k2 = x$k2,
-    PE = x$PE,
-    NE = x$NE,
-    BF = x$log_BF10
-  )
-
-  # Derive effect type
-  df$effect <- with(df, ifelse(PE == 1, "PE",
-                               ifelse(NE == 1, "NE", "None")))
-
-  # Legend labels using bquote for math
-  labels <- c(
-    "PE"   = bquote(BF[10] > .(D)),
-    "NE"   = bquote(BF[0][1] > .(D)),
-    "None" = bquote(1 / .(D) < BF[10] ~ "<" ~ .(D))
-  )
-
-  # ---- First heatmap: classification ----
-  p1 <- ggplot2::ggplot(
-    df,
-    ggplot2::aes(x = .data$k1, y = .data$k2, fill = .data$effect)
-  ) +
-    ggplot2::geom_tile() +
-    ggplot2::scale_fill_manual(
-      name = "classification",
-      values = c("PE" = "#440154", "NE" = "#21908C", "None" = "#FDE725"),
-      labels = labels
-    ) +
-    ggplot2::labs(
-      title = "BF and number of success",
-      x = "x1",
-      y = "x2"
-    ) +
-    ggplot2::coord_fixed() +
-    ggplot2::theme_minimal()
-
-  # ---- Second heatmap: BF values ----
-  p2 <- ggplot2::ggplot(
-    df,
-    ggplot2::aes(x = .data$k1, y = .data$k2, fill = .data$BF)
-  ) +
-    ggplot2::geom_tile() +
-    ggplot2::scale_fill_viridis_c(name = "BF") +
-    ggplot2::labs(
-      title = "Heatmap of BF",
-      x = "k1",
-      y = "k2"
-    ) +
-    ggplot2::coord_fixed() +
-    ggplot2::theme_minimal()
-
-  # Return both plots as a list
-  list(classification = p1, BF = p2)
-}
-
-
-
-
 heatmap_p2 <- function(x, D) {
   # Prepare data
   df <- data.frame(
@@ -5319,7 +5264,7 @@ heatmap_p2 <- function(x, D) {
     ggplot2::scale_fill_viridis_c(name = "log BF10") +
     ggplot2::labs(
       title = "Heatmap of BF",
-      x = "k1", y = "k2"
+      x = "x1", y = "x2"
     ) +
     ggplot2::coord_fixed() +
     ggplot2::theme_minimal()
@@ -5488,7 +5433,8 @@ output$bin_upper<-shiny::renderUI({
 shiny::observeEvent(input$runbin, {
   bin = input_bin()
 
-  dat <- tryCatch({switch(bin$interval,
+  dat <- tryCatch({
+    suppressWarnings(switch(bin$interval,
                 "1" = {bin_table(bin$D,bin$target,bin$h0,bin$alpha,bin$beta,bin$location,
                   bin$scale,bin$model,bin$hypothesis,
                   bin$alpha_d,bin$beta_d,bin$location_d,bin$scale_d,
@@ -5498,7 +5444,9 @@ shiny::observeEvent(input$runbin, {
                                  bin$scale,bin$model,bin$hypothesis,
                                  bin$alpha_d,bin$beta_d,bin$location_d,bin$scale_d,
                                  bin$model_d,bin$de_an_prior,bin$N, bin$mode_bf,bin$FP,bin$e,bin$direct)
-                  })}, error = function(e) {
+
+
+                  }))}, error = function(e) {
                     "Error"
                   })
 
@@ -5511,10 +5459,11 @@ shiny::observeEvent(input$runbin, {
                                  bin$alpha_d,bin$beta_d,bin$location_d,
                                  bin$scale_d,bin$model_d,bin$hypothesis,
                                  bin$de_an_prior)},
-           "2" =bin_e_prior_plot (bin$h0,bin$alpha,bin$beta,bin$location,bin$scale,
+           "2" = bin_e_prior_plot (bin$h0,bin$alpha,bin$beta,bin$location,bin$scale,
                                   bin$model,bin$alpha_d,bin$beta_d,bin$location_d,
                                   bin$scale_d,bin$model_d,
-                                  bin$hypothesis,bin$de_an_prior,bin$e))
+                                  bin$hypothesis,bin$de_an_prior,bin$e)
+           )
 
 
 
@@ -5529,12 +5478,12 @@ shiny::observeEvent(input$runbin, {
     \\begin{array}{l c}
     \\textbf{Probability of Compelling Evidence} & \\\\
     \\hline
-    p\\text{(BF}_{10} > ', bin$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
-    p\\text{(BF}_{01} > ', bin$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
+    p\\text{(BF}_{10} > ', bin$D, '\\, | \\, \\mathcal{H}_1)\\ & ', format(round(dat[1], 3), nsmall = 3), ' \\\\
+    p\\text{(BF}_{01} > ', bin$D, '\\, | \\, \\mathcal{H}_0)\\ & ', format(round(dat[3], 3), nsmall = 3), ' \\\\
     \\textbf{Probability of Misleading Evidence} & \\\\
     \\hline
-    p\\text{(BF}_{01} > ', bin$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
-    p\\text{(BF}_{10} > ', bin$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
+    p\\text{(BF}_{01} > ', bin$D, '\\, | \\, \\mathcal{H}_1)\\ & ', format(round(dat[2], 3), nsmall = 3), ' \\\\
+    p\\text{(BF}_{10} > ', bin$D, '\\, | \\, \\mathcal{H}_0)\\ & ', format(round(dat[4], 3), nsmall = 3), ' \\\\
     \\textbf{Required Sample Size} & \\\\
     \\hline
     \\text{N} & ', dat[5], ' \\\\
@@ -5549,55 +5498,97 @@ shiny::observeEvent(input$runbin, {
       )
     )
   })
-
-  if (bin$pc) {
-    switch(bin$interval,
-           "1" = Power_bin(bin$D,bin$h0,bin$alpha,bin$beta,bin$location,bin$scale,bin$model,bin$hypothesis,
-                           bin$alpha_d,bin$beta_d,bin$location_d,
-                           bin$scale_d,bin$model_d, bin$de_an_prior,dat[1,5]),
-           "2" = Power_e_bin(bin$D,bin$h0,bin$alpha,bin$beta,bin$location,bin$scale,bin$model,bin$hypothesis,
-                             bin$alpha_d,bin$beta_d,bin$location_d,
-                             bin$scale_d,bin$model_d, bin$de_an_prior,dat[1,5],bin$e))
-
-    pc_bin <- grDevices::recordPlot()
-  } else pc_bin <- NA
+  # Define reactive containers OUTSIDE the if blocks
+  pc_bin   <- shiny::reactiveVal(NULL)
+  rela_bin <- shiny::reactiveVal(NULL)
 
 
-  if (bin$rela) {
-    switch(bin$interval,
-           "1" =bin_bf10(bin$D,dat[1,5],bin$alpha,bin$beta,bin$location,bin$scale,bin$model,bin$hypothesis),
-           "2" =bin_e_bf10(bin$D,dat[1,5],bin$alpha,bin$beta,bin$location,bin$scale,bin$model,bin$hypothesis,bin$e) )
+  # ===================================================
+  #               POWER CURVE (bin)
+  # ===================================================
 
-    rela_bin <- grDevices::recordPlot()
-  } else rela_bin <- NA
+  if (isTRUE(bin$pc)) {
 
+    output$plot_power_bin_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$"))
+      )
+    })
 
-  output$Optional_Plots_bin <- shiny::renderUI({
-    shiny::tagList(
-      if (bin$pc) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$")),
-          output$PCbin <- shiny::renderPlot({
+    output$plot_power_bin <- shiny::renderPlot({
 
-            pc_bin
+      suppressWarnings(
+        switch(
+          bin$interval,
 
-          })
+          "1" = Power_bin(
+            bin$D, bin$h0, bin$alpha, bin$beta, bin$location, bin$scale,
+            bin$model, bin$hypothesis,
+            bin$alpha_d, bin$beta_d, bin$location_d,
+            bin$scale_d, bin$model_d, bin$de_an_prior,
+            dat[1,5]
+          ),
+
+          "2" = Power_e_bin(
+            bin$D, bin$h0, bin$alpha, bin$beta, bin$location, bin$scale,
+            bin$model, bin$hypothesis,
+            bin$alpha_d, bin$beta_d, bin$location_d,
+            bin$scale_d, bin$model_d, bin$de_an_prior,
+            dat[1,5], bin$e
+          )
         )
-      },
-      if (bin$rela) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$")),
-          output$bfrbin <- shiny::renderPlot({
+      )
 
-            rela_bin
+      pc_bin(grDevices::recordPlot())
+    })
 
-          })
+  } else {
+
+    pc_bin(NULL)
+    output$plot_power_bin_text <- shiny::renderUI(NULL)
+    output$plot_power_bin      <- shiny::renderPlot(NULL)(NULL)
+  }
+
+
+  # ===================================================
+  #           RELATIONSHIP BETWEEN BF & DATA (bin)
+  # ===================================================
+
+  if (isTRUE(bin$rela)) {
+
+    output$plot_rel_bin_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$"))
+      )
+    })
+
+    output$plot_rel_bin <- shiny::renderPlot({
+
+      suppressWarnings(
+        switch(
+          bin$interval,
+
+          "1" = bin_bf10(
+            bin$D, dat[1,5], bin$alpha, bin$beta, bin$location, bin$scale,
+            bin$model, bin$hypothesis
+          ),
+
+          "2" = bin_e_bf10(
+            bin$D, dat[1,5], bin$alpha, bin$beta, bin$location, bin$scale,
+            bin$model, bin$hypothesis, bin$e
+          )
         )
-      }
-    )
-  })
+      )
 
+      rela_bin(grDevices::recordPlot())
+    })
 
+  } else {
+
+    rela_bin(NULL)
+    output$plot_rel_bin_text <- shiny::renderUI(NULL)
+    output$plot_rel_bin      <- shiny::renderPlot(NULL)(NULL)
+  }
 
   output$export_bin <- shiny::downloadHandler(
     filename = function() {
@@ -5612,7 +5603,7 @@ shiny::observeEvent(input$runbin, {
       rmarkdown::render(
         input = tempReport,output_format ="html_document",
         output_file = file,
-        params = list(bin = bin, dat = dat,pc_bin=pc_bin,rela_bin=rela_bin),  # ✅ pass to `params`
+        params = list(bin = bin, dat = dat,pc_bin=pc_bin(),rela_bin=rela_bin()),  # ✅ pass to `params`
         envir = new.env(parent = globalenv())  # environment still required
       )
     }
@@ -5637,28 +5628,39 @@ shiny::observeEvent(input$calbin, {
 ')
 
     output$result_bin <- shiny::renderText({
-
       args <- list(
         x = bin$Suc,
         n = bin$N,
-        alpha = bin$alpha,
-        beta = bin$beta,
-        location = bin$location,
-        scale = bin$scale,
+        h0 = bin$location,
         model = bin$model,
         hypothesis = bin$hypothesis
       )
 
-      if (bin$interval != 1) {
-        args$e <- bin$e
+      # Add model-specific parameters
+      if (bin$model == "beta") {
+        args$alpha <- bin$alpha
+        args$beta  <- bin$beta
+      } else if (bin$model == "Moment") {
+        args$scale <- bin$scale
       }
 
+      # Include e only if interval != 1
+      if (!is.null(bin$interval) && bin$interval != 1) {
+        args$e <- bin$e
+      }
+      fmt_val <- function(x) {
+        if (is.numeric(x) && length(x) == 1) return(as.character(x))
+        if (is.numeric(x) && length(x) > 1) return(paste(x, collapse = ", "))
+        if (is.character(x)) return(shQuote(x))
+        return(as.character(x))
+      }
       # Build string with each argument on a new line
       arg_strings <- sapply(names(args), function(nm) {
-        if (nm == "e" && length(args[[nm]]) > 1) {
-          sprintf("  e = c(%s)", paste(fmt_val(args[[nm]]), collapse = ", "))
+        val <- args[[nm]]
+        if (nm == "e" && length(val) > 1) {
+          sprintf("  e = c(%s)", paste(fmt_val(val), collapse = ", "))
         } else {
-          sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+          sprintf("  %s = %s", nm, fmt_val(val))
         }
       })
 
@@ -5900,12 +5902,12 @@ shiny::observeEvent(input$runf, {
     \\begin{array}{l c}
     \\textbf{Probability of Compelling Evidence} & \\\\
     \\hline
-    p\\text{(BF}_{10} > ', ff$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
-    p\\text{(BF}_{01} > ', ff$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
+    p\\text{(BF}_{10} > ', ff$D, '\\, | \\, \\mathcal{H}_1)\\ & ', format(round(dat[1], 3), nsmall = 3), ' \\\\
+    p\\text{(BF}_{01} > ', ff$D, '\\, | \\, \\mathcal{H}_0)\\ & ', format(round(dat[3], 3), nsmall = 3), ' \\\\
     \\textbf{Probability of Misleading Evidence} & \\\\
     \\hline
-    p\\text{(BF}_{01} > ', ff$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
-    p\\text{(BF}_{10} > ', ff$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
+    p\\text{(BF}_{01} > ', ff$D, '\\, | \\, \\mathcal{H}_1)\\ & ', format(round(dat[2], 3), nsmall = 3), ' \\\\
+    p\\text{(BF}_{10} > ', ff$D, '\\, | \\, \\mathcal{H}_0)\\ & ', format(round(dat[4], 3), nsmall = 3), ' \\\\
     \\textbf{Required Sample Size} & \\\\
     \\hline
     \\text{N} & ', dat[5], ' \\\\
@@ -5920,50 +5922,98 @@ shiny::observeEvent(input$runf, {
       )
     )
   })
-
-  if (ff$pc) {
-    switch(ff$inter,
-           "1" = Power_f(ff$D,ff$k,ff$p,ff$dff,ff$rscale,ff$f_m,ff$model,ff$k_d,ff$p_d,
-                         ff$dff_d,ff$rscale_d,ff$f_m_d,ff$model_d,ff$de_an_prior,dat[1,5]),
-           "2" = Power_fe(ff$D,ff$k,ff$p,ff$dff,ff$rscale,
-                          ff$f_m,ff$model,ff$k_d,ff$p_d,ff$dff_d,ff$rscale_d,ff$f_m_d,ff$model_d,ff$de_an_prior,dat[1,5],ff$e))
-
-      pc_f <- grDevices::recordPlot()
-  } else pc_f <- NA
-
-  if (ff$rela) {
-    switch(ff$inter,
-           "1" = bf10_f(ff$D,dat[1,5],ff$k,ff$p,ff$dff,ff$rscale,ff$f_m,ff$model),
-           "2" = bf10_fe(ff$D,dat[1,5],ff$k,ff$p,ff$dff,ff$rscale,ff$f_m,ff$model,ff$e))
-    rela_f <- grDevices::recordPlot()
-  } else rela_f <- NA
+  # Define reactive containers OUTSIDE the if blocks
+  pc_f   <- shiny::reactiveVal(NULL)
+  rela_f <- shiny::reactiveVal(NULL)
 
 
+  # ===================================================
+  #               POWER CURVE (F)
+  # ===================================================
 
-  output$Optional_Plots_f <- shiny::renderUI({
-    shiny::tagList(
-      if (ff$pc) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$")),
-          output$PCf <- shiny::renderPlot({
+  if (isTRUE(ff$pc)) {
 
-            pc_f
+    output$plot_power_f_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$${\\text{Power Curve}}$$"))
+      )
+    })
 
-          })
+    output$plot_power_f <- shiny::renderPlot({
+
+      suppressWarnings(
+        switch(
+          ff$inter,
+
+          "1" = Power_f(
+            ff$D, ff$k, ff$p, ff$dff, ff$rscale,
+            ff$f_m, ff$model,
+            ff$k_d, ff$p_d, ff$dff_d, ff$rscale_d, ff$f_m_d, ff$model_d,
+            ff$de_an_prior,
+            dat[1,5]
+          ),
+
+          "2" = Power_fe(
+            ff$D, ff$k, ff$p, ff$dff, ff$rscale,
+            ff$f_m, ff$model,
+            ff$k_d, ff$p_d, ff$dff_d, ff$rscale_d, ff$f_m_d, ff$model_d,
+            ff$de_an_prior,
+            dat[1,5],
+            ff$e
+          )
         )
-      },
-      if (ff$rela) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$")),
-          output$bfrf <- shiny::renderPlot({
+      )
 
-            rela_f
+      pc_f(grDevices::recordPlot())
+    })
 
-          })
+  } else {
+
+    pc_f(NULL)
+    output$plot_power_f_text <- shiny::renderUI(NULL)
+    output$plot_power_f      <- shiny::renderPlot(NULL)(NULL)
+  }
+
+
+
+  # ===================================================
+  #           RELATIONSHIP BETWEEN BF & DATA (F)
+  # ===================================================
+
+  if (isTRUE(ff$rela)) {
+
+    output$plot_rel_f_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$${\\text{Relationship between BF and data}}$$"))
+      )
+    })
+
+    output$plot_rel_f <- shiny::renderPlot({
+
+      suppressWarnings(
+        switch(
+          ff$inter,
+
+          "1" = bf10_f(
+            ff$D, dat[1,5], ff$k, ff$p, ff$dff, ff$rscale, ff$f_m, ff$model
+          ),
+
+          "2" = bf10_fe(
+            ff$D, dat[1,5], ff$k, ff$p, ff$dff, ff$rscale, ff$f_m, ff$model, ff$e
+          )
         )
-      }
-    )
-  })
+      )
+
+      rela_f(grDevices::recordPlot())
+    })
+
+  } else {
+
+    rela_f(NULL)
+    output$plot_rel_f_text <- shiny::renderUI(NULL)
+    output$plot_rel_f      <- shiny::renderPlot(NULL)(NULL)
+  }
+
 
   output$export_f <- shiny::downloadHandler(
     filename = function() {
@@ -5978,7 +6028,7 @@ shiny::observeEvent(input$runf, {
       rmarkdown::render(
         input = tempReport,output_format ="html_document",
         output_file = file,
-        params = list(ff = ff, dat = dat,pc_f=pc_f,rela_f=rela_f),  # ✅ pass to `params`
+        params = list(ff = ff, dat = dat,pc_f=pc_f(),rela_f=rela_f()),  # ✅ pass to `params`
         envir = new.env(parent = globalenv())  # environment still required
       )
     }
@@ -6205,12 +6255,12 @@ shiny::observeEvent(input$runp2, {
                            '\\begin{array}{l c}
       \\textbf{Probability of Compelling Evidence} & \\\\
       \\hline
-      p\\text{(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_1) & ', round(table[1,1], 3), ' \\\\
-      p\\text{(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_0) & ', round(table[1,3], 3), ' \\\\
+      p\\text{(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_1) & ', format(round(table[1,1],3), nsmall = 3), ' \\\\
+      p\\text{(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_0) & ', format(round(table[1,3],3), nsmall = 3), ' \\\\
       \\textbf{Probability of Misleading Evidence} & \\\\
       \\hline
-      p\\text{(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_1) & ', round(table[1,2], 3), ' \\\\
-      p\\text{(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_0) & ', round(table[1,4], 3), ' \\\\
+      p\\text{(BF}_{01} > ', p2$D, '\\, | \\, \\mathcal{H}_1) & ', format(round(table[1,2],3), nsmall = 3), ' \\\\
+      p\\text{(BF}_{10} > ', p2$D, '\\, | \\, \\mathcal{H}_0) & ', format(round(table[1,4],3), nsmall = 3), ' \\\\
       \\textbf{Required Sample Size} & \\\\
       \\hline
       \\text{N}_1 & ', table[1,5], ' \\\\
@@ -6222,48 +6272,69 @@ shiny::observeEvent(input$runp2, {
     }
   })
 
+  # Define reactive containers OUTSIDE the if blocks
+  pc_p2   <- shiny::reactiveVal(NULL)
+  rela_p2 <- shiny::reactiveVal(NULL)
 
+  # ===================================================
+  #               POWER CURVE
+  # ===================================================
 
-  # Compute power plot if needed
-  pc_p2 <- if (p2$pc) {
-    Power_p2(
-      p2$D, table[1,5], p2$a0, p2$b0, p2$a1, p2$b1, p2$a2,
-      p2$b2, table[1,6] / table[1,5], p2$model1, p2$a1d, p2$b1d, p2$dp1,
-      p2$model2, p2$a2d, p2$b2d, p2$dp2
-    )
-    grDevices::recordPlot()
-  } else NULL
+  if (isTRUE(p2$pc)) {
 
-  output$PCp2 <- shiny::renderPlot({
-    shiny::req(pc_p2)
-    pc_p2
-  })
+    output$plot_power_p2_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$"))
+      )
+    })
 
-  # Compute heatmap if needed
-  rela_p2 <- if (p2$rela) heatmap_p2(dat[[2]], p2$D) else NULL
+    output$plot_power_p2 <- shiny::renderPlot({
 
-  output$bfrp2 <- shiny::renderPlot({
-    shiny::req(rela_p2)
-    rela_p2
-  })
-
-  # Optional plots UI
-  output$Optional_Plots_p2 <- shiny::renderUI({
-    shiny::tagList(
-      if (!is.null(pc_p2)) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$")),
-          shiny::plotOutput("PCp2")
+      suppressWarnings(
+        Power_p2(
+          p2$D, table[1,5], p2$a0, p2$b0, p2$a1, p2$b1, p2$a2,
+          p2$b2, table[1,6] / table[1,5], p2$model1, p2$a1d, p2$b1d, p2$dp1,
+          p2$model2, p2$a2d, p2$b2d, p2$dp2
         )
-      },
-      if (!is.null(rela_p2)) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$")),
-          shiny::plotOutput("bfrp2")
-        )
-      }
-    )
-  })
+      )
+
+      pc_p2(grDevices::recordPlot())
+    })
+
+  } else {
+
+    pc_p2(NULL)
+    output$plot_power_p2_text <- shiny::renderUI(NULL)
+    output$plot_power_p2      <- shiny::renderPlot(NULL)(NULL)
+  }
+
+  # ===================================================
+  #           RELATIONSHIP BETWEEN BF & DATA
+  # ===================================================
+
+  if (isTRUE(p2$rela)) {
+
+    output$plot_rel_p2_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$"))
+      )
+    })
+
+    output$plot_rel_p2 <- shiny::renderPlot({
+      # Explicitly assign and print the ggplot
+      plt <- heatmap_p2(dat[[2]], p2$D)
+      print(plt)
+
+      # Save the plot for later
+      rela_p2(grDevices::recordPlot())
+    })
+
+  } else {
+
+    rela_p2(NULL)
+    output$plot_rel_p2_text <- shiny::renderUI(NULL)
+    output$plot_rel_p2      <- shiny::renderPlot(NULL)(NULL)
+  }
 
   # Download handler
   output$export_p2 <- shiny::downloadHandler(
@@ -6276,7 +6347,7 @@ shiny::observeEvent(input$runp2, {
         input = tempReport,
         output_format = "html_document",
         output_file = file,
-        params = list(p2 = p2, dat = dat, pc_p2 = pc_p2, rela_p2 = rela_p2),
+        params = list(p2 = p2, dat = dat, pc_p2 = pc_p2(), rela_p2 = rela_p2()),
         envir = new.env(parent = globalenv())
       )
     }
@@ -6317,7 +6388,12 @@ shiny::observeEvent(input$calp2, {
         x1 = p2$k1,
         x2 = p2$k2
       )
-
+      fmt_val <- function(x) {
+        if (is.numeric(x) && length(x) == 1) return(as.character(x))
+        if (is.numeric(x) && length(x) > 1) return(paste(x, collapse = ", "))
+        if (is.character(x)) return(shQuote(x))
+        return(as.character(x))
+      }
       # Build string with each argument on a new line
       arg_strings <- sapply(names(args), function(nm) {
         sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
@@ -6402,7 +6478,7 @@ input_r <- shiny::reactive({
   model <- switch(input$modelr,
                   "1" = "d_beta",
                   "2" = "beta",
-                  "3" = "NLP")
+                  "3" = "Moment")
   k <- input$kr
   scale <- input$sr
   alpha <- input$ralpha
@@ -6413,7 +6489,7 @@ input_r <- shiny::reactive({
   model_d <- switch(input$modelrd,
                     "1" = "d_beta",
                     "2" = "beta",
-                    "3" = "NLP",
+                    "3" = "Moment",
                     "4" = "Point")
   location_d <- input$h0phod
   k_d <- input$rkd
@@ -6569,12 +6645,12 @@ shiny::observeEvent(input$runr, {
     \\begin{array}{l c}
     \\textbf{Probability of Compelling Evidence} & \\\\
     \\hline
-    p\\text{(BF}_{10} > ', rr$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
-    p\\text{(BF}_{01} > ', rr$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
+    p\\text{(BF}_{10} > ', rr$D, '\\, | \\, \\mathcal{H}_1)\\ & ', format(round(dat[1], 3), nsmall = 3), ' \\\\
+    p\\text{(BF}_{01} > ', rr$D, '\\, | \\, \\mathcal{H}_0)\\ & ', format(round(dat[3], 3), nsmall = 3), ' \\\\
     \\textbf{Probability of Misleading Evidence} & \\\\
     \\hline
-    p\\text{(BF}_{01} > ', rr$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
-    p\\text{(BF}_{10} > ', rr$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
+    p\\text{(BF}_{01} > ', rr$D, '\\, | \\, \\mathcal{H}_1)\\ & ', format(round(dat[2], 3), nsmall = 3), ' \\\\
+    p\\text{(BF}_{10} > ', rr$D, '\\, | \\, \\mathcal{H}_0)\\ & ', format(round(dat[4], 3), nsmall = 3), ' \\\\
     \\textbf{Required Sample Size} & \\\\
     \\hline
     \\text{N} & ', dat[5], ' \\\\
@@ -6591,59 +6667,96 @@ shiny::observeEvent(input$runr, {
   })
 
 
+  # Define reactive containers OUTSIDE the if blocks
+  pc_r   <- shiny::reactiveVal(NULL)
+  rela_r <- shiny::reactiveVal(NULL)
 
 
-  if (rr$pc) {
-    switch(rr$interval,
-                     "1" = Power_r(rr$D,rr$k, rr$alpha, rr$beta,rr$h0,rr$hypothesis,rr$location,rr$scale,rr$dff,rr$model,
-                                   rr$k_d, rr$alpha_d, rr$beta_d,rr$location_d,rr$scale_d,rr$dff_d,rr$model_d, rr$de_an_prior,dat[1,5]),
-                     "2" = Power_re(rr$D,rr$k, rr$alpha, rr$beta,rr$h0,rr$hypothesis,rr$location,rr$scale,rr$dff,rr$model,
-                                    rr$k_d, rr$alpha_d, rr$beta_d,rr$location_d,rr$scale_d,rr$dff_d,rr$model_d, rr$de_an_prior,dat[1,5],rr$e))
+  # ===================================================
+  #                POWER CURVE (r)
+  # ===================================================
 
-    pc_r <- grDevices::recordPlot()
-  }else{
-    pc_r <-NA
-    }
+  if (isTRUE(rr$pc)) {
 
-  if (rr$rela) {
-    switch(rr$interval,
-           "1" = r_bf10_p(rr$D,dat[1,5],rr$k,rr$alpha, rr$beta,rr$h0,
-                          rr$hypothesis,rr$location,rr$scale,rr$dff,rr$model),
-           "2" = re_bf10_p(rr$D,dat[1,5],rr$k,rr$alpha,rr$beta,rr$h0,rr$hypothesis,rr$location,rr$scale,rr$dff,rr$model,rr$e))
+    output$plot_power_r_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$"))
+      )
+    })
 
+    output$plot_power_r <- shiny::renderPlot({
 
-    rela_r <- grDevices::recordPlot()
-  } else{
-    rela_r <- NA
+      suppressWarnings(
+        switch(
+          rr$interval,
+
+          "1" = Power_r(
+            rr$D, rr$k, rr$alpha, rr$beta, rr$h0, rr$hypothesis,
+            rr$location, rr$scale, rr$dff, rr$model,
+            rr$k_d, rr$alpha_d, rr$beta_d, rr$location_d, rr$scale_d,
+            rr$dff_d, rr$model_d, rr$de_an_prior, dat[1,5]
+          ),
+
+          "2" = Power_re(
+            rr$D, rr$k, rr$alpha, rr$beta, rr$h0, rr$hypothesis,
+            rr$location, rr$scale, rr$dff, rr$model,
+            rr$k_d, rr$alpha_d, rr$beta_d, rr$location_d, rr$scale_d,
+            rr$dff_d, rr$model_d, rr$de_an_prior, dat[1,5], rr$e
+          )
+        )
+      )
+
+      pc_r(grDevices::recordPlot())
+    })
+
+  } else {
+
+    pc_r(NULL)
+    output$plot_power_r_text <- shiny::renderUI(NULL)
+    output$plot_power_r      <- shiny::renderPlot(NULL)(NULL)
   }
 
 
 
-  output$Optional_Plots_r <- shiny::renderUI({
-    shiny::tagList(
-      if (rr$pc) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$")),
-          output$PCr <- shiny::renderPlot({
+  # ===================================================
+  #                RELATIONSHIP (r)
+  # ===================================================
 
-            pc_r
+  if (isTRUE(rr$rela)) {
 
-          })
+    output$plot_rel_r_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$"))
+      )
+    })
+
+    output$plot_rel_r <- shiny::renderPlot({
+
+      suppressWarnings(
+        switch(
+          rr$interval,
+
+          "1" = r_bf10_p(
+            rr$D, dat[1,5], rr$k, rr$alpha, rr$beta, rr$h0,
+            rr$hypothesis, rr$location, rr$scale, rr$dff, rr$model
+          ),
+
+          "2" = re_bf10_p(
+            rr$D, dat[1,5], rr$k, rr$alpha, rr$beta, rr$h0,
+            rr$hypothesis, rr$location, rr$scale, rr$dff, rr$model, rr$e
+          )
         )
-      },
-      if (rr$rela) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$")),
-          output$bfrr <- shiny::renderPlot({
+      )
 
-            rela_r
+      rela_r(grDevices::recordPlot())
+    })
 
-          })
-        )
-      }
-    )
-  })
+  } else {
 
+    rela_r(NULL)
+    output$plot_rel_r_text <- shiny::renderUI(NULL)
+    output$plot_rel_r      <- shiny::renderPlot(NULL)(NULL)
+  }
 
   output$export_r <- shiny::downloadHandler(
     filename = function() {
@@ -6658,7 +6771,7 @@ shiny::observeEvent(input$runr, {
       rmarkdown::render(
         input = tempReport,output_format ="html_document",
         output_file = file,
-        params = list(rr = rr, dat = dat,pc_r=pc_r,rela_r=rela_r),  # ✅ pass to `params`
+        params = list(rr = rr, dat = dat,pc_r=pc_r(),rela_r=rela_r()),  # ✅ pass to `params`
         envir = new.env(parent = globalenv())  # environment still required
       )
     }
@@ -6695,41 +6808,69 @@ shiny::observeEvent(input$calr, {
 
   output$result_r <- shiny::renderText({
 
-    args <- list(
-      r = rr$rval,
-      n = rr$N,
-      k = rr$k,
-      alpha = rr$alpha,
-      beta = rr$beta,
-      h0 = rr$h0,
-      hypothesis = rr$hypothesis,
-      location = rr$location,
-      scale = rr$scale,
-      dff = rr$dff,
-      model = rr$model
-    )
+    build_BF10_call <- function(rr) {
 
-    if (rr$interval != 1) {
-      args$e <- rr$e
+      fmt_val <- function(x) {
+        if (is.numeric(x) && length(x) == 1) return(as.character(x))
+        if (is.numeric(x) && length(x) > 1) return(paste(x, collapse = ", "))
+        if (is.character(x)) return(shQuote(x))
+        return(as.character(x))
+      }
+
+      args <- list(
+        r = rr$rval,
+        n = rr$N,
+        model = rr$model
+      )
+
+      # Add model-specific arguments
+      if (!is.null(rr$model)) {
+        if (rr$model == "d_beta") {
+          args$k <- rr$k
+          # alpha, beta, scale are ignored
+        } else if (rr$model == "beta") {
+          args$alpha <- rr$alpha
+          args$beta  <- rr$beta
+          # k, scale ignored
+        } else if (rr$model == "Moment") {
+          args$scale <- rr$scale
+          # k, alpha, beta ignored
+        }
+      }
+
+      # Common arguments always included
+      args$h0 <- rr$h0
+      args$hypothesis <- rr$hypothesis
+      # location is internal only → never printed
+
+      # Optional e (equivalence) only if interval != 1
+      if (!is.null(rr$interval) && rr$interval != 1) {
+        args$e <- rr$e
+      }
+
+      # Build string with each argument on a new line
+      arg_strings <- sapply(names(args), function(nm) {
+        val <- args[[nm]]
+        if (nm == "e" && length(val) > 1) {
+          # print vector as c(...) without nested c()
+          sprintf("  e = c(%s)", paste(fmt_val(val), collapse = ", "))
+        } else {
+          sprintf("  %s = %s", nm, fmt_val(val))
+        }
+      })
+
+      call_string <- paste0(
+        "# Function to be used in R\n",
+        "BF10.cor(\n",
+        paste(arg_strings, collapse = ",\n"),
+        "\n)"
+      )
+
+      call_string
     }
 
-    # Build string with each argument on a new line
-    arg_strings <- sapply(names(args), function(nm) {
-      if (nm == "e" && length(args[[nm]]) > 1) {
-        sprintf("  e = c(%s)", paste(fmt_val(args[[nm]]), collapse = ", "))
-      } else {
-        sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
-      }
-    })
 
-    call_string <- paste0(
-      "# Function to be used in R\n",
-      "BF10.cor(\n",
-      paste(arg_strings, collapse = ",\n"),
-      "\n)"
-    )
-
-    call_string
+    build_BF10_call(rr)
   })
 
 
@@ -6797,7 +6938,7 @@ input_t1 <- shiny::reactive({
   model <- switch(input$modelt1,
                   "1" = "t-distribution",
                   "2" = "Normal",
-                  "3" = "NLP")
+                  "3" = "Moment")
 
   location <- input$lt1
   scale <- input$st1
@@ -6808,7 +6949,7 @@ input_t1 <- shiny::reactive({
   model_d <- switch(input$modelt1d,
                     "1" = "t-distribution",
                     "2" = "Normal",
-                    "3" = "NLP",
+                    "3" = "Moment",
                     "4" = "Point")
   location_d <- input$lt1d
 
@@ -6822,6 +6963,7 @@ input_t1 <- shiny::reactive({
   tval <- input$t1tval
   pc   <- "1" %in% input$o_plot_t1
   rela <- "2" %in% input$o_plot_t1
+
   if (mode_bf!=1){
     pc=rela=F
   }
@@ -6910,12 +7052,12 @@ shiny::observeEvent(input$runt1, {
     \\begin{array}{l c}
     \\textbf{Probability of Compelling Evidence} & \\\\
     \\hline
-    p\\text{(BF}_{10} > ', x$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1], 3), ' \\\\
-    p\\text{(BF}_{01} > ', x$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[3], 3), ' \\\\
+    p\\text{(BF}_{10} > ', x$D, '\\, | \\, \\mathcal{H}_1)\\ & ', format(round(dat[1], 3), nsmall = 3), ' \\\\
+    p\\text{(BF}_{01} > ', x$D, '\\, | \\, \\mathcal{H}_0)\\ & ', format(round(dat[3], 3), nsmall = 3), ' \\\\
     \\textbf{Probability of Misleading Evidence} & \\\\
     \\hline
-    p\\text{(BF}_{01} > ', x$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[2], 3), ' \\\\
-    p\\text{(BF}_{10} > ', x$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[4], 3), ' \\\\
+    p\\text{(BF}_{01} > ', x$D, '\\, | \\, \\mathcal{H}_1)\\ & ', format(round(dat[2], 3), nsmall = 3), ' \\\\
+    p\\text{(BF}_{10} > ', x$D, '\\, | \\, \\mathcal{H}_0)\\ & ', format(round(dat[4], 3), nsmall = 3), ' \\\\
     \\textbf{Required Sample Size} & \\\\
     \\hline
     \\text{N} & ', dat[5], ' \\\\
@@ -6930,58 +7072,99 @@ shiny::observeEvent(input$runt1, {
       )
     )
   })
-
-  if (x$pc) {
-    suppressWarnings(switch(x$interval,
-                            "1"=
-                              Power_t1(x$D,x$model,x$location,x$scale,x$dff, x$hypothesis,
-                                       x$model_d,x$location_d,x$scale_d,x$dff_d, x$de_an_prior,dat[1,5]),
-                            "2" = Power_t1e(x$D,x$model,x$location,x$scale,x$dff, x$hypothesis,
-                                            x$model_d,x$location_d,x$scale_d,x$dff_d, x$de_an_prior,dat[1,5],x$e)))
-    pc_t1 <- grDevices::recordPlot()
-  } else pc_t1 <- NA
-
-  if (x$rela) {
-    suppressWarnings(switch(x$interval,
-                            "1"=
-                              bf10_t1(
-                                D = x$D,                  # Access 'D' explicitly
-                                df = dat[1,5],               # Access 'dff' (degrees of freedom) for 'df'
-                                target = x$target,        # Access 'target' explicitly
-                                model = x$model,          # Access 'model' explicitly
-                                location = x$location,    # Access 'location' explicitly
-                                scale = x$scale,          # Access 'scale' explicitly
-                                dff = x$dff,              # Access 'dff' explicitly again, if required
-                                hypothesis = x$hypothesis # Access 'hypothesis' explicitly
-                              ), "2"= te1_BF (x$D,dat[1,5],x$model ,x$location,x$scale,x$dff , x$hypothesis ,x$e)))
-    rela_t1 <- grDevices::recordPlot()
-  } else rela_t1 <- NA
+  # --- reactive containers should be defined OUTSIDE the if blocks ----
+  pc_t1   <- shiny::reactiveVal(NULL)
+  rela_t1 <- shiny::reactiveVal(NULL)
 
 
-  output$Optional_Plots_t1 <- shiny::renderUI({
-    shiny::tagList(
-      if (x$pc) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$")),
-          output$PCt1 <- shiny::renderPlot({
+  # ===============================
+  #   POWER CURVE SECTION (pc)
+  # ===============================
 
-            pc_t1
+  if (isTRUE(x$pc)) {
 
-          })
+    output$plot_power_t1_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$"))
+      )
+    })
+
+    output$plot_power_t1 <- shiny::renderPlot({
+
+      suppressWarnings(
+        switch(
+          x$interval,
+          "1" = Power_t1(
+            x$D, x$model, x$location, x$scale, x$dff, x$hypothesis,
+            x$model_d, x$location_d, x$scale_d, x$dff_d,
+            x$de_an_prior, dat[1,5]
+          ),
+          "2" = Power_t1e(
+            x$D, x$model, x$location, x$scale, x$dff, x$hypothesis,
+            x$model_d, x$location_d, x$scale_d, x$dff_d,
+            x$de_an_prior, dat[1,5], x$e
+          )
         )
-      },
-      if (x$rela) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$")),
-          output$bfrt1 <- shiny::renderPlot({
+      )
 
-            rela_t1
+      pc_t1(grDevices::recordPlot())
+    })
 
-          })
+  } else {
+
+    pc_t1(NULL)
+    output$plot_power_t1_text <- shiny::renderUI(NULL)
+    output$plot_power_t1      <- shiny::renderPlot(NULL)(NULL)
+  }
+
+
+
+  # ===============================
+  #   RELATIONSHIP SECTION (rela)
+  # ===============================
+
+  if (isTRUE(x$rela)) {
+
+    output$plot_rel_t1_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$"))
+      )
+    })
+
+    output$plot_rel_t1 <- shiny::renderPlot({
+
+      suppressWarnings(
+        switch(
+          x$interval,
+          "1" =
+            bf10_t1(
+              D         = x$D,
+              df        = dat[1,5],
+              target    = x$target,
+              model     = x$model,
+              location  = x$location,
+              scale     = x$scale,
+              dff       = x$dff,
+              hypothesis = x$hypothesis
+            ),
+          "2" =
+            te1_BF(
+              x$D, dat[1,5], x$model, x$location, x$scale, x$dff,
+              x$hypothesis, x$e
+            )
         )
-      }
-    )
-  })
+      )
+
+      rela_t1(grDevices::recordPlot())
+    })
+
+  } else {
+
+    rela_t1(NULL)
+    output$plot_rel_t1_text <- shiny::renderUI(NULL)
+    output$plot_rel_t1      <- shiny::renderPlot(NULL)(NULL)
+  }
+
 
   output$export_t1 <- shiny::downloadHandler(
     filename = function() {
@@ -6997,7 +7180,7 @@ shiny::observeEvent(input$runt1, {
       rmarkdown::render(
         input = tempReport,output_format ="html_document",
         output_file = file,
-        params = list(x = x, dat = dat,pc_t1=pc_t1,rela_t1=rela_t1),  # ✅ pass to `params`
+        params = list(x = x, dat = dat,pc_t1=pc_t1(),rela_t1=rela_t1()),  # ✅ pass to `params`
         envir = new.env(parent = globalenv())  # environment still required
       )
     }
@@ -7042,7 +7225,7 @@ shiny::observeEvent(input$cal1, {
 
     call_string <- paste0(
       "# Function to be used in R\n",
-      "BF10.t.test.one_sample(\n",
+      "BF10.t.test.one.sample(\n",
       paste(arg_strings, collapse = ",\n"),
       "\n)"
     )
@@ -7182,7 +7365,7 @@ input_t2 <- shiny::reactive({
   model <- switch(input$modelt2,
                   "1" = "t-distribution",
                   "2" = "Normal",
-                  "3" = "NLP")
+                  "3" = "Moment")
 
   location <- input$lt2
   scale <- input$st2
@@ -7193,7 +7376,7 @@ input_t2 <- shiny::reactive({
   model_d <- switch(input$modelt2d,
                     "1" = "t-distribution",
                     "2" = "Normal",
-                    "3" = "NLP",
+                    "3" = "Moment",
                     "4" = "Point")
   location_d <- input$lt2d
   scale_d <- input$st2d
@@ -7246,6 +7429,8 @@ input_t2 <- shiny::reactive({
 
 shiny::observeEvent(input$runt2, {
   t2 = input_t2()
+
+
   dat <- tryCatch({
     suppressWarnings(switch(t2$interval,
                             "1" = t2_Table(t2$D, t2$r, t2$target, t2$model, t2$location, t2$scale, t2$dff, t2$hypothesis,
@@ -7303,12 +7488,12 @@ shiny::observeEvent(input$runt2, {
     \\begin{array}{l c}
     \\textbf{Probability of Compelling Evidence} & \\\\
     \\hline
-    p\\text{(BF}_{10} > ', t2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1,1], 3), ' \\\\
-    p\\text{(BF}_{01} > ', t2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[1,3], 3), ' \\\\
+    p\\text{(BF}_{10} > ', t2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', format(round(dat[1,1], 3),nsmall=3), ' \\\\
+    p\\text{(BF}_{01} > ', t2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', format(round(dat[1,3], 3),nsmall=3), ' \\\\
     \\textbf{Probability of Misleading Evidence} & \\\\
     \\hline
-    p\\text{(BF}_{01} > ', t2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', round(dat[1,2], 3), ' \\\\
-    p\\text{(BF}_{10} > ', t2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', round(dat[1,4], 3), ' \\\\
+    p\\text{(BF}_{01} > ', t2$D, '\\, | \\, \\mathcal{H}_1)\\ & ', format(round(dat[1,2], 3),nsmall=3), ' \\\\
+    p\\text{(BF}_{10} > ', t2$D, '\\, | \\, \\mathcal{H}_0)\\ & ', format(round(dat[1,4], 3),nsmall=3), ' \\\\
     \\textbf{Required Sample Size} & \\\\
     \\hline
     \\text{N}_1 & ', dat[1,5], ' \\\\
@@ -7324,52 +7509,100 @@ shiny::observeEvent(input$runt2, {
       )
     )
   })
+  # Define reactive containers OUTSIDE the if blocks
+  pc_t2   <- shiny::reactiveVal(NULL)
+  rela_t2 <- shiny::reactiveVal(NULL)
 
 
-  if (t2$pc) {
-    suppressWarnings(switch(t2$interval,
-                            "1" = Power_t2(t2$D,t2$model,t2$location,t2$scale,t2$dff, t2$hypothesis,
-                                           t2$model_d,t2$location_d,t2$scale_d,t2$dff_d, t2$de_an_prior,dat[1,5],dat[1,6]/dat[1,5]),
-                            "2" = Power_t2e(t2$D,t2$model,t2$location,t2$scale,t2$dff, t2$hypothesis,
-                                            t2$model_d,t2$location_d,t2$scale_d,t2$dff_d, t2$de_an_prior,dat[1,5],dat[1,6]/dat[1,5],t2$e)))
+  # ===================================================
+  #                POWER CURVE (t2)
+  # ===================================================
 
+  if (isTRUE(t2$pc)) {
 
+    output$plot_power_t2_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$"))
+      )
+    })
 
+    output$plot_power_t2 <- shiny::renderPlot({
 
-    pc_t2 <- grDevices::recordPlot()
-  } else pc_t2 <- NA
+      suppressWarnings(
+        switch(
+          t2$interval,
 
-  if (t2$rela) {
-    suppressWarnings(switch(t2$interval,
-                            "1"= t2_bf10(t2$D ,dat[1,5],t2$r, t2$target,t2$model ,t2$location ,t2$scale,t2$dff  , t2$hypothesis ),
-                            "2" =t2e_BF (t2$D,dat[1,5],t2$r,t2$model ,t2$location,t2$scale,t2$dff , t2$hypothesis ,t2$e) ))
-    rela_t2 <- grDevices::recordPlot()
-  } else rela_t2 <- NA
+          "1" = Power_t2(
+            t2$D, t2$model, t2$location, t2$scale, t2$dff, t2$hypothesis,
+            t2$model_d, t2$location_d, t2$scale_d, t2$dff_d,
+            t2$de_an_prior,
+            dat[1,5],
+            dat[1,6] / dat[1,5]
+          ),
 
-  output$Optional_Plots_t2 <- shiny::renderUI({
-    shiny::tagList(
-      if (t2$pc) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$")),
-          output$PCt2 <- shiny::renderPlot({
-
-            pc_t2
-
-          })
+          "2" = Power_t2e(
+            t2$D, t2$model, t2$location, t2$scale, t2$dff, t2$hypothesis,
+            t2$model_d, t2$location_d, t2$scale_d, t2$dff_d,
+            t2$de_an_prior,
+            dat[1,5],
+            dat[1,6] / dat[1,5],
+            t2$e
+          )
         )
-      },
-      if (t2$rela) {
-        shiny::tagList(
-          shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$")),
-          output$bfrt2 <- shiny::renderPlot({
+      )
 
-            rela_t2
+      pc_t2(grDevices::recordPlot())
+    })
 
-          })
+  } else {
+
+    pc_t2(NULL)
+    output$plot_power_t2_text <- shiny::renderUI(NULL)
+    output$plot_power_t2      <- shiny::renderPlot(NULL)(NULL)
+  }
+
+
+  # ===================================================
+  #                RELATIONSHIP (t2)
+  # ===================================================
+
+  if (isTRUE(t2$rela)) {
+
+    output$plot_rel_t2_text <- shiny::renderUI({
+      shiny::tagList(
+        shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$"))
+      )
+    })
+
+    output$plot_rel_t2 <- shiny::renderPlot({
+
+      suppressWarnings(
+        switch(
+          t2$interval,
+
+          "1" = t2_BF(
+            t2$D, dat[1,5], t2$r, t2$target,
+            t2$model, t2$location, t2$scale, t2$dff,
+            t2$hypothesis
+          ),
+
+          "2" = t2e_BF(
+            t2$D, dat[1,5], t2$r,
+            t2$model, t2$location, t2$scale, t2$dff,
+            t2$hypothesis, t2$e
+          )
         )
-      }
-    )
-  })
+      )
+
+      rela_t2(grDevices::recordPlot())
+    })
+
+  } else {
+
+    rela_t2(NULL)
+    output$plot_rel_t2_text <- shiny::renderUI(NULL)
+    output$plot_rel_t2      <- shiny::renderPlot(NULL)(NULL)
+  }
 
 
   output$export_t2 <- shiny::downloadHandler(
@@ -7385,7 +7618,7 @@ shiny::observeEvent(input$runt2, {
       rmarkdown::render(
         input = tempReport,output_format ="html_document",
         output_file = file,
-        params = list(t2 = t2, dat = dat,pc_t2=pc_t2,rela_t2=rela_t2),  # ✅ pass to `params`
+        params = list(t2 = t2, dat = dat,pc_t2=pc_t2(),rela_t2=rela_t2()),  # ✅ pass to `params`
         envir = new.env(parent = globalenv())  # environment still required
       )
     }
@@ -7448,6 +7681,19 @@ shiny::observeEvent(input$cal2, {
 
   output$result_t2 <- shiny::renderText({
 
+
+    fmt_val <- function(val) {
+      if (is.character(val)) {
+        sprintf('"%s"', val)
+      } else if (is.numeric(val) && length(val) > 1) {
+        paste0("c(", paste(val, collapse = ","), ")")
+      } else {
+        as.character(val)
+      }
+    }
+
+
+
     args <- list(
       tval = t2$tval,
       N1 = t2$N1,
@@ -7474,7 +7720,7 @@ shiny::observeEvent(input$cal2, {
 
     call_string <- paste0(
       "# Function to be used in R\n",
-      "BF10.t.test.two_sample(\n",
+      "BF10.t.test.two.sample(\n",
       paste(arg_strings, collapse = ",\n"),
       "\n)"
     )
@@ -7572,7 +7818,7 @@ t2_BF10 <-function(t,n1,r,model ,location,scale,dff , hypothesis ){
     switch(model,
            "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
            "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "NLP"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
            "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
   error = 1e-10
@@ -7663,7 +7909,7 @@ t2_TPE <-function(t,n1,r,model ,location ,scale,dff , hypothesis ){
     switch(model,
            "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
            "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "NLP"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
            "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
 
@@ -7684,7 +7930,7 @@ t2_TPE <-function(t,n1,r,model ,location ,scale,dff , hypothesis ){
   }
 
   error = 1e-4
-  if (model == "NLP" & scale <.3 ){
+  if (model == "Moment" & scale <.3 ){
     error = 1e-14
   }
   x = stats::integrate(int,lower = bound[1],upper = bound[2], rel.tol = error,stop.on.error=FALSE)$value
@@ -7720,7 +7966,7 @@ t2_FNE<-function(t,n1,r,model ,location ,scale,dff , hypothesis ){
     switch(model,
            "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
            "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "NLP"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
            "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
   int <- function(delta) {
     ncp <- delta * constant
@@ -7901,7 +8147,7 @@ t2_Table <- function(D,r,target,model,location,scale,dff, hypothesis,
 
 # plots for showing the relationship between BF and t-values
 
-t2_bf10 <-function(D ,n1,r, target,model ,location ,scale,dff  , hypothesis ){
+t2_BF <-function(D ,n1,r, target,model ,location ,scale,dff  , hypothesis ){
   oldpar <- graphics::par(no.readonly = TRUE)
   base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 2))

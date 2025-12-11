@@ -2,32 +2,47 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BF10.f.test}
 \alias{BF10.f.test}
-\title{Bayes factor for a Bayesian F-test}
+\title{Bayes Factor for a Bayesian F-Test}
 \usage{
 BF10.f.test(fval, df1, df2, dff, rscale, f_m, model, e = NULL)
 }
 \arguments{
-\item{fval}{Observed F-value from the F-test.}
+\item{fval}{Numeric scalar. Observed F statistic (must be ≥ 0).}
 
-\item{df1}{Degrees of freedom for the numerator of the F-test.}
+\item{df1}{Numeric scalar. Numerator degrees of freedom (must be > 0).}
 
-\item{df2}{Degrees of freedom for the denominator of the F-test.}
+\item{df2}{Numeric scalar. Denominator degrees of freedom (must be > 0).}
 
-\item{dff}{Degrees of freedom for the analysis prior under the alternative hypothesis (if applicable).}
+\item{dff}{Numeric scalar. Degrees of freedom for the analysis prior under
+the alternative hypothesis. For the Moment prior, this must be \eqn{\ge 3}.}
 
-\item{rscale}{Scaling parameter for the analysis effect size prior.}
+\item{rscale}{Numeric scalar. Scale parameter for the effect-size prior
+(only used when \code{model = "effectsize"}).}
 
-\item{f_m}{Cohen's f effect size parameter for the analysis prior.}
+\item{f_m}{Numeric scalar. Cohen's f effect-size parameter for the
+analysis prior.}
 
-\item{model}{Statistical model of the analysis prior under the alternative hypothesis: effect size prior (\code{"effectsize"}) or Moment prior (\code{"Moment"}).}
+\item{model}{Character string specifying the analysis prior under the
+alternative hypothesis. Must be either \code{"effectsize"} or
+\code{"Moment"}.}
 
-\item{e}{Optional numeric vector specifying bounds for an interval null; used if interval BF is calculated.}
+\item{e}{Optional numeric scalar specifying an upper bound for an interval
+NaN hypothesis. If provided, must be > 0.}
 }
 \value{
-The Bayes factor (BF10) for the F-test.
+A list of class \code{"BFvalue_f"} containing:
+\itemize{
+\item \code{fval} Input F-value
+\item \code{df1, df2} Degrees of freedom
+\item \code{e} Interval bound (if specified)
+\item \code{analysis_h1} Details of the analysis prior
+\item \code{bf10} The computed Bayes factor
+}
 }
 \description{
-Calculate the Bayes factor (BF10) for an F-test, either against a point null or an interval null hypothesis.
+Computes the Bayes factor (BF10) for an F-test, comparing a full model to a
+reduced model under either an effect-size prior or a Moment prior.
+Optionally, an interval null hypothesis can be specified.
 }
 \examples{
 BF10.f.test(
@@ -36,7 +51,8 @@ BF10.f.test(
   df2 = 12,
   dff = 12,
   rscale = 0.707,
-  f_m = .1,
+  f_m = 0.1,
   model = "effectsize"
 )
+
 }

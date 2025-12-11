@@ -12,7 +12,16 @@ geometry: margin=2cm
 classoption: a4paper
 ---
 
-A Bayes Factor design analysis for regression/ANOVA was conducted on `r Sys.time()`.
+A Bayes Factor design analysis for regression/ANOVA was conducted on `r Sys.time()`.The code for reproducing the results:
+```{r, echo=FALSE, results='asis'}
+# Generate the reproducible code
+
+cat("```r\n")
+cat(show_f_code(params$ff))
+cat("\n```")
+
+
+```
 
 **Hypothesis**
 

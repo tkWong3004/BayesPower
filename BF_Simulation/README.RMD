@@ -29,7 +29,7 @@ Simulations are conducted for sample sizes ranging from 100 to 1000 with increme
 We ran simulations under various conditions, varying the design and analysis priors.  
 The results show that the simulated probabilities of compelling and misleading evidence align closely with those obtained using our method. 
 
-Users can replicate or extend these simulations using the scripts in this folder. Each script loads the required packages and defines custom functions for simulation. Toward the end of the script, users may adjust the input parameters as needed and run the simulation by executing the final lines of code. Although a simulation with as few as 1,000 iterations already produces results close to those obtained with our method (as shown below for some tests), we recommend that users employ a higher number of iterations for improved estimation based on the simulation.
+Users can replicate or extend these simulations using the scripts in this folder. Each script loads the required packages and defines custom functions for simulation. For each section of the script in`sim_figure.r` , users may adjust the input parameters as needed and run the simulation by executing the final lines of code toward the end of the section. 
 
 Below, we show some of the simulation results using the specification of analysis and design priors from the Application section of the paper.  
 
@@ -79,7 +79,7 @@ knitr::include_graphics("example_2.png")
 
 ### ANOVA
 ```{r , echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=6}
-f_ver(iter=1000,D=3,p=3,k=4,dff=3,rscale=.18,f_m=.1,model="effectsize",
+f_ver(iter=10000,D=3,p=3,k=4,dff=3,rscale=.18,f_m=.1,model="effectsize",
       dff_d=3,rscale_d=1,f_m_d=.1,model_d="Point",de_an_prior=0,e=NULL)
 
 ```
@@ -90,9 +90,9 @@ knitr::include_graphics("example_3.png")
 
 ### One proportion
 ```{r , echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=6}
-bin_ver(iter=1000,h0=.5, D=3,model="beta",  alpha=1, beta=1,location=.5,
+bin_ver(iter=10000,h0=.5, D=3,model="beta",  alpha=1, beta=1,location=.5,
         scale=1, hypothesis=">" ,model_d="Point",
-        location_d=.5,k_d=1, alpha_d=1, beta_d=1,scale_d=1,de_an_prior=1,e=NULL)
+        location_d=.55,k_d=1, alpha_d=1, beta_d=1,scale_d=1,de_an_prior=1,e=NULL)
 ```
 
 ```{r , echo=FALSE,  out.width = '50%'}
@@ -102,7 +102,7 @@ knitr::include_graphics("example_4.png")
 ### Two proportion
 
 ```{r , echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=6}
-p2_ver(iter=1000,D=3, a0=1, b0=1, a1=156, b1=339, a2=151, b2=339,
+p2_ver(iter=10000,D=3, a0=1, b0=1, a1=156, b1=339, a2=151, b2=339,
        model1="same",da1=156,db1=339,dp1=.5,model2="same",da2=151,db2=339,dp2=.5)
 
 

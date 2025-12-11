@@ -12,7 +12,16 @@ geometry: margin=2cm
 classoption: a4paper
 ---
 
-A Bayes Factor design analysis for testing correlation was conducted on `r Sys.time()`.
+A Bayes Factor design analysis for testing correlation was conducted on `r Sys.time()`.The code for reproducing the results:
+```{r, echo=FALSE, results='asis'}
+# Generate the reproducible code
+
+cat("```r\n")
+cat(show_cor_code(params$rr))
+cat("\n```")
+
+
+```
 
 **Hypothesis**
 

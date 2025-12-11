@@ -2,36 +2,44 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BF10.props}
 \alias{BF10.props}
-\title{Bayes factor for a Bayesian test of two proportions}
+\title{Bayes factor for comparing two proportions}
 \usage{
 BF10.props(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)
 }
 \arguments{
-\item{a0}{Alpha parameter of the beta distribution under the null hypothesis.}
+\item{a0}{Alpha parameter of the Beta prior under the null hypothesis.}
 
-\item{b0}{Beta parameter of the beta distribution under the null hypothesis.}
+\item{b0}{Beta parameter of the Beta prior under the null hypothesis.}
 
-\item{a1}{Alpha parameter of the analysis beta prior distribution for group 1 under the alternative hypothesis.}
+\item{a1}{Alpha parameter of the Beta prior for group 1 under the alternative hypothesis.}
 
-\item{b1}{Beta parameter of the analysis beta prior distribution for group 1 under the alternative hypothesis.}
+\item{b1}{Beta parameter of the Beta prior for group 1 under the alternative hypothesis.}
 
-\item{a2}{Alpha parameter of the analysis beta prior distribution for group 2 under the alternative hypothesis.}
+\item{a2}{Alpha parameter of the Beta prior for group 2 under the alternative hypothesis.}
 
-\item{b2}{Beta parameter of the analysis beta prior distribution for group 2 under the alternative hypothesis.}
+\item{b2}{Beta parameter of the Beta prior for group 2 under the alternative hypothesis.}
 
 \item{n1}{Sample size for group 1.}
 
 \item{n2}{Sample size for group 2.}
 
-\item{x1}{Observed number of successes for group 1.}
+\item{x1}{Number of successes observed in group 1.}
 
-\item{x2}{Observed number of successes for group 2.}
+\item{x2}{Number of successes observed in group 2.}
 }
 \value{
-The Bayes factor (BF10) for comparing two proportions.
+A list of class \code{BFvalue_2p} containing:
+\itemize{
+\item \code{type}: the string "Two-proportions".
+\item \code{analysis_h0}: list with \code{a} and \code{b} for the null prior.
+\item \code{analysis_h1_theta_1}: list with \code{a} and \code{b} for group 1 prior under H1.
+\item \code{analysis_h1_theta_2}: list with \code{a} and \code{b} for group 2 prior under H1.
+\item \code{bf10}: the computed Bayes factor (BF10).
+\item \code{n1}, \code{x1}, \code{n2}, \code{x2}: the input sample sizes and observed successes.
+}
 }
 \description{
-Calculate the Bayes factor (BF10) for comparing two proportions using a Bayesian framework.
+Compute the Bayes factor (BF10) for a Bayesian test of two proportions.
 }
 \examples{
 BF10.props(
