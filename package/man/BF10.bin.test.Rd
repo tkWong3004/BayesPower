@@ -19,10 +19,10 @@ BF10.bin.test(x, n, alpha, beta, h0, scale, model, hypothesis, e = NULL)
 
 \item{h0}{Null proportion value (numeric scalar between 0.1 and 0.9).}
 
-\item{scale}{Scale parameter for the analysis prior (only used if \code{model = "Moment"}).}
+\item{scale}{Scale parameter for the analysis prior (only used if \code{model = "moment"}).}
 
 \item{model}{Statistical model for the analysis prior under the alternative hypothesis:
-\code{"beta"} (stretched beta) or \code{"Moment"} (normal-moment prior).}
+\code{"beta"} (stretched beta) or \code{"moment"} (normal-moment prior).}
 
 \item{hypothesis}{Hypothesis being tested: two-sided (\code{"!="}), right-sided (\code{">"}),
 or left-sided (\code{"<"}).}
@@ -63,7 +63,7 @@ BF10.bin.test(
   n = 20,
   h0 = 0.5,
   scale = 0.5,
-  model = "Moment",
+  model = "moment",
   hypothesis = ">"
 )
 

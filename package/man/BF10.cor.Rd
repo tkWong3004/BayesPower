@@ -21,9 +21,9 @@ BF10.cor(r, n, k, alpha, beta, h0, hypothesis, scale, model, e = NULL)
 
 \item{hypothesis}{The hypothesis being tested: two-sided (\code{"!="}), right-sided (\code{">"}), or left-sided (\code{"<"}).}
 
-\item{scale}{Scale parameter for the analysis normal-moment prior (\code{"Moment"}). Must be > 0.}
+\item{scale}{Scale parameter for the analysis normal-moment prior (\code{"moment"}). Must be > 0.}
 
-\item{model}{Statistical model for the analysis prior: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"Moment"}).}
+\item{model}{Statistical model for the analysis prior: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"moment"}).}
 
 \item{e}{Optional numeric vector specifying bounds for an interval null hypothesis. For \code{"!="}, must be two distinct finite values between -0.5 and 0.5. For \code{">"} or \code{"<"}, must satisfy additional bounds relative to \code{h0}.}
 }
@@ -43,7 +43,7 @@ A list with class \code{"BFvalue_r"} containing:
 \description{
 Calculate the Bayes factor (BF10) for a correlation coefficient, either against a point NaN
 or an interval null hypothesis. Supports default beta (\code{"d_beta"}), stretched beta (\code{"beta"}),
-and normal-moment (\code{"Moment"}) priors for the alternative hypothesis.
+and normal-moment (\code{"moment"}) priors for the alternative hypothesis.
 }
 \examples{
 BF10.cor(

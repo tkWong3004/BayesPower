@@ -25,7 +25,7 @@ F_prior<- function(fsq,q,dff,rscale,f,model) {
     (dff * rscale^2 + f^2 + fsq)^(-dff / 2 - q / 2) *
     hypergeo::genhypergeo(c((dff + q) / 4, (2 + dff + q) / 4),
                           q / 2, 4 * f^2 * fsq / (dff * rscale^2 + f^2 + fsq)^2)},
-          "Moment" = { temp <- f^2 * (dff + q - 2)/2
+          "moment" = { temp <- f^2 * (dff + q - 2)/2
 
           gamma((q + dff) / 2) / gamma(dff / 2) / gamma(q / 2) *
             2 * (dff - 2) / q / (dff-2 + q) / f^2 *
@@ -66,7 +66,7 @@ F_BF_bound_01 <-function(D,q,m,dff,rscale,f_m,model){
 F_TPE<-function(f,q,m,dff,rscale,f_m,model){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
-  if (model == "Point"){
+  if (model == "point"){
     x = stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = F)
     return(x)
   }
@@ -81,7 +81,7 @@ F_TPE<-function(f,q,m,dff,rscale,f_m,model){
 F_FNE<-function(f,q,m,dff,rscale,f_m,model){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
-  if (model == "Point"){
+  if (model == "point"){
 
     x = stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = T)
     return(x)
@@ -274,7 +274,7 @@ prior_plot_f <-function(q,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,model_d,de_a
   fsq = seq(0.001,15,.2)
 
   prior.analysis = F_prior(fsq,q,dff,rscale,f_m,model)
-  prior.design   <- if (de_an_prior == 0 && model_d != "Point")
+  prior.design   <- if (de_an_prior == 0 && model_d != "point")
     F_prior(fsq,q,dff_d,rscale_d,f_m_d,model_d) else
       rep(NA, length(fsq))
   ylim.max <- max(prior.analysis, prior.design, na.rm = TRUE)
@@ -290,14 +290,14 @@ prior_plot_f <-function(q,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,model_d,de_a
 
   # If design prior != analysis prior:
   if (de_an_prior == 0) {
-    if (model_d == "Point")
+    if (model_d == "point")
       graphics::arrows(x0 = f_m, y0 = 0, x1 = f_m, y1 = ylim.max, length = 0.1, col = "black", lty = 2) else
         graphics::lines(fsq, prior.design, lty = 2)
 
     # Add legend:
     graphics::legend("topright",
            legend = c("Analysis prior", "Design prior"),
-           lty = c(1, 2),
+           lty = c(1, 2), lwd = c(2, 1), 
            col = c("black", "black"),
            bty = "n")
   }
@@ -390,7 +390,7 @@ Power_f<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model_
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(n,FPE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -406,7 +406,7 @@ Power_f<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model_
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[0][1]~"greater"~.(D))))
   graphics::lines(n,FNE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True negative", "False negative"),
@@ -463,7 +463,7 @@ Fe_TPE<-function(f,q,m,dff,rscale,f_m,model,e){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
 
-  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = F))
+  if (model == "point") return(stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = F))
 
   normalizationh1  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-5)$value
   int  <- function(fsq){
@@ -479,7 +479,7 @@ Fe_FNE<-function(f,q,m,dff,rscale,f_m,model,e){
   if (length(f) == 0 || any(f == "no bound is found")) return(0)
 
 
-  if (model == "Point") return(stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = T))
+  if (model == "point") return(stats::pf(f,q,m-q,ncp =m*f_m^2,lower.tail = T))
 
   normalizationh1  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f_m,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
   int  <- function(fsq){
@@ -693,7 +693,7 @@ prior_plot_fe <-function(q,dff,rscale,f,model,dff_d,rscale_d,f_m_d,model_d,de_an
   #prior.analysis.h0 = F_prior(fsq,q,dff,rscale,f,model)/(1-normalization)
   prior.analysis.h0 = F_prior(fsq,q,dff,rscale,f,model)
   prior.analysis.h0[fsq>e]=0
-  prior.design <- if (de_an_prior == 0 && model_d != "Point"){
+  prior.design <- if (de_an_prior == 0 && model_d != "point"){
     #normalization_d  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
 
     #F_prior(fsq,q,dff_d,rscale_d,f_m_d,model_d)/normalization_d
@@ -717,7 +717,7 @@ prior_plot_fe <-function(q,dff,rscale,f,model,dff_d,rscale_d,f_m_d,model_d,de_an
   legend.lwd    <- c(2, 2)
 
   if (de_an_prior == 0) {
-    if (model_d == "Point") {
+    if (model_d == "point") {
       graphics::arrows(x0 = f_m_d, y0 = 0, x1 = f_m_d, y1 = ylim.max,
              length = 0.1, col = "gray", lty = 2,lwd = 3)
     } else {
@@ -830,7 +830,7 @@ Power_fe<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(sdf,FPE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -847,7 +847,7 @@ Power_fe<-function(D,k,p,dff,rscale,f_m,model,k_d,p_d,dff_d,rscale_d,f_m_d,model
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[0][1]~"greater"~.(D))))
   graphics::lines(sdf,FNE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -910,25 +910,25 @@ bin_prior <-function(prop,alpha,beta,location,scale,model){
 
   switch(model,
          "beta" = stats::dbeta(prop, alpha,beta),
-         "Moment" = dMoment(prop,location,scale))
+         "moment" = dMoment(prop,location,scale))
 }
 bin_BF<-function(x,n,alpha,beta,location,scale,model,hypothesis){
   BF = NA
   bound  <- switch(hypothesis,
-                   ">" = c(a = location, b = 1),
-                   "<" = c(a = 0, b = location),
-                   "!=" = c(a = 0, b = 1)
+                   "greater" = c(a = location, b = 1),
+                   "less" = c(a = 0, b = location),
+                   "two.sided" = c(a = 0, b = 1)
   )
 
 
-  normalization <- if (hypothesis == "!=") {
+  normalization <- if (hypothesis == "two.sided") {
     switch(model,
-           "Moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
+           "moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
            "beta"     = 1)
 
   } else {
     switch(model,
-           "Moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
+           "moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
            "beta"     = stats::pbeta(bound[2],alpha,beta)-stats::pbeta(bound[1],alpha,beta))
     }
   for( i in 1:length(x)){
@@ -1002,9 +1002,9 @@ bin_BF_bound_01 <-function(D,n,alpha,beta,location,scale,model,hypothesis){
 bin_TPE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis){
   if (length(x) == 0 || any(x == "bound cannot be found")) return(0)
 
-  if (model =="Point"){
+  if (model =="point"){
     TPE = switch(hypothesis,
-               "!=" = {
+               "two.sided" = {
 
                  switch(length(x)==2,
                         "1" ={stats::pbinom(min(x),n,location,lower.tail = T)+ stats::pbinom(max(x)-1,n,location,lower.tail = F)},
@@ -1015,30 +1015,30 @@ bin_TPE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis){
 
                         })
                  },
-               ">"  = {stats::pbinom(x-1,n,location,lower.tail = F)},
-               "<"  = {stats::pbinom(x,n,location,lower.tail = T)}
+               "greater"  = {stats::pbinom(x-1,n,location,lower.tail = F)},
+               "less"  = {stats::pbinom(x,n,location,lower.tail = T)}
     )
     return(TPE)
   }
 
   bound  <- switch(hypothesis,
-                   ">" = c(a = h0, b = 1),
-                   "<" = c(a = 0, b = h0),
-                   "!=" = c(a = 0, b = 1)
+                   "greater" = c(a = h0, b = 1),
+                   "less" = c(a = 0, b = h0),
+                   "two.sided" = c(a = 0, b = 1)
   )
-  normalization <- if (hypothesis == "!=") {
+  normalization <- if (hypothesis == "two.sided") {
     switch(model,
-           "Moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
+           "moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
            "beta"     = 1)
 
   } else {
     switch(model,
-           "Moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
+           "moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
            "beta"     = stats::pbeta(bound[2],alpha,beta)-stats::pbeta(bound[1],alpha,beta))
   }
   int <- function(prop) {
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     if (length(x) == 2) {
                       stats::pbinom(min(x), n, prop, lower.tail = TRUE) +
                         stats::pbinom(max(x) - 1, n, prop, lower.tail = FALSE)
@@ -1052,8 +1052,8 @@ bin_TPE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis){
                       }, x, n, prop)
                     }
                   },
-                  ">" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE),
-                  "<" = stats::pbinom(x, n, prop, lower.tail = TRUE)
+                  "greater" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE),
+                  "less" = stats::pbinom(x, n, prop, lower.tail = TRUE)
     )
 
     pro * bin_prior(prop, alpha, beta, location, scale, model) / normalization
@@ -1068,9 +1068,9 @@ bin_TPE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis){
 bin_FNE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis){
   if (length(x) == 0 || any(x == "bound cannot be found")) return(0)
 
-  if (model == "Point") {
+  if (model == "point") {
     FNE <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     if (length(x) == 2) {
                       stats::pbinom(max(x), n, location, lower.tail = TRUE) - stats::pbinom(min(x) - 1, n, location, lower.tail = TRUE)
                     } else {
@@ -1081,8 +1081,8 @@ bin_FNE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis){
                       }
                     }
                   },
-                  ">" = stats::pbinom(x, n, location, lower.tail = TRUE),
-                  "<" = stats::pbinom(x - 1, n, location, lower.tail = FALSE)
+                  "greater" = stats::pbinom(x, n, location, lower.tail = TRUE),
+                  "less" = stats::pbinom(x - 1, n, location, lower.tail = FALSE)
     )
     return(FNE)
   }
@@ -1090,24 +1090,24 @@ bin_FNE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis){
 
 
   bound  <- switch(hypothesis,
-                   ">" = c(a = h0, b = 1),
-                   "<" = c(a = 0, b = h0),
-                   "!=" = c(a = 0, b = 1)
+                   "greater" = c(a = h0, b = 1),
+                   "less" = c(a = 0, b = h0),
+                   "two.sided" = c(a = 0, b = 1)
   )
 
-  normalization <- if (hypothesis == "!=") {
+  normalization <- if (hypothesis == "two.sided") {
     switch(model,
-           "Moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
+           "moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
            "beta"     = 1)
 
   } else {
     switch(model,
-           "Moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
+           "moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
            "beta"     = stats::pbeta(bound[2],alpha,beta)-stats::pbeta(bound[1],alpha,beta))
   }
   int <- function(prop) {
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     if (length(x) == 2) {
                       stats::pbinom(max(x), n, prop, lower.tail = TRUE) - stats::pbinom(min(x) - 1, n, prop, lower.tail = TRUE)
                     } else {
@@ -1118,8 +1118,8 @@ bin_FNE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis){
                       }
                     }
                   },
-                  ">" = stats::pbinom(x , n, prop, lower.tail = TRUE),
-                  "<" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE)
+                  "greater" = stats::pbinom(x , n, prop, lower.tail = TRUE),
+                  "less" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE)
     )
 
     pro * bin_prior(prop, alpha, beta, location, scale, model) / normalization
@@ -1134,7 +1134,7 @@ bin_FPE<-function(x,n,location,hypothesis){
   if (length(x) == 0 || any(x == "bound cannot be found")) return(0)
 
   FPE <- switch(hypothesis,
-                "!=" = {
+                "two.sided" = {
                   if (length(x) == 2) {
                     stats::pbinom(min(x), n, location, lower.tail = TRUE) +
                       stats::pbinom(max(x) - 1, n, location, lower.tail = FALSE)
@@ -1148,8 +1148,8 @@ bin_FPE<-function(x,n,location,hypothesis){
                     }, x, n, location)
                   }
                 },
-                ">" = stats::pbinom(x - 1, n, location, lower.tail = FALSE),
-                "<" = stats::pbinom(x, n, location, lower.tail = TRUE)
+                "greater" = stats::pbinom(x - 1, n, location, lower.tail = FALSE),
+                "less" = stats::pbinom(x, n, location, lower.tail = TRUE)
   )
 
     return(FPE)
@@ -1162,7 +1162,7 @@ bin_TNE<-function(x,n,location,hypothesis){
 
 
   TNE <- switch(hypothesis,
-                "!=" = {
+                "two.sided" = {
                   if (length(x) == 2) {
                     stats::pbinom(max(x), n, location, lower.tail = TRUE) - stats::pbinom(min(x) - 1, n, location, lower.tail = TRUE)
                   } else {
@@ -1173,8 +1173,8 @@ bin_TNE<-function(x,n,location,hypothesis){
                     }
                   }
                 },
-                ">" = stats::pbinom(x, n, location, lower.tail = TRUE),
-                "<" = stats::pbinom(x - 1, n, location, lower.tail = FALSE)
+                "greater" = stats::pbinom(x, n, location, lower.tail = TRUE),
+                "less" = stats::pbinom(x - 1, n, location, lower.tail = FALSE)
   )
 
   return(TNE)
@@ -1357,7 +1357,7 @@ bin_table<-function(D,target,h0,alpha,beta,location,scale,model,hypothesis,
 
 
   # FNE and TNE:
-  if (any(hypothesis == "!=" & max_BF < D | BF_D == "bound cannot be found")) {
+  if (any(hypothesis == "two.sided" & max_BF < D | BF_D == "bound cannot be found")) {
     FNE <- 0
     TNE <- 0
   } else {
@@ -1410,7 +1410,7 @@ bin_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis){
 
   # Check if BF01 = D is possible:
   max.BF01 <- 1 / bin_BF(round(location*n),n,alpha,beta,location,scale,model,hypothesis)
-  impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(b.BF01, "bound cannot be found"))
+  impossible <- (hypothesis == "two.sided") && (max.BF01 < D || identical(b.BF01, "bound cannot be found"))
 
   plot(x, BF01, type = "l", log = "y", xlab = "Number of success", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
@@ -1473,7 +1473,7 @@ Power_bin<-function(D,h0,alpha,beta,location,scale,model,hypothesis,
        xlab = "Sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(Ns,FPE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -1489,7 +1489,7 @@ Power_bin<-function(D,h0,alpha,beta,location,scale,model,hypothesis,
        xlab = "Sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[0][1]~"greater"~.(D))))
   graphics::lines(Ns,FNE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True negative", "False negative"),
@@ -1506,20 +1506,20 @@ Power_bin<-function(D,h0,alpha,beta,location,scale,model,hypothesis,
 
 
 compute.prior.density.b <- function(prop,alpha,beta,location,scale,model,hypothesis) {
-  if (model == "Point") return(rep(NA, length(prop)))
+  if (model == "point") return(rep(NA, length(prop)))
   bound  <- switch(hypothesis,
-                   ">" = c(a = location, b = 1),
-                   "<" = c(a = 0, b = location),
-                   "!=" = c(a = 0, b = 1)
+                   "greater" = c(a = location, b = 1),
+                   "less" = c(a = 0, b = location),
+                   "two.sided" = c(a = 0, b = 1)
   )
-  normalization <- if (hypothesis == "!=") {
+  normalization <- if (hypothesis == "two.sided") {
     switch(model,
-           "Moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
+           "moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
            "beta"     = 1)
 
   } else {
     switch(model,
-           "Moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
+           "moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
            "beta"     = stats::pbeta(bound[2],alpha,beta)-stats::pbeta(bound[1],alpha,beta))
   }
   bin_prior(prop,alpha,beta,location,scale,model)/ normalization
@@ -1531,14 +1531,14 @@ bin_prior_plot <-function(h0,alpha,beta,location,scale,model,alpha_d,beta_d,loca
   base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
   bound          <- switch(hypothesis,
-                   ">" = c(a = h0, b = 1),
-                   "<" = c(a = 0, b = h0),
-                   "!=" = c(a = 0, b = 1)
+                   "greater" = c(a = h0, b = 1),
+                   "less" = c(a = 0, b = h0),
+                   "two.sided" = c(a = 0, b = 1)
   )
   prop           <- seq(bound[1],bound[2],.01)
   normalization  <- stats::integrate(function(prop)bin_prior(prop,alpha,beta,location,scale,model),lower = bound[1],upper = bound[2],rel.tol = 1e-10)$value
   prior.analysis <- compute.prior.density.b(prop,alpha,beta,location,scale,model,hypothesis)
-  prior.design   <- if (de_an_prior == 0 && model_d != "Point")
+  prior.design   <- if (de_an_prior == 0 && model_d != "point")
     compute.prior.density.b(prop,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis) else
       rep(NA, length(prop))
 
@@ -1560,14 +1560,14 @@ bin_prior_plot <-function(h0,alpha,beta,location,scale,model,alpha_d,beta_d,loca
 
   # If design prior != analysis prior:
   if (de_an_prior == 0) {
-    if (model_d == "Point")
+    if (model_d == "point")
       graphics::arrows(x0 = location_d, y0 = 0, x1 = location_d, y1 = ylim.max, length = 0.1, col = "black", lty = 2) else
         graphics::lines(prop, prior.design, lty = 2)
 
     # Add legend:
     graphics::legend("topright",
            legend = c("Analysis prior", "Design prior"),
-           lty = c(1, 2),
+           lty = c(1, 2), lwd = c(2, 1), 
            col = c("black", "black"),
            bty = "n")
   }
@@ -1617,30 +1617,30 @@ adjust_root_01_e <- function(root, n, alpha, beta, location, scale, model, hypot
 bin_e_BF<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
   BF = NA
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = location+e, b = 1),
-                      "<" = c(a = 0, b = location+e),
-                      "!=" = c(a = location+e[1], b = location+e[2])
+                      "greater" = c(a = location+e, b = 1),
+                      "less" = c(a = 0, b = location+e),
+                      "two.sided" = c(a = location+e[1], b = location+e[2])
   )
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = location, b = location+e),
-                      "<" = c(a = location+e, b = location),
-                      "!=" = c(a = location+e[1], b = location+e[2])
+                      "greater" = c(a = location, b = location+e),
+                      "less" = c(a = location+e, b = location),
+                      "two.sided" = c(a = location+e[1], b = location+e[2])
   )
 
   normalizationh1 <- switch(hypothesis,
-                            "!=" = {
+                            "two.sided" = {
                               if (model == "beta") {
                                 1 - (stats::pbeta(bound_h1[2], alpha, beta) - stats::pbeta(bound_h1[1], alpha, beta))
-                              } else if (model == "Moment") {
+                              } else if (model == "moment") {
                                 (pmom(1 - location, tau = scale^2) - pmom(bound_h1[2] - location, tau = scale^2)) +
                                   (pmom(bound_h1[1] - location, tau = scale^2) - pmom(0 - location, tau = scale^2))
                               }
                             },
-                            "<" = ,
-                            ">" = {
+                            "less" = ,
+                            "greater" = {
                               if (model == "beta") {
                                 stats::pbeta(bound_h1[2], alpha, beta) - stats::pbeta(bound_h1[1], alpha, beta)
-                              } else if (model == "Moment") {
+                              } else if (model == "moment") {
                                 pmom(bound_h1[2] - location, tau = scale^2) - pmom(bound_h1[1] - location, tau = scale^2)
                               }
                             }
@@ -1648,7 +1648,7 @@ bin_e_BF<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
 
   normalizationh0 <- switch(model,
                             "beta"      =   stats::pbeta(bound_h0[2], alpha, beta) - stats::pbeta(bound_h0[1], alpha, beta),
-                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            "moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
                             }
   )
 
@@ -1656,7 +1656,7 @@ bin_e_BF<-function(x,n,alpha,beta,location,scale,model,hypothesis,e){
   int  <- function(prop){stats::dbinom(x[i], size=n, prob=prop) *bin_prior(prop,alpha,beta,location,scale,model)
   }
 
-  if (hypothesis == "!="){
+  if (hypothesis == "two.sided"){
     lh1 = stats::integrate(int,lower = 0,upper = bound_h1[1], rel.tol=1e-5,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = 1, rel.tol=1e-5,stop.on.error = F)$value
   }else{
     lh1 = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=1e-5,stop.on.error = F)$value
@@ -1726,9 +1726,9 @@ bin_e_TPE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis,e){
   if (length(x) == 0 || any(x == "bound cannot be found")) return(0)
 
 
-  if (model =="Point"){
+  if (model =="point"){
     TPE = switch(hypothesis,
-               "!=" = {
+               "two.sided" = {
 
                  switch(length(x)==2,
                         "1" ={stats::pbinom(min(x),n,location,lower.tail = T)+ stats::pbinom(max(x)-1,n,location,lower.tail = F)},
@@ -1739,38 +1739,38 @@ bin_e_TPE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis,e){
 
                         })
                  },
-               ">"  = {stats::pbinom(x-1,n,location,lower.tail = F)},
-               "<"  = {stats::pbinom(x,n,location,lower.tail = T)}
+               "greater"  = {stats::pbinom(x-1,n,location,lower.tail = F)},
+               "less"  = {stats::pbinom(x,n,location,lower.tail = T)}
     )
     return(TPE)
   }
 
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = h0+e, b = 1),
-                      "<" = c(a = 0, b = h0+e),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0+e, b = 1),
+                      "less" = c(a = 0, b = h0+e),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
   normalizationh1 <- switch(hypothesis,
-                            "!=" = {
+                            "two.sided" = {
                               if (model == "beta") {
                                 1 - (stats::pbeta(bound_h1[2], alpha, beta) - stats::pbeta(bound_h1[1], alpha, beta))
-                              } else if (model == "Moment") {
+                              } else if (model == "moment") {
                                 (pmom(1 - location, tau = scale^2) - pmom(bound_h1[2] - location, tau = scale^2)) +
                                   (pmom(bound_h1[1] - location, tau = scale^2) - pmom(0 - location, tau = scale^2))
                               }
                             },
-                            "<" = ,
-                            ">" = {
+                            "less" = ,
+                            "greater" = {
                               if (model == "beta") {
                                 stats::pbeta(bound_h1[2], alpha, beta) - stats::pbeta(bound_h1[1], alpha, beta)
-                              } else if (model == "Moment") {
+                              } else if (model == "moment") {
                                 pmom(bound_h1[2] - location, tau = scale^2) - pmom(bound_h1[1] - location, tau = scale^2)
                               }
                             }
   )
   int <- function(prop) {
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     if (length(x) == 2) {
                       stats::pbinom(min(x), n, prop, lower.tail = TRUE) +
                         stats::pbinom(max(x) - 1, n, prop, lower.tail = FALSE)
@@ -1784,14 +1784,14 @@ bin_e_TPE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis,e){
                       }, x, n, prop)
                     }
                   },
-                  ">" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE),
-                  "<" = stats::pbinom(x, n, prop, lower.tail = TRUE)
+                  "greater" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE),
+                  "less" = stats::pbinom(x, n, prop, lower.tail = TRUE)
     )
 
     pro * bin_prior(prop, alpha, beta, location, scale, model) / normalizationh1
   }
 
-  if(hypothesis == "!="){
+  if(hypothesis == "two.sided"){
     TPE = stats::integrate(int,lower = 0,upper = bound_h1[1], rel.tol = 1e-5)$value + stats::integrate(int,lower = bound_h1[2],upper = 1, rel.tol = 1e-5)$value
   }else{
     TPE = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol = 1e-5)$value
@@ -1806,9 +1806,9 @@ bin_e_FNE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis,e){
   if (length(x) == 0 || any(x == "bound cannot be found")) return(0)
 
 
-  if (model =="Point"){
+  if (model =="point"){
     FNE = switch(hypothesis,
-                 "!=" = {
+                 "two.sided" = {
 
                    switch(length(x)==2,
                           "1" ={stats::pbinom(max(x),n,location,lower.tail = T)- stats::pbinom(min(x)-1,n,location,lower.tail = T)},
@@ -1818,39 +1818,39 @@ bin_e_FNE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis,e){
                                    "0" = stats::pbinom(x-1,n,location,lower.tail = F))
 
                           })},
-                 ">"  = {stats::pbinom(x,n,location,lower.tail = T)},
-                 "<"  = {stats::pbinom(x-1,n,location,lower.tail = F)}
+                 "greater"  = {stats::pbinom(x,n,location,lower.tail = T)},
+                 "less"  = {stats::pbinom(x-1,n,location,lower.tail = F)}
     )
     return(FNE)
   }
 
 
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = h0+e, b = 1),
-                      "<" = c(a = 0, b = h0+e),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0+e, b = 1),
+                      "less" = c(a = 0, b = h0+e),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
   normalizationh1 <- switch(hypothesis,
-                            "!=" = {
+                            "two.sided" = {
                               if (model == "beta") {
                                 1 - (stats::pbeta(bound_h1[2], alpha, beta) - stats::pbeta(bound_h1[1], alpha, beta))
-                              } else if (model == "Moment") {
+                              } else if (model == "moment") {
                                 (pmom(1 - location, tau = scale^2) - pmom(bound_h1[2] - location, tau = scale^2)) +
                                   (pmom(bound_h1[1] - location, tau = scale^2) - pmom(0 - location, tau = scale^2))
                               }
                             },
-                            "<" = ,
-                            ">" = {
+                            "less" = ,
+                            "greater" = {
                               if (model == "beta") {
                                 stats::pbeta(bound_h1[2], alpha, beta) - stats::pbeta(bound_h1[1], alpha, beta)
-                              } else if (model == "Moment") {
+                              } else if (model == "moment") {
                                 pmom(bound_h1[2] - location, tau = scale^2) - pmom(bound_h1[1] - location, tau = scale^2)
                               }
                             }
   )
   int <- function(prop) {
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     if (length(x) == 2) {
                       stats::pbinom(max(x), n, prop, lower.tail = TRUE) - stats::pbinom(min(x) - 1, n, prop, lower.tail = TRUE)
                     } else {
@@ -1863,13 +1863,13 @@ bin_e_FNE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis,e){
                     }, x, n, prop)
                     }
                   },
-                  ">" = stats::pbinom(x , n, prop, lower.tail = TRUE),
-                  "<" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE)
+                  "greater" = stats::pbinom(x , n, prop, lower.tail = TRUE),
+                  "less" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE)
     )
 
     pro * bin_prior(prop, alpha, beta, location, scale, model) / normalizationh1
   }
-  if(hypothesis == "!="){
+  if(hypothesis == "two.sided"){
     FNE = stats::integrate(int,lower = 0,upper = bound_h1[1], rel.tol = 1e-5)$value + stats::integrate(int,lower = bound_h1[2],upper = 1, rel.tol = 1e-5)$value
   }else{
     FNE = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol = 1e-5)$value
@@ -1886,19 +1886,19 @@ bin_e_FPE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis,e){
 
 
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = h0, b = h0+e),
-                      "<" = c(a = h0+e, b = h0),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0, b = h0+e),
+                      "less" = c(a = h0+e, b = h0),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
   normalizationh0 <- switch(model,
                             "beta"      =   stats::pbeta(bound_h0[2], alpha, beta) - stats::pbeta(bound_h0[1], alpha, beta),
-                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            "moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
                             }
   )
 
   int <- function(prop) {
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     if (length(x) == 2) {
                       stats::pbinom(min(x), n, prop, lower.tail = TRUE) +
                         stats::pbinom(max(x) - 1, n, prop, lower.tail = FALSE)
@@ -1912,8 +1912,8 @@ bin_e_FPE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis,e){
                       }, x, n, prop)
                     }
                   },
-                  ">" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE),
-                  "<" = stats::pbinom(x, n, prop, lower.tail = TRUE)
+                  "greater" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE),
+                  "less" = stats::pbinom(x, n, prop, lower.tail = TRUE)
     )
 
     pro * bin_prior(prop, alpha, beta, location, scale, model) / normalizationh0
@@ -1931,19 +1931,19 @@ bin_e_TNE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis,e){
   if (length(x) == 0 || any(x == "bound cannot be found")) return(0)
 
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = h0, b = h0+e),
-                      "<" = c(a = h0+e, b = h0),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0, b = h0+e),
+                      "less" = c(a = h0+e, b = h0),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
 
   normalizationh0 <- switch(model,
                             "beta"      =   stats::pbeta(bound_h0[2], alpha, beta) - stats::pbeta(bound_h0[1], alpha, beta),
-                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            "moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
                             }
   )
   int <- function(prop) {
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     if (length(x) == 2) {
                       stats::pbinom(max(x), n, prop, lower.tail = TRUE) - stats::pbinom(min(x) - 1, n, prop, lower.tail = TRUE)
                     } else {
@@ -1961,8 +1961,8 @@ bin_e_TNE<-function(x,n,h0,alpha,beta,location,scale,model,hypothesis,e){
 
                     }
                   },
-                  ">" = stats::pbinom(x , n, prop, lower.tail = TRUE),
-                  "<" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE)
+                  "greater" = stats::pbinom(x , n, prop, lower.tail = TRUE),
+                  "less" = stats::pbinom(x - 1, n, prop, lower.tail = FALSE)
     )
 
     pro * bin_prior(prop, alpha, beta, location, scale, model) / normalizationh0
@@ -2147,7 +2147,7 @@ bin_e_table<-function(D,target,h0,alpha,beta,location,scale,model,hypothesis,
     TPR_model    <- model_d
   }
   # FNE and TNE:
-  if (any(hypothesis == "!=" & max_BF < D | b01 == "bound cannot be found")) {
+  if (any(hypothesis == "two.sided" & max_BF < D | b01 == "bound cannot be found")) {
     FNE <- 0
     TNE <- 0
   } else {
@@ -2196,7 +2196,7 @@ bin_e_bf10 <-function(D,n,alpha,beta,location,scale,model,hypothesis,e){
 
   # Check if BF01 = D is possible:
   max.BF01 <- 1 / bin_e_BF(round(n/2),n,alpha,beta,location,scale,model,hypothesis,e)
-  impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(b.BF01, "bound cannot be found"))
+  impossible <- (hypothesis == "two.sided") && (max.BF01 < D || identical(b.BF01, "bound cannot be found"))
 
   plot(x, BF01, type = "l", log = "y", xlab = "Number of success", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
@@ -2264,7 +2264,7 @@ Power_e_bin<-function(D,h0,alpha,beta,location,scale,model,hypothesis,
        xlab = "Sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(sN,FPE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -2279,7 +2279,7 @@ Power_e_bin<-function(D,h0,alpha,beta,location,scale,model,hypothesis,
        xlab = "Sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[0][1]~"greater"~.(D))))
   graphics::lines(sN,FNE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True negative", "False negative"),
@@ -2294,36 +2294,36 @@ Power_e_bin<-function(D,h0,alpha,beta,location,scale,model,hypothesis,
 }
 
 compute.prior.density.be.h1 <- function(h0,prop,alpha,beta,location,scale,model,hypothesis,e) {
-  if (model == "Point") return(rep(NA, length(prop)))
+  if (model == "point") return(rep(NA, length(prop)))
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = h0+e, b = 1),
-                      "<" = c(a = 0, b = h0+e),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0+e, b = 1),
+                      "less" = c(a = 0, b = h0+e),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
 
   prior_h1<- bin_prior(prop,alpha,beta,location,scale,model)
   switch(hypothesis,
-         "!=" = { prior_h1[prop>min(bound_h1)&prop<max(bound_h1)]=0 },
-         ">" = { prior_h1[prop<bound_h1[1]]=0 },
-         "<" = { prior_h1[prop>bound_h1[2]]=0 }
+         "two.sided" = { prior_h1[prop>min(bound_h1)&prop<max(bound_h1)]=0 },
+         "greater" = { prior_h1[prop<bound_h1[1]]=0 },
+         "less" = { prior_h1[prop>bound_h1[2]]=0 }
   )
   prior_h1
 }
 
 
 compute.prior.density.be.h0 <- function(h0,prop,alpha,beta,location,scale,model,hypothesis,e) {
-  if (model == "Point") return(rep(NA, length(prop)))
+  if (model == "point") return(rep(NA, length(prop)))
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = h0, b = h0+e),
-                      "<" = c(a = h0+e, b = h0),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0, b = h0+e),
+                      "less" = c(a = h0+e, b = h0),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
 
   prior_h0<- bin_prior(prop,alpha,beta,location,scale,model)
   switch(hypothesis,
-         "!=" = { prior_h0[prop<min(bound_h0)|prop>max(bound_h0)]=0 },
-         ">" = { prior_h0[prop>bound_h0[2]]=0 },
-         "<" = { prior_h0[prop<bound_h0[1]]=0 }
+         "two.sided" = { prior_h0[prop<min(bound_h0)|prop>max(bound_h0)]=0 },
+         "greater" = { prior_h0[prop>bound_h0[2]]=0 },
+         "less" = { prior_h0[prop<bound_h0[1]]=0 }
   )
   prior_h0
 }
@@ -2337,15 +2337,15 @@ bin_e_prior_plot <-function(h0,alpha,beta,location,scale,model,alpha_d,beta_d,lo
   base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
   bounds <- switch(hypothesis,
-                        ">"  = c(h0, 1),
-                        "<"  = c(0, h0),
-                        "!=" = c(0, 1))
+                        "greater"  = c(h0, 1),
+                        "less"  = c(0, h0),
+                        "two.sided" = c(0, 1))
   prop           <- seq(bounds[1],bounds[2],.002)
 
 
   prior.analysis.h1 <- compute.prior.density.be.h1(h0,prop,alpha,beta,location,scale,model,hypothesis,e)
   prior.analysis.h0<-  compute.prior.density.be.h0(h0,prop,alpha,beta,location,scale,model,hypothesis,e)
-  prior.design <- if (de_an_prior == 0 && model_d != "Point") {
+  prior.design <- if (de_an_prior == 0 && model_d != "point") {
     compute.prior.density.be.h1(h0,prop,alpha_d,beta_d,location_d,scale_d,model_d,hypothesis,e)
   } else {
     rep(NA, length(prop))
@@ -2377,7 +2377,7 @@ bin_e_prior_plot <-function(h0,alpha,beta,location,scale,model,alpha_d,beta_d,lo
   legend.lwd    <- c(2, 2)
 
   if (de_an_prior == 0) {
-    if (model_d == "Point") {
+    if (model_d == "point") {
       graphics::arrows(x0 = location_d, y0 = 0, x1 = location_d, y1 = ylim.max,
              length = 0.1, col = "gray", lty = 2)
     } else {
@@ -2454,9 +2454,9 @@ dMoment <-function(delta,mu,ta){
 r_prior<- function(rho,k,location,scale,dff,model, alpha, beta,a,b){
 
   switch(model,
-         "Normal" = stats::dnorm(rho,location,scale),
+         "normal" = stats::dnorm(rho,location,scale),
          "d_beta"   = d_strechted_beta(rho,k,a,b),
-          "Moment"   = dMoment(rho,location,scale),
+          "moment"   = dMoment(rho,location,scale),
           "t_dis" = tstude(rho,location,scale,dff),
          "beta" = d_beta(rho, alpha, beta,a,b))
 }
@@ -2492,21 +2492,21 @@ d_cor <- function(r, rho, n) {
 r_BF10<-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model){
   x = NA
   bound  <- switch(hypothesis,
-                   ">" = c(a = h0, b = 1),
-                   "<" = c(a = -1, b = h0),
-                   "!=" = c(a = -1, b = 1)
+                   "greater" = c(a = h0, b = 1),
+                   "less" = c(a = -1, b = h0),
+                   "two.sided" = c(a = -1, b = 1)
   )
-  normalization <- if (hypothesis == "!=") {
+  normalization <- if (hypothesis == "two.sided") {
     switch(model,
            "d_beta"   = 1,
            "beta" = 1,
-           "Moment"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "moment"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
 
   }else{
     switch(model,
            "d_beta"   = p_beta(bound[2], 1/k, 1/k,-1,1)-p_beta(bound[1], 1/k,1/k,-1,1) ,
            "beta" = p_beta(bound[2], alpha, beta,-1,1)-p_beta(bound[1], alpha, beta,-1,1),
-           "Moment"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "moment"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
 }
 
   # Define the integrand function for marginal likelihood under H1
@@ -2559,38 +2559,38 @@ r_TPE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model){
 
   if (any(r == "bound cannot be found") || length(r) == 0) return(0)
 
-  if (model =="Point"){
+  if (model =="point"){
     x = switch(hypothesis,
-               "!=" = {p_cor(max(r),location,n,lower.tail = F)+ p_cor(min(r),location,n,lower.tail = T)},
-               ">"  = {p_cor(r,location,n,lower.tail =F)},
-               "<"  = {p_cor(r,location,n,lower.tail =T)}
+               "two.sided" = {p_cor(max(r),location,n,lower.tail = F)+ p_cor(min(r),location,n,lower.tail = T)},
+               "greater"  = {p_cor(r,location,n,lower.tail =F)},
+               "less"  = {p_cor(r,location,n,lower.tail =T)}
     )
     return(x)
   }
 
   bound  <- switch(hypothesis,
-                   ">" = c(a = h0, b = 1),
-                   "<" = c(a = -1, b = h0),
-                   "!=" = c(a = -1, b = 1)
+                   "greater" = c(a = h0, b = 1),
+                   "less" = c(a = -1, b = h0),
+                   "two.sided" = c(a = -1, b = 1)
   )
-  normalization <-   normalization <- if (hypothesis == "!=") {
+  normalization <-   normalization <- if (hypothesis == "two.sided") {
     switch(model,
            "d_beta"   = 1,
            "beta" = 1,
-           "Moment"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "moment"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
 
   }else{
     switch(model,
            "d_beta"   = p_beta(bound[2], 1/k, 1/k,-1,1)-p_beta(bound[1], 1/k,1/k,-1,1) ,
            "beta" = p_beta(bound[2], alpha, beta,-1,1)-p_beta(bound[1], alpha, beta,-1,1),
-           "Moment"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "moment"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
   }
   int <- function(rho) {
     prob <- switch(hypothesis,
-                   "!=" = p_cor(max(r), rho, n, lower.tail = FALSE) +
+                   "two.sided" = p_cor(max(r), rho, n, lower.tail = FALSE) +
                      p_cor(min(r), rho, n, lower.tail = TRUE),
-                   ">"  = p_cor(r, rho, n, lower.tail = FALSE),
-                   "<"  = p_cor(r, rho, n, lower.tail = TRUE)
+                   "greater"  = p_cor(r, rho, n, lower.tail = FALSE),
+                   "less"  = p_cor(r, rho, n, lower.tail = TRUE)
     )
 
     prob * r_prior(rho, k, location, scale, dff, model, alpha, beta,min(bound),max(bound)) / normalization
@@ -2605,40 +2605,40 @@ r_FNE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model){
   if (any(r == "bound cannot be found") || length(r) == 0) return(0)
 
 
-  if (model =="Point"){
+  if (model =="point"){
     x = switch(hypothesis,
-               "!=" = {p_cor(max(r),location,n,lower.tail = T)- p_cor(min(r),location,n,lower.tail = T)},
-               ">"  = {p_cor(r,location,n,lower.tail =T)},
-               "<"  = {p_cor(r,location,n,lower.tail =F)}
+               "two.sided" = {p_cor(max(r),location,n,lower.tail = T)- p_cor(min(r),location,n,lower.tail = T)},
+               "greater"  = {p_cor(r,location,n,lower.tail =T)},
+               "less"  = {p_cor(r,location,n,lower.tail =F)}
     )
     return(x)
   }
 
 
   bound  <- switch(hypothesis,
-                   ">" = c(a = h0, b = 1),
-                   "<" = c(a = -1, b = h0),
-                   "!=" = c(a = -1, b = 1)
+                   "greater" = c(a = h0, b = 1),
+                   "less" = c(a = -1, b = h0),
+                   "two.sided" = c(a = -1, b = 1)
   )
 
-  normalization <-  normalization <- if (hypothesis == "!=") {
+  normalization <-  normalization <- if (hypothesis == "two.sided") {
     switch(model,
            "d_beta"   = 1,
            "beta" = 1,
-           "Moment"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "moment"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
 
   }else{
     switch(model,
            "d_beta"   = p_beta(bound[2], 1/k, 1/k,-1,1)-p_beta(bound[1], 1/k,1/k,-1,1) ,
            "beta" = p_beta(bound[2], alpha, beta,-1,1)-p_beta(bound[1], alpha, beta,-1,1),
-           "Moment"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+           "moment"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
   }
   int <- function(rho) {
     prob <- switch(hypothesis,
-                   "!=" = p_cor(max(r), rho, n, lower.tail = TRUE) -
+                   "two.sided" = p_cor(max(r), rho, n, lower.tail = TRUE) -
                      p_cor(min(r), rho, n, lower.tail = TRUE),
-                   ">"  = p_cor(r, rho, n, lower.tail = TRUE),
-                   "<"  = p_cor(r, rho, n, lower.tail = FALSE)
+                   "greater"  = p_cor(r, rho, n, lower.tail = TRUE),
+                   "less"  = p_cor(r, rho, n, lower.tail = FALSE)
     )
 
     prob * r_prior(rho, k, location, scale, dff, model, alpha, beta,min(bound),max(bound)) / normalization
@@ -2655,10 +2655,10 @@ r_FPE <-function(r,n,h0,hypothesis){
   if (any(r == "bound cannot be found") || length(r) == 0) return(0)
 
   x <- switch(hypothesis,
-              "!=" = p_cor(max(r), h0, n, lower.tail = FALSE) +
+              "two.sided" = p_cor(max(r), h0, n, lower.tail = FALSE) +
                 p_cor(min(r), h0, n, lower.tail = TRUE),
-              ">"  = p_cor(r, h0, n, lower.tail = FALSE),
-              "<"  = p_cor(r, h0, n, lower.tail = TRUE)
+              "greater"  = p_cor(r, h0, n, lower.tail = FALSE),
+              "less"  = p_cor(r, h0, n, lower.tail = TRUE)
   )
   return(x)
 
@@ -2670,16 +2670,16 @@ r_TNE <-function(r,n,h0,hypothesis){
   if (any(r == "bound cannot be found") || length(r) == 0) return(0)
 
   bound  <- switch(hypothesis,
-                   ">" = c(a = h0, b = 1),
-                   "<" = c(a = -1, b = h0),
-                   "!=" = c(a = -1, b = 1)
+                   "greater" = c(a = h0, b = 1),
+                   "less" = c(a = -1, b = h0),
+                   "two.sided" = c(a = -1, b = 1)
   )
 
   x <- switch(hypothesis,
-              "!=" = p_cor(max(r), h0, n, lower.tail = TRUE) -
+              "two.sided" = p_cor(max(r), h0, n, lower.tail = TRUE) -
                 p_cor(min(r), h0, n, lower.tail = TRUE),
-              ">"  = p_cor(r, h0, n, lower.tail = TRUE),
-              "<"  = p_cor(r, h0, n, lower.tail = FALSE)
+              "greater"  = p_cor(r, h0, n, lower.tail = TRUE),
+              "less"  = p_cor(r, h0, n, lower.tail = FALSE)
   )
 
   return(x)
@@ -2819,7 +2819,7 @@ r_table<-function(D,target,model,k, alpha, beta,h0,location,scale,dff, hypothesi
     TPR_dff     <- dff_d
   }
   # FNE and TNE:
-  if (any(hypothesis == "!=" & max_BF < D | BF_D == "bound cannot be found")) {
+  if (any(hypothesis == "two.sided" & max_BF < D | BF_D == "bound cannot be found")) {
     FNE <- 0
     TNE <- 0
   } else {
@@ -2842,17 +2842,17 @@ r_table<-function(D,target,model,k, alpha, beta,h0,location,scale,dff, hypothesi
 }
 
 compute.prior.density.r <- function(rho, k,location,scale,dff,model, alpha, beta,hypothesis) {
-  if (model == "Point") return(rep(NA, length(rho)))
+  if (model == "point") return(rep(NA, length(rho)))
   bound  <- switch(hypothesis,
-                   ">" = c(a = location, b = 1),
-                   "<" = c(a = -1, b = location),
-                   "!=" = c(a = -1, b = 1)
+                   "greater" = c(a = location, b = 1),
+                   "less" = c(a = -1, b = location),
+                   "two.sided" = c(a = -1, b = 1)
   )
-  normalization <- if (hypothesis == "!=") 1 else
+  normalization <- if (hypothesis == "two.sided") 1 else
     switch(model,
-           "Normal" = stats::pnorm(bound[2],location,scale)-stats::pnorm(bound[1],location,scale),
+           "normal" = stats::pnorm(bound[2],location,scale)-stats::pnorm(bound[1],location,scale),
            "d_beta"   = p_beta(bound[2], 1/k, 1/k,min(bound),max(bound))-p_beta(bound[1], 1/k,1/k,min(bound),max(bound)) ,
-           "Moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
+           "moment"   = pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2),
            "t_dis" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0),
            "beta" = p_beta(bound[2], alpha, beta,min(bound),max(bound))-p_beta(bound[1], alpha, beta,min(bound),max(bound)))
 
@@ -2867,13 +2867,13 @@ r_prior_plot <-function(k, alpha, beta,h0,location,scale,dff,model,de_an_prior,
   base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
   bound  <- switch(hypothesis,
-                   ">" = c(a = h0, b = 1),
-                   "<" = c(a = -1, b = h0),
-                   "!=" = c(a = -1, b = 1)
+                   "greater" = c(a = h0, b = 1),
+                   "less" = c(a = -1, b = h0),
+                   "two.sided" = c(a = -1, b = 1)
   )
   rho <- seq(bound[1],bound[2],.01)
   prior.analysis <-compute.prior.density.r(rho, k,location,scale,dff,model, alpha, beta,hypothesis)
-  prior.design   <- if (de_an_prior == 0 && model_d != "Point")
+  prior.design   <- if (de_an_prior == 0 && model_d != "point")
     compute.prior.density.r(rho, k_d,location_d,scale_d,dff_d,model_d, alpha_d, beta_d,hypothesis) else
       rep(NA, length(rho))
   # Combine all values into one vector
@@ -2894,14 +2894,14 @@ r_prior_plot <-function(k, alpha, beta,h0,location,scale,dff,model,de_an_prior,
 
   # If design prior != analysis prior:
   if (de_an_prior == 0) {
-    if (model_d == "Point")
+    if (model_d == "point")
       graphics::arrows(x0 = location_d, y0 = 0, x1 = location_d, y1 = ylim.max, length = 0.1, col = "black", lty = 2) else
         graphics::lines(rho, prior.design, lty = 2)
 
     # Add legend:
     graphics::legend("topright",
            legend = c("Analysis prior", "Design prior"),
-           lty = c(1, 2),
+           lty = c(1, 2), lwd = c(2, 1), 
            col = c("black", "black"),
            bty = "n")
   }
@@ -2937,7 +2937,7 @@ r_bf10_p <-function(D,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model){
 
   # Check if BF01 = D is possible:
   max.BF01   <- 1 / r_BF10(h0,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model)
-  impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(r.BF01, "bound cannot be found"))
+  impossible <- (hypothesis == "two.sided") && (max.BF01 < D || identical(r.BF01, "bound cannot be found"))
 
   plot(rr, BF01, type = "l", log = "y", xlab = "Correlation", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
@@ -2992,7 +2992,7 @@ Power_r<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(Ns,FPE,col = "grey")
   graphics::legend(x = N.max*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -3008,7 +3008,7 @@ Power_r<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[0][1]~"greater"~.(D))))
   graphics::lines(Ns,FNE,col = "grey")
   graphics::legend(x = N.max*-.1,y=1.1,
                    legend = c("True negative", "False negative"),
@@ -3078,49 +3078,49 @@ re_BF10i<-function(r,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model,e){
     x = NA
 
     bound_h1  <- switch(hypothesis,
-                        ">" = c(a = h0+e, b = 1),
-                        "<" = c(a = -1, b = h0+e),
-                        "!=" = c(a = h0+e[1], b = h0+e[2])
+                        "greater" = c(a = h0+e, b = 1),
+                        "less" = c(a = -1, b = h0+e),
+                        "two.sided" = c(a = h0+e[1], b = h0+e[2])
     )
     bound_h0  <- switch(hypothesis,
-                        ">" = c(a = h0, b = h0+e),
-                        "<" = c(a = h0+e, b = h0),
-                        "!=" = c(a = h0+e[1], b = h0+e[2])
+                        "greater" = c(a = h0, b = h0+e),
+                        "less" = c(a = h0+e, b = h0),
+                        "two.sided" = c(a = h0+e[1], b = h0+e[2])
     )
 
     normalizationh1 <- switch(hypothesis,
-                              "!=" = switch(model,
+                              "two.sided" = switch(model,
                                             "d_beta"       = 1-(p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                             "beta"         = 1-(p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                            "Moment"          = {
+                                            "moment"          = {
                                               (pmom(1-location, tau = scale^2)-pmom(bound_h1[2]-location, tau = scale^2))+
                                                 (pmom(bound_h1[1]-location, tau = scale^2)-pmom(-1-location, tau = scale^2))
                                             }),
 
-                              "<"  = switch(model,
+                              "less"  = switch(model,
                                             "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                             "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                            "Moment"          = {
+                                            "moment"          = {
                                               (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                             }),
-                              ">"  = switch(model,
+                              "greater"  = switch(model,
                                             "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                             "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                            "Moment"          = {
+                                            "moment"          = {
                                               (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                             })
     )
     normalizationh0 <- switch(model,
                               "d_beta" = p_beta(bound_h0[2], 1/k, 1/k, -1, 1) - p_beta(bound_h0[1], 1/k, 1/k, -1, 1),
                               "beta"   = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
-                              "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                              "moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
                               }
     )
 
     int  <- function(rho){d_cor(r,rho,n)*r_prior(rho,k,location,scale,dff,model, alpha, beta,-1,1)/normalizationh1
     }
 
-    if (hypothesis == "!="){
+    if (hypothesis == "two.sided"){
       lh1 = stats::integrate(int,lower = -1,upper = bound_h1[1], rel.tol=1e-5,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = 1, rel.tol=1e-5,stop.on.error = F)$value
     }else{
       lh1 = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=1e-5,stop.on.error = F)$value
@@ -3146,16 +3146,16 @@ re_BF_bound_10 <-function(D,n,k,alpha, beta,h0,hypothesis,location,scale,dff,mod
   }
   opt_result <- stats::optimize(Bound_finding, interval = c(-1, 1))$minimum
 
-  if (hypothesis=="!="){
+  if (hypothesis=="two.sided"){
     x <- r_auto_uniroot_fixed_upper (Bound_finding,opt_result, lower = -1, step = .05, max_attempts = 25)
     y <- r_auto_uniroot_fixed_lower(Bound_finding,opt_result, upper = 1, step = .05, max_attempts = 25)
   }
-  if (hypothesis == ">"){
+  if (hypothesis == "greater"){
 
     x <- r_auto_uniroot_fixed_lower(Bound_finding,h0, upper = 1, step = .05, max_attempts = 25)
   }
 
-  if (hypothesis == "<"){
+  if (hypothesis == "less"){
 
     x <- r_auto_uniroot_fixed_upper (Bound_finding,h0, lower = -1, step = .05, max_attempts = 25)
   }
@@ -3180,49 +3180,49 @@ re_TPE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e){
     return(r)
   }
 
-  if (model =="Point"){
+  if (model =="point"){
     x = switch(hypothesis,
-               "!=" = {p_cor(max(r),location,n,lower.tail = F)+ p_cor(min(r),location,n,lower.tail = T)},
-               ">"  = {p_cor(r,location,n,lower.tail =F)},
-               "<"  = {p_cor(r,location,n,lower.tail =T)}
+               "two.sided" = {p_cor(max(r),location,n,lower.tail = F)+ p_cor(min(r),location,n,lower.tail = T)},
+               "greater"  = {p_cor(r,location,n,lower.tail =F)},
+               "less"  = {p_cor(r,location,n,lower.tail =T)}
     )
     return(x)
   }
 
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = h0+e, b = 1),
-                      "<" = c(a = -1, b = h0+e),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0+e, b = 1),
+                      "less" = c(a = -1, b = h0+e),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
   normalizationh1 <- switch(hypothesis,
-                            "!=" = switch(model,
+                            "two.sided" = switch(model,
                                           "d_beta"       = 1-(p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = 1-(p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "Moment"          = {
+                                          "moment"          = {
                                             (pmom(1-location, tau = scale^2)-pmom(bound_h1[2]-location, tau = scale^2))+
                                               (pmom(bound_h1[1]-location, tau = scale^2)-pmom(-1-location, tau = scale^2))
                                           }),
 
-                            "<"  = switch(model,
+                            "less"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "Moment"          = {
+                                          "moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           }),
-                            ">"  = switch(model,
+                            "greater"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "Moment"          = {
+                                          "moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           })
   )
 
   int <- function(rho) {
     pro <- switch(hypothesis,
-                  "!=" = p_cor(max(r), rho, n, lower.tail = FALSE) +
+                  "two.sided" = p_cor(max(r), rho, n, lower.tail = FALSE) +
                     p_cor(min(r), rho, n, lower.tail = TRUE),
-                  ">"  = p_cor(r, rho, n, lower.tail = FALSE),
-                  "<"  = p_cor(r, rho, n, lower.tail = TRUE)
+                  "greater"  = p_cor(r, rho, n, lower.tail = FALSE),
+                  "less"  = p_cor(r, rho, n, lower.tail = TRUE)
     )
 
     pro * r_prior(rho, k, location, scale, dff, model, alpha, beta,-1,1) / normalizationh1
@@ -3230,7 +3230,7 @@ re_TPE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e){
 
 
 
-  if (hypothesis == "!="){
+  if (hypothesis == "two.sided"){
     x = stats::integrate(int,lower = -1,upper = bound_h1[1], rel.tol=1e-5,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = 1, rel.tol=1e-5,stop.on.error = F)$value
   }else{
     x = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=1e-5,stop.on.error = F)$value
@@ -3246,56 +3246,56 @@ re_FNE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e){
     r=0
     return(r)
   }
-  if (model =="Point"){
+  if (model =="point"){
     x = switch(hypothesis,
-               "!=" = {p_cor(max(r),location,n,lower.tail = T)- p_cor(min(r),location,n,lower.tail = T)},
-               ">"  = {p_cor(r,location,n,lower.tail =T)},
-               "<"  = {p_cor(r,location,n,lower.tail =F)}
+               "two.sided" = {p_cor(max(r),location,n,lower.tail = T)- p_cor(min(r),location,n,lower.tail = T)},
+               "greater"  = {p_cor(r,location,n,lower.tail =T)},
+               "less"  = {p_cor(r,location,n,lower.tail =F)}
     )
     return(x)
   }
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = h0+e, b = 1),
-                      "<" = c(a = -1, b = h0+e),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0+e, b = 1),
+                      "less" = c(a = -1, b = h0+e),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
 
   normalizationh1 <- switch(hypothesis,
-                            "!=" = switch(model,
+                            "two.sided" = switch(model,
                                           "d_beta"       = 1-(p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = 1-(p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "Moment"          = {
+                                          "moment"          = {
                                             (pmom(1-location, tau = scale^2)-pmom(bound_h1[2]-location, tau = scale^2))+
                                               (pmom(bound_h1[1]-location, tau = scale^2)-pmom(-1-location, tau = scale^2))
                                           }),
 
-                            "<"  = switch(model,
+                            "less"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "Moment"          = {
+                                          "moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           }),
-                            ">"  = switch(model,
+                            "greater"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "Moment"          = {
+                                          "moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           })
   )
 
   int <- function(rho) {
     pro <- switch(hypothesis,
-                  "!=" = p_cor(max(r), rho, n, lower.tail = T) -
+                  "two.sided" = p_cor(max(r), rho, n, lower.tail = T) -
                     p_cor(min(r), rho, n, lower.tail = TRUE),
-                  ">"  = p_cor(r, rho, n, lower.tail = T),
-                  "<"  = p_cor(r, rho, n, lower.tail = F)
+                  "greater"  = p_cor(r, rho, n, lower.tail = T),
+                  "less"  = p_cor(r, rho, n, lower.tail = F)
     )
 
     pro * r_prior(rho, k, location, scale, dff, model, alpha, beta,-1,1) / normalizationh1
   }
 
 
-  if (hypothesis == "!="){
+  if (hypothesis == "two.sided"){
     x = stats::integrate(int,lower = -1,upper = bound_h1[1], rel.tol=1e-10,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = 1, rel.tol=1e-10,stop.on.error = F)$value
   }else{
     x = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=1e-10,stop.on.error = F)$value
@@ -3313,24 +3313,24 @@ re_FPE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e){
     return(r)
   }
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = h0, b = h0+e),
-                      "<" = c(a = h0+e, b = h0),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0, b = h0+e),
+                      "less" = c(a = h0+e, b = h0),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
   normalizationh0 <- switch(model,
                             "d_beta" = p_beta(bound_h0[2], 1/k, 1/k, -1, 1) - p_beta(bound_h0[1], 1/k, 1/k, -1, 1),
                             "beta"   = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
-                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            "moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
                             }
   )
 
 
   int <- function(rho) {
     pro <- switch(hypothesis,
-                  "!=" = p_cor(max(r), rho, n, lower.tail = FALSE) +
+                  "two.sided" = p_cor(max(r), rho, n, lower.tail = FALSE) +
                          p_cor(min(r), rho, n, lower.tail = TRUE),
-                  ">"  = p_cor(r, rho, n, lower.tail = FALSE),
-                  "<"  = p_cor(r, rho, n, lower.tail = TRUE)
+                  "greater"  = p_cor(r, rho, n, lower.tail = FALSE),
+                  "less"  = p_cor(r, rho, n, lower.tail = TRUE)
     )
 
     pro * r_prior(rho, k, location, scale, dff, model, alpha, beta,-1,1) / normalizationh0
@@ -3350,24 +3350,24 @@ re_TNE <-function(r,n,k, alpha, beta,h0,hypothesis,location,scale,dff,model,e){
     return(r)
   }
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = h0, b = h0+e),
-                      "<" = c(a = h0+e, b = h0),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0, b = h0+e),
+                      "less" = c(a = h0+e, b = h0),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
 
   normalizationh0 <- switch(model,
                             "d_beta" = p_beta(bound_h0[2], 1/k, 1/k, -1, 1) - p_beta(bound_h0[1], 1/k, 1/k, -1, 1),
                             "beta"   = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
-                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            "moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
                             }
   )
 
   int <- function(rho) {
     pro <- switch(hypothesis,
-                  "!=" = p_cor(max(r), rho, n, lower.tail = TRUE) -
+                  "two.sided" = p_cor(max(r), rho, n, lower.tail = TRUE) -
                     p_cor(min(r), rho, n, lower.tail = TRUE),
-                  ">"  = p_cor(r, rho, n, lower.tail = TRUE),
-                  "<"  = p_cor(r, rho, n, lower.tail = FALSE)
+                  "greater"  = p_cor(r, rho, n, lower.tail = TRUE),
+                  "less"  = p_cor(r, rho, n, lower.tail = FALSE)
     )
 
     pro * r_prior(rho, k, location, scale, dff, model, alpha, beta,-1,1) / normalizationh0
@@ -3529,7 +3529,7 @@ re_table<-function(D,target,model,k, alpha, beta,h0,location,scale,dff, hypothes
     TPR_model     <- model_d
   }
   # FNE and TNE:
-  if (any(hypothesis == "!=" & max_BF < D | BF_D == "bound cannot be found")) {
+  if (any(hypothesis == "two.sided" & max_BF < D | BF_D == "bound cannot be found")) {
     FNE <- 0
     TNE <- 0
   } else {
@@ -3552,31 +3552,31 @@ re_table<-function(D,target,model,k, alpha, beta,h0,location,scale,dff, hypothes
 
 
 compute.prior.density.re.h1 <- function(rho,h0, k,location,scale,dff,model, alpha, beta,hypothesis,e) {
-  if (model == "Point") return(rep(NA, length(rho)))
+  if (model == "point") return(rep(NA, length(rho)))
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = h0+e, b = 1),
-                      "<" = c(a = -1, b = h0+e),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0+e, b = 1),
+                      "less" = c(a = -1, b = h0+e),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
   normalizationh1 <- switch(hypothesis,
-                            "!=" = switch(model,
+                            "two.sided" = switch(model,
                                           "d_beta"       = 1-(p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = 1-(p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "Moment"          = {
+                                          "moment"          = {
                                             (pmom(1-location, tau = scale^2)-pmom(bound_h1[2]-location, tau = scale^2))+
                                               (pmom(bound_h1[1]-location, tau = scale^2)-pmom(-1-location, tau = scale^2))
                                           }),
 
-                            "<"  = switch(model,
+                            "less"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "Moment"          = {
+                                          "moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           }),
-                            ">"  = switch(model,
+                            "greater"  = switch(model,
                                           "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
                                           "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                          "Moment"          = {
+                                          "moment"          = {
                                             (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
                                           })
   )
@@ -3585,24 +3585,24 @@ compute.prior.density.re.h1 <- function(rho,h0, k,location,scale,dff,model, alph
 
   prior_h1<-r_prior(rho,k,location,scale,dff,model, alpha, beta,-1,1)
   switch(hypothesis,
-         "!=" = { prior_h1[rho>min(bound_h1)&rho<max(bound_h1)]=0 },
-         ">" = { prior_h1[rho<bound_h1[1]]=0 },
-         "<" = { prior_h1[rho>bound_h1[2]]=0 }
+         "two.sided" = { prior_h1[rho>min(bound_h1)&rho<max(bound_h1)]=0 },
+         "greater" = { prior_h1[rho<bound_h1[1]]=0 },
+         "less" = { prior_h1[rho>bound_h1[2]]=0 }
   )
   prior_h1
 
   }
 compute.prior.density.re.h0 <- function(rho,h0, k,location,scale,dff,model, alpha, beta,hypothesis,e) {
-  if (model == "Point") return(rep(NA, length(rho)))
+  if (model == "point") return(rep(NA, length(rho)))
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = h0, b = h0+e),
-                      "<" = c(a = h0+e, b = h0),
-                      "!=" = c(a = h0+e[1], b = h0+e[2])
+                      "greater" = c(a = h0, b = h0+e),
+                      "less" = c(a = h0+e, b = h0),
+                      "two.sided" = c(a = h0+e[1], b = h0+e[2])
   )
   normalizationh0 <- switch(model,
                             "d_beta" = p_beta(bound_h0[2], 1/k, 1/k, -1, 1) - p_beta(bound_h0[1], 1/k, 1/k, -1, 1),
                             "beta"   = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
-                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
+                            "moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
                             }
   )
 
@@ -3610,9 +3610,9 @@ compute.prior.density.re.h0 <- function(rho,h0, k,location,scale,dff,model, alph
 
   prior_h0<-r_prior(rho,k,location,scale,dff,model, alpha, beta,-1,1)
   switch(hypothesis,
-         "!=" = { prior_h0[rho<min(bound_h0)|rho>max(bound_h0)]=0 },
-         ">" = { prior_h0[rho>bound_h0[2]]=0 },
-         "<" = { prior_h0[rho<bound_h0[1]]=0 }
+         "two.sided" = { prior_h0[rho<min(bound_h0)|rho>max(bound_h0)]=0 },
+         "greater" = { prior_h0[rho>bound_h0[2]]=0 },
+         "less" = { prior_h0[rho<bound_h0[1]]=0 }
   )
   prior_h0
 
@@ -3628,14 +3628,14 @@ re_prior_plot <-function(k, alpha, beta,h0,location,scale,dff,model,de_an_prior,
 
 
   plot.bounds <- switch(hypothesis,
-                        ">"  = c(h0, 1),
-                        "<"  = c(-1, h0),
-                        "!=" = c(-1, 1))
+                        "greater"  = c(h0, 1),
+                        "less"  = c(-1, h0),
+                        "two.sided" = c(-1, 1))
   rr <- seq(plot.bounds[1], plot.bounds[2], 0.0025)
 
   prior.analysis.h1 <- compute.prior.density.re.h1(rr,h0, k,location,scale,dff,model, alpha, beta,hypothesis,e)
   prior.analysis.h0<- compute.prior.density.re.h0(rr,h0, k,location,scale,dff,model, alpha, beta,hypothesis,e)
-  prior.design <- if (de_an_prior == 0 && model_d != "Point") {
+  prior.design <- if (de_an_prior == 0 && model_d != "point") {
     compute.prior.density.re.h1(rr, k_d,location_d,scale_d,dff_d,model_d, alpha_d, beta_d,hypothesis,e)
   } else {
     rep(NA, length(rr))
@@ -3667,7 +3667,7 @@ re_prior_plot <-function(k, alpha, beta,h0,location,scale,dff,model,de_an_prior,
   legend.lwd    <- c(2, 2)
 
   if (de_an_prior == 0) {
-    if (model_d == "Point") {
+    if (model_d == "point") {
       graphics::arrows(x0 = location_d, y0 = 0, x1 = location_d, y1 = ylim.max,
              length = 0.1, col = "gray", lty = 2)
     } else {
@@ -3719,7 +3719,7 @@ re_bf10_p <-function(D,n,k,alpha,beta,h0,hypothesis,location,scale,dff,model,e){
 
   # Check if BF01 = D is possible:
   max.BF01   <- 1 / re_BF10(h0,n,k,alpha, beta,h0,hypothesis,location,scale,dff,model,e)
-  impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(r.BF01, "bound cannot be found"))
+  impossible <- (hypothesis == "two.sided") && (max.BF01 < D || identical(r.BF01, "bound cannot be found"))
 
   plot(rr, BF01, type = "l", log = "y", xlab = "Correlation", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
@@ -3773,7 +3773,7 @@ Power_re<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(Ns,FPE,col = "grey")
   graphics::legend(x = N.max*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -3789,7 +3789,7 @@ Power_re<-function(D,k, alpha, beta,h0,hypothesis,location,scale,dff,model,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[0][1]~"greater"~.(D))))
   graphics::lines(Ns,FNE,col = "grey")
   graphics::legend(x = N.max*-.1,y=1.1,
                    legend = c("True negative", "False negative"),
@@ -3826,17 +3826,17 @@ tstude <- function(t, location = 0, scale = sqrt(2)/2, df = 1) {
 
 t1_prior<- function(delta, location, scale, dff, model){
   switch(model,
-         "Cauchy"         = tstude(delta, location, scale, 1),
-         "Normal"         = stats::dnorm (delta, location, scale),
-         "Moment"            = dMoment  (delta, location, scale),
-         "t-distribution" = tstude(delta, location, scale, dff))
+         "cauchy"         = tstude(delta, location, scale, 1),
+         "normal"         = stats::dnorm (delta, location, scale),
+         "moment"            = dMoment  (delta, location, scale),
+         "t" = tstude(delta, location, scale, dff))
 }
 
 t1_BF10 <-function(t, df, model, location, scale, dff, hypothesis){
   bound  <- switch(hypothesis,
-                   ">"  = c(a = 0, b = Inf),
-                   "<"  = c(a = -Inf, b = 0),
-                   "!=" = c(a = -Inf, b = Inf)
+                   "greater"  = c(a = 0, b = Inf),
+                   "less"  = c(a = -Inf, b = 0),
+                   "two.sided" = c(a = -Inf, b = Inf)
   )
   x <- numeric(length(t))
 
@@ -3845,12 +3845,12 @@ t1_BF10 <-function(t, df, model, location, scale, dff, hypothesis){
   # For all priors, the prior integrates to 1 when a = -Inf, b = Inf.
   # For all priors, we use their CDFs when either a = 0 or b = 0 and minimize manual integrations.
   # Note: pmom() errors at -Inf and Inf, so we avoid it below.
-  normalization <- if (hypothesis == "!=") 1 else
+  normalization <- if (hypothesis == "two.sided") 1 else
     switch(model,
-           "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
-           "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
-           "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
+           "cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
+           "normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
+           "moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "t" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
   for(i in 1:length(t)){
     # int  <- function(delta) stats::dt(t[i], df, ncp = delta * sqrt(df+1)) * t1_prior(delta, location, scale, dff, model)/normalization
@@ -3897,7 +3897,7 @@ t1_TNE <- function(t, df,hypothesis) {
   if (length(t) == 2) return(stats::pt(max(t), df) - stats::pt(min(t), df))
 
   # length(t) = 1:
-  return(if (hypothesis==">") stats::pt(t, df,0) else 1 - stats::pt(t, df))
+  return(if (hypothesis=="greater") stats::pt(t, df,0) else 1 - stats::pt(t, df))
 }
 
 # p(BF10>D|H1)
@@ -3906,9 +3906,9 @@ t1_TNE <- function(t, df,hypothesis) {
 t1_TPE <- function(t, df, model, location, scale, dff) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  hypothesis <- if (length(t) == 2) "!=" else if (t >= 0) ">" else "<"
+  hypothesis <- if (length(t) == 2) "two.sided" else if (t >= 0) "greater" else "less"
 
-  if (model == "Point") {
+  if (model == "point") {
     ncp <- location * sqrt(df + 1)
     if (length(t) == 2) return(pnct(min(t), df, ncp) + (1 - pnct(max(t), df, ncp)))
     # Length 1:
@@ -3916,16 +3916,16 @@ t1_TPE <- function(t, df, model, location, scale, dff) {
   }
 
   bound  <- switch(hypothesis,
-                   ">"  = c(a = 0,    b = Inf),
-                   "<"  = c(a = -Inf, b = 0),
-                   "!=" = c(a = -Inf, b = Inf))
+                   "greater"  = c(a = 0,    b = Inf),
+                   "less"  = c(a = -Inf, b = 0),
+                   "two.sided" = c(a = -Inf, b = Inf))
 
-  normalization <- if (hypothesis == "!=") 1 else
+  normalization <- if (hypothesis == "two.sided") 1 else
     switch(model,
-           "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
-           "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
-           "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
+           "cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
+           "normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
+           "moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "t" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
   int <- if (length(t) == 2) { # two-sided test
     function(delta) {
@@ -3940,7 +3940,7 @@ t1_TPE <- function(t, df, model, location, scale, dff) {
   }
 
   # setting error value such that error are prevented:
-  #error <- if (model == "Moment" && scale < 0.3) 1e-14 else if (scale > 0.3) .Machine$double.eps^0.25 else 1e-8
+  #error <- if (model == "moment" && scale < 0.3) 1e-14 else if (scale > 0.3) .Machine$double.eps^0.25 else 1e-8
   error = 1e-4
   stats::integrate(int, lower = bound[1], upper = bound[2], rel.tol = error, stop.on.error = FALSE)$value
 }
@@ -3951,40 +3951,40 @@ t1_FNE <- function(t, df, model, location, scale, dff,hypothesis){
 
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  if (model == "Point") {
+  if (model == "point") {
     ncp <- location * sqrt(df + 1)
     if (length(t) == 2) return(pnct(max(t), df, ncp) - pnct(min(t), df, ncp))
     # Length 1:
-    return(if (hypothesis==">") pnct(t, df, ncp) else 1 - pnct(t, df, ncp))
+    return(if (hypothesis=="greater") pnct(t, df, ncp) else 1 - pnct(t, df, ncp))
   }
 
   bound  <- switch(hypothesis,
-                   ">"  = c(a = 0,    b = Inf),
-                   "<"  = c(a = -Inf, b = 0),
-                   "!=" = c(a = -Inf, b = Inf))
+                   "greater"  = c(a = 0,    b = Inf),
+                   "less"  = c(a = -Inf, b = 0),
+                   "two.sided" = c(a = -Inf, b = Inf))
 
 
-  normalization <- if (hypothesis == "!=") 1 else
+  normalization <- if (hypothesis == "two.sided") 1 else
     switch(model,
-           "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
-           "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
-           "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
+           "cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
+           "normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
+           "moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "t" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
-  int <- if (hypothesis =="!=") { # two-sided test
+  int <- if (hypothesis =="two.sided") { # two-sided test
     function(delta) {
       pro1 <- pnct(max(t), df, delta * sqrt(df + 1))
       pro2 <- pnct(min(t), df, delta * sqrt(df + 1))
       (pro1 - pro2) * t1_prior(delta, location, scale, dff, model) / normalization
     }
-  } else if (hypothesis ==">") { # one-sided test with delta > 0
+  } else if (hypothesis =="greater") { # one-sided test with delta > 0
     function(delta) pnct(t, df, delta * sqrt(df + 1)) * t1_prior(delta, location, scale, dff, model) / normalization
   } else {             # one-sided test with delta < 0
     function(delta) (1 - pnct(t, df, delta * sqrt(df + 1))) * t1_prior(delta, location, scale, dff, model) / normalization
   }
 
   # setting error value such that error are prevented:
-  #error <- if (model == "Moment" && scale < 0.3) 1e-14 else if (scale > 0.3) .Machine$double.eps^0.25 else 1e-8
+  #error <- if (model == "moment" && scale < 0.3) 1e-14 else if (scale > 0.3) .Machine$double.eps^0.25 else 1e-8
   error = 1e-4
   stats::integrate(int, lower = bound[1], upper = bound[2], rel.tol = error, stop.on.error = FALSE)$value
 }
@@ -3998,7 +3998,7 @@ t1_FPE <- function(t, df,hypothesis) {
   if (length(t) == 2) return(stats::pt(min(t), df) + (1 - stats::pt(max(t), df)))
 
   # length(t) = 1:
-  return(if (hypothesis==">") 1 - stats::pt(t, df) else stats::pt(t, df))
+  return(if (hypothesis=="greater") 1 - stats::pt(t, df) else stats::pt(t, df))
 }
 
 
@@ -4133,7 +4133,7 @@ t1_Table <- function(D, target, model, location, scale, dff, hypothesis,
   }
 
   # FNE and TNE:
-  if (any(hypothesis == "!=" & max_BF < D | BF_D == "bound cannot be found")) {
+  if (any(hypothesis == "two.sided" & max_BF < D | BF_D == "bound cannot be found")) {
     FNE <- 0
     TNE <- 0
   } else {
@@ -4156,11 +4156,11 @@ t1_Table <- function(D, target, model, location, scale, dff, hypothesis,
 
 # For plotting, compute normalized prior density over tt:
 compute.prior.density.t <- function(tt, model, location, scale, dff, hypothesis) {
-  if (model == "Point") return(rep(NA, length(tt)))
+  if (model == "point") return(rep(NA, length(tt)))
   bounds <- switch(hypothesis,
-                   ">"  = c(0, Inf),
-                   "<"  = c(-Inf, 0),
-                   "!=" = c(-Inf, Inf))
+                   "greater"  = c(0, Inf),
+                   "less"  = c(-Inf, 0),
+                   "two.sided" = c(-Inf, Inf))
   norm <- stats::integrate(function(delta) t1_prior(delta, location, scale, dff, model),
                     lower = bounds[1], upper = bounds[2])$value
   t1_prior(tt, location, scale, dff, model) / norm
@@ -4174,12 +4174,12 @@ t1_prior_plot <- function(D, target, model, location, scale, dff, hypothesis,
   graphics::par(mfrow = c(1, 1))
 
   plot.bounds    <- switch(hypothesis,
-                           ">"  = c(0, 5),
-                           "<"  = c(-5, 0),
-                           "!=" = c(-5, 5))
+                           "greater"  = c(0, 5),
+                           "less"  = c(-5, 0),
+                           "two.sided" = c(-5, 5))
   tt             <- seq(plot.bounds[1], plot.bounds[2], 0.01)
   prior.analysis <- compute.prior.density.t(tt, model, location, scale, dff, hypothesis)
-  prior.design   <- if (de_an_prior == 0 && model_d != "Point")
+  prior.design   <- if (de_an_prior == 0 && model_d != "point")
     compute.prior.density.t(tt, model_d, location_d, scale_d, dff_d, hypothesis) else
       rep(NA, length(tt))
   ylim.max <- max(prior.analysis, prior.design, na.rm = TRUE)
@@ -4194,14 +4194,14 @@ t1_prior_plot <- function(D, target, model, location, scale, dff, hypothesis,
 
   # If design prior != analysis prior:
   if (de_an_prior == 0) {
-    if (model_d == "Point")
+    if (model_d == "point")
       graphics::arrows(x0 = location_d, y0 = 0, x1 = location_d, y1 = ylim.max, length = 0.1, col = "black", lty = 2) else
         graphics::lines(tt, prior.design, lty = 2)
 
     # Add legend:
     graphics::legend("topright",
            legend = c("Analysis prior", "Design prior"),
-           lty = c(1, 2),
+           lty = c(1, 2), lwd = c(2, 1), 
            col = c("black", "black"),
            bty = "n")
   }
@@ -4236,8 +4236,8 @@ bf10_t1 <-function(D = 3, df, target, model = "NA", location = 0, scale = 0.707,
   t.BF01 <- t1_BF01_bound(D, df, model, location, scale, dff, hypothesis)
 
   # Check if BF01 = D is possible:
-  max.BF01   <- 1 / t1_BF10(0, df, model, location, scale, dff, hypothesis = "!=")
-  impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
+  max.BF01   <- 1 / t1_BF10(0, df, model, location, scale, dff, hypothesis = "two.sided")
+  impossible <- (hypothesis == "two.sided") && (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
 
   plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
@@ -4291,7 +4291,7 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(dfs+1,FPE,col = "grey")
   graphics::legend(x = df.max*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -4308,7 +4308,7 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[0][1]~"greater"~.(D))))
   graphics::lines(dfs+1,FNE,col = "grey")
   graphics::legend(x = df.max*-.1,y=1.1,
                    legend = c("True negative", "false negative"),
@@ -4355,10 +4355,10 @@ robust_uniroot <- function(f, lower, upper_start = 500, max_attempts = 20, step 
 te_prior<- function(delta,location,scale,dff,model){
 
   switch(model,
-        "Cauchy"        = tstude(delta,location, scale,1),
-        "Normal"        = stats::dnorm(delta,location,scale),
-        "Moment"            = dMoment(delta,location,scale),
-        "t-distribution" = tstude(delta,location,scale,dff))
+        "cauchy"        = tstude(delta,location, scale,1),
+        "normal"        = stats::dnorm(delta,location,scale),
+        "moment"            = dMoment(delta,location,scale),
+        "t" = tstude(delta,location,scale,dff))
 
 
 }
@@ -4366,37 +4366,37 @@ norm_h1 <- function(hypothesis, model, bound_h1, location, scale, dff = NULL) {
   normalizationh1 <- switch(
     hypothesis,
 
-    "!=" = 1 - switch(
+    "two.sided" = 1 - switch(
       model,
-      "Cauchy"         = stats::pcauchy(bound_h1[2], location, scale) -
+      "cauchy"         = stats::pcauchy(bound_h1[2], location, scale) -
         stats::pcauchy(bound_h1[1], location, scale),
-      "Normal"         = stats::pnorm(bound_h1[2], location, scale) -
+      "normal"         = stats::pnorm(bound_h1[2], location, scale) -
         stats::pnorm(bound_h1[1], location, scale),
-      "Moment"            = pmom(bound_h1[2] - location, tau = scale^2) -
+      "moment"            = pmom(bound_h1[2] - location, tau = scale^2) -
         pmom(bound_h1[1] - location, tau = scale^2),
-      "t-distribution" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
+      "t" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
         stats::pt((bound_h1[1] - location)/scale, df = dff)
     ),
 
-    "<" = switch(
+    "less" = switch(
       model,
-      "Cauchy"         = stats::pcauchy(bound_h1[2], location, scale) -
+      "cauchy"         = stats::pcauchy(bound_h1[2], location, scale) -
         stats::pcauchy(bound_h1[1], location, scale),
-      "Normal"         = stats::pnorm(bound_h1[2], location, scale) -
+      "normal"         = stats::pnorm(bound_h1[2], location, scale) -
         stats::pnorm(bound_h1[1], location, scale),
-      "Moment"            = pmom(bound_h1[2] - location, tau = scale^2),
-      "t-distribution" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
+      "moment"            = pmom(bound_h1[2] - location, tau = scale^2),
+      "t" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
         stats::pt((bound_h1[1] - location)/scale, df = dff)
     ),
 
-    ">" = switch(
+    "greater" = switch(
       model,
-      "Cauchy"         = stats::pcauchy(bound_h1[2], location, scale) -
+      "cauchy"         = stats::pcauchy(bound_h1[2], location, scale) -
         stats::pcauchy(bound_h1[1], location, scale),
-      "Normal"         = stats::pnorm(bound_h1[2], location, scale) -
+      "normal"         = stats::pnorm(bound_h1[2], location, scale) -
         stats::pnorm(bound_h1[1], location, scale),
-      "Moment"            = 1 - pmom(bound_h1[1] - location, tau = scale^2),
-      "t-distribution" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
+      "moment"            = 1 - pmom(bound_h1[1] - location, tau = scale^2),
+      "t" = stats::pt((bound_h1[2] - location)/scale, df = dff) -
         stats::pt((bound_h1[1] - location)/scale, df = dff)
     )
   )
@@ -4407,16 +4407,16 @@ norm_h0 <- function(model, bound_h0, location, scale, dff = NULL) {
   normalizationh0 <- switch(
     model,
 
-    "Cauchy"         = stats::pcauchy(bound_h0[2], location, scale) -
+    "cauchy"         = stats::pcauchy(bound_h0[2], location, scale) -
       stats::pcauchy(bound_h0[1], location, scale),
 
-    "Normal"         = stats::pnorm(bound_h0[2], location, scale) -
+    "normal"         = stats::pnorm(bound_h0[2], location, scale) -
       stats::pnorm(bound_h0[1], location, scale),
 
-    "Moment"            = pmom(bound_h0[2] - location, tau = scale^2) -
+    "moment"            = pmom(bound_h0[2] - location, tau = scale^2) -
       pmom(bound_h0[1] - location, tau = scale^2),
 
-    "t-distribution" = stats::pt((bound_h0[2] - location)/scale, df = dff) -
+    "t" = stats::pt((bound_h0[2] - location)/scale, df = dff) -
       stats::pt((bound_h0[1] - location)/scale, df = dff)
   )
 
@@ -4426,15 +4426,15 @@ norm_h0 <- function(model, bound_h0, location, scale, dff = NULL) {
 
 t1e_BF10i <-function(t,df,model ,location, scale,dff , hypothesis,e ){
   bound_h1  <- switch(hypothesis,
-                      "!=" = c(a = e[1], b = e[2]),
-                      ">" = c(a = e, b = Inf),
-                      "<" = c(a = -Inf, b = e)
+                      "two.sided" = c(a = e[1], b = e[2]),
+                      "greater" = c(a = e, b = Inf),
+                      "less" = c(a = -Inf, b = e)
                       )
 
   bound_h0  <- switch(hypothesis,
-                      "!=" = c(a = e[1], b = e[2]),
-                      ">" = c(a = 0, b = e),
-                      "<" = c(a = e, b = 0)
+                      "two.sided" = c(a = e[1], b = e[2]),
+                      "greater" = c(a = 0, b = e),
+                      "less" = c(a = e, b = 0)
                       )
 
   normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
@@ -4450,7 +4450,7 @@ t1e_BF10i <-function(t,df,model ,location, scale,dff , hypothesis,e ){
 
    error = 1e-4
 
-  if (hypothesis == "!="){
+  if (hypothesis == "two.sided"){
   lh1 = stats::integrate(int,lower = -Inf,upper = bound_h1[1], rel.tol=error,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = Inf, rel.tol=error,stop.on.error = F)$value
   }else{
     lh1 = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=error,stop.on.error = F)$value
@@ -4478,14 +4478,14 @@ t1e_BF10_bound <-function(D, df,model,location,scale,dff , hypothesis,e){
   }
 
   switch(hypothesis,
-         "!=" ={
+         "two.sided" ={
            x <- tryCatch(stats::uniroot(Bound_finding, lower = -20, upper = 0)$root, error = function(e) NA)
            y <- tryCatch(stats::uniroot(Bound_finding, lower =  0, upper = 20)$root, error = function(e) NA)
          },
-         ">"={
+         "greater"={
            x <- tryCatch(stats::uniroot(Bound_finding, lower = 0, upper = 20)$root, error = function(e) NA)
          },
-         "<" = {
+         "less" = {
            x <- tryCatch(stats::uniroot(Bound_finding, lower = -20, upper = 0)$root, error = function(e) NA)
          })
 
@@ -4512,7 +4512,7 @@ t1e_BF01_bound <-function(D, df,model,location,scale,dff , hypothesis,e){
 t1e_TPE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  if (model == "Point") {
+  if (model == "point") {
     ncp <- location * sqrt(df + 1)
     if (length(t) == 2) return(pnct(min(t), df, ncp) + (1 - pnct(max(t), df, ncp)))
     # Length 1:
@@ -4521,9 +4521,9 @@ t1e_TPE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
 
 
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = e, b = Inf),
-                      "<" = c(a = -Inf, b = e),
-                      "!=" = c(a = e[1], b = e[2])
+                      "greater" = c(a = e, b = Inf),
+                      "less" = c(a = -Inf, b = e),
+                      "two.sided" = c(a = e[1], b = e[2])
   )
 
   normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
@@ -4535,10 +4535,10 @@ t1e_TPE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
     ncp <- delta * sqrt(df + 1)
 
     pro <- switch(hypothesis,
-                  "!=" = pnct(max(t), df, ncp = ncp, lower  = FALSE) +
+                  "two.sided" = pnct(max(t), df, ncp = ncp, lower  = FALSE) +
                     pnct(min(t), df, ncp = ncp, lower  = TRUE),
-                  ">"  = pnct(t, df, ncp = ncp, lower  = FALSE),
-                  "<"  = pnct(t, df, ncp = ncp, lower  = TRUE)
+                  "greater"  = pnct(t, df, ncp = ncp, lower  = FALSE),
+                  "less"  = pnct(t, df, ncp = ncp, lower  = TRUE)
     )
 
     pro * te_prior(delta, location,scale, dff, model) / normalizationh1
@@ -4547,10 +4547,10 @@ t1e_TPE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
    error = 1e-4
 
   x <- switch(hypothesis,
-              "!=" = stats::integrate(int, -Inf, bound_h1[1], rel.tol = error)$value +
+              "two.sided" = stats::integrate(int, -Inf, bound_h1[1], rel.tol = error)$value +
                 stats::integrate(int, bound_h1[2], Inf, rel.tol = error)$value,
-              "<"  = ,
-              ">"  = stats::integrate(int, bound_h1[1], bound_h1[2], rel.tol = error)$value
+              "less"  = ,
+              "greater"  = stats::integrate(int, bound_h1[1], bound_h1[2], rel.tol = error)$value
 
   )
   return(x)
@@ -4561,7 +4561,7 @@ t1e_FNE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
 
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  if (model == "Point") {
+  if (model == "point") {
     ncp <- location * sqrt(df + 1)
     if (length(t) == 2) return(pnct(max(t), df, ncp) - pnct(min(t), df, ncp))
     # Length 1:
@@ -4569,9 +4569,9 @@ t1e_FNE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
   }
 
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = e, b = Inf),
-                      "<" = c(a = -Inf, b = e),
-                      "!=" = c(a = e[1], b = e[2])
+                      "greater" = c(a = e, b = Inf),
+                      "less" = c(a = -Inf, b = e),
+                      "two.sided" = c(a = e[1], b = e[2])
   )
 
   normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
@@ -4582,10 +4582,10 @@ t1e_FNE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
     ncp <- delta * sqrt(df + 1)
 
     pro <- switch(hypothesis,
-                   "!=" = pnct(max(t), df, ncp = ncp, lower  = TRUE) -
+                   "two.sided" = pnct(max(t), df, ncp = ncp, lower  = TRUE) -
                      pnct(min(t), df, ncp = ncp, lower  = TRUE),
-                   ">"  = pnct(t, df, ncp = ncp, lower  = TRUE),
-                   "<"  = pnct(t,df, ncp = ncp, lower  = FALSE)
+                   "greater"  = pnct(t, df, ncp = ncp, lower  = TRUE),
+                   "less"  = pnct(t,df, ncp = ncp, lower  = FALSE)
     )
 
     pro * te_prior(delta,location, scale, dff, model) / normalizationh1
@@ -4594,9 +4594,9 @@ t1e_FNE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
    error = 1e-4
 
   x <- switch(hypothesis,
-              "!=" = stats::integrate(int,lower = -Inf,upper = bound_h1[1], rel.tol=error,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = Inf, rel.tol=error,stop.on.error = F)$value ,
-              "<"  = ,
-              ">"  = stats::integrate(int, bound_h1[1], bound_h1[2], rel.tol = error)$value)
+              "two.sided" = stats::integrate(int,lower = -Inf,upper = bound_h1[1], rel.tol=error,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = Inf, rel.tol=error,stop.on.error = F)$value ,
+              "less"  = ,
+              "greater"  = stats::integrate(int, bound_h1[1], bound_h1[2], rel.tol = error)$value)
   return(x)
 
 }
@@ -4606,9 +4606,9 @@ t1e_TNE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = 0, b = e),
-                      "<" = c(a = e, b = 0),
-                      "!=" = c(a = e[1], b = e[2])
+                      "greater" = c(a = 0, b = e),
+                      "less" = c(a = e, b = 0),
+                      "two.sided" = c(a = e[1], b = e[2])
   )
   normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
 
@@ -4617,10 +4617,10 @@ t1e_TNE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
   int <- function(delta) {
     ncp <- delta * sqrt(df + 1)
     pro <- switch(hypothesis,
-                   "!=" = pnct(max(t), df, ncp, lower  = TRUE) -
+                   "two.sided" = pnct(max(t), df, ncp, lower  = TRUE) -
                      pnct(min(t), df, ncp, lower  = TRUE),
-                   ">"  = pnct(t, df, ncp, lower  = TRUE),
-                   "<"  = pnct(t, df, ncp, lower  = FALSE),
+                   "greater"  = pnct(t, df, ncp, lower  = TRUE),
+                   "less"  = pnct(t, df, ncp, lower  = FALSE),
                    stop("Unsupported hypothesis")
     )
 
@@ -4638,9 +4638,9 @@ t1e_TNE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
 t1e_FPE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = 0, b = e),
-                      "<" = c(a = e, b = 0),
-                      "!=" = c(a = e[1], b = e[2])
+                      "greater" = c(a = 0, b = e),
+                      "less" = c(a = e, b = 0),
+                      "two.sided" = c(a = e[1], b = e[2])
   )
 
   normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
@@ -4649,9 +4649,9 @@ t1e_FPE <-function(t,df,model ,location,scale,dff , hypothesis ,e){
     ncp <- delta * sqrt(df + 1)
 
     pro <- switch(hypothesis,
-                   "!=" = pnct(max(t), df, ncp, lower  = FALSE) + pnct(min(t), df, ncp, lower  = TRUE),
-                   ">"  = pnct(t, df, ncp, lower  = FALSE),
-                   "<"  = pnct(t, df, ncp, lower  = TRUE),
+                   "two.sided" = pnct(max(t), df, ncp, lower  = FALSE) + pnct(min(t), df, ncp, lower  = TRUE),
+                   "greater"  = pnct(t, df, ncp, lower  = FALSE),
+                   "less"  = pnct(t, df, ncp, lower  = TRUE),
                    stop("Unsupported hypothesis")
     )
 
@@ -4784,7 +4784,7 @@ t1e_table<-function(D,target,model,location,scale,dff, hypothesis,e ,
   }
 
   # FNE and TNE:
-  if (any(hypothesis == "!=" & max_BF < D | BF_D == "bound cannot be found")) {
+  if (any(hypothesis == "two.sided" & max_BF < D | BF_D == "bound cannot be found")) {
     FNE <- 0
     TNE <- 0
   } else {
@@ -4806,11 +4806,11 @@ t1e_table<-function(D,target,model,location,scale,dff, hypothesis,e ,
 }
 
 compute.prior.density.te.h1 <- function(tt, model,location, scale, dff, hypothesis,e) {
-  if (model == "Point") return(rep(NA, length(tt)))
+  if (model == "point") return(rep(NA, length(tt)))
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = e, b = Inf),
-                      "<" = c(a = -Inf, b = -e),
-                      "!=" = c(a = e[1], b = e[2])
+                      "greater" = c(a = e, b = Inf),
+                      "less" = c(a = -Inf, b = -e),
+                      "two.sided" = c(a = e[1], b = e[2])
   )
 
   normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
@@ -4819,18 +4819,18 @@ compute.prior.density.te.h1 <- function(tt, model,location, scale, dff, hypothes
   #prior_h1<-te_prior(tt,scale,dff,model) / normalizationh1
   prior_h1<-te_prior(tt,location,scale,dff,model)
   switch(hypothesis,
-         "!=" = { prior_h1[tt>min(bound_h1)&tt<max(bound_h1)]=0 },
-         ">" = { prior_h1[tt<bound_h1[1]]=0 },
-         "<" = { prior_h1[tt>bound_h1[2]]=0 }
+         "two.sided" = { prior_h1[tt>min(bound_h1)&tt<max(bound_h1)]=0 },
+         "greater" = { prior_h1[tt<bound_h1[1]]=0 },
+         "less" = { prior_h1[tt>bound_h1[2]]=0 }
          )
   prior_h1
 }
 compute.prior.density.te.h0 <- function(tt, model,location, scale, dff, hypothesis,e) {
-  if (model == "Point") return(rep(NA, length(tt)))
+  if (model == "point") return(rep(NA, length(tt)))
   bound_h0  <- switch(hypothesis,
-                      "!=" = c(a = e[1], b = e[2]),
-                      ">" = c(a = 0, b = e),
-                      "<" = c(a = e, b = 0)
+                      "two.sided" = c(a = e[1], b = e[2]),
+                      "greater" = c(a = 0, b = e),
+                      "less" = c(a = e, b = 0)
   )
   # H0 Normalization
   normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
@@ -4839,9 +4839,9 @@ compute.prior.density.te.h0 <- function(tt, model,location, scale, dff, hypothes
   #prior_h0 <- te_prior(tt,scale,dff,model) / normalizationh0
   prior_h0 <- te_prior(tt,location,scale,dff,model)
   switch(hypothesis,
-         "!=" = { prior_h0[!(tt>min(bound_h0)&tt<max(bound_h0))]=0},
-         ">" = { prior_h0[tt>bound_h0[2]]=0 },
-         "<" = { prior_h0[tt<bound_h0[1]]=0 }
+         "two.sided" = { prior_h0[!(tt>min(bound_h0)&tt<max(bound_h0))]=0},
+         "greater" = { prior_h0[tt>bound_h0[2]]=0 },
+         "less" = { prior_h0[tt<bound_h0[1]]=0 }
 
   )
   prior_h0
@@ -4855,14 +4855,14 @@ t1e_prior_plot <- function(model,location, scale, dff, hypothesis, e,
   graphics::par(mfrow = c(1, 1))
 
   plot.bounds <- switch(hypothesis,
-                        ">"  = c(0, 5),
-                        "<"  = c(-5, 0),
-                        "!=" = c(-5, 5))
+                        "greater"  = c(0, 5),
+                        "less"  = c(-5, 0),
+                        "two.sided" = c(-5, 5))
   tt <- seq(plot.bounds[1], plot.bounds[2], 0.01)
 
   prior.analysis.h1 <- compute.prior.density.te.h1(tt, model,location, scale, dff, hypothesis, e)
   prior.analysis.h0 <- compute.prior.density.te.h0(tt, model,location, scale, dff, hypothesis, e)
-  prior.design <- if (de_an_prior == 0 && model_d != "Point") {
+  prior.design <- if (de_an_prior == 0 && model_d != "point") {
     compute.prior.density.te.h1(tt, model_d,location_d, scale_d, dff_d, hypothesis, e)
   } else {
     rep(NA, length(tt))
@@ -4887,7 +4887,7 @@ t1e_prior_plot <- function(model,location, scale, dff, hypothesis, e,
   legend.lwd    <- c(2, 2)
 
   if (de_an_prior == 0) {
-    if (model_d == "Point") {
+    if (model_d == "point") {
       graphics::arrows(x0 = location_d, y0 = 0, x1 = location_d, y1 = ylim.max,
              length = 0.1, col = "gray", lty = 2)
     } else {
@@ -4991,7 +4991,7 @@ Power_t1e<-function(D,model,location,scale,dff, hypothesis,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(dfs+1,FPE,col = "grey")
   graphics::legend(x = df.max*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -5007,7 +5007,7 @@ Power_t1e<-function(D,model,location,scale,dff, hypothesis,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[0][1]~"greater"~.(D))))
   graphics::lines(dfs+1,FNE,col = "grey")
   graphics::legend(x = df.max*-.1,y=1.1,
                    legend = c("True negative", "False negative"),
@@ -5126,7 +5126,7 @@ p2_prior_plot<-function(a,b,ad,bd,dp,model,nu){
   prior.design   <- switch(model,
                            "same" = stats::dbeta(prop,a,b),
                            "beta" = stats::dbeta(prop,ad,bd),
-                           "Point" = rep(NA, length(prop)))
+                           "point" = rep(NA, length(prop)))
 
   ylim.max <- max(prior.analysis, prior.design, na.rm = TRUE)
 
@@ -5139,14 +5139,14 @@ p2_prior_plot<-function(a,b,ad,bd,dp,model,nu){
 
 
   if (model != "same") {
-    if (model == "Point")
+    if (model == "point")
       graphics::arrows(x0 = dp, y0 = 0, x1 = dp, y1 = ylim.max, length = 0.1, col = "black", lty = 2) else
         graphics::lines(prop, prior.design, lty = 2)
 
     # Add legend:
     graphics::legend("topright",
            legend = c("Analysis prior", "Design prior"),
-           lty = c(1, 2),
+           lty = c(1, 2), lwd = c(2, 1), 
            col = c("black", "black"),
            bty = "n")
   }
@@ -5182,7 +5182,7 @@ Power_p2<-function(D,n1, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,model2,da2
        xlab = "Sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(Nt,FPE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -5198,7 +5198,7 @@ Power_p2<-function(D,n1, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,model2,da2
        xlab = "Sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(Nt,FNE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -5234,7 +5234,7 @@ heatmap_p2 <- function(x, D) {
   labels <- c(
     "PE"   = bquote(BF[10] > .(D)),
     "NE"   = bquote(BF[0][1] > .(D)),
-    "None" = bquote(1 / .(D) < BF[10] ~ "<" ~ .(D))
+    "None" = bquote(1 / .(D) < BF[10] ~ "less" ~ .(D))
   )
 
   # First plot: categorical heatmap
@@ -5295,13 +5295,13 @@ input_bin <- shiny::reactive({
 
   hypothesis <- switch(interval,
                        "1" =   switch(input$h1bin,        # direction of the test
-                                      "1" = "!=",
-                                      "2" =  ">",
-                                      "3" =  "<"),
+                                      "1" = "two.sided",
+                                      "2" =  "greater",
+                                      "3" =  "less"),
                        "2" = switch(input$h1bine,        # direction of the test
-                                    "1" = "!=",
-                                    "2" =  ">",
-                                    "3" =  "<"))
+                                    "1" = "two.sided",
+                                    "2" =  "greater",
+                                    "3" =  "less"))
   h0       <-  input$h0prop
   location <- input$h0prop
   lbbin <- input$lbbine
@@ -5330,7 +5330,7 @@ input_bin <- shiny::reactive({
 
   model <- switch(input$modelbin,
                   "1" = "beta",
-                  "2" = "Moment")
+                  "2" = "moment")
   alpha <- input$alphabin
   beta <- input$betabin
   scale <- input$sbin
@@ -5342,8 +5342,8 @@ input_bin <- shiny::reactive({
   scale_d <- input$sbind
   model_d <- switch(input$modelbind,
                   "1" = "beta",
-                  "2" = "Moment",
-                  "3" = "Point")
+                  "2" = "moment",
+                  "3" = "point")
   location_d <- input$h0bind
   target <- input$powerbin
   FP <- input$FP_bin
@@ -5640,7 +5640,7 @@ shiny::observeEvent(input$calbin, {
       if (bin$model == "beta") {
         args$alpha <- bin$alpha
         args$beta  <- bin$beta
-      } else if (bin$model == "Moment") {
+      } else if (bin$model == "moment") {
         args$scale <- bin$scale
       }
 
@@ -5738,7 +5738,7 @@ input_f <- shiny::reactive({
 
   model <- switch(input$modelf,
                   "1" = "effectsize",
-                  "2" = "Moment")
+                  "2" = "moment")
 
   rscale <- input$rf
   f_m <- sqrt(input$fsdf)
@@ -5749,8 +5749,8 @@ input_f <- shiny::reactive({
 
   model_d <- switch(input$modelfd,
                     "1" = "effectsize",
-                    "2" = "Moment",
-                    "3" = "Point")
+                    "2" = "moment",
+                    "3" = "point")
 
   rscale_d <- input$rfd
   f_m_d <- sqrt(input$fsdfd)
@@ -6146,10 +6146,10 @@ input_p2 <- shiny::reactive({
 
 
   model_p1 <-switch(input$model_p1,
-                    "1" = "Point",
+                    "1" = "point",
                     "2" = "beta")
   model_p2 <-switch(input$model_p2,
-                    "1" = "Point",
+                    "1" = "point",
                     "2" = "beta")
 
   if (input$priorp2 == 1){
@@ -6463,13 +6463,13 @@ input_r <- shiny::reactive({
 
   hypothesis <- switch(interval,
                        "1" =   switch(input$h1r,        # direction of the test
-                                      "1" = "!=",
-                                      "2" =  ">",
-                                      "3" =  "<"),
+                                      "1" = "two.sided",
+                                      "2" =  "greater",
+                                      "3" =  "less"),
                        "2" = switch(input$h1re,        # direction of the test
-                                    "1" = "!=",
-                                    "2" =  ">",
-                                    "3" =  "<"))
+                                    "1" = "two.sided",
+                                    "2" =  "greater",
+                                    "3" =  "less"))
 
 
 
@@ -6478,7 +6478,7 @@ input_r <- shiny::reactive({
   model <- switch(input$modelr,
                   "1" = "d_beta",
                   "2" = "beta",
-                  "3" = "Moment")
+                  "3" = "moment")
   k <- input$kr
   scale <- input$sr
   alpha <- input$ralpha
@@ -6489,8 +6489,8 @@ input_r <- shiny::reactive({
   model_d <- switch(input$modelrd,
                     "1" = "d_beta",
                     "2" = "beta",
-                    "3" = "Moment",
-                    "4" = "Point")
+                    "3" = "moment",
+                    "4" = "point")
   location_d <- input$h0phod
   k_d <- input$rkd
   scale_d <- input$rsd
@@ -6832,7 +6832,7 @@ shiny::observeEvent(input$calr, {
           args$alpha <- rr$alpha
           args$beta  <- rr$beta
           # k, scale ignored
-        } else if (rr$model == "Moment") {
+        } else if (rr$model == "moment") {
           args$scale <- rr$scale
           # k, alpha, beta ignored
         }
@@ -6927,18 +6927,18 @@ input_t1 <- shiny::reactive({
 
   hypothesis <- switch(interval,
                        "1" =   switch(input$h1t1,        # direction of the test
-                                      "1" = "!=",
-                                      "2" =  ">",
-                                      "3" =  "<"),
+                                      "1" = "two.sided",
+                                      "2" =  "greater",
+                                      "3" =  "less"),
                        "2" = switch(input$h1t1e,        # direction of the test
-                                    "1" = "!=",
-                                    "2" =  ">",
-                                    "3" =  "<"))
+                                    "1" = "two.sided",
+                                    "2" =  "greater",
+                                    "3" =  "less"))
 
   model <- switch(input$modelt1,
-                  "1" = "t-distribution",
-                  "2" = "Normal",
-                  "3" = "Moment")
+                  "1" = "t",
+                  "2" = "normal",
+                  "3" = "moment")
 
   location <- input$lt1
   scale <- input$st1
@@ -6947,10 +6947,10 @@ input_t1 <- shiny::reactive({
                         "1" = 1,
                         "2" = 0)
   model_d <- switch(input$modelt1d,
-                    "1" = "t-distribution",
-                    "2" = "Normal",
-                    "3" = "Moment",
-                    "4" = "Point")
+                    "1" = "t",
+                    "2" = "normal",
+                    "3" = "moment",
+                    "4" = "point")
   location_d <- input$lt1d
 
   scale_d <- input$st1d
@@ -7352,20 +7352,20 @@ input_t2 <- shiny::reactive({
 
   hypothesis <- switch(interval,
                        "1" =   switch(input$h1t2,        # direction of the test
-                                      "1" = "!=",
-                                      "2" =  ">",
-                                      "3" =  "<"),
+                                      "1" = "two.sided",
+                                      "2" =  "greater",
+                                      "3" =  "less"),
                        "2" = switch(input$h1t2e,        # direction of the test
-                                    "1" = "!=",
-                                    "2" =  ">",
-                                    "3" =  "<"))
+                                    "1" = "two.sided",
+                                    "2" =  "greater",
+                                    "3" =  "less"))
 
 
 
   model <- switch(input$modelt2,
-                  "1" = "t-distribution",
-                  "2" = "Normal",
-                  "3" = "Moment")
+                  "1" = "t",
+                  "2" = "normal",
+                  "3" = "moment")
 
   location <- input$lt2
   scale <- input$st2
@@ -7374,10 +7374,10 @@ input_t2 <- shiny::reactive({
                         "1" = 1,
                         "2" = 0)
   model_d <- switch(input$modelt2d,
-                    "1" = "t-distribution",
-                    "2" = "Normal",
-                    "3" = "Moment",
-                    "4" = "Point")
+                    "1" = "t",
+                    "2" = "normal",
+                    "3" = "moment",
+                    "4" = "point")
   location_d <- input$lt2d
   scale_d <- input$st2d
   dff_d <- input$dft2d
@@ -7809,17 +7809,17 @@ t2_BF10 <-function(t,n1,r,model ,location,scale,dff , hypothesis ){
   df = n1+n2-2
   constant = sqrt((n1*n2)/(n1+n2))
   bound  <- switch(hypothesis,
-                   ">" = c(a = 0, b = Inf),
-                   "<" = c(a = -Inf, b = 0),
-                   "!=" = c(a = -Inf, b = Inf)
+                   "greater" = c(a = 0, b = Inf),
+                   "less" = c(a = -Inf, b = 0),
+                   "two.sided" = c(a = -Inf, b = Inf)
   )
 
-  normalization <- if (hypothesis == "!=") 1 else
+  normalization <- if (hypothesis == "two.sided") 1 else
     switch(model,
            "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
-           "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
-           "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
+           "normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
+           "moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "t" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
   error = 1e-10
   x <- sapply(t, function(ti) {
@@ -7871,9 +7871,9 @@ t2_TNE <- function(t , n1,r,hypothesis){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
   pro <- switch(hypothesis,
-                "!=" = stats::pt(max(t), df) - stats::pt(min(t), df),
-                ">"  = stats::pt(t, df),
-                "<"  = 1 - stats::pt(t, df)
+                "two.sided" = stats::pt(max(t), df) - stats::pt(min(t), df),
+                "greater"  = stats::pt(t, df),
+                "less"  = 1 - stats::pt(t, df)
   )
 
   return(pro)
@@ -7887,50 +7887,50 @@ t2_TPE <-function(t,n1,r,model ,location ,scale,dff , hypothesis ){
   constant = sqrt((n1*n2)/(n1+n2))
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  if (model == "Point"){
+  if (model == "point"){
     pro = switch(hypothesis,
-                 "!="= pnct(min(t),df,ncp = location*constant,lower  = T)+pnct(max(t),df,ncp = location*constant,lower  = F),
-                 ">" = pnct(t,df,ncp = location*constant,lower  = F),
-                 "<" = pnct(t,df,ncp = location*constant,lower  = T))
+                 "two.sided"= pnct(min(t),df,ncp = location*constant,lower  = T)+pnct(max(t),df,ncp = location*constant,lower  = F),
+                 "greater" = pnct(t,df,ncp = location*constant,lower  = F),
+                 "less" = pnct(t,df,ncp = location*constant,lower  = T))
     return(pro)
   }
 
   bound  <- switch(hypothesis,
-                   ">" = c(a = 0, b = Inf),
-                   "<" = c(a = -Inf, b = 0),
-                   "!=" = c(a = -Inf, b = Inf)
+                   "greater" = c(a = 0, b = Inf),
+                   "less" = c(a = -Inf, b = 0),
+                   "two.sided" = c(a = -Inf, b = Inf)
   )
 
 
 
   x = NULL
 
-  normalization <- if (hypothesis == "!=") 1 else
+  normalization <- if (hypothesis == "two.sided") 1 else
     switch(model,
            "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
-           "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
-           "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
+           "normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
+           "moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "t" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
 
   int <- function(delta) {
     ncp <- delta * constant
 
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     pro1 <- pnct(max(t), df, ncp = ncp, lower = FALSE)
                     pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
                     pro1 + pro2
                   },
-                  ">" = pnct(t, df, ncp = ncp, lower = FALSE),
-                  "<" = pnct(t, df, ncp = ncp, lower = TRUE)
+                  "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
+                  "less" = pnct(t, df, ncp = ncp, lower = TRUE)
     )
 
     pro * t1_prior(delta, location, scale, dff, model) / normalization
   }
 
   error = 1e-4
-  if (model == "Moment" & scale <.3 ){
+  if (model == "moment" & scale <.3 ){
     error = 1e-14
   }
   x = stats::integrate(int,lower = bound[1],upper = bound[2], rel.tol = error,stop.on.error=FALSE)$value
@@ -7947,38 +7947,38 @@ t2_FNE<-function(t,n1,r,model ,location ,scale,dff , hypothesis ){
   constant = sqrt((n1*n2)/(n1+n2))
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  if (model == "Point"){
+  if (model == "point"){
     pro = switch(hypothesis,
-                 "!="=  pnct(max(t),df,ncp = location*constant,lower  = T) - pnct(min(t),df,ncp = location*constant,lower  = T),
-                 ">" = pnct(t,df,ncp = location*constant,lower  = T),
-                 "<" = pnct(t,df,ncp = location*constant,lower  = F))
+                 "two.sided"=  pnct(max(t),df,ncp = location*constant,lower  = T) - pnct(min(t),df,ncp = location*constant,lower  = T),
+                 "greater" = pnct(t,df,ncp = location*constant,lower  = T),
+                 "less" = pnct(t,df,ncp = location*constant,lower  = F))
     return(pro)
   }
   bound  <- switch(hypothesis,
-                   ">" = c(a = 0, b = Inf),
-                   "<" = c(a = -Inf, b = 0),
-                   "!=" = c(a = -Inf, b = Inf)
+                   "greater" = c(a = 0, b = Inf),
+                   "less" = c(a = -Inf, b = 0),
+                   "two.sided" = c(a = -Inf, b = Inf)
   )
   x = NULL
 
 
-  normalization <- if (hypothesis == "!=") 1 else
+  normalization <- if (hypothesis == "two.sided") 1 else
     switch(model,
            "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
-           "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
-           "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
+           "normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
+           "moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
+           "t" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
   int <- function(delta) {
     ncp <- delta * constant
 
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     pro1 <- pnct(max(t), df, ncp = ncp, lower = TRUE)
                     pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
                     pro1 - pro2
                   },
-                  ">" = pnct(t, df, ncp = ncp, lower = TRUE),
-                  "<" = pnct(t, df, ncp = ncp, lower = FALSE)
+                  "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
+                  "less" = pnct(t, df, ncp = ncp, lower = FALSE)
     )
 
     pro * t1_prior(delta, location, scale, dff, model) / normalization
@@ -7999,10 +7999,10 @@ t2_FPE <- function(t,n1,r, hypothesis){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
   pro <- switch(hypothesis,
-                "!=" = stats::pt(max(t), df = df, lower.tail = FALSE) +
+                "two.sided" = stats::pt(max(t), df = df, lower.tail = FALSE) +
                   stats::pt(min(t), df = df, lower.tail = TRUE),
-                ">"  = stats::pt(t, df = df, lower.tail = FALSE),
-                "<"  = stats::pt(t, df = df, lower.tail = TRUE)
+                "greater"  = stats::pt(t, df = df, lower.tail = FALSE),
+                "less"  = stats::pt(t, df = df, lower.tail = TRUE)
   )
   return(pro)
 
@@ -8122,7 +8122,7 @@ t2_Table <- function(D,r,target,model,location,scale,dff, hypothesis,
   }
 
   # FNE and TNE:
-  if (any(hypothesis == "!=" & max_BF < D | BF_D == "bound cannot be found")) {
+  if (any(hypothesis == "two.sided" & max_BF < D | BF_D == "bound cannot be found")) {
     FNE <- 0
     TNE <- 0
   } else {
@@ -8173,8 +8173,8 @@ t2_BF <-function(D ,n1,r, target,model ,location ,scale,dff  , hypothesis ){
   t.BF01 <- t2_BF01_bound(D, n1,r,model ,location ,scale,dff , hypothesis)
 
   # Check if BF01 = D is possible:
-  max.BF01   <- 1 / t2_BF10 (0,n1,r,model ,location,scale,dff ,"!=")
-  impossible <- (hypothesis == "!=") && (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
+  max.BF01   <- 1 / t2_BF10 (0,n1,r,model ,location,scale,dff ,"two.sided")
+  impossible <- (hypothesis == "two.sided") && (max.BF01 < D || identical(t.BF01, "bound cannot be found"))
 
   plot(tt, BF01, type = "l", log = "y", xlab = "t-value", ylab = bquote("BF"['01']* " (log scale)"),
        main = "", frame.plot = FALSE, xaxt = "n")
@@ -8228,7 +8228,7 @@ Power_t2<-function(D,model,location,scale,dff, hypothesis,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(sdf,FPE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -8244,7 +8244,7 @@ Power_t2<-function(D,model,location,scale,dff, hypothesis,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[0][1]~"greater"~.(D))))
   graphics::lines(sdf,FNE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True negative", "False negative"),
@@ -8266,14 +8266,14 @@ t2e_BF10i <-function(t,n1,r,model ,location,scale,dff , hypothesis,e ){
   df = n1+n2-2
   constant = sqrt((n1*n2)/(n1+n2))
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = e, b = Inf),
-                      "<" = c(a = -Inf, b = e),
-                      "!=" = c(a = e[1], b = e[2])
+                      "greater" = c(a = e, b = Inf),
+                      "less" = c(a = -Inf, b = e),
+                      "two.sided" = c(a = e[1], b = e[2])
   )
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = 0, b = e),
-                      "<" = c(a = e, b = 0),
-                      "!=" = c(a = e[1], b = e[2])
+                      "greater" = c(a = 0, b = e),
+                      "less" = c(a = e, b = 0),
+                      "two.sided" = c(a = e[1], b = e[2])
   )
   normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
 
@@ -8286,7 +8286,7 @@ t2e_BF10i <-function(t,n1,r,model ,location,scale,dff , hypothesis,e ){
 
   error = 1e-4
 
-  if (hypothesis == "!="){
+  if (hypothesis == "two.sided"){
   lh1 = stats::integrate(int,lower = -Inf,upper = bound_h1[1], rel.tol=error,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = Inf, rel.tol=error,stop.on.error = F)$value
   }else{
     lh1 = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=error,stop.on.error = F)$value}
@@ -8311,14 +8311,14 @@ t2e_BF10_bound <-function(D, n1,r,model,location,scale,dff , hypothesis,e){
   }
 
   switch(hypothesis,
-         "!=" ={
+         "two.sided" ={
            x <- tryCatch(stats::uniroot(Bound_finding, lower = -20, upper = 0)$root, error = function(e) NA)
            y <- tryCatch(stats::uniroot(Bound_finding, lower =  0, upper = 20)$root, error = function(e) NA)
          },
-         ">"={
+         "greater"={
            x <- tryCatch(stats::uniroot(Bound_finding, lower = 0, upper = 20)$root, error = function(e) NA)
          },
-         "<" = {
+         "less" = {
            x <- tryCatch(stats::uniroot(Bound_finding, lower = -20, upper = 0)$root, error = function(e) NA)
          })
 
@@ -8344,19 +8344,19 @@ t2e_TPE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
   df = n1+n2-2
   constant = sqrt((n1*n2)/(n1+n2))
 
-  if (model =="Point"){
+  if (model =="point"){
     x = switch(hypothesis,
-               "!=" = {pnct(min(t),df,ncp= location*constant,lower = T)+ pnct(max(t),df,ncp=location*constant,lower = F)},
-               "<"  = {pnct(t,df,ncp = location *constant,lower  = T)},
-               ">"  = {pnct(t,df,ncp = location *constant,lower  = F)}
+               "two.sided" = {pnct(min(t),df,ncp= location*constant,lower = T)+ pnct(max(t),df,ncp=location*constant,lower = F)},
+               "less"  = {pnct(t,df,ncp = location *constant,lower  = T)},
+               "greater"  = {pnct(t,df,ncp = location *constant,lower  = F)}
                )
     return(x)
   }
 
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = e, b = Inf),
-                      "<" = c(a = -Inf, b = e),
-                      "!=" = c(a = e[1], b = e[2])
+                      "greater" = c(a = e, b = Inf),
+                      "less" = c(a = -Inf, b = e),
+                      "two.sided" = c(a = e[1], b = e[2])
   )
 
   normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
@@ -8367,13 +8367,13 @@ t2e_TPE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
     ncp <- delta * constant
 
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     pro1 <- pnct(max(t), df, ncp = ncp, lower = FALSE)
                     pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
                     pro1 + pro2
                   },
-                  ">" = pnct(t, df, ncp = ncp, lower = FALSE),
-                  "<" = pnct(t, df, ncp = ncp, lower = TRUE)
+                  "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
+                  "less" = pnct(t, df, ncp = ncp, lower = TRUE)
     )
 
     pro * te_prior(delta,location, scale, dff, model) / normalizationh1
@@ -8382,7 +8382,7 @@ t2e_TPE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
 
   error = 1e-4
 
-  if (hypothesis == "!="){
+  if (hypothesis == "two.sided"){
     x = stats::integrate(int,lower = -Inf,upper = bound_h1[1], rel.tol=error,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = Inf, rel.tol=error,stop.on.error = F)$value
   }else{
     x = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=error,stop.on.error = F)$value
@@ -8400,18 +8400,18 @@ t2e_FNE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
   df = n1+n2-2
   constant = sqrt((n1*n2)/(n1+n2))
 
-  if (model =="Point"){
+  if (model =="point"){
     x = switch(hypothesis,
-               "!=" = {pnct(max(t),df,ncp= location*constant,lower = T)- pnct(min(t),df,ncp=location*constant,lower = T)},
-               "<"  = {pnct(t,df,ncp = location *constant,lower  = F)},
-               ">"  = {pnct(t,df,ncp = location *constant,lower  = T)}
+               "two.sided" = {pnct(max(t),df,ncp= location*constant,lower = T)- pnct(min(t),df,ncp=location*constant,lower = T)},
+               "less"  = {pnct(t,df,ncp = location *constant,lower  = F)},
+               "greater"  = {pnct(t,df,ncp = location *constant,lower  = T)}
     )
     return(x)
   }
   bound_h1  <- switch(hypothesis,
-                      ">" = c(a = e, b = Inf),
-                      "<" = c(a = -Inf, b = e),
-                      "!=" = c(a = e[1], b = e[2])
+                      "greater" = c(a = e, b = Inf),
+                      "less" = c(a = -Inf, b = e),
+                      "two.sided" = c(a = e[1], b = e[2])
   )
 
   normalizationh1 <- norm_h1(hypothesis, model, bound_h1, location, scale, dff)
@@ -8421,20 +8421,20 @@ t2e_FNE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
     ncp <- delta * constant
 
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     pro1 <- pnct(max(t), df, ncp = ncp, lower = TRUE)
                     pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
                     pro1 - pro2
                   },
-                  ">" = pnct(t, df, ncp = ncp, lower = TRUE),
-                  "<" = pnct(t, df, ncp = ncp, lower = FALSE)
+                  "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
+                  "less" = pnct(t, df, ncp = ncp, lower = FALSE)
     )
 
     pro * te_prior(delta, location,scale, dff, model) / normalizationh1
   }
 
   error = 1e-4
-  if (hypothesis == "!="){
+  if (hypothesis == "two.sided"){
     x = stats::integrate(int,lower = -Inf,upper = bound_h1[1], rel.tol=error,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = Inf, rel.tol=error,stop.on.error = F)$value
   }else{
     x = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=error,stop.on.error = F)$value
@@ -8454,9 +8454,9 @@ t2e_TNE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
 
 
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = 0, b = e),
-                      "<" = c(a = e, b = 0),
-                      "!=" = c(a = e[1], b = e[2])
+                      "greater" = c(a = 0, b = e),
+                      "less" = c(a = e, b = 0),
+                      "two.sided" = c(a = e[1], b = e[2])
   )
 
   normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
@@ -8466,13 +8466,13 @@ t2e_TNE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
     ncp <- delta * constant
 
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     pro1 <- pnct(max(t), df, ncp = ncp, lower = TRUE)
                     pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
                     pro1 - pro2
                   },
-                  ">" = pnct(t, df, ncp = ncp, lower = TRUE),
-                  "<" = pnct(t, df, ncp = ncp, lower = FALSE)
+                  "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
+                  "less" = pnct(t, df, ncp = ncp, lower = FALSE)
     )
 
     pro * te_prior(delta,location, scale, dff, model) / normalizationh0
@@ -8491,9 +8491,9 @@ t2e_FPE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
   constant = sqrt((n1*n2)/(n1+n2))
 
   bound_h0  <- switch(hypothesis,
-                      ">" = c(a = 0, b = e),
-                      "<" = c(a = e, b = 0),
-                      "!=" = c(a = e[1], b = e[2])
+                      "greater" = c(a = 0, b = e),
+                      "less" = c(a = e, b = 0),
+                      "two.sided" = c(a = e[1], b = e[2])
   )
 
   normalizationh0 <- norm_h0(model, bound_h0, location, scale, dff)
@@ -8503,13 +8503,13 @@ t2e_FPE <-function(t,n1,r,model ,location,scale,dff , hypothesis ,e){
     ncp <- delta * constant
 
     pro <- switch(hypothesis,
-                  "!=" = {
+                  "two.sided" = {
                     pro1 <- pnct(max(t), df, ncp = ncp, lower = FALSE)
                     pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
                     pro1 + pro2
                   },
-                  ">" = pnct(t, df, ncp = ncp, lower = FALSE),
-                  "<" = pnct(t, df, ncp = ncp, lower = TRUE)
+                  "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
+                  "less" = pnct(t, df, ncp = ncp, lower = TRUE)
     )
 
     pro * te_prior(delta,location, scale, dff, model) / normalizationh0
@@ -8641,7 +8641,7 @@ t2e_table<-function(D,r,target,model,location,scale,dff, hypothesis,e ,
   }
 
   # FNE and TNE:
-  if (any(hypothesis == "!=" & max_BF < D | BF_D == "bound cannot be found")) {
+  if (any(hypothesis == "two.sided" & max_BF < D | BF_D == "bound cannot be found")) {
     FNE <- 0
     TNE <- 0
   } else {
@@ -8742,7 +8742,7 @@ Power_t2e<-function(D,model,location,scale,dff, hypothesis,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[10]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[10]~"greater"~.(D))))
   graphics::lines(sdf,FPE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True positive", "False positive"),
@@ -8758,7 +8758,7 @@ Power_t2e<-function(D,model,location,scale,dff, hypothesis,
        xlab = "Total sample size",
        ylab = "probability",
        ylim = c(0, 1), frame.plot = FALSE,
-       main = bquote(bold("Power curve for BF"[0][1]~">"~.(D))))
+       main = bquote(bold("Power curve for BF"[0][1]~"greater"~.(D))))
   graphics::lines(sdf,FNE,col = "grey")
   graphics::legend(x = smax*-.1,y=1.1,
                    legend = c("True negative", "False negative"),

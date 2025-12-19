@@ -24,13 +24,13 @@ BF10.t.test.two.sample(
 \item{N2}{Numeric scalar. Sample size of group 2 (must be > 2, will be rounded to nearest integer).}
 
 \item{model}{Character. Analysis prior under the alternative hypothesis:
-\code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.}
+\code{"normal"}, \code{"moment"} (normal-moment prior), or \code{"t"}.}
 
 \item{location}{Numeric scalar. Location parameter of the analysis prior.}
 
 \item{scale}{Numeric scalar > 0. Scale parameter of the analysis prior.}
 
-\item{dff}{Numeric scalar. Degrees of freedom for the analysis prior (required if model = \code{"t-distribution"}; ignored otherwise).}
+\item{dff}{Numeric scalar. Degrees of freedom for the analysis prior (required if model = \code{"t"}; ignored otherwise).}
 
 \item{hypothesis}{Character. Hypothesis to test: two-sided (\code{"!="}), right-sided (\code{">"}), or left-sided (\code{"<"}).}
 
@@ -64,7 +64,7 @@ BF10.t.test.two.sample(
   tval = 2.1,
   N1 = 30,
   N2 = 30,
-  model = "t-distribution",
+  model = "t",
   location = 0,
   scale = 0.707,
   dff = 1,
@@ -76,7 +76,7 @@ BF10.t.test.two.sample(
   tval = 1.8,
   N1 = 25,
   N2 = 25,
-  model = "Normal",
+  model = "normal",
   location = 0,
   scale = 1,
   dff = 0,

@@ -45,21 +45,21 @@ BFpower.props(
 
 \item{b2}{Beta parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
 
-\item{model1}{Model for the design prior of group 1: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
+\item{model1}{Model for the design prior of group 1: \code{"beta"}, \code{"point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
 \item{a1d}{Alpha parameter of the design prior for group 1 (used if \code{model1 = "beta"}).}
 
 \item{b1d}{Beta parameter of the design prior for group 1 (used if \code{model1 = "beta"}).}
 
-\item{dp1}{True proportion for group 1 in the design prior (used if \code{model1 = "Point"}).}
+\item{dp1}{True proportion for group 1 in the design prior (used if \code{model1 = "point"}).}
 
-\item{model2}{Model for the design prior of group 2: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
+\item{model2}{Model for the design prior of group 2: \code{"beta"}, \code{"point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
 \item{a2d}{Alpha parameter of the design prior for group 2 (used if \code{model2 = "beta"}).}
 
 \item{b2d}{Beta parameter of the design prior for group 2 (used if \code{model2 = "beta"}).}
 
-\item{dp2}{True proportion for group 2 in the design prior (used if \code{model2 = "Point"}).}
+\item{dp2}{True proportion for group 2 in the design prior (used if \code{model2 = "point"}).}
 
 \item{n1}{Sample size for group 1.}
 
@@ -111,7 +111,7 @@ The user must specify the analysis priors under the null and alternative hypothe
 
 Design priors for the alternative hypothesis can optionally be specified:
 \itemize{
-\item \code{model1}, \code{a1d}, \code{b1d}, \code{dp1} - design prior for group 1 (\code{"same"} uses the analysis prior, \code{"beta"} requires Beta parameters, \code{"Point"} uses a fixed proportion).
+\item \code{model1}, \code{a1d}, \code{b1d}, \code{dp1} - design prior for group 1 (\code{"same"} uses the analysis prior, \code{"beta"} requires Beta parameters, \code{"point"} uses a fixed proportion).
 \item \code{model2}, \code{a2d}, \code{b2d}, \code{dp2} - design prior for group 2.
 }
 

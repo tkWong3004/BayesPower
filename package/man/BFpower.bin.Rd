@@ -37,23 +37,23 @@ BFpower.bin(
 
 \item{false_rate}{Targeted false positive rate (if \code{direct = "h1"}) or false negative rate (if \code{direct = "h0"}). Used only when sample size determination is requested.}
 
-\item{model}{Analysis prior model under the alternative hypothesis: \code{"beta"} or \code{"Moment"}.}
+\item{model}{Analysis prior model under the alternative hypothesis: \code{"beta"} or \code{"moment"}.}
 
 \item{alpha}{Parameter for the analysis beta prior (used when \code{model = "beta"}).}
 
 \item{beta}{Parameter for the analysis beta prior (used when \code{model = "beta"}).}
 
-\item{scale}{Scale parameter for the analysis moment prior (used when \code{model = "Moment"}).}
+\item{scale}{Scale parameter for the analysis moment prior (used when \code{model = "moment"}).}
 
-\item{model_d}{Design prior model under the alternative hypothesis: \code{"beta"}, \code{"Moment"}, or \code{"Point"}.}
+\item{model_d}{Design prior model under the alternative hypothesis: \code{"beta"}, \code{"moment"}, or \code{"point"}.}
 
 \item{alpha_d}{Parameter for the design beta prior (used when \code{model_d = "beta"}).}
 
 \item{beta_d}{Parameter for the design beta prior (used when \code{model_d = "beta"}).}
 
-\item{location_d}{Proportion value for the design point prior (\code{model_d = "Point"}). Represents the true proportion under the alternative hypothesis.}
+\item{location_d}{Proportion value for the design point prior (\code{model_d = "point"}). Represents the true proportion under the alternative hypothesis.}
 
-\item{scale_d}{Scale parameter for the design moment prior (used when \code{model_d = "Moment"}).}
+\item{scale_d}{Scale parameter for the design moment prior (used when \code{model_d = "moment"}).}
 
 \item{N}{Sample size. If \code{NaN}, sample size determination is performed.}
 
@@ -107,13 +107,13 @@ If a positive numeric sample size \code{N} is provided, the function computes th
 The user must specify the analysis prior under the alternative hypothesis using \code{model}:
 \itemize{
 \item \code{model = "beta"}: requires \code{alpha} and \code{beta} parameters (shape parameters of the beta distribution).
-\item \code{model = "Moment"}: requires \code{scale} parameter (scale of the moment prior).
+\item \code{model = "moment"}: requires \code{scale} parameter (scale of the moment prior).
 }
 The design prior under the alternative hypothesis can optionally be specified using \code{model_d}:
 \itemize{
 \item \code{"beta"}: requires \code{alpha_d} and \code{beta_d}.
-\item \code{"Moment"}: requires \code{scale_d}.
-\item \code{"Point"}: requires \code{location_d}, representing the true proportion under the alternative hypothesis.
+\item \code{"moment"}: requires \code{scale_d}.
+\item \code{"point"}: requires \code{location_d}, representing the true proportion under the alternative hypothesis.
 }
 If \code{model_d} is \code{NaN}, no design prior is used.
 

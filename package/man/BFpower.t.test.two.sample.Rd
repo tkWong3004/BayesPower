@@ -44,22 +44,22 @@ right-sided (\code{">"}), or left-sided (\code{"<"}).}
 \item{false_rate}{Numeric scalar. Target false positive or negative rate .}
 
 \item{model}{Character. Analysis prior under the alternative hypothesis:
-\code{"Normal"}, \code{"Moment"}, or \code{"t-distribution"}.}
+\code{"normal"}, \code{"moment"}, or \code{"t"}.}
 
 \item{location}{Numeric scalar. Location parameter for the analysis prior.}
 
 \item{scale}{Numeric scalar > 0. Scale parameter for the analysis prior.}
 
-\item{dff}{Numeric scalar. Degrees of freedom for the analysis prior (required if model = \code{"t-distribution"}; ignored otherwise).}
+\item{dff}{Numeric scalar. Degrees of freedom for the analysis prior (required if model = \code{"t"}; ignored otherwise).}
 
 \item{model_d}{Optional character. Design prior under the alternative:
-\code{"Normal"}, \code{"Moment"}, \code{"t-distribution"}, or \code{"Point"}.}
+\code{"normal"}, \code{"moment"}, \code{"t"}, or \code{"point"}.}
 
 \item{location_d}{Numeric scalar. Location parameter for the design prior.}
 
 \item{scale_d}{Numeric scalar > 0. Scale parameter for the design prior.}
 
-\item{dff_d}{Numeric scalar. Degrees of freedom for the design prior (required if \code{model_d = "t-distribution"}; ignored otherwise).}
+\item{dff_d}{Numeric scalar. Degrees of freedom for the design prior (required if \code{model_d = "t"}; ignored otherwise).}
 
 \item{N1}{Sample size for group 1 (used if \code{r = NaN}).}
 
@@ -122,20 +122,20 @@ the arguments \code{positive}, \code{true_rate}, and \code{false_rate} are ignor
 
 The analysis prior specifies the prior distribution of the effect under the alternative hypothesis. The user must provide:
 \itemize{
-\item \code{model} - the type of prior: \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.
+\item \code{model} - the type of prior: \code{"normal"}, \code{"moment"} (normal-moment prior), or \code{"t"}.
 \item \code{location} - the mean or location of the prior.
 \item \code{scale} - the standard deviation or scale (must be positive).
-\item \code{dff} - degrees of freedom (required if \code{model = "t-distribution"}).
+\item \code{dff} - degrees of freedom (required if \code{model = "t"}).
 }
 
 \strong{Design Priors (optional):}
 
 A design prior can be supplied to reflect uncertainty about the effect size during study planning. If provided, the following must be supplied:
 \itemize{
-\item \code{model_d} - the type of design prior: \code{"Normal"}, \code{"Moment"}, \code{"t-distribution"}, or \code{"Point"}.
+\item \code{model_d} - the type of design prior: \code{"normal"}, \code{"moment"}, \code{"t"}, or \code{"point"}.
 \item \code{location_d} - the location of the design prior.
-\item \code{scale_d} - the scale parameter (positive for all models except \code{"Point"}).
-\item \code{dff_d} - degrees of freedom for \code{"t-distribution"} design priors.
+\item \code{scale_d} - the scale parameter (positive for all models except \code{"point"}).
+\item \code{dff_d} - degrees of freedom for \code{"t"} design priors.
 }
 
 \strong{Interval Null Hypothesis:}
@@ -157,7 +157,7 @@ BFpower.t.test.two.sample(
   D = 3,
   true_rate = 0.8,
   false_rate = 0.05,
-  model = "t-distribution",
+  model = "t",
   location = 0,
   scale = 0.707,
   dff = 1,
@@ -171,7 +171,7 @@ BFpower.t.test.two.sample(
   D = 3,
   true_rate = 0.8,
   false_rate = 0.05,
-  model = "Normal",
+  model = "normal",
   location = 0,
   scale = 1,
   dff = 0,

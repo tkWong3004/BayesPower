@@ -39,11 +39,11 @@ sample size determination is requested; \code{N = NaN}).}
 \item{k}{Number of predictors in the full model (must satisfy \code{k > p}).}
 
 \item{model}{Analysis prior model under the alternative hypothesis:
-\code{"effectsize"} or \code{"Moment"}.}
+\code{"effectsize"} or \code{"moment"}.}
 
 \item{dff}{Degrees of freedom for the analysis prior under the alternative
 hypothesis. Must be a positive scalar, and must be at least 3 if
-\code{model = "Moment"}.}
+\code{model = "moment"}.}
 
 \item{rscale}{Scale parameter for the analysis effect-size prior (only used when
 \code{model = "effectsize"}).}
@@ -51,10 +51,10 @@ hypothesis. Must be a positive scalar, and must be at least 3 if
 \item{f_m}{Cohen's \eqn{f} effect-size parameter for the analysis prior (must be > 0).}
 
 \item{model_d}{Design prior model under the alternative hypothesis:
-\code{"effectsize"}, \code{"Moment"}, or \code{"Point"}.}
+\code{"effectsize"}, \code{"moment"}, or \code{"point"}.}
 
 \item{dff_d}{Degrees of freedom for the design prior. Must be a positive scalar,
-and at least 3 if \code{model_d = "Moment"}.}
+and at least 3 if \code{model_d = "moment"}.}
 
 \item{rscale_d}{Scale parameter for the design effect-size prior
 (only used when \code{model_d = "effectsize"}).}
@@ -121,13 +121,13 @@ If a positive numeric sample size \code{N} is provided, the function computes th
 The function requires the user to specify the full model (\code{k} predictors) and the reduced model (\code{p} predictors, \code{k > p}), and the analysis prior under the alternative hypothesis. Depending on the chosen \code{model}, different arguments are required:
 \itemize{
 \item \code{model = "effectsize"}: requires \code{rscale} (scale parameter) and \code{f_m} (Cohen\'s f effect-size), and \code{dff} (degrees of freedom).
-\item \code{model = "Moment"}: requires \code{f_m} (Cohen\'s f effect-size) and \code{dff} (degrees of freedom, must be >= 3); \code{rscale} is not used.
+\item \code{model = "moment"}: requires \code{f_m} (Cohen\'s f effect-size) and \code{dff} (degrees of freedom, must be >= 3); \code{rscale} is not used.
 }
 The design prior under the alternative hypothesis can optionally be specified using \code{model_d}, which can be:
 \itemize{
 \item \code{"effectsize"}: requires \code{rscale_d}, \code{f_m_d}, and \code{dff_d}.
-\item \code{"Moment"}: requires \code{f_m_d} and \code{dff_d} (>=3); \code{rscale_d} is not used.
-\item \code{"Point"}: requires \code{f_m_d} only; \code{rscale_d} and \code{dff_d} are not used.
+\item \code{"moment"}: requires \code{f_m_d} and \code{dff_d} (>=3); \code{rscale_d} is not used.
+\item \code{"point"}: requires \code{f_m_d} only; \code{rscale_d} and \code{dff_d} are not used.
 }
 
 \strong{Interval Null Hypothesis:}

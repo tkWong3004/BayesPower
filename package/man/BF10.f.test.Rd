@@ -24,7 +24,7 @@ analysis prior.}
 
 \item{model}{Character string specifying the analysis prior under the
 alternative hypothesis. Must be either \code{"effectsize"} or
-\code{"Moment"}.}
+\code{"moment"}.}
 
 \item{e}{Optional numeric scalar specifying an upper bound for an interval
 NaN hypothesis. If provided, must be > 0.}

@@ -9,18 +9,18 @@ print.BFpower_t <- function (x,...) {
   HR <- strrep(HL, 50)
   line <- paste0("\u2500", strrep("\u2500", 50), "\n")
   digits <- 3
-
+  
   # Subscript-safe labels
   H0 <- "H\u2080"
   H1 <- "H\u2081"
-
+  
   # Symbols
   delta <- "\u03b4"
   neq   <- "\u2260"
   leq   <- "\u2264"
   geq   <- "\u2265"
   union <- "\u222a"
-
+  
   # Header with centered text
   header_text <- ifelse(x$mode_bf == 1, "SAMPLE SIZE CALCULATION", "POWER CALCULATION")
   pad_total <- 50 - nchar(header_text)
@@ -29,84 +29,84 @@ print.BFpower_t <- function (x,...) {
   cat(UL, HR, UR, "\n", sep = "")
   cat(VL, strrep(" ", pad_left), header_text, strrep(" ", pad_right), VL, "\n", sep = "")
   cat(LL, HR, LR, "\n\n", sep = "")
-
+  
   # Type of test
   cat(x$type, "\n\n", sep = "")
   cat(line)
-
+  
   # Hypothesis section
   cat("Hypotheses\n")
   cat(line)
-
+  
   if (is.null(x$e)) {
-    if (x$hypothesis == "!=") {
+    if (x$alternative == "two.sided") {
       cat("  ", H0, " (Null)         : ", delta, " = 0\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", delta, " ", neq, " 0\n\n", sep = "")
     }
-    if (x$hypothesis == ">") {
+    if (x$alternative == "greater") {
       cat("  ", H0, " (Null)         : ", delta, " = 0\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", delta, " > 0\n\n", sep = "")
     }
-    if (x$hypothesis == "<") {
+    if (x$alternative == "less") {
       cat("  ", H0, " (Null)         : ", delta, " = 0\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", delta, " < 0\n\n", sep = "")
     }
   } else {
-    if (x$hypothesis == "!=") {
+    if (x$alternative == "two.sided") {
       cat("  ", H0, " (Null)         : ",
           min(x$e), " ", leq, " ", delta, " ", leq, " ", max(x$e), "\n", sep = "")
       cat("  ", H1, " (Alternative)  : ",
           delta, " < ", min(x$e), " ", union, " ",
           delta, " > ", max(x$e), "\n\n", sep = "")
     }
-    if (x$hypothesis == ">") {
+    if (x$alternative == "greater") {
       cat("  ", H0, " (Null)         : 0 ", leq, " ", delta, " ", leq, " ", x$e, "\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", delta, " > ", x$e, "\n\n", sep = "")
     }
-    if (x$hypothesis == "<") {
+    if (x$alternative == "less") {
       cat("  ", H0, " (Null)         : ", x$e, " ", leq, " ", delta, " ", leq, " 0\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", delta, " < ", x$e, "\n\n", sep = "")
     }
   }
-
+  
   cat(line)
   cat("Analysis/design prior : \n")
   cat(line)
-
+  
   # Prior under H0
   cat("Analysis/design prior under ", H0, ":\n", sep = "")
   if (is.null(x$e)) {
     cat("  Point prior (location = 0)\n")
   } else {
-    cat("  Model: ", x$analysis_h1$model,
+    cat("  Model: ", x$analysis_h1$prior_analysis,
         " (location = ", x$analysis_h1$location,
         ", scale = ", x$analysis_h1$scale,
         if (!is.null(x$analysis_h1$dff)) paste0(", df = ", x$analysis_h1$dff),
         ")\n", sep = "")
   }
-
+  
   # Prior under H1
   cat("Analysis prior under ", H1, ":\n", sep = "")
-  cat("  Model: ", x$analysis_h1$model,
+  cat("  Model: ", x$analysis_h1$prior_analysis,
       " (location = ", x$analysis_h1$location,
       ", scale = ", x$analysis_h1$scale,
       if (!is.null(x$analysis_h1$dff)) paste0(", df = ", x$analysis_h1$dff),
       ")\n", sep = "")
-
-  if (!is.nan(x$design_h1$model)) {
+  
+  if (!is.null(x$design_h1$prior_design)) {
     cat("Design prior under ", H1, ":\n", sep = "")
-    cat("  Model: ", x$design_h1$model,
+    cat("  Model: ", x$design_h1$prior_design,
         " (location = ", x$design_h1$location,
         ", scale = ", x$design_h1$scale,
         if (!is.null(x$design_h1$dff)) paste0(", df = ", x$design_h1$dff),
         ")\n", sep = "")
   }
-
+  
   cat("\n")
   cat(line)
   cat("Threshold of compelling evidence: ", x$D, "\n\n", sep = "")
   cat(line)
-
+  
   # Results
   cat("Results:\n")
   cat(line)
@@ -114,7 +114,7 @@ print.BFpower_t <- function (x,...) {
   cat(paste0("  False Positive Rate          = ", round(x$results[4], digits), "\n"))
   cat(paste0("  True Negative Rate           = ", round(x$results[3], digits), "\n"))
   cat(paste0("  False Negative Rate          = ", round(x$results[2], digits), "\n"))
-
+  
   # Required sample sizes (unlist for CRAN)
   if (x$type == "One-sample t-test") {
     cat("  Required Sample size         = ",
@@ -131,82 +131,82 @@ print.BFpower_t <- function (x,...) {
 #' @method plot BFpower_t
 #' @keywords internal
 plot.BFpower_t<-function (x,...){
-  if(x$analysis_h1$model!="t-distribution"){x$analysis_h1$dff=0}
-
-  if (is.nan(x$design_h1$model)){
+  if(x$analysis_h1$prior_analysis!="t"){x$analysis_h1$dff=0}
+  
+  if (is.null(x$design_h1$prior_design)){
     de_an_prior=1
     x$design_h1$location=0
     x$design_h1$scale=0
     x$design_h1$dff=0
   }else{
     de_an_prior=0
-    if(x$design_h1$model!="t-distribution"){x$design_h1$dff=0}
-
+    if(x$design_h1$prior_design!="t"){x$design_h1$dff=0}
+    
   }
   if (is.null(x$e)){
-    t1_prior_plot(x$D, 0, x$analysis_h1$model, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
-                  x$hypothesis,
-                  x$design_h1$model, x$design_h1$location, x$design_h1$scale, x$design_h1$dff, de_an_prior)
-
-     }else {
-
-    t1e_prior_plot(x$analysis_h1$model,x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
-                   x$hypothesis, x$e,
-                               de_an_prior, x$design_h1$model, x$design_h1$scale, x$design_h1$dff, x$design_h1$location)
-
+    t1_prior_plot(x$D, 0, x$analysis_h1$prior_analysis, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
+                  x$alternative,
+                  x$design_h1$prior_design, x$design_h1$location, x$design_h1$scale, x$design_h1$dff, de_an_prior)
+    
+  }else {
+    
+    t1e_prior_plot(x$analysis_h1$prior_analysis,x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
+                   x$alternative, x$e,
+                   de_an_prior, x$design_h1$prior_design, x$design_h1$scale, x$design_h1$dff, x$design_h1$location)
+    
   }
-
+  
   if(x$plot_power){
     if (is.null(x$e)){
       if (x$type=="One-sample t-test"){
-        suppressWarnings(Power_t1(x$D, x$analysis_h1$model, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
-                                  x$hypothesis,x$design_h1$model, x$design_h1$location, x$design_h1$scale, x$design_h1$dff,de_an_prior, unlist(x$results[5])))
-
-
+        suppressWarnings(Power_t1(x$D, x$analysis_h1$prior_analysis, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
+                                  x$alternative,x$design_h1$prior_design, x$design_h1$location, x$design_h1$scale, x$design_h1$dff,de_an_prior, unlist(x$results[5])))
+        
+        
       }else{
-        suppressWarnings(Power_t2(x$D,x$analysis_h1$model, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
-                                  x$hypothesis,
-                                  x$design_h1$model, x$design_h1$location, x$design_h1$scale, x$design_h1$dff,de_an_prior,x$results[1,5],x$results[1,6]/x$results[1,5]))
-
+        suppressWarnings(Power_t2(x$D,x$analysis_h1$prior_analysis, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
+                                  x$alternative,
+                                  x$design_h1$prior_design, x$design_h1$location, x$design_h1$scale, x$design_h1$dff,de_an_prior,x$results[1,5],x$results[1,6]/x$results[1,5]))
+        
       }
-
-
-
+      
+      
+      
     }else {
       if (x$type=="One-sample t-test"){
-        suppressWarnings(Power_t1e(x$D,x$analysis_h1$model, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
-                                   x$hypothesis,x$design_h1$model, x$design_h1$location, x$design_h1$scale, x$design_h1$dff,de_an_prior,unlist(x$results[5]) ,x$e))
-
+        suppressWarnings(Power_t1e(x$D,x$analysis_h1$prior_analysis, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
+                                   x$alternative,x$design_h1$prior_design, x$design_h1$location, x$design_h1$scale, x$design_h1$dff,de_an_prior,unlist(x$results[5]) ,x$e))
+        
       } else{
-        suppressWarnings(Power_t2e(x$D,x$analysis_h1$model, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
-                  x$hypothesis,
-                  x$design_h1$model, x$design_h1$location, x$design_h1$scale, x$design_h1$dff,de_an_prior,x$results[1,5],x$results[1,6]/x$results[1,5],x$e))
+        suppressWarnings(Power_t2e(x$D,x$analysis_h1$prior_analysis, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
+                                   x$alternative,
+                                   x$design_h1$prior_design, x$design_h1$location, x$design_h1$scale, x$design_h1$dff,de_an_prior,x$results[1,5],x$results[1,6]/x$results[1,5],x$e))
       }
-         }
+    }
   }
-
-
+  
+  
   if(x$plot_rel){
     if (is.null(x$e)){
-
+      
       if (x$type=="One-sample t-test"){
-      suppressWarnings(bf10_t1(x$D, unlist(x$result[5])-1, 0,x$analysis_h1$model , x$analysis_h1$location , x$analysis_h1$scale , x$analysis_h1$dff , x$hypothesis))
-
+        suppressWarnings(bf10_t1(x$D, unlist(x$result[5])-1, 0,x$analysis_h1$prior_analysis , x$analysis_h1$location , x$analysis_h1$scale , x$analysis_h1$dff , x$alternative))
+        
       }else{
-        suppressWarnings(t2_BF(x$D ,x$result[1,5],x$results[1,6]/x$results[1,5], 0,x$analysis_h1$model , x$analysis_h1$location , x$analysis_h1$scale , x$analysis_h1$dff , x$hypothesis ))
+        suppressWarnings(t2_BF(x$D ,x$result[1,5],x$results[1,6]/x$results[1,5], 0,x$analysis_h1$prior_analysis , x$analysis_h1$location , x$analysis_h1$scale , x$analysis_h1$dff , x$alternative ))
       }
-
-
+      
+      
+    }else{
+      if (x$type=="One-sample t-test"){
+        
+        suppressWarnings(te1_BF(x$D,unlist(x$result[5])-1,x$analysis_h1$prior_analysis , x$analysis_h1$location , x$analysis_h1$scale , x$analysis_h1$dff , x$alternative,x$e))
       }else{
-        if (x$type=="One-sample t-test"){
-
-      suppressWarnings(te1_BF(x$D,unlist(x$result[5])-1,x$analysis_h1$model , x$analysis_h1$location , x$analysis_h1$scale , x$analysis_h1$dff , x$hypothesis,x$e))
-        }else{
-          suppressWarnings(t2e_BF (x$D ,x$result[1,5],x$results[1,6]/x$results[1,5],x$analysis_h1$model , x$analysis_h1$location , x$analysis_h1$scale , x$analysis_h1$dff , x$hypothesis,x$e))
-        }
-
-          }
-
+        suppressWarnings(t2e_BF (x$D ,x$result[1,5],x$results[1,6]/x$results[1,5],x$analysis_h1$prior_analysis , x$analysis_h1$location , x$analysis_h1$scale , x$analysis_h1$dff , x$alternative,x$e))
+      }
+      
+    }
+    
   }
 }
 
@@ -214,16 +214,16 @@ plot.BFpower_t<-function (x,...){
 #' @export
 #' @method print BFvalue_t
 print.BFvalue_t <- function (x,...) {
-
+  
   # Unicode box-drawing characters
   UL <- "\u2554"; UR <- "\u2557"
   LL <- "\u255a"; LR <- "\u255d"
   HL <- "\u2550"; VL <- "\u2551"
   HR <- strrep(HL, 50)
   line <- paste0("\u2500", strrep("\u2500", 50), "\n")
-
+  
   digits <- 3
-
+  
   # Hypothesis symbols
   H0 <- "H\u2080"
   H1 <- "H\u2081"
@@ -232,11 +232,11 @@ print.BFvalue_t <- function (x,...) {
   leq <- "\u2264"
   geq <- "\u2265"
   union <- "\u222a"
-
+  
   # Bayes Factor subscripts
   BF10 <- "BF\u2081\u2080"
   BF01 <- "BF\u2080\u2081"
-
+  
   # Header
   header_text <- "BAYES FACTOR CALCULATION"
   pad_total <- 50 - nchar(header_text)
@@ -245,92 +245,92 @@ print.BFvalue_t <- function (x,...) {
   cat(UL, HR, UR, "\n", sep = "")
   cat(VL, strrep(" ", pad_left), header_text, strrep(" ", pad_right), VL, "\n", sep = "")
   cat(LL, HR, LR, "\n\n", sep = "")
-
+  
   # Type of test
   cat(x$type, "\n\n", sep = "")
   cat(line)
-
+  
   # Hypotheses
   cat("Hypotheses\n")
   cat(line)
-
+  
   if (is.null(x$e)) {
-
-    if (x$hypothesis == "!=") {
+    
+    if (x$alternative == "two.sided") {
       cat("  ", H0, " (Null)         : ", delta, " = 0\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", delta, " ", neq, " 0\n\n", sep = "")
     }
-
-    if (x$hypothesis == ">") {
+    
+    if (x$alternative == "greater") {
       cat("  ", H0, " (Null)         : ", delta, " = 0\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", delta, " > 0\n\n", sep = "")
     }
-
-    if (x$hypothesis == "<") {
+    
+    if (x$alternative == "less") {
       cat("  ", H0, " (Null)         : ", delta, " = 0\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", delta, " < 0\n\n", sep = "")
     }
-
+    
   } else {
-
-    if (x$hypothesis == "!=") {
+    
+    if (x$alternative == "two.sided") {
       cat("  ", H0, " (Null)         : ",
           min(x$e), " ", leq, " ", delta, " ", leq, " ", max(x$e), "\n", sep = "")
       cat("  ", H1, " (Alternative)  : ",
           delta, " < ", min(x$e), " ", union, " ", delta, " > ", max(x$e), "\n\n", sep = "")
     }
-
-    if (x$hypothesis == ">") {
+    
+    if (x$alternative == "greater") {
       cat("  ", H0, " (Null)         : 0 ", leq, " ", delta, " ", leq, " ", x$e, "\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", delta, " > ", x$e, "\n\n", sep = "")
     }
-
-    if (x$hypothesis == "<") {
+    
+    if (x$analysis_h1$design_analysis == "less") {
       cat("  ", H0, " (Null)         : ", x$e, " ", leq, " ", delta, " ", leq, " 0\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", delta, " < ", x$e, "\n\n", sep = "")
     }
   }
-
+  
   cat(line)
-
+  
   # Analysis prior
   cat("Analysis prior : \n")
   cat(line)
-
+  
   cat("Analysis prior under ", H0, ":\n", sep = "")
   if (is.null(x$e)) {
     cat("  Point prior (location = 0)\n")
   } else {
-    cat("  Model: ", x$analysis_h1$model,
+    cat("  Model: ", x$analysis_h1$prior_analysis,
         " (location = ", x$analysis_h1$location,
         ", scale = ", x$analysis_h1$scale,
         if (!is.null(x$analysis_h1$dff)) paste0(", df = ", x$analysis_h1$dff),
         ")\n", sep = "")
   }
-
+  
   cat("Analysis prior under ", H1, ":\n", sep = "")
-  cat("  Model: ", x$analysis_h1$model,
+  cat("  Model: ", x$analysis_h1$prior_analysis,
       " (location = ", x$analysis_h1$location,
       ", scale = ", x$analysis_h1$scale,
       if (!is.null(x$analysis_h1$dff)) paste0(", df = ", x$analysis_h1$dff),
       ")\n", sep = "")
-
+  
   cat("\n")
   cat(line)
   cat("Results\n")
   cat(line)
-
+  
   cat(
     "t(df=", x$df, ") = ", x$tval,
     ", ", BF10, " = ", x$bf10,
     ", ", BF01, " = ", 1 / x$bf10,
     "\n", sep = ""
   )
-
-  if (x$type == "Indepedent-samples t-test (equal variance)") {
+  
+  if (x$type == "Independent-samples t-test (equal variance)") {
     cat("N1 = ", x$N1, ", N2 = ", x$N2, "\n", sep = "")
   }
-
+  
 }
 
 
@@ -346,7 +346,7 @@ print.BFpower_r <- function(x,...) {
   HR <- strrep(HL, 50)
   line <- paste0("\u2500", strrep("\u2500", 50), "\n")
   digits <- 3
-
+  
   # hypothesis symbols
   H0 <- "H\u2080"
   H1 <- "H\u2081"
@@ -355,59 +355,59 @@ print.BFpower_r <- function(x,...) {
   leq <- "\u2264"
   geq <- "\u2265"
   union <- "\u222a"
-
+  
   # Header text with centered padding
   header_text <- ifelse(x$mode_bf == 1, "SAMPLE SIZE CALCULATION", "POWER CALCULATION")
   pad_total <- 50 - nchar(header_text)
   pad_left <- floor(pad_total / 2)
   pad_right <- ceiling(pad_total / 2)
-
+  
   # Print box header
   cat(UL, HR, UR, "\n", sep = "")
   cat(VL, strrep(" ", pad_left), header_text, strrep(" ", pad_right), VL, "\n", sep = "")
   cat(LL, HR, LR, "\n\n", sep = "")
-
+  
   # Type of test
   cat(x$type, "\n\n", sep = "")
   cat(line)
-
+  
   # Hypotheses
   cat("Hypotheses\n")
   cat(line)
-
+  
   if (is.null(x$e)) {
     cat("  Null value        : ", rho, "\u2080 = ", x$h0, " \n", sep = "")
-    if (x$hypothesis == "!=") {
+    if (x$hypothesis == "two.sided") {
       cat("  ", H0, " (Null)         : ", rho, " = ", rho, "\u2080\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " ", neq, " ", rho, "\u2080\n\n", sep = "")
     }
-    if (x$hypothesis == ">") {
+    if (x$hypothesis == "greater") {
       cat("  ", H0, " (Null)         : ", rho, " = ", rho, "\u2080\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " > ", rho, "\u2080\n\n", sep = "")
     }
-    if (x$hypothesis == "<") {
+    if (x$hypothesis == "less") {
       cat("  ", H0, " (Null)         : ", rho, " = ", rho, "\u2080\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " < ", rho, "\u2080\n\n", sep = "")
     }
   } else {
-    if (x$hypothesis == "!=") {
+    if (x$hypothesis == "two.sided") {
       cat("  ", H0, " (Null)         : ", x$h0 + min(x$e), " ", leq, " ", rho, " ", leq, " ", x$h0 + max(x$e), "\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " < ", x$h0 + min(x$e), " ", union, " ", rho, " > ", x$h0 + max(x$e), "\n\n", sep = "")
     }
-    if (x$hypothesis == ">") {
+    if (x$hypothesis == "greater") {
       cat("  ", H0, " (Null)         : ", x$h0, " ", leq, " ", rho, " ", leq, " ", x$h0 + x$e, "\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " > ", x$h0 + x$e, "\n\n", sep = "")
     }
-    if (x$hypothesis == "<") {
+    if (x$hypothesis == "less") {
       cat("  ", H0, " (Null)         : ", x$h0 + x$e, " ", leq, " ", rho, " ", leq, " ", x$h0, "\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " < ", x$h0 + x$e, "\n\n", sep = "")
     }
   }
-
+  
   cat(line)
   cat("Analysis/design prior:\n")
   cat(line)
-
+  
   # prior under H0
   cat("Analysis/design prior under ", H0, ":\n", sep = "")
   if (is.null(x$e)) {
@@ -417,7 +417,7 @@ print.BFpower_r <- function(x,...) {
     if (x$analysis_h1$model == "d_beta") cat("  Default Stretched Beta (k =", x$analysis_h1$k, ")\n")
     if (x$analysis_h1$model == "beta") cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n")
   }
-
+  
   # prior under H1
   cat("Analysis/design prior under ", H1, ":\n", sep = "")
   if (is.nan(x$design_h1$model)) {
@@ -432,15 +432,15 @@ print.BFpower_r <- function(x,...) {
     if (x$design_h1$model == "NLP") cat("  Normal-moment (location =", x$design_h1$location, ", scale =", x$analysis_h1$scale, ")\n")
     if (x$design_h1$model == "d_beta") cat("  Default Stretched Beta (k =", x$design_h1$k, ")\n")
     if (x$design_h1$model == "beta") cat("  Stretched Beta (alpha =", x$design_h1$alpha, ", beta =", x$design_h1$beta, ")\n")
-    if (x$design_h1$model == "Point") cat("  Point (location =", x$design_h1$location, ")\n")
+    if (x$design_h1$model == "point") cat("  Point (location =", x$design_h1$location, ")\n")
   }
-
+  
   # Threshold
   cat("\n")
   cat(line)
   cat("Threshold of compelling evidence: ", x$D, "\n\n", sep = "")
   cat(line)
-
+  
   # Results
   cat("Results:\n")
   cat(line)
@@ -454,14 +454,14 @@ print.BFpower_r <- function(x,...) {
 #' @export
 #' @method plot BFpower_r
 plot.BFpower_r<-function (x,...){
-
+  
   if (is.nan(x$design_h1$model)){
     de_an_prior=1
-
+    
   }else{
     de_an_prior=0
-
-
+    
+    
   }
   if (is.null(x$e)){
     r_prior_plot(x$analysis_h1$k, x$analysis_h1$alpha, x$analysis_h1$beta,
@@ -471,18 +471,18 @@ plot.BFpower_r<-function (x,...){
                  x$design_h1$location,x$design_h1$scale,1,
                  x$design_h1$model,x$hypothesis)
   }else {
-
+    
     re_prior_plot(x$analysis_h1$k, x$analysis_h1$alpha, x$analysis_h1$beta,
                   x$h0,x$h0,x$analysis_h1$scale,
                   1,x$analysis_h1$model,de_an_prior,
                   x$design_h1$k, x$design_h1$alpha, x$design_h1$beta,
                   x$design_h1$location,x$design_h1$scale,1,
                   x$design_h1$model_d,x$hypothesis,x$e)
-
-
-
+    
+    
+    
   }
-
+  
   if(x$plot_power){
     if (is.null(x$e)){
       Power_r(x$D,x$analysis_h1$k, x$analysis_h1$alpha,
@@ -493,15 +493,15 @@ plot.BFpower_r<-function (x,...){
               de_an_prior,x$results[1,5])
     }else {
       Power_re(x$D,x$analysis_h1$k, x$analysis_h1$alpha,
-              x$analysis_h1$beta,x$h0,x$hypothesis,
-              x$h0,x$analysis_h1$scale,x$analysis_h1$dff,x$analysis_h1$model,
-              x$design_h1$k, x$design_h1$alpha, x$design_h1$beta,
-              x$design_h1$location,x$design_h1$scale,1,x$design_h1$model,
-              de_an_prior,x$results[1,5],x$e)
+               x$analysis_h1$beta,x$h0,x$hypothesis,
+               x$h0,x$analysis_h1$scale,x$analysis_h1$dff,x$analysis_h1$model,
+               x$design_h1$k, x$design_h1$alpha, x$design_h1$beta,
+               x$design_h1$location,x$design_h1$scale,1,x$design_h1$model,
+               de_an_prior,x$results[1,5],x$e)
     }
   }
-
-
+  
+  
   if(x$plot_rel){
     if (is.null(x$e)){
       r_bf10_p(x$D,x$results[1,5],x$analysis_h1$k,x$analysis_h1$alpha, x$analysis_h1$beta,
@@ -509,10 +509,10 @@ plot.BFpower_r<-function (x,...){
                x$hypothesis,x$h0,x$analysis_h1$scale,1,x$analysis_h1$model)
     }else{
       re_bf10_p(x$D,x$results[1,5],x$analysis_h1$k,x$analysis_h1$alpha, x$analysis_h1$beta,
-               x$h0,
-               x$hypothesis,x$h0,x$analysis_h1$scale,1,x$analysis_h1$model,x$e)
+                x$h0,
+                x$hypothesis,x$h0,x$analysis_h1$scale,1,x$analysis_h1$model,x$e)
     }
-
+    
   }
 }
 
@@ -526,66 +526,66 @@ print.BFvalue_r <- function(x,...) {
   HR <- strrep(HL, 50)
   line <- paste0("\u2500", strrep("\u2500", 50), "\n")
   digits <- 3
-
+  
   # hypothesis symbols
   H0 <- "H\u2080"
   H1 <- "H\u2081"
   rho <- "\u03c1"
   neq <- "\u2260"
   union <- "\u222a"
-
+  
   # Centered header
   header_text <- "BAYES FACTOR CALCULATION"
   pad_total <- 50 - nchar(header_text)
   pad_left <- floor(pad_total / 2)
   pad_right <- ceiling(pad_total / 2)
-
+  
   # Print box header
   cat(UL, HR, UR, "\n", sep = "")
   cat(VL, strrep(" ", pad_left), header_text, strrep(" ", pad_right), VL, "\n", sep = "")
   cat(LL, HR, LR, "\n\n", sep = "")
-
+  
   # Type of test
   cat(x$type, "\n\n", sep = "")
   cat(line)
-
+  
   # Hypotheses
   cat("Hypotheses\n")
   cat(line)
-
+  
   if (is.null(x$e)) {
     cat("  Null value        : ", rho, "\u2080 = ", x$h0, "\n", sep = "")
-    if (x$hypothesis == "!=") {
+    if (x$hypothesis == "two.sided") {
       cat("  ", H0, " (Null)         : ", rho, " = ", rho, "\u2080\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " ", neq, " ", rho, "\u2080\n\n", sep = "")
     }
-    if (x$hypothesis == ">") {
+    if (x$hypothesis == "greater") {
       cat("  ", H0, " (Null)         : ", rho, " = ", rho, "\u2080\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " > ", rho, "\u2080\n\n", sep = "")
     }
-    if (x$hypothesis == "<") {
+    if (x$hypothesis == "less") {
       cat("  ", H0, " (Null)         : ", rho, " = ", rho, "\u2080\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " < ", rho, "\u2080\n\n", sep = "")
     }
   } else {
-    if (x$hypothesis == "!=") {
+    if (x$hypothesis == "two.sided") {
       cat("  ", H0, " (Null)         : ", x$h0 + min(x$e), " <= ", rho, " <= ", x$h0 + max(x$e), "\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " < ", x$h0 + min(x$e), " ", union, " ", rho, " > ", x$h0 + max(x$e), "\n\n", sep = "")
     }
-    if (x$hypothesis == ">") {
+    if (x$hypothesis == "greater") {
       cat("  ", H0, " (Null)         : ", x$h0, " <= ", rho, " <= ", x$h0 + x$e, "\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " > ", x$h0 + x$e, "\n\n", sep = "")
     }
-    if (x$hypothesis == "<") {
+    if (x$hypothesis == "less") {
       cat("  ", H0, " (Null)         : ", x$h0 + x$e, " <= ", rho, " <= ", x$h0, "\n", sep = "")
       cat("  ", H1, " (Alternative)  : ", rho, " < ", x$h0 + x$e, "\n\n", sep = "")
     }
   }
-
+  
   cat(line)
   cat("Analysis prior:\n")
   cat(line)
-
+  
   # prior under H0
   cat("Analysis under ", H0, ":\n", sep = "")
   if (is.null(x$e)) {
@@ -595,23 +595,22 @@ print.BFvalue_r <- function(x,...) {
     if (x$analysis_h1$model == "d_beta") cat("  Default Stretched Beta (k =", x$analysis_h1$k, ")\n")
     if (x$analysis_h1$model == "beta") cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n")
   }
-
+  
   # prior under H1
   cat("Analysis prior under ", H1, ":\n", sep = "")
   if (x$analysis_h1$model == "NLP") cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
   if (x$analysis_h1$model == "d_beta") cat("  Default Stretched Beta (k =", x$analysis_h1$k, ")\n")
   if (x$analysis_h1$model == "beta") cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n")
-
+  
   # Threshold
   cat("\n")
-
+  
   # Results
   cat(line)
   cat("Results\n")
   cat(line)
   cat("  r (n = ", x$n, ") = ", x$r, ", BF\u2081\u2080 = ", x$bf10, ", BF\u2080\u2081 = ", 1 / x$bf10, "\n", sep = "")
 }
-
 
 
 ##### ANOVA/regression #####
@@ -674,7 +673,7 @@ print.BFpower_f <- function(x,...) {
       cat("  Effect size prior (scale =", x$analysis_h1$rscale,
           ", ", f2, " = ", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
     }
-    if (x$analysis_h1$model == "Moment") {
+    if (x$analysis_h1$model == "moment") {
       cat("  Moment prior (", f2, " =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
     }
   }
@@ -685,7 +684,7 @@ print.BFpower_f <- function(x,...) {
     cat("  Effect size prior (scale =", x$analysis_h1$rscale,
         ", ", f2, " =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
   }
-  if (x$analysis_h1$model == "Moment") {
+  if (x$analysis_h1$model == "moment") {
     cat("  Moment prior (", f2, " =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
   }
 
@@ -696,10 +695,10 @@ print.BFpower_f <- function(x,...) {
       cat("  Effect size prior (scale =", x$design_h1$rscale,
           ", ", f2, " =", x$design_h1$f_m, ", df =", x$design_h1$dff, ")\n")
     }
-    if (x$design_h1$model == "Moment") {
+    if (x$design_h1$model == "moment") {
       cat("  Moment prior (", f2, " =", x$design_h1$f_m, ", df =", x$design_h1$dff, ")\n")
     }
-    if (x$design_h1$model == "Point") {
+    if (x$design_h1$model == "point") {
       cat("  Point prior (", f2, " =", x$design_h1$f_m, ")\n")
     }
   }
@@ -842,7 +841,7 @@ print.BFvalue_f <- function(x,...) {
       cat("  Effect size prior (scale =", x$analysis_h1$rscale,
           ", f =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
     }
-    if (x$analysis_h1$model == "Moment") {
+    if (x$analysis_h1$model == "moment") {
       cat("  Moment prior (f =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
     }
   }
@@ -853,7 +852,7 @@ print.BFvalue_f <- function(x,...) {
     cat("  Effect size prior (scale =", x$analysis_h1$rscale,
         ", f =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
   }
-  if (x$analysis_h1$model == "Moment") {
+  if (x$analysis_h1$model == "moment") {
     cat("  Moment prior (f =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
   }
 
@@ -909,28 +908,28 @@ print.BFpower_bin <- function(x,...) {
 
   if (is.null(x$e)) {
     cat("  Null value        : ", theta, sub0, " = ", x$h0, "\n", sep = "")
-    if (x$hypothesis == "!=") {
+    if (x$hypothesis == "two.sided") {
       cat("  H", sub0, " (Null)         : ", theta, " = ", theta, sub0, "\n", sep = "")
       cat("  H", sub1, " (Alternative)  : ", theta, " ", neq, " ", theta, sub0, "\n\n", sep = "")
     }
-    if (x$hypothesis == ">") {
+    if (x$hypothesis == "greater") {
       cat("  H", sub0, " (Null)         : ", theta, " = ", theta, sub0, "\n", sep = "")
       cat("  H", sub1, " (Alternative)  : ", theta, " > ", theta, sub0, "\n\n", sep = "")
     }
-    if (x$hypothesis == "<") {
+    if (x$hypothesis == "less") {
       cat("  H", sub0, " (Null)         : ", theta, " = ", theta, sub0, "\n", sep = "")
       cat("  H", sub1, " (Alternative)  : ", theta, " < ", theta, sub0, "\n\n", sep = "")
     }
   } else {
-    if (x$hypothesis == "!=") {
+    if (x$hypothesis == "two.sided") {
       cat("  H", sub0, " (Null)         : ", x$h0 + min(x$e), " <= ", theta, " <= ", x$h0 + max(x$e), "\n", sep = "")
       cat("  H", sub1, " (Alternative)  : ", theta, " < ", x$h0 + min(x$e), " ", union, " ", theta, " > ", x$h0 + max(x$e), "\n\n", sep = "")
     }
-    if (x$hypothesis == ">") {
+    if (x$hypothesis == "greater") {
       cat("  H", sub0, " (Null)         : ", x$h0, " <= ", theta, " <= ", x$h0 + x$e, "\n", sep = "")
       cat("  H", sub1, " (Alternative)  : ", theta, " > ", x$h0 + x$e, "\n\n", sep = "")
     }
-    if (x$hypothesis == "<") {
+    if (x$hypothesis == "less") {
       cat("  H", sub0, " (Null)         : ", x$h0 + x$e, " <= ", theta, " <= ", x$h0, "\n", sep = "")
       cat("  H", sub1, " (Alternative)  : ", theta, " < ", x$h0 + x$e, "\n\n", sep = "")
     }
@@ -945,7 +944,7 @@ print.BFpower_bin <- function(x,...) {
   if (is.null(x$e)) {
     cat("  Point prior (location = ", x$h0, ")\n", sep = "")
   } else {
-    if (x$analysis_h1$model == "Moment") {
+    if (x$analysis_h1$model == "moment") {
       cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
     }
     if (x$analysis_h1$model == "beta") {
@@ -955,7 +954,7 @@ print.BFpower_bin <- function(x,...) {
 
   # Prior under H1
   cat("Analysis/design prior under H", sub1, ":\n", sep = "")
-  if (x$analysis_h1$model == "Moment") {
+  if (x$analysis_h1$model == "moment") {
     cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
   }
   if (x$analysis_h1$model == "beta") {
@@ -965,13 +964,13 @@ print.BFpower_bin <- function(x,...) {
   # Design prior under H1
   if (!is.nan(x$design_h1$model)) {
     cat("Design prior under H", sub1, ":\n", sep = "")
-    if (x$design_h1$model == "Moment") {
+    if (x$design_h1$model == "moment") {
       cat("  Normal-moment (location =", x$design_h1$location, ", scale =", x$analysis_h1$scale, ")\n")
     }
     if (x$design_h1$model == "beta") {
       cat("  Beta (alpha =", x$design_h1$alpha, ", beta =", x$design_h1$beta, ")\n")
     }
-    if (x$design_h1$model == "Point") {
+    if (x$design_h1$model == "point") {
       cat("  Point (location =", x$design_h1$location, ")\n")
     }
   }
@@ -1090,16 +1089,16 @@ print.BFvalue_bin <- function(x,...) {
 
   if (is.null(x$e)) {
     cat("  Null value        : ", theta, sub0, " = ", x$h0, "\n", sep = "")
-    if (x$hypothesis == "!=") cat("  H", sub0, " (Null)         : ", theta, " = ", theta, sub0, "\n  H", sub1, " (Alternative)  : ", theta, " ", neq, " ", theta, sub0, "\n\n", sep = "")
-    if (x$hypothesis == ">")  cat("  H", sub0, " (Null)         : ", theta, " = ", theta, sub0, "\n  H", sub1, " (Alternative)  : ", theta, " > ", theta, sub0, "\n\n", sep = "")
-    if (x$hypothesis == "<")  cat("  H", sub0, " (Null)         : ", theta, " = ", theta, sub0, "\n  H", sub1, " (Alternative)  : ", theta, " < ", theta, sub0, "\n\n", sep = "")
+    if (x$hypothesis == "two.sided") cat("  H", sub0, " (Null)         : ", theta, " = ", theta, sub0, "\n  H", sub1, " (Alternative)  : ", theta, " ", neq, " ", theta, sub0, "\n\n", sep = "")
+    if (x$hypothesis == "greater")  cat("  H", sub0, " (Null)         : ", theta, " = ", theta, sub0, "\n  H", sub1, " (Alternative)  : ", theta, " > ", theta, sub0, "\n\n", sep = "")
+    if (x$hypothesis == "less")  cat("  H", sub0, " (Null)         : ", theta, " = ", theta, sub0, "\n  H", sub1, " (Alternative)  : ", theta, " < ", theta, sub0, "\n\n", sep = "")
   } else {
-    if (x$hypothesis == "!=") {
+    if (x$hypothesis == "two.sided") {
       cat("  H", sub0, " (Null)         : ", x$h0 + min(x$e), " <= ", theta, " <= ", x$h0 + max(x$e), "\n", sep = "")
       cat("  H", sub1, " (Alternative)  : ", theta, " < ", x$h0 + min(x$e), " ", union, " ", theta, " > ", x$h0 + max(x$e), "\n\n", sep = "")
     }
-    if (x$hypothesis == ">")  cat("  H", sub0, " (Null)         : ", x$h0, " <= ", theta, " <= ", x$h0 + x$e, "\n  H", sub1, " (Alternative)  : ", theta, " > ", x$h0 + x$e, "\n\n", sep = "")
-    if (x$hypothesis == "<")  cat("  H", sub0, " (Null)         : ", x$h0 + x$e, " <= ", theta, " <= ", x$h0, "\n  H", sub1, " (Alternative)  : ", theta, " < ", x$h0 + x$e, "\n\n", sep = "")
+    if (x$hypothesis == "greater")  cat("  H", sub0, " (Null)         : ", x$h0, " <= ", theta, " <= ", x$h0 + x$e, "\n  H", sub1, " (Alternative)  : ", theta, " > ", x$h0 + x$e, "\n\n", sep = "")
+    if (x$hypothesis == "less")  cat("  H", sub0, " (Null)         : ", x$h0 + x$e, " <= ", theta, " <= ", x$h0, "\n  H", sub1, " (Alternative)  : ", theta, " < ", x$h0 + x$e, "\n\n", sep = "")
   }
 
   cat(line)
@@ -1111,13 +1110,13 @@ print.BFvalue_bin <- function(x,...) {
   if (is.null(x$e)) {
     cat("  Point prior (location = ", x$h0, ")\n", sep = "")
   } else {
-    if (x$analysis_h1$model == "Moment") cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
+    if (x$analysis_h1$model == "moment") cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
     if (x$analysis_h1$model == "beta")   cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n")
   }
 
   # Prior under H1
   cat("Analysis prior under H", sub1, ":\n", sep = "")
-  if (x$analysis_h1$model == "Moment") cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
+  if (x$analysis_h1$model == "moment") cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
   if (x$analysis_h1$model == "beta")   cat("  Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n")
 
   # Results
@@ -1196,7 +1195,7 @@ print.BFpower_2p <- function(x,...) {
         ", beta = ", x$design_h1_theta_1$b, ")\n", sep = "")
     cat(" ", theta2, " ~ Beta( alpha =", x$design_h1_theta_2$a,
         ", beta = ", x$design_h1_theta_2$b, ")\n", sep = "")
-  } else if (x$design_h1_theta_1$model == "Point") {
+  } else if (x$design_h1_theta_1$model == "point") {
     cat(" ", theta1, " = ", x$design_h1_theta_1$p, "\n", sep = "")
     cat(" ", theta2, " = ", x$design_h1_theta_2$p, "\n", sep = "")
   }

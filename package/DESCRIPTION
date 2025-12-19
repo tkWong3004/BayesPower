@@ -1,6 +1,6 @@
 Package: BayesPower
 Title: Sample Size and Power Calculation for Bayesian Testing with Bayes Factor
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: c(
     person("Tsz Keung", "Wong", email = "t.k.wong3004@gmail.com", role = c("aut", "cre")),
     person("Samuel", "Pawel", role = c("aut")),

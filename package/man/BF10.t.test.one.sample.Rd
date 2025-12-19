@@ -23,16 +23,16 @@ BF10.t.test.one.sample(
 \item{model}{Character string. Statistical model for the analysis prior under the alternative hypothesis.
 Choices are:
 \describe{
-\item{"Normal"}{Normal distribution.}
-\item{"Moment"}{Normal moment prior.}
-\item{"t-distribution"}{Scaled t-distribution.}
+\item{"normal"}{Normal distribution.}
+\item{"moment"}{Normal moment prior.}
+\item{"t"}{Scaled t-distribution.}
 }}
 
 \item{location}{Numeric scalar. Location parameter for the analysis prior under the alternative hypothesis.}
 
 \item{scale}{Numeric scalar. Scale parameter for the analysis prior under the alternative hypothesis (must be > 0).}
 
-\item{dff}{Numeric scalar. Degrees of freedom for the t-distribution prior (only required if \code{model = "t-distribution"}; must be > 0). Ignored otherwise.}
+\item{dff}{Numeric scalar. Degrees of freedom for the t-distribution prior (only required if \code{model = "t"}; must be > 0). Ignored otherwise.}
 
 \item{hypothesis}{Character string. Hypothesis being tested. One of:
 \describe{
@@ -68,7 +68,7 @@ against either a point NaN hypothesis or an interval null hypothesis.
 BF10.t.test.one.sample(
   tval = 2.31,
   df = 29,
-  model = "t-distribution",
+  model = "t",
   location = 0,
   scale = 0.707,
   dff = 1,

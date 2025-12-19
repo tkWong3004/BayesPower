@@ -41,7 +41,7 @@ BFpower.cor(
 
 \item{false_rate}{Targeted false positive rate (if \code{positive = "positive"}) or false negative rate (if \code{positive = "negative"}).}
 
-\item{model}{Analysis prior model under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"Moment"}).}
+\item{model}{Analysis prior model under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"moment"}).}
 
 \item{k}{Parameter for the default beta prior (\code{"d_beta"}).}
 
@@ -49,19 +49,19 @@ BFpower.cor(
 
 \item{beta}{Parameter for the beta prior (\code{"beta"}).}
 
-\item{scale}{Scale parameter for the normal moment prior (\code{"Moment"}).}
+\item{scale}{Scale parameter for the normal moment prior (\code{"moment"}).}
 
-\item{model_d}{Design prior model under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), normal moment (\code{"Moment"}), or point (\code{"Point"}).}
+\item{model_d}{Design prior model under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), normal moment (\code{"moment"}), or point (\code{"point"}).}
 
 \item{alpha_d}{Parameter for the design beta prior (\code{"beta"}).}
 
 \item{beta_d}{Parameter for the design beta prior (\code{"beta"}).}
 
-\item{location_d}{Location parameter for the design point prior (\code{"Point"}).}
+\item{location_d}{Location parameter for the design point prior (\code{"point"}).}
 
 \item{k_d}{Parameter for the design default beta prior (\code{"d_beta"}).}
 
-\item{scale_d}{Scale parameter for the design normal moment prior (\code{"Moment"}).}
+\item{scale_d}{Scale parameter for the design normal moment prior (\code{"moment"}).}
 
 \item{N}{Sample size (numeric scalar).}
 
@@ -122,7 +122,7 @@ The analysis prior specifies the prior distribution of the correlation under the
 
 \strong{Design Priors (optional):}
 
-A design prior can be specified for planning purposes. If provided, \code{model_d} must be one of \code{"d_beta"}, \code{"beta"}, \code{"Moment"}, or \code{"Point"}, and the corresponding parameters must be supplied:
+A design prior can be specified for planning purposes. If provided, \code{model_d} must be one of \code{"d_beta"}, \code{"beta"}, \code{"moment"}, or \code{"point"}, and the corresponding parameters must be supplied:
 \itemize{
 \item \code{d_beta}: \code{k_d} > 0.
 \item \code{beta}: \code{alpha_d} and \code{beta_d} > 0.
