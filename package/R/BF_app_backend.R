@@ -8599,7 +8599,7 @@ t2e_N_01_finder<-function(D,r,target,model,location,scale,dff, hypothesis,e ,
 }
 
 t2e_table<-function(D,r,target,model,location,scale,dff, hypothesis,e ,
-                    model_d,location_d,scale_d,dff_d, de_an_prior,mode_bf,N1,N2,alpha ,direct){
+                    model_d,location_d,scale_d,dff_d, de_an_prior,N1,N2,mode_bf,alpha ,direct){
   bound01 = as.numeric(0)
   bound10 = as.numeric(0)
 
