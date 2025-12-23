@@ -3,8 +3,9 @@ setwd("~/MyGitHub/BayesPower/package/R")
 # Questions:
 # - Parameter e: Why ">" requires e>0 and "<" requires e<0?
 # - Why dff = 0 when checking on prior_analysis?
+# - Why does BFpower.cor() use dff and dff_d internally?
 
-#devtools::install_github(repo = "tkWong3004/BayesPower", subdir = "package")
+# devtools::install_github(repo = "tkWong3004/BayesPower", subdir = "package", ref = "dev-jorge")
 devtools::document()
 devtools::install()
 library(BayesPower)
@@ -45,7 +46,14 @@ BFpower.ttest.TwoSamples(
   N2             = 25
 )
 
-
+BFpower.cor(
+  alternative    = "two.sided",
+  e              = c(-.2, .2), 
+  rho.h0         = 0,
+  prior_analysis = "d_beta", k = 1, alpha = 3, beta = 3, scale = .3,
+  type_rate      = "negative", true_rate      = 0.8, false_rate     = 0.05,
+  D              = 1.2
+)
 
 
 

@@ -68,16 +68,17 @@ BFpower.ttest.OneSample(
 }
 \value{
 A list of class \code{BFpower_t} containing 10 elements:
-\describe{
-\item{type}{Character string describing the test type, always "One-sample t-test".}
-\item{alternative}{Character, the tested alternative hypothesis.}
-\item{e}{Optional numeric vector for interval null bounds.}
-\item{analysis_h1}{List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
-\item{design_h1}{List with the design prior parameters: \code{prior_design}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).}
-\item{results}{Data frame with the probabilities of compelling/misleading evidence (\code{NaN} if calculation fails), and with the required sample size.}
-\item{D}{Numeric, threshold of compelling evidence.}
-\item{plot_power}{Logical, whether to plot the power curve.}
-\item{plot_rel}{Logical, whether the relationship between the BF and t-value is plotted.}
+\itemize{
+\item \code{type}: Character string describing the test type (always "One-sample t-test").
+\item \code{alternative}: Character, the tested alternative hypothesis.
+\item \code{h0}: Correlation value.
+\item \code{e}: Bounds for interval null (if used).
+\item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.
+\item \code{design_h1}: List with the design prior parameters: \code{prior_design}, \code{location}, \code{scale}, and optionally \code{dff}.
+\item \code{results}: Data frame with the probabilities of compelling/misleading evidence, and with the required sample size.
+\item \code{D}: Numeric, threshold of compelling evidence.
+\item \code{plot_power}: Logical, whether to plot the power curve.
+\item \code{plot_rel}: Logical, whether the relationship between the BF and the t-value is plotted.
 }
 }
 \description{
@@ -91,8 +92,7 @@ analysis and design priors.
 
 If no sample size is provided, the function determines the minimum sample size required to meet the desired requirements. In this mode, the user must supply the following arguments:
 \itemize{
-\item \code{type_rate} - either \code{"positive"} to control true/false positive rates,
-or \code{"negative"} to control true/false negative rates.
+\item \code{type_rate} - either \code{"positive"} to control true/false positive rates, or \code{"negative"} to control true/false negative rates.
 \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
 \item \code{false_rate} - the acceptable false positive or false negative rate (between 0.001 and 0.1).
 \item \code{D} - the Bayes factor threshold for compelling evidence (must be > 1).
@@ -108,6 +108,10 @@ If a positive numeric sample size \code{N} is provided, the function computes
 the probabilities of obtaining compelling or misleading evidence for that
 fixed sample size. In this mode, the arguments \code{type_rate}, \code{true_rate},
 and \code{false_rate} are ignored; only the Bayes factor threshold \code{D} is used.
+
+\strong{Hypothesis specification:}
+
+The \code{alternative} argument defines the test type: \code{"two.sided"} for two-sided, \code{"greater"} for right-sided, or \code{"less"} for left-sided tests.
 
 \strong{Analysis Priors:}
 
@@ -139,10 +143,8 @@ null hypothesis. For a point-null hypothesis, \code{e} should be left as \code{N
 
 \strong{Plotting:}
 
-If \code{plot_power = TRUE}, the function plots the probability of compelling
-evidence as a function of sample size.
-If \code{plot_rel = TRUE}, a relative
-likelihood curve is plotted to illustrate how evidence varies with effect size.
+If \code{plot_power = TRUE}, the function plots the probability of compelling evidence as a function of sample size.
+If \code{plot_rel = TRUE}, the relationship between the Bayes factor and the effect size is plotted.
 }
 \examples{
 # Sample size determination with a point-null hypothesis:

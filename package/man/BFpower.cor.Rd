@@ -2,100 +2,108 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BFpower.cor}
 \alias{BFpower.cor}
-\title{Sample size determination for Bayesian correlation test}
+\title{Sample Size Determination for the Bayesian Correlation Test}
 \usage{
 BFpower.cor(
-  hypothesis,
-  h0,
+  alternative = "two.sided",
+  rho.h0 = 0,
   e = NULL,
-  D,
-  true_rate,
-  false_rate,
-  model,
-  k,
-  alpha,
-  beta,
-  scale,
-  model_d = NaN,
-  alpha_d,
-  beta_d,
-  location_d,
-  k_d,
-  scale_d,
-  N = NaN,
-  positive = "positive",
+  prior_analysis = "d_beta",
+  k = 1,
+  alpha = 1,
+  beta = 1,
+  scale = 1,
+  prior_design = NULL,
+  k_d = 1,
+  alpha_d = 1,
+  beta_d = 1,
+  scale_d = 1,
+  location_d = 1,
+  N = NULL,
+  type_rate = "positive",
+  true_rate = 0.8,
+  false_rate = 0.05,
+  D = 3,
   plot_power = FALSE,
   plot_rel = FALSE
 )
 }
 \arguments{
-\item{hypothesis}{The hypothesis being tested: two-sided (\code{"!="}), right-sided (\code{">"}), or left-sided (\code{"<"}).}
+\item{alternative}{Character. The alternative hypothesis being tested: \code{"two-sided"} (default), \code{"greater"}, or \code{"less"}.}
 
-\item{h0}{NaN value of the correlation; must be a numeric scalar between -0.8 and 0.8.}
+\item{rho.h0}{Numeric scalar. Null rho correlation value. Must be between -0.8 and 0.8. Default is 0.}
 
-\item{e}{Optional numeric vector or scalar specifying bounds for an interval null; used if interval Bayes factor is calculated.}
+\item{e}{Optional numeric vector. Bounds for an interval null hypothesis:
+\itemize{
+\item For \code{alternative = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
+\item For \code{alternative = "greater"}, must be a single numeric scalar > 0.
+\item For \code{alternative = "less"}, must be a single numeric scalar < 0.
+}}
 
-\item{D}{Threshold of compelling evidence (numeric scalar > 1).}
+\item{prior_analysis}{Character. Analysis prior under the alternative hypothesis:
+\code{"d_beta"} (default stretched beta; default), \code{"beta"} (stretched beta), or \code{"moment"} (normal-moment prior).}
 
-\item{true_rate}{Targeted true positive rate (if \code{positive = "positive"}) or true negative rate (if \code{positive = "negative"}).}
+\item{k}{Numeric scalar. Parameter for the default stretched beta prior (\code{"d_beta"}). Default is 1.}
 
-\item{false_rate}{Targeted false positive rate (if \code{positive = "positive"}) or false negative rate (if \code{positive = "negative"}).}
+\item{alpha}{Numeric scalar. Parameter for the analysis stretched beta prior (\code{"beta"}). Default is 1.}
 
-\item{model}{Analysis prior model under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"moment"}).}
+\item{beta}{Numeric scalar. Parameter for the analysis stretched beta prior (\code{"beta"}). Default is 1.}
 
-\item{k}{Parameter for the default beta prior (\code{"d_beta"}).}
+\item{scale}{Numeric scalar. Scale parameter for the analysis normal-moment prior (\code{"moment"}). Default is 1.}
 
-\item{alpha}{Parameter for the beta prior (\code{"beta"}).}
+\item{prior_design}{Character. Design prior under the alternative hypothesis:
+\code{"d_beta"} (default stretched beta; default), \code{"beta"} (stretched beta), \code{"moment"} (normal-moment prior), or point (\code{"point"}).}
 
-\item{beta}{Parameter for the beta prior (\code{"beta"}).}
+\item{k_d}{Numeric scalar. Parameter for the design default stretched beta prior (\code{"d_beta"}). Default is 1.}
 
-\item{scale}{Scale parameter for the normal moment prior (\code{"moment"}).}
+\item{alpha_d}{Numeric scalar. Parameter for the design stretched beta prior (\code{"beta"}). Default is 1.}
 
-\item{model_d}{Design prior model under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), normal moment (\code{"moment"}), or point (\code{"point"}).}
+\item{beta_d}{Numeric scalar. Parameter for the design stretched beta prior (\code{"beta"}). Default is 1.}
 
-\item{alpha_d}{Parameter for the design beta prior (\code{"beta"}).}
+\item{scale_d}{Numeric scalar. Scale parameter for the design normal-moment prior (\code{"moment"}). Default is 1.}
 
-\item{beta_d}{Parameter for the design beta prior (\code{"beta"}).}
+\item{location_d}{Numeric scalar. Location parameter for the design point prior (\code{"point"}). Default is 0.}
 
-\item{location_d}{Location parameter for the design point prior (\code{"point"}).}
+\item{N}{Optional numeric scalar. Sample size. Only required if the goal is not sample size determination, but rather to calculate the probability of obtaining compelling or misleading evidence for a given sample size.}
 
-\item{k_d}{Parameter for the design default beta prior (\code{"d_beta"}).}
+\item{type_rate}{Character. Either \code{"positive"} (control true/false positive rates) or \code{"negative"} (control true/false negative rates). Default is \code{"positive"}.}
 
-\item{scale_d}{Scale parameter for the design normal moment prior (\code{"moment"}).}
+\item{true_rate}{Numeric scalar. Depending on \code{type_rate}, it is either the targeted true positive or true negative rate (between 0.6 and 0.999). Default is 0.8.}
 
-\item{N}{Sample size (numeric scalar).}
+\item{false_rate}{Numeric scalar. Depending on \code{type_rate}, it is either the targeted false positive or false negative rate (between 0.001 and 0.1). Default is 0.05.}
 
-\item{positive}{Character indicating which rate to control: \code{"positive"} (true/false positive rates) or \code{"negative"} (true/false negative rates).}
+\item{D}{Numeric scalar. Threshold of compelling evidence (must be > 1). Default is 3.}
 
-\item{plot_power}{Logical; if TRUE, plots power curves.}
+\item{plot_power}{Logical. If \code{TRUE}, plots power curve. Default is \code{FALSE}.}
 
-\item{plot_rel}{Logical; if TRUE, plots the relationship between the BF and data.}
+\item{plot_rel}{Logical. If \code{TRUE}, plots relative likelihood curve. Default is \code{FALSE}.}
 }
 \value{
-A list of class \code{BFpower_r} containing:
+A list of class \code{BFpower_r} containing 10 elements:
 \itemize{
-\item \code{type}: Test type (always "Correlation").
-\item \code{hypothesis}: Hypothesis tested.
-\item \code{h0}: NaN correlation value.
+\item \code{type}: Character string describing the test type (always "Correlation").
+\item \code{alternative}: Character, the tested alternative hypothesis.
+\item \code{rho.h0}: Correlation null value.
 \item \code{e}: Bounds for interval null (if used).
-\item \code{analysis_h1}: Analysis prior parameters under the alternative hypothesis.
-\item \code{design_h1}: Design prior parameters under the alternative hypothesis.
-\item \code{results}: Data frame of probabilities of compelling and misleading evidence.
-\item \code{D}: Threshold of compelling evidence.
-\item \code{plot_power}: Logical, whether power curves are plotted.
-\item \code{plot_rel}: Logical, whether the relationship between the BF and correlation is plotted.
+\item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
+\item \code{design_h1}: List with the design prior parameters: \code{prior_design}, \code{k}, \code{alpha}, \code{beta}, \code{scale}, and \code{location}.
+\item \code{results}: Data frame with the probabilities of compelling/misleading evidence, and with the required sample size.
+\item \code{D}: Numeric, threshold of compelling evidence.
+\item \code{plot_power}: Logical, whether to plot the power curve.
+\item \code{plot_rel}: Logical, whether the relationship between the BF and the correlation is plotted.
 }
 }
 \description{
-Perform sample size determination or calculate probabilities of compelling and misleading evidence
-for a Bayesian correlation test.
+Perform sample size determination or the probability of obtaining compelling or misleading evidence for a Bayesian correlation test.
+Can handle both point-null and interval-null hypothesis, and allows specifying
+analysis and design priors.
 }
 \details{
-\strong{1. Sample size determination mode (when \code{N = NaN}):}
+\strong{1. Sample size determination mode (when \code{N = NULL}):}
 
-If no sample size is provided, the function calculates the minimum sample size. The user must provide:
+If no sample size is provided, the function determines the minimum sample size required to meet the desired requirements. In this mode, the user must supply the following arguments:
 \itemize{
-\item \code{positive} - either \code{"positive"} to control true/false positive rates, or \code{"negative"} to control true/false negative rates.
+\item \code{type_rate} - either \code{"positive"} to control true/false positive rates, or \code{"negative"} to control true/false negative rates.
 \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
 \item \code{false_rate} - the acceptable false positive or false negative rate (between 0.001 and 0.1).
 \item \code{D} - the Bayes factor threshold for compelling evidence (must be > 1).
@@ -105,49 +113,52 @@ The function iteratively finds the smallest sample size for which the probabilit
 
 \strong{2. Fixed-sample analysis mode (when \code{N} is supplied):}
 
-If a positive numeric sample size \code{N} is provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, the arguments \code{positive}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{D} is used.
+If a positive numeric sample size \code{N} is provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, the arguments \code{type_rate}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{D} is used.
 
 \strong{Hypothesis specification:}
 
-The \code{hypothesis} argument defines the test type: \code{"!="} for two-sided, \code{">"} for right-sided, or \code{"<"} for left-sided tests. The optional \code{e} argument specifies bounds for an interval null hypothesis. If \code{e = NULL}, a point-NaN test is assumed.
+The \code{alternative} argument defines the test type: \code{"two.sided"} for two-sided, \code{"greater"} for right-sided, or \code{"less"} for left-sided tests.
 
 \strong{Analysis Priors:}
 
-The analysis prior specifies the prior distribution of the correlation under the alternative hypothesis. Depending on \code{model}, the user must supply:
+The analysis prior specifies the prior distribution of the correlation under the alternative hypothesis. Depending on \code{prior_analysis}, the user must provide:
 \itemize{
-\item \code{d_beta} (default beta): \code{k} > 0.
-\item \code{beta} (stretched beta): \code{alpha} and \code{beta} > 0.
-\item \code{Moment} (normal-moment prior): \code{scale} > 0.
+\item \code{prior_analysis = "d_beta"} (default stretched beta): \code{k} (positive).
+\item \code{prior_analysis = "beta"} (stretched beta): \code{alpha} and \code{beta} (both positive).
+\item \code{prior_analysis = "moment"} (normal-moment prior): \code{scale} (positive).
 }
 
 \strong{Design Priors (optional):}
 
-A design prior can be specified for planning purposes. If provided, \code{model_d} must be one of \code{"d_beta"}, \code{"beta"}, \code{"moment"}, or \code{"point"}, and the corresponding parameters must be supplied:
+A design prior can be supplied to reflect uncertainty about the correlation during study planning. If provided, \code{prior_design} must be one of \code{"d_beta"}, \code{"beta"}, \code{"moment"}, or \code{"point"}, and the corresponding parameters must be supplied:
 \itemize{
-\item \code{d_beta}: \code{k_d} > 0.
-\item \code{beta}: \code{alpha_d} and \code{beta_d} > 0.
-\item \code{Moment}: \code{scale_d} > 0.
-\item \code{Point}: \code{location_d} numeric scalar.
+\item \code{prior_design = "d_beta"} (default stretched beta): \code{k_d} (positive).
+\item \code{prior_design = "beta"} (stretched beta): \code{alpha_d} and \code{beta_d} (both positive).
+\item \code{prior_design = "moment"} (normal-moment prior): \code{scale_d} (positive).
+\item \code{prior_design = "point"} (point prior): \code{location_d} (real).
 }
 
-\strong{Interval null Hypothesis:}
+\strong{Interval Null Hypothesis:}
 
-If \code{e} is provided, the function evaluates the Bayes factor for an interval null. Otherwise, a point-null hypothesis is assumed.
+The argument \code{e} specifies the bounds of an interval null hypothesis.
+If \code{e} is provided, the function evaluates the Bayes factor for an interval
+null hypothesis. For a point-null hypothesis, \code{e} should be left as \code{NULL}.
 
 \strong{Plotting:}
 
-If \code{plot_power = TRUE}, the function plots the probability of compelling evidence as a function of sample size. If \code{plot_rel = TRUE}, the relationship between the BF and correlation is plotted.
+If \code{plot_power = TRUE}, the function plots the probability of compelling evidence as a function of sample size.
+If \code{plot_rel = TRUE}, the relationship between the Bayes factor and the correlation is plotted.
 }
 \examples{
 BFpower.cor(
-  hypothesis = "!=",
-  h0 = 0,
-  D = 3,
-  true_rate = 0.8,
-  false_rate = 0.05,
-  model = "d_beta",
-  k = 1,
-  positive = "positive"
+  alternative    = "two.sided",
+  rho.h0         = 0,
+  prior_analysis = "d_beta",
+  k              = 1,
+  type_rate      = "positive", 
+  true_rate      = 0.8,
+  false_rate     = 0.05,
+  D              = 3
 )
 
 }
