@@ -30,7 +30,7 @@ show_t1_code <- function(x) {
 
     if (arg == "direct") {
       if (val != "h0") return(NULL)
-      arg_print <- "positive"
+      arg_print <- "type_rate"
       val <- "\"negative\""
     }
 
@@ -45,6 +45,36 @@ show_t1_code <- function(x) {
       arg_print <- "plot_rel"
       val <- TRUE
     }
+
+
+    ## HYPOTHESIS > ALTERNATIVE RULE
+    if (arg == "hypothesis") {
+
+      arg_print <- "alternative"
+
+      val <- switch(val,
+                    "<"  = "less",
+                    "!=" = "two.sided",
+                    ">"  = "greater",
+                    stop("Invalid hypothesis")
+      )
+
+      val <- shQuote(val)
+    }
+
+    ## D > threshold
+    if (arg == "D") arg_print <- "threshold"
+
+    ## e > ROPE
+    if (arg == "e") arg_print <- "ROPE"
+
+
+    ## model > prior_analysis
+    if (arg == "model") arg_print <- "prior_analysis"
+
+    ## model_d > prior_design
+    if (arg == "model_d") arg_print <- "prior_design"
+
 
     ## VALUE FORMATTING
     if (is.character(val) && !grepl("^\"", val)) val <- shQuote(val)
@@ -64,14 +94,14 @@ show_t1_code <- function(x) {
     Nval <- if (is.null(x$N)) "NULL" else x$N
     code_lines <- c(code_lines, glue::glue("  N = {Nval}"))
   }
-  # If mode_bf == 1 → skip printing N entirely
+  # If mode_bf == 1 > skip printing N entirely
 
   ## Remove trailing comma
   if (length(code_lines) > 0)
     code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
 
   paste0(
-    "BFpower.t.test.one.sample(\n",
+    "BFpower.ttest.OneSample(\n",
     paste(code_lines, collapse = "\n"),
     "\n)"
   )
@@ -104,7 +134,7 @@ show_t2_code <- function(x) {
         arg %in% c("model_d","location_d","scale_d","dff_d")) return(NULL)
 
     ## NEW RULE:
-    ## If mode_bf != 1 → DO NOT print r
+    ## If mode_bf != 1 > DO NOT print r
     if (x$mode_bf != 1 && arg == "r") return(NULL)
 
     if (is.null(val)) return(NULL)
@@ -118,7 +148,7 @@ show_t2_code <- function(x) {
 
     if (arg == "direct") {
       if (val != "h0") return(NULL)
-      arg_print <- "positive"
+      arg_print <- "type_rate"
       val <- "\"negative\""
     }
 
@@ -133,6 +163,37 @@ show_t2_code <- function(x) {
       arg_print <- "plot_rel"
       val <- TRUE
     }
+
+
+
+    ## HYPOTHESIS > ALTERNATIVE RULE
+    if (arg == "hypothesis") {
+
+      arg_print <- "alternative"
+
+      val <- switch(val,
+                    "<"  = "less",
+                    "!=" = "two.sided",
+                    ">"  = "greater",
+                    stop("Invalid hypothesis")
+      )
+
+      val <- shQuote(val)
+    }
+
+    ## D > threshold
+    if (arg == "D") arg_print <- "threshold"
+
+    ## e > ROPE
+    if (arg == "e") arg_print <- "ROPE"
+
+
+    ## model > prior_analysis
+    if (arg == "model") arg_print <- "prior_analysis"
+
+    ## model_d > prior_design
+    if (arg == "model_d") arg_print <- "prior_design"
+
 
     ## -----------------------------
     ## VALUE FORMATTING
@@ -171,7 +232,7 @@ show_t2_code <- function(x) {
   }
 
   paste0(
-    "BFpower.t.test.two.sample(\n",
+    "BFpower.ttest.TwoSample(\n",
     paste(code_lines, collapse = "\n"),
     "\n)"
   )
@@ -246,33 +307,63 @@ show_cor_code <- function(x) {
 
     arg_print <- arg
 
-    # target → true_rate, FP → false_rate
+    # target > true_rate, FP > false_rate
     if (arg == "target") arg_print <- "true_rate"
     if (arg == "FP")     arg_print <- "false_rate"
 
-    # direct → positive only when val=="h0" → positive="negative"
+    # direct > positive only when val=="h0" > positive="negative"
     if (arg == "direct") {
       if (val == "h0") {
-        arg_print <- "positive"
+        arg_print <- "type_rate"
         val <- "negative"
       } else {
         return(NULL) # skip h1 / positive
       }
     }
 
-    # pc → plot_power only if TRUE
+    # pc > plot_power only if TRUE
     if (arg == "pc") {
       if (!isTRUE(val)) return(NULL)
       arg_print <- "plot_power"
       val <- TRUE
     }
 
-    # rel → plot_rel only if TRUE
+    # rel > plot_rel only if TRUE
     if (arg == "rela") {
       if (!isTRUE(val)) return(NULL)
       arg_print <- "plot_rel"
       val <- TRUE
     }
+
+    ## HYPOTHESIS > ALTERNATIVE RULE
+    if (arg == "hypothesis") {
+
+      arg_print <- "alternative"
+
+      val <- switch(val,
+                    "<"  = "less",
+                    "!=" = "two.sided",
+                    ">"  = "greater",
+                    stop("Invalid hypothesis")
+      )
+
+      val <- shQuote(val)
+    }
+
+    ## D > threshold
+    if (arg == "D") arg_print <- "threshold"
+
+    ## e > ROPE
+    if (arg == "e") arg_print <- "ROPE"
+
+
+    ## model > prior_analysis
+    if (arg == "model") arg_print <- "prior_analysis"
+
+    ## model_d > prior_design
+    if (arg == "model_d") arg_print <- "prior_design"
+
+
 
     ## ---------------------------------------------------------
     ## VALUE FORMATTING
@@ -335,10 +426,10 @@ show_f_code <- function(x) {
 
 
 
-    # ----- RULES: direct → positive only if val=="h0" -----
+    # ----- RULES: direct > positive only if val=="h0" -----
     if (arg == "direct") {
       if (!is.null(val) && val == "h0") {
-        arg_print <- "positive"
+        arg_print <- "type_rate"
         val <- "negative"  # <-- no quotes!
       } else {
         return(NULL)  # skip h1
@@ -356,15 +447,7 @@ show_f_code <- function(x) {
       arg_print <- "plot_rel"
       val <- TRUE
     }
-    # ----- RULES: direct → positive only if val=="h0" -----
-    if (arg == "direct") {
-      if (!is.null(val) && val == "h0") {
-        arg_print <- "positive"
-        val <- "negative"  # <-- no quotes!
-      } else {
-        return(NULL)  # skip h1
-      }
-    }
+
     # ----- RULES: de_an_prior -----
     if (arg == "de_an_prior") return(NULL) # never printed
     if (!is.null(x$de_an_prior) && (x$de_an_prior == 1 || x$de_an_prior == "1") &&
@@ -384,8 +467,28 @@ show_f_code <- function(x) {
     if (arg == "mode_bf") return(NULL)
     if (!is.null(x$mode_bf) && x$mode_bf == 1 && arg == "N") return(NULL)
 
+
+    ## D > threshold
+    if (arg == "D") arg_print <- "threshold"
+
+    ## e > ROPE
+    if (arg == "e") arg_print <- "ROPE"
+
+
+    ## model > prior_analysis
+    if (arg == "model") arg_print <- "prior_analysis"
+
+    ## model_d > prior_design
+    if (arg == "model_d") arg_print <- "prior_design"
+
+
+
     # Skip NULL args
     if (is.null(val)) return(NULL)
+
+
+
+
 
     # Format values
     if (is.character(val)) {
@@ -448,10 +551,10 @@ show_bin_code <- function(x) {
       if (!is.null(x$mode_bf) && x$mode_bf != 1) return(NULL)
     }
 
-    # ----- RULES: direct → positive only if val=="h0" -----
+    # ----- RULES: direct > positive only if val=="h0" -----
     if (arg == "direct") {
       if (!is.null(val) && val == "h0") {
-        arg_print <- "positive"
+        arg_print <- "type_rate"
         val <- "negative"  # <-- no quotes!
       } else {
         return(NULL)  # skip h1
@@ -484,6 +587,38 @@ show_bin_code <- function(x) {
     if (arg == "interval") return(NULL)  # interval is never printed
     if (arg == "e" && !is.null(x$interval) && x$interval == "1") val <- NULL
 
+
+
+    ## HYPOTHESIS > ALTERNATIVE RULE
+    if (arg == "hypothesis") {
+
+      arg_print <- "alternative"
+
+      val <- switch(val,
+                    "<"  = "less",
+                    "!=" = "two.sided",
+                    ">"  = "greater",
+                    stop("Invalid hypothesis")
+      )
+    }
+
+
+    ## D > threshold
+    if (arg == "D") arg_print <- "threshold"
+
+    ## e > ROPE
+    if (arg == "e") arg_print <- "ROPE"
+
+
+    ## model > prior_analysis
+    if (arg == "model") arg_print <- "prior_analysis"
+
+    ## model_d > prior_design
+    if (arg == "model_d") arg_print <- "prior_design"
+
+
+
+
     # Skip NULL args
     if (is.null(val)) return(NULL)
 
@@ -504,16 +639,19 @@ show_bin_code <- function(x) {
 
 
 show_props_code <- function(x) {
-  args <- c("D", "target", "a0", "b0",
-            "model1","a1", "b1", "a2", "b2",
-            "model2", "a1d", "b1d", "dp1", "a2d", "b2d", "dp2",
-            "mode_bf", "n1", "n2", "direct","pc","rela")
+
+  args <- c(
+    "D", "target", "a0", "b0",
+    "model1","a1", "b1", "a2", "b2",
+    "model2", "a1d", "b1d", "dp1", "a2d", "b2d", "dp2",
+    "mode_bf", "n1", "n2", "direct","pc","rela"
+  )
 
   code_lines <- sapply(args, function(arg) {
     val <- x[[arg]]
 
-    # --- RULES ---
-    # target renamed
+    # --- RULES: renaming ---
+    # target → true_rate
     if (arg == "target") {
       arg_print <- "true_rate"
     } else {
@@ -523,7 +661,7 @@ show_props_code <- function(x) {
     # mode_bf: never printed
     if (arg == "mode_bf") return(NULL)
 
-    # mode_bf rules: suppress n1 and n2 if mode_bf == 1
+    # suppress n1/n2 if mode_bf == 1
     if (!is.null(x$mode_bf) && x$mode_bf == 1 && arg %in% c("n1","n2")) {
       return(NULL)
     }
@@ -541,6 +679,7 @@ show_props_code <- function(x) {
       if (x$model2 == "beta" && arg == "dp2") val <- NULL
       if (x$model2 == "Point" && arg %in% c("a2d","b2d")) val <- NULL
     }
+
     # ----- RULES: plotting -----
     if (arg == "pc") {
       if (!isTRUE(val)) return(NULL)
@@ -552,26 +691,40 @@ show_props_code <- function(x) {
       arg_print <- "plot_rel"
       val <- TRUE
     }
-    # direct rules
+
+    # ----- RULES: direct -----
     if (arg == "direct") {
       if (!is.null(val)) {
         if (val == "h1") return(NULL)        # ignore
-        if (val == "h0") {                  # print positive = "negative"
-          arg_print <- "positive"
-          val <- '"negative"'
+        if (val == "h0") {                   # print type_rate = "negative"
+          arg_print <- "type_rate"
+          val <- "negative"                  # keep as plain string
         }
       }
     }
 
+
     # Skip NULL
     if (is.null(val)) return(NULL)
 
-    # Format values
-    if (is.character(val) && !arg_print %in% "positive") {  # already quoted for positive
-      val <- shQuote(val, type = "cmd")
+    # ----- Special renaming -----
+    ## D → threshold
+    if (arg == "D") arg_print <- "threshold"
+
+    ## model1 → prior_design_1
+    if (arg == "model1") arg_print <- "prior_design_1"
+
+    ## model2 → prior_design_2
+    if (arg == "model2") arg_print <- "prior_design_2"
+
+    # ----- Value formatting -----
+    # Format all character values
+    if (is.character(val)) {
+      val <- shQuote(val, type = "cmd")  # <- this will quote "negative" properly
     } else if (is.vector(val) && length(val) > 1) {
       val <- paste0("c(", paste(val, collapse = ", "), ")")
     }
+
 
     glue::glue("  {arg_print} = {val},")
   })

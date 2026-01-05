@@ -4,7 +4,7 @@
 \alias{BF10.f.test}
 \title{Bayes Factor for a Bayesian F-Test}
 \usage{
-BF10.f.test(fval, df1, df2, dff, rscale, f_m, model, e = NULL)
+BF10.f.test(fval, df1, df2, dff, rscale, f_m, prior_analysis, ROPE = NULL)
 }
 \arguments{
 \item{fval}{Numeric scalar. Observed F statistic (must be ≥ 0).}
@@ -17,24 +17,24 @@ BF10.f.test(fval, df1, df2, dff, rscale, f_m, model, e = NULL)
 the alternative hypothesis. For the Moment prior, this must be \eqn{\ge 3}.}
 
 \item{rscale}{Numeric scalar. Scale parameter for the effect-size prior
-(only used when \code{model = "effectsize"}).}
+(only used when \code{prior_analysis = "effectsize"}).}
 
 \item{f_m}{Numeric scalar. Cohen's f effect-size parameter for the
 analysis prior.}
 
-\item{model}{Character string specifying the analysis prior under the
+\item{prior_analysis}{Analysis prior under the
 alternative hypothesis. Must be either \code{"effectsize"} or
 \code{"Moment"}.}
 
-\item{e}{Optional numeric scalar specifying an upper bound for an interval
-NaN hypothesis. If provided, must be > 0.}
+\item{ROPE}{Optional numeric scalar specifying an upper bound for an interval
+null hypothesis. If provided, must be > 0.}
 }
 \value{
 A list of class \code{"BFvalue_f"} containing:
 \itemize{
 \item \code{fval} Input F-value
 \item \code{df1, df2} Degrees of freedom
-\item \code{e} Interval bound (if specified)
+\item \code{ROPE} Interval bound (if specified)
 \item \code{analysis_h1} Details of the analysis prior
 \item \code{bf10} The computed Bayes factor
 }
@@ -52,7 +52,7 @@ BF10.f.test(
   dff = 12,
   rscale = 0.707,
   f_m = 0.1,
-  model = "effectsize"
+  prior_analysis = "effectsize"
 )
 
 }

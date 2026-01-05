@@ -43,11 +43,14 @@ Compute the Bayes factor (BF10) for a Bayesian test of two proportions.
 }
 \examples{
 BF10.props(
-  a0 = 2, b0 = 3,
-  a1 = 2, b1 = 3,
-  a2 = 2, b2 = 3,
-  n1 = 50, n2 = 60,
-  x1 = 25, x2 = 30
-)
-
+a0 = 1,
+b0 = 1,
+a1 = 1,
+b1 = 1,
+a2 = 1,
+b2 = 1,
+n1 = 493,
+n2 = 488,
+x1 = 155,
+x2 = 150)
 }

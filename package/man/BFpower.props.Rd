@@ -5,7 +5,7 @@
 \title{Sample size determination for Bayesian test of two proportions}
 \usage{
 BFpower.props(
-  D,
+  threshold,
   true_rate,
   a0,
   b0,
@@ -13,23 +13,23 @@ BFpower.props(
   b1,
   a2,
   b2,
-  model1 = "same",
+  prior_design_1 = "same",
   a1d,
   b1d,
   dp1,
-  model2 = "same",
+  prior_design_2 = "same",
   a2d,
   b2d,
   dp2,
-  n1 = NaN,
-  n2 = NaN,
-  positive = "positive",
+  n1 = NULL,
+  n2 = NULL,
+  type_rate = "positive",
   plot_power = FALSE,
   plot_rel = FALSE
 )
 }
 \arguments{
-\item{D}{Threshold of compelling evidence.}
+\item{threshold}{Threshold of compelling evidence.}
 
 \item{true_rate}{Targeted true positive rate (if \code{positive = "positive"}) or true negative rate (if \code{positive = "negative"}).}
 
@@ -45,7 +45,7 @@ BFpower.props(
 
 \item{b2}{Beta parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
 
-\item{model1}{Model for the design prior of group 1: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
+\item{prior_design_1}{the design prior of group 1: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
 \item{a1d}{Alpha parameter of the design prior for group 1 (used if \code{model1 = "beta"}).}
 
@@ -53,7 +53,7 @@ BFpower.props(
 
 \item{dp1}{True proportion for group 1 in the design prior (used if \code{model1 = "Point"}).}
 
-\item{model2}{Model for the design prior of group 2: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
+\item{prior_design_2}{the design prior of group 2: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
 \item{a2d}{Alpha parameter of the design prior for group 2 (used if \code{model2 = "beta"}).}
 
@@ -65,7 +65,7 @@ BFpower.props(
 
 \item{n2}{Sample size for group 2.}
 
-\item{positive}{Choose \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.}
+\item{type_rate}{Choose \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.}
 
 \item{plot_power}{Logical; if TRUE, plot the power curve.}
 
@@ -85,20 +85,20 @@ Perform sample size determination or calculate probabilities of compelling and m
 for a Bayesian comparison of two proportions.
 }
 \details{
-\strong{1. Sample size determination mode (when \code{n1 = NaN} and \code{n2 = NaN}):}
+\strong{1. Sample size determination mode (when \code{n1 = NULL} and \code{n2 = NULL}):}
 
 If no sample sizes are provided for the two groups, the function calculates the minimum sample sizes needed to achieve the desired configuration. The user must provide:
 \itemize{
-\item \code{positive} - either \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.
+\item \code{type_rate} - either \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.
 \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
-\item \code{D} - the Bayes factor threshold for compelling evidence (must be > 1).
+\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be > 1).
 }
 
 The function iteratively finds the smallest sample sizes for which the probability of obtaining compelling evidence meets or exceeds \code{true_rate}.
 
 \strong{2. Fixed-sample analysis mode (when \code{n1} and \code{n2} are supplied):}
 
-If positive numeric sample sizes \code{n1} and \code{n2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for these fixed sample sizes. In this mode, \code{positive} and \code{true_rate} are ignored; only the Bayes factor threshold \code{D} is used.
+If positive numeric sample sizes \code{n1} and \code{n2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for these fixed sample sizes. In this mode, \code{type_rate} and \code{true_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
 
 \strong{Model specification:}
 
@@ -111,8 +111,8 @@ The user must specify the analysis priors under the null and alternative hypothe
 
 Design priors for the alternative hypothesis can optionally be specified:
 \itemize{
-\item \code{model1}, \code{a1d}, \code{b1d}, \code{dp1} - design prior for group 1 (\code{"same"} uses the analysis prior, \code{"beta"} requires Beta parameters, \code{"Point"} uses a fixed proportion).
-\item \code{model2}, \code{a2d}, \code{b2d}, \code{dp2} - design prior for group 2.
+\item \code{prior_design_1}, \code{a1d}, \code{b1d}, \code{dp1} - design prior for group 1 (\code{"same"} uses the analysis prior, \code{"beta"} requires Beta parameters, \code{"Point"} uses a fixed proportion).
+\item \code{prior_design_2}, \code{a2d}, \code{b2d}, \code{dp2} - design prior for group 2.
 }
 
 \strong{Plotting:}
@@ -121,14 +121,15 @@ If \code{plot_power = TRUE}, a power curve is plotted showing the probability of
 }
 \examples{
 BFpower.props(
-  D = 3,
-  true_rate = 0.8,
-  a0 = 1,
-  b0 = 1,
-  a1 = 1,
-  b1 = 1,
-  a2 = 1,
-  b2 = 1
-)
+threshold = 3,
+true_rate = 0.8,
+a0 = 1,
+b0 = 1,
+a1 = 156,
+b1 = 339,
+a2 = 151,
+b2 = 339,
+plot_power = TRUE,
+plot_rel = TRUE)
 
 }

@@ -5,69 +5,69 @@
 \title{Sample Size Determination for Bayesian F-test}
 \usage{
 BFpower.f.test(
-  D,
+  threshold,
   true_rate,
   false_rate,
   p,
   k,
-  model,
+  prior_analysis,
   dff,
   rscale,
   f_m,
-  model_d = NaN,
+  prior_design = NULL,
   dff_d,
   rscale_d,
   f_m_d,
-  N = NaN,
-  positive = "positive",
-  e = NULL,
+  N = NULL,
+  type_rate = "positive",
+  ROPE = NULL,
   plot_power = FALSE,
   plot_rel = FALSE
 )
 }
 \arguments{
-\item{D}{Numeric scalar. Threshold for compelling evidence (must be > 1).}
+\item{threshold}{Numeric scalar. Threshold for compelling evidence (must be > 1).}
 
 \item{true_rate}{Targeted true positive or true negative rate (used only when
-sample size determination is requested; \code{N = NaN}).}
+sample size determination is requested; \code{N = NULL}).}
 
 \item{false_rate}{Targeted false positive or false negative rate (used only when
-sample size determination is requested; \code{N = NaN}).}
+sample size determination is requested; \code{N = NULL}).}
 
 \item{p}{Number of predictors in the reduced model.}
 
 \item{k}{Number of predictors in the full model (must satisfy \code{k > p}).}
 
-\item{model}{Analysis prior model under the alternative hypothesis:
+\item{prior_analysis}{Analysis prior model under the alternative hypothesis:
 \code{"effectsize"} or \code{"Moment"}.}
 
 \item{dff}{Degrees of freedom for the analysis prior under the alternative
 hypothesis. Must be a positive scalar, and must be at least 3 if
-\code{model = "Moment"}.}
+\code{prior_analysis = "Moment"}.}
 
 \item{rscale}{Scale parameter for the analysis effect-size prior (only used when
-\code{model = "effectsize"}).}
+\code{prior_analysis = "effectsize"}).}
 
 \item{f_m}{Cohen's \eqn{f} effect-size parameter for the analysis prior (must be > 0).}
 
-\item{model_d}{Design prior model under the alternative hypothesis:
+\item{prior_design}{Design prior model under the alternative hypothesis:
 \code{"effectsize"}, \code{"Moment"}, or \code{"Point"}.}
 
 \item{dff_d}{Degrees of freedom for the design prior. Must be a positive scalar,
-and at least 3 if \code{model_d = "Moment"}.}
+and at least 3 if \code{prior_design = "Moment"}.}
 
 \item{rscale_d}{Scale parameter for the design effect-size prior
-(only used when \code{model_d = "effectsize"}).}
+(only used when \code{prior_design = "effectsize"}).}
 
 \item{f_m_d}{Cohen's \eqn{f} value for the design prior or the effect-size of the
 point design prior.}
 
 \item{N}{Sample size. If \code{NaN}, sample size determination is performed.}
 
-\item{positive}{Either \code{"positive"} (control true/false positive rates) or
+\item{type_rate}{Either \code{"positive"} (control true/false positive rates) or
 \code{"negative"} (control true/false negative rates).}
 
-\item{e}{Numeric bounds for the interval null (only used when interval
+\item{ROPE}{Numeric bounds for the interval null (only used when interval
 Bayes factors are required).}
 
 \item{plot_power}{Logical. Whether to plot power curves when
@@ -80,11 +80,11 @@ A list of class \code{BFpower_f} containing:
 \itemize{
 \item \code{type}: Test type ("Regression/ANOVA").
 \item \code{k}, \code{p}: Model sizes.
-\item \code{e}: Bounds for interval null (if used).
+\item \code{ROPE}: Bounds for interval null (if used).
 \item \code{analysis_h1}: List describing the analysis prior.
 \item \code{design_h1}: List describing the design prior.
 \item \code{results}: Data frame of the probabilities of compelling/misleading evidence and the required or supplied sample size.
-\item \code{D}: Threshold of compelling evidence.
+\item \code{threshold}: Threshold of compelling evidence.
 \item \code{plot_power}: Logical, whether power curves are plotted.
 \item \code{plot_rel}: Logical, whether the relationship between the BF and data is plotted.
 }
@@ -92,7 +92,7 @@ A list of class \code{BFpower_f} containing:
 If sample size determination fails, the function returns \code{NaN} and prints a message.
 }
 \description{
-This function performs sample size determination (when \code{N = NaN}) or
+This function performs sample size determination (when \code{N = NULL}) or
 calculates the probability of compelling/misleading evidence for a fixed sample
 size.
 }
@@ -100,39 +100,39 @@ size.
 Computes required sample size or probabilities of compelling or misleading
 evidence for a fixed sample size.
 
-\strong{1. Sample size determination mode (when \code{N = NaN}):}
+\strong{1. Sample size determination mode (when \code{N = NULL}):}
 
 If no sample size is provided, the function calculates the minimum sample size to achieve the desired configuration below. The user must provide:
 \itemize{
-\item \code{positive} - either \code{"positive"} to control true/false positive rates, or \code{"negative"} to control true/false negative rates.
+\item \code{type_rate} - either \code{"positive"} to control true/false positive rates, or \code{"negative"} to control true/false negative rates.
 \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
 \item \code{false_rate} - the acceptable false positive or false negative rate (between 0.001 and 0.1).
-\item \code{D} - the Bayes factor threshold for compelling evidence (must be > 1).
+\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be > 1).
 }
 
 The function iteratively finds the smallest sample size for which the probability of obtaining compelling evidence meets or exceeds \code{true_rate}, while the probability of misleading evidence does not exceed \code{false_rate}.
 
 \strong{2. Fixed-sample analysis mode (when \code{N} is supplied):}
 
-If a positive numeric sample size \code{N} is provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, the arguments \code{positive}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{D} is used.
+If a positive numeric sample size \code{N} is provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, the arguments \code{type_rate}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
 
 \strong{Model specification:}
 
-The function requires the user to specify the full model (\code{k} predictors) and the reduced model (\code{p} predictors, \code{k > p}), and the analysis prior under the alternative hypothesis. Depending on the chosen \code{model}, different arguments are required:
+The function requires the user to specify the full model (\code{k} predictors) and the reduced model (\code{p} predictors, \code{k > p}), and the analysis prior under the alternative hypothesis. Depending on the chosen \code{prior_analysis}, different arguments are required:
 \itemize{
-\item \code{model = "effectsize"}: requires \code{rscale} (scale parameter) and \code{f_m} (Cohen\'s f effect-size), and \code{dff} (degrees of freedom).
-\item \code{model = "Moment"}: requires \code{f_m} (Cohen\'s f effect-size) and \code{dff} (degrees of freedom, must be >= 3); \code{rscale} is not used.
+\item \code{prior_analysis = "effectsize"}: requires \code{rscale} (scale parameter) and \code{f_m} (Cohen's f effect-size), and \code{dff} (degrees of freedom).
+\item \code{prior_analysis = "Moment"}: requires \code{f_m} (Cohen's f effect-size) and \code{dff} (degrees of freedom, must be >= 3); \code{rscale} is not used.
 }
-The design prior under the alternative hypothesis can optionally be specified using \code{model_d}, which can be:
+The design prior under the alternative hypothesis can optionally be specified using \code{prior_design}, which can be:
 \itemize{
 \item \code{"effectsize"}: requires \code{rscale_d}, \code{f_m_d}, and \code{dff_d}.
 \item \code{"Moment"}: requires \code{f_m_d} and \code{dff_d} (>=3); \code{rscale_d} is not used.
 \item \code{"Point"}: requires \code{f_m_d} only; \code{rscale_d} and \code{dff_d} are not used.
 }
 
-\strong{Interval Null Hypothesis:}
+\strong{interval null Hypothesis:}
 
-If \code{e} is provided, the function evaluates the Bayes factor for an interval null. Otherwise, a point-null hypothesis is assumed.
+If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval null. Otherwise, a point-null hypothesis is assumed.
 
 \strong{Plotting:}
 
@@ -140,15 +140,18 @@ If \code{plot_power = TRUE}, the function plots the probability of compelling ev
 }
 \examples{
 BFpower.f.test(
-  D = 3,
-  true_rate = 0.8,
-  false_rate = 0.05,
-  p = 1,
-  k = 2,
-  model = "effectsize",
-  dff = 1,
-  rscale = 1,
-  f_m = 0.316227766016838
-)
+ threshold = 3,
+ true_rate = 0.8,
+ false_rate = 0.05,
+ p = 3,
+ k = 4,
+ prior_analysis = "effectsize",
+ dff = 3,
+ rscale = 0.18,
+ f_m = 0.1,
+ prior_design = "Point",
+ f_m_d = 0.1,
+ plot_power = TRUE,
+ plot_rel = TRUE)
 
 }

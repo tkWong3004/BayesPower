@@ -4,7 +4,18 @@
 \alias{BF10.cor}
 \title{Bayes factor for a Bayesian correlation test}
 \usage{
-BF10.cor(r, n, k, alpha, beta, h0, hypothesis, scale, model, e = NULL)
+BF10.cor(
+  r,
+  n,
+  k,
+  alpha,
+  beta,
+  h0,
+  alternative,
+  scale,
+  prior_analysis,
+  ROPE = NULL
+)
 }
 \arguments{
 \item{r}{Observed correlation coefficient. Must be a numeric scalar between -1 and 1.}
@@ -17,15 +28,15 @@ BF10.cor(r, n, k, alpha, beta, h0, hypothesis, scale, model, e = NULL)
 
 \item{beta}{Parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.}
 
-\item{h0}{NaN value of the correlation. Must be a numeric scalar between -0.8 and 0.8.}
+\item{h0}{Null value of the correlation. Must be a numeric scalar between -0.8 and 0.8.}
 
-\item{hypothesis}{The hypothesis being tested: two-sided (\code{"!="}), right-sided (\code{">"}), or left-sided (\code{"<"}).}
+\item{alternative}{The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
 \item{scale}{Scale parameter for the analysis normal-moment prior (\code{"Moment"}). Must be > 0.}
 
-\item{model}{Statistical model for the analysis prior: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"Moment"}).}
+\item{prior_analysis}{Analysis prior: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"Moment"}).}
 
-\item{e}{Optional numeric vector specifying bounds for an interval null hypothesis. For \code{"!="}, must be two distinct finite values between -0.5 and 0.5. For \code{">"} or \code{"<"}, must satisfy additional bounds relative to \code{h0}.}
+\item{ROPE}{Optional numeric vector specifying bounds for an interval null hypothesis. For \code{"two.sided"}, must be two distinct finite values between -0.5 and 0.5. For \code{"greater"} or \code{"less"}, must satisfy additional bounds relative to \code{h0}.}
 }
 \value{
 A list with class \code{"BFvalue_r"} containing:
@@ -35,38 +46,22 @@ A list with class \code{"BFvalue_r"} containing:
 \item \code{h0}: NaN value of the correlation
 \item \code{r}: Observed correlation coefficient
 \item \code{n}: Sample size
-\item \code{analysis_h1}: List of analysis prior parameters including \code{model}, \code{k}, \code{alpha}, \code{beta}, \code{scale}
-\item \code{hypothesis}: Hypothesis being tested
-\item \code{e}: Interval bounds if specified
+\item \code{analysis_h1}: List of analysis prior parameters including \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, \code{scale}
+\item \code{alternative}: the direction of the alternative hypothesis
+\item \code{ROPE}: Interval bounds if specified
 }
 }
 \description{
-Calculate the Bayes factor (BF10) for a correlation coefficient, either against a point NaN
+Calculate the Bayes factor (BF10) for a correlation coefficient, either against a point null
 or an interval null hypothesis. Supports default beta (\code{"d_beta"}), stretched beta (\code{"beta"}),
 and normal-moment (\code{"Moment"}) priors for the alternative hypothesis.
 }
 \examples{
 BF10.cor(
-  r = 0.3,
-  n = 50,
+  r = 0.3930924,
+  n = 46,
+  prior_analysis = "d_beta",
   k = 1,
-  alpha = 0.05,
-  beta = 0.2,
   h0 = 0,
-  hypothesis = "!=",
-  scale = 1,
-  model = "d_beta"
-)
-
-BF10.cor(
-  r = 0.25,
-  n = 40,
-  alpha = 2,
-  beta = 3,
-  h0 = 0,
-  hypothesis = ">",
-  scale = 1,
-  model = "beta"
-)
-
+  alternative = "two.sided")
 }

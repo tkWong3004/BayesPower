@@ -4,7 +4,17 @@
 \alias{BF10.bin.test}
 \title{Bayes Factor for a Bayesian One-Proportion Test}
 \usage{
-BF10.bin.test(x, n, alpha, beta, h0, scale, model, hypothesis, e = NULL)
+BF10.bin.test(
+  x,
+  n,
+  alpha,
+  beta,
+  h0,
+  scale,
+  prior_analysis,
+  alternative,
+  ROPE = NULL
+)
 }
 \arguments{
 \item{x}{Observed number of successes (non-negative integer scalar, must be \eqn{\le n}).}
@@ -12,22 +22,22 @@ BF10.bin.test(x, n, alpha, beta, h0, scale, model, hypothesis, e = NULL)
 \item{n}{Sample size (positive integer scalar).}
 
 \item{alpha}{Shape parameter of the analysis beta prior under the alternative hypothesis
-(required if \code{model = "beta"}).}
+(required if \code{prior_analysis = "beta"}).}
 
 \item{beta}{Shape parameter of the analysis beta prior under the alternative hypothesis
-(required if \code{model = "beta"}).}
+(required if \code{prior_analysis = "beta"}).}
 
 \item{h0}{Null proportion value (numeric scalar between 0.1 and 0.9).}
 
-\item{scale}{Scale parameter for the analysis prior (only used if \code{model = "Moment"}).}
+\item{scale}{Scale parameter for the analysis prior (only used if \code{prior_analysis = "Moment"}).}
 
-\item{model}{Statistical model for the analysis prior under the alternative hypothesis:
+\item{prior_analysis}{the analysis prior under the alternative hypothesis:
 \code{"beta"} (stretched beta) or \code{"Moment"} (normal-moment prior).}
 
-\item{hypothesis}{Hypothesis being tested: two-sided (\code{"!="}), right-sided (\code{">"}),
-or left-sided (\code{"<"}).}
+\item{alternative}{Hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}),
+or left-sided (\code{"less"}).}
 
-\item{e}{Optional numeric vector specifying bounds for an interval null; used if interval BF is calculated.}
+\item{ROPE}{Optional numeric vector specifying bounds for an interval null; used if interval BF is calculated.}
 }
 \value{
 An object of class \code{"BFvalue_bin"} containing:
@@ -37,34 +47,23 @@ An object of class \code{"BFvalue_bin"} containing:
 \item \code{x}: Number of successes.
 \item \code{n}: Sample size.
 \item \code{h0}: Null proportion value.
-\item \code{analysis_h1}: List describing the analysis prior (\code{model}, \code{alpha}, \code{beta}, \code{scale}).
-\item \code{hypothesis}: Tested hypothesis.
-\item \code{e}: interval null bounds (if specified).
+\item \code{analysis_h1}: List describing the analysis prior (\code{prior_analysis}, \code{alpha}, \code{beta}, \code{scale}).
+\item \code{alternative}: the direction of the alternative hypothesis.
+\item \code{ROPE}: interval null bounds (if specified).
 }
 }
 \description{
-Calculate the Bayes factor (BF10) for a single-proportion test, either against a point NaN
+Calculate the Bayes factor (BF10) for a single-proportion test, either against a point null
 or an interval null hypothesis.
 }
 \examples{
 BF10.bin.test(
-  x = 12,
-  n = 50,
-  alpha = 2,
-  beta = 3,
-  h0 = 0.5,
-  scale = 1,
-  model = "beta",
-  hypothesis = "!="
-)
-
-BF10.bin.test(
-  x = 8,
-  n = 20,
-  h0 = 0.5,
-  scale = 0.5,
-  model = "Moment",
-  hypothesis = ">"
-)
+ x = 42,
+ n = 52,
+ h0 = 0.5,
+ prior_analysis = "beta",
+ alternative = "greater",
+ alpha = 1,
+ beta = 1)
 
 }

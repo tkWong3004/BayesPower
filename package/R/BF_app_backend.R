@@ -3636,7 +3636,7 @@ re_prior_plot <-function(k, alpha, beta,h0,location,scale,dff,model,de_an_prior,
   prior.analysis.h1 <- compute.prior.density.re.h1(rr,h0, k,location,scale,dff,model, alpha, beta,hypothesis,e)
   prior.analysis.h0<- compute.prior.density.re.h0(rr,h0, k,location,scale,dff,model, alpha, beta,hypothesis,e)
   prior.design <- if (de_an_prior == 0 && model_d != "Point") {
-    compute.prior.density.re.h1(rr, k_d,location_d,scale_d,dff_d,model_d, alpha_d, beta_d,hypothesis,e)
+    compute.prior.density.re.h1(rr, h0,k_d,location_d,scale_d,dff_d,model_d, alpha_d, beta_d,hypothesis,e)
   } else {
     rep(NA, length(rr))
   }
@@ -5115,6 +5115,8 @@ pro_table_p2<-function(D,target, a0, b0, a1, b1, a2, b2, r,model1,da1,db1,dp1,mo
 }
 
 
+
+
 p2_prior_plot<-function(a,b,ad,bd,dp,model,nu){
   oldpar <- graphics::par(no.readonly = TRUE)
   base::on.exit(graphics::par(oldpar))
@@ -5546,7 +5548,7 @@ shiny::observeEvent(input$runbin, {
 
     pc_bin(NULL)
     output$plot_power_bin_text <- shiny::renderUI(NULL)
-    output$plot_power_bin      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_power_bin      <- shiny::renderPlot(NULL)
   }
 
 
@@ -5587,7 +5589,7 @@ shiny::observeEvent(input$runbin, {
 
     rela_bin(NULL)
     output$plot_rel_bin_text <- shiny::renderUI(NULL)
-    output$plot_rel_bin      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_rel_bin      <- shiny::renderPlot(NULL)
   }
 
   output$export_bin <- shiny::downloadHandler(
@@ -5648,19 +5650,44 @@ shiny::observeEvent(input$calbin, {
       if (!is.null(bin$interval) && bin$interval != 1) {
         args$e <- bin$e
       }
+
       fmt_val <- function(x) {
         if (is.numeric(x) && length(x) == 1) return(as.character(x))
         if (is.numeric(x) && length(x) > 1) return(paste(x, collapse = ", "))
         if (is.character(x)) return(shQuote(x))
         return(as.character(x))
       }
+
       # Build string with each argument on a new line
-      arg_strings <- sapply(names(args), function(nm) {
-        val <- args[[nm]]
-        if (nm == "e" && length(val) > 1) {
-          sprintf("  e = c(%s)", paste(fmt_val(val), collapse = ", "))
+      arg_strings <- sapply(names(args), function(arg) {
+
+        val <- args[[arg]]
+        arg_print <- arg  # default printed name
+
+        ## model → prior_analysis
+        if (arg == "model") arg_print <- "prior_analysis"
+
+        ## e → ROPE
+        if (arg == "e") arg_print <- "ROPE"
+
+        ## hypothesis → alternative
+        if (arg == "hypothesis") {
+
+          arg_print <- "alternative"
+
+          val <- switch(val,
+                        "<"  = "less",
+                        "!=" = "two.sided",
+                        ">"  = "greater",
+                        stop("Invalid hypothesis")
+          )
+        }
+
+        # Format e as c(...) if vector
+        if (arg == "e" && length(val) > 1) {
+          sprintf("  %s = c(%s)", arg_print, paste(fmt_val(val), collapse = ", "))
         } else {
-          sprintf("  %s = %s", nm, fmt_val(val))
+          sprintf("  %s = %s", arg_print, fmt_val(val))
         }
       })
 
@@ -5672,6 +5699,7 @@ shiny::observeEvent(input$calbin, {
       )
 
       call_string
+
     })
 
 
@@ -5971,7 +5999,7 @@ shiny::observeEvent(input$runf, {
 
     pc_f(NULL)
     output$plot_power_f_text <- shiny::renderUI(NULL)
-    output$plot_power_f      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_power_f      <- shiny::renderPlot(NULL)
   }
 
 
@@ -6011,7 +6039,7 @@ shiny::observeEvent(input$runf, {
 
     rela_f(NULL)
     output$plot_rel_f_text <- shiny::renderUI(NULL)
-    output$plot_rel_f      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_rel_f      <- shiny::renderPlot(NULL)
   }
 
 
@@ -6076,9 +6104,24 @@ shiny::observeEvent(input$calf, {
     }
 
     # Build string with each argument on a new line
-    arg_strings <- sapply(names(args), function(nm) {
-      sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+    arg_strings <- sapply(names(args), function(arg) {
+
+      val <- args[[arg]]
+      arg_print <- arg
+
+      ## model > prior_analysis
+      if (arg == "model") {
+        arg_print <- "prior_analysis"
+      }
+
+      ## e > ROPE
+      if (arg == "e") {
+        arg_print <- "ROPE"
+      }
+
+      sprintf("  %s = %s", arg_print, fmt_val(val))
     })
+
 
     call_string <- paste0(
       "# Function to be used in R\n",
@@ -6305,7 +6348,7 @@ shiny::observeEvent(input$runp2, {
 
     pc_p2(NULL)
     output$plot_power_p2_text <- shiny::renderUI(NULL)
-    output$plot_power_p2      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_power_p2      <- shiny::renderPlot(NULL)
   }
 
   # ===================================================
@@ -6333,7 +6376,7 @@ shiny::observeEvent(input$runp2, {
 
     rela_p2(NULL)
     output$plot_rel_p2_text <- shiny::renderUI(NULL)
-    output$plot_rel_p2      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_rel_p2      <- shiny::renderPlot(NULL)
   }
 
   # Download handler
@@ -6713,7 +6756,7 @@ shiny::observeEvent(input$runr, {
 
     pc_r(NULL)
     output$plot_power_r_text <- shiny::renderUI(NULL)
-    output$plot_power_r      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_power_r      <- shiny::renderPlot(NULL)
   }
 
 
@@ -6755,7 +6798,7 @@ shiny::observeEvent(input$runr, {
 
     rela_r(NULL)
     output$plot_rel_r_text <- shiny::renderUI(NULL)
-    output$plot_rel_r      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_rel_r      <- shiny::renderPlot(NULL)
   }
 
   output$export_r <- shiny::downloadHandler(
@@ -6827,47 +6870,74 @@ shiny::observeEvent(input$calr, {
       if (!is.null(rr$model)) {
         if (rr$model == "d_beta") {
           args$k <- rr$k
-          # alpha, beta, scale are ignored
         } else if (rr$model == "beta") {
           args$alpha <- rr$alpha
           args$beta  <- rr$beta
-          # k, scale ignored
         } else if (rr$model == "Moment") {
           args$scale <- rr$scale
-          # k, alpha, beta ignored
         }
       }
 
-      # Common arguments always included
+      # Common arguments
       args$h0 <- rr$h0
       args$hypothesis <- rr$hypothesis
-      # location is internal only → never printed
 
-      # Optional e (equivalence) only if interval != 1
+      # Optional ROPE (only if interval != 1)
       if (!is.null(rr$interval) && rr$interval != 1) {
         args$e <- rr$e
       }
 
-      # Build string with each argument on a new line
-      arg_strings <- sapply(names(args), function(nm) {
-        val <- args[[nm]]
-        if (nm == "e" && length(val) > 1) {
-          # print vector as c(...) without nested c()
-          sprintf("  e = c(%s)", paste(fmt_val(val), collapse = ", "))
-        } else {
-          sprintf("  %s = %s", nm, fmt_val(val))
+      # Build string with renaming & mapping rules
+      arg_strings <- sapply(names(args), function(arg) {
+
+        val <- args[[arg]]
+        arg_print <- arg
+
+        ## model > prior_analysis
+        if (arg == "model") {
+          arg_print <- "prior_analysis"
         }
+
+        ## e > ROPE
+        if (arg == "e") {
+          arg_print <- "ROPE"
+          if (length(val) > 1) {
+            return(sprintf(
+              "  %s = c(%s)",
+              arg_print,
+              paste(fmt_val(val), collapse = ", ")
+            ))
+          }
+        }
+
+        ## hypothesis > alternative
+        if (arg == "hypothesis") {
+
+          arg_print <- "alternative"
+
+          val <- switch(val,
+                        "<"  = "less",
+                        "!=" = "two.sided",
+                        ">"  = "greater",
+                        stop("Invalid hypothesis")
+          )
+
+          val <- shQuote(val)
+        } else {
+          val <- fmt_val(val)
+        }
+
+        sprintf("  %s = %s", arg_print, val)
       })
 
-      call_string <- paste0(
+      paste0(
         "# Function to be used in R\n",
         "BF10.cor(\n",
         paste(arg_strings, collapse = ",\n"),
         "\n)"
       )
-
-      call_string
     }
+
 
 
     build_BF10_call(rr)
@@ -7114,7 +7184,7 @@ shiny::observeEvent(input$runt1, {
 
     pc_t1(NULL)
     output$plot_power_t1_text <- shiny::renderUI(NULL)
-    output$plot_power_t1      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_power_t1      <- shiny::renderPlot(NULL)
   }
 
 
@@ -7162,7 +7232,7 @@ shiny::observeEvent(input$runt1, {
 
     rela_t1(NULL)
     output$plot_rel_t1_text <- shiny::renderUI(NULL)
-    output$plot_rel_t1      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_rel_t1      <- shiny::renderPlot(NULL)
   }
 
 
@@ -7192,45 +7262,81 @@ shiny::observeEvent(input$runt1, {
 shiny::observeEvent(input$cal1, {
   x = input_t1()
 
-  output$result_t1 <- shiny::renderText({
+  output$result_t1 <- shiny::renderText({args <- list(
+    tval = x$tval,
+    df = x$N,
+    model = x$model,
+    location = x$location,
+    scale = x$scale,
+    dff = x$dff,
+    hypothesis = x$hypothesis
+  )
 
-    fmt_val <- function(val) {
-      if (is.character(val)) {
-        sprintf('"%s"', val)
-      } else if (is.numeric(val) && length(val) > 1) {
-        paste0("c(", paste(val, collapse = ","), ")")
+  if (!is.null(x$e) && x$interval != 1) {
+    args$e <- x$e
+  }
+
+  # Build string with each argument on a new line
+  arg_strings <- sapply(names(args), function(arg) {
+
+    # fmt_val defined inside sapply, same style as before
+    fmt_val <- function(x) {
+      if (is.character(x)) {
+        # Wrap character strings in quotes
+        return(shQuote(x))
+      } else if (is.numeric(x) && length(x) > 1) {
+        # Wrap numeric vectors in c(...)
+        return(paste0("c(", paste(x, collapse = ", "), ")"))
+      } else if (is.numeric(x)) {
+        return(as.character(x))
+      } else if (is.logical(x)) {
+        return(ifelse(x, "TRUE", "FALSE"))
       } else {
-        as.character(val)
+        stop("Unsupported type in fmt_val")
       }
     }
 
-    args <- list(
-      tval = x$tval,
-      df = x$N,
-      model = x$model,
-      location = x$location,
-      scale = x$scale,
-      dff = x$dff,
-      hypothesis = x$hypothesis
-    )
+    val <- args[[arg]]
+    arg_print <- arg
 
-    if (x$interval != 1) {
-      args$e <- x$e
+    ## model > prior_analysis
+    if (arg == "model") {
+      arg_print <- "prior_analysis"
     }
 
-    # Build string with each argument on a new line
-    arg_strings <- sapply(names(args), function(nm) {
-      sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
-    })
+    ## e > ROPE
+    if (arg == "e") {
+      arg_print <- "ROPE"
+    }
 
-    call_string <- paste0(
-      "# Function to be used in R\n",
-      "BF10.t.test.one.sample(\n",
-      paste(arg_strings, collapse = ",\n"),
-      "\n)"
-    )
+    ## hypothesis > alternative
+    if (arg == "hypothesis") {
+      arg_print <- "alternative"
 
-    call_string
+      val <- switch(val,
+                    "<"  = "less",
+                    "!=" = "two.sided",
+                    ">"  = "greater",
+                    stop("Invalid hypothesis")
+      )
+
+      val <- shQuote(val)
+
+    } else {
+      val <- fmt_val(val)
+    }
+
+    sprintf("  %s = %s", arg_print, val)
+  })
+
+  call_string <- paste0(
+    "# Function to be used in R\n",
+    "BF10.ttest.OneSample(\n",
+    paste(arg_strings, collapse = ",\n"),
+    "\n)"
+  )
+
+  call_string
   })
 
 
@@ -7268,9 +7374,9 @@ shiny::observeEvent(input$cal1, {
     ))
 
   })
-  BF10 <- switch(x$interval,
+  BF10 <- suppressWarnings(switch(x$interval,
                  "1" = t1_BF10(x$tval,x$N,x$model ,x$location,x$scale,x$dff , x$hypothesis ),
-                 "2" = t1e_BF10(x$tval,x$N,x$model,x$location,x$scale,x$dff , x$hypothesis,x$e ))
+                 "2" = t1e_BF10(x$tval,x$N,x$model,x$location,x$scale,x$dff , x$hypothesis,x$e )))
 
   output$BFt1 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
@@ -7558,7 +7664,7 @@ shiny::observeEvent(input$runt2, {
 
     pc_t2(NULL)
     output$plot_power_t2_text <- shiny::renderUI(NULL)
-    output$plot_power_t2      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_power_t2      <- shiny::renderPlot(NULL)
   }
 
 
@@ -7601,7 +7707,7 @@ shiny::observeEvent(input$runt2, {
 
     rela_t2(NULL)
     output$plot_rel_t2_text <- shiny::renderUI(NULL)
-    output$plot_rel_t2      <- shiny::renderPlot(NULL)(NULL)
+    output$plot_rel_t2      <- shiny::renderPlot(NULL)
   }
 
 
@@ -7710,17 +7816,45 @@ shiny::observeEvent(input$cal2, {
     }
 
     # Build string with each argument on a new line
-    arg_strings <- sapply(names(args), function(nm) {
-      if (nm == "e" && length(args[[nm]]) > 1) {
-        sprintf("  e = c(%s)", paste(fmt_val(args[[nm]]), collapse = ", "))
-      } else {
-        sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
+    arg_strings <- sapply(names(args), function(arg) {
+
+      val <- args[[arg]]
+      arg_print <- arg
+
+      ## model > prior_analysis
+      if (arg == "model") {
+        arg_print <- "prior_analysis"
       }
+
+      ## e > ROPE
+      if (arg == "e") {
+        arg_print <- "ROPE"
+      }
+
+      ## hypothesis > alternative
+      if (arg == "hypothesis") {
+
+        arg_print <- "alternative"
+
+        val <- switch(val,
+                      "<"  = "less",
+                      "!=" = "two.sided",
+                      ">"  = "greater",
+                      stop("Invalid hypothesis")
+        )
+
+        val <- shQuote(val)
+
+      } else {
+        val <- fmt_val(val)
+      }
+
+      sprintf("  %s = %s", arg_print, val)
     })
 
     call_string <- paste0(
       "# Function to be used in R\n",
-      "BF10.t.test.two.sample(\n",
+      "BF10.ttest.TwoSample(\n",
       paste(arg_strings, collapse = ",\n"),
       "\n)"
     )
