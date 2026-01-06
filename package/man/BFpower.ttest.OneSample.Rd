@@ -68,7 +68,7 @@ An object of class \code{BFpower_t} (a list) containing:
 \item{alternative}{Character, the direction of the alternative hypothesis.}
 \item{ROPE}{Optional numeric vector for interval null bounds.}
 \item{analysis_h1}{List with analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
-\item{design_h1}{List with design prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NaN} if not provided).}
+\item{design_h1}{List with design prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).}
 \item{results}{Data frame of probabilities: compelling/misleading evidence, or \code{NaN} if calculation fails.}
 \item{threshold}{Numeric, threshold of compelling evidence.}
 \item{plot_power}{Logical, whether to plot the power curve.}

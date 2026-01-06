@@ -43,7 +43,7 @@ A list with class \code{"BFvalue_r"} containing:
 \itemize{
 \item \code{type}: "correlation"
 \item \code{bf10}: Calculated Bayes factor BF10
-\item \code{h0}: NaN value of the correlation
+\item \code{h0}: Null value of the correlation
 \item \code{r}: Observed correlation coefficient
 \item \code{n}: Sample size
 \item \code{analysis_h1}: List of analysis prior parameters including \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, \code{scale}

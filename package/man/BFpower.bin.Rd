@@ -55,7 +55,7 @@ BFpower.bin(
 
 \item{scale_d}{Scale parameter for the design moment prior (used when \code{prior_design = "Moment"}).}
 
-\item{N}{Sample size. If \code{NaN}, sample size determination is performed.}
+\item{N}{Sample size. If \code{NULL}, sample size determination is performed.}
 
 \item{ROPE}{Numeric bounds for the interval null (used when computing interval Bayes factors).}
 

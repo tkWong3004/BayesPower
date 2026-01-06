@@ -29,7 +29,7 @@
 #'   \item{alternative}{Character, the direction of the alternative hypothesis.}
 #'   \item{ROPE}{Optional numeric vector for interval null bounds.}
 #'   \item{analysis_h1}{List with analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
-#'   \item{design_h1}{List with design prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NaN} if not provided).}
+#'   \item{design_h1}{List with design prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).}
 #'   \item{results}{Data frame of probabilities: compelling/misleading evidence, or \code{NaN} if calculation fails.}
 #'   \item{threshold}{Numeric, threshold of compelling evidence.}
 #'   \item{plot_power}{Logical, whether to plot the power curve.}
@@ -265,7 +265,7 @@ BFpower.ttest.OneSample <- function(
     },
     error = function(err) {
       message("Required sample size > 10,000")
-      stop(NULL)
+      stop(NaN)
     }
   )
   type = "One-sample t-test"
@@ -346,8 +346,8 @@ BFpower.ttest.OneSample <- function(
 #' @param location_d Numeric scalar. Location parameter for the design prior.
 #' @param scale_d Numeric scalar > 0. Scale parameter for the design prior.
 #' @param dff_d Numeric scalar. Degrees of freedom for the design prior (required if \code{prior_design = "t-distribution"}; ignored otherwise).
-#' @param N1 Sample size for group 1 (used if \code{r = NaN}).
-#' @param N2 Sample size for group 2 (used if \code{r = NaN}).
+#' @param N1 Sample size for group 1 (used if \code{r = NULL}).
+#' @param N2 Sample size for group 2 (used if \code{r = NULL}).
 #' @param r Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).
 #' @param type_rate Character, either \code{"positive"} or \code{"negative"}; determines whether to control
 #'   true/false positive or true/false negative rates .
@@ -619,7 +619,7 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
     }),
     error = function(err) {
       message("Required sample size > 10,000")
-      stop(NULL)
+      stop(NaN)
     }
   )
 
@@ -987,7 +987,7 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
     }),
     error = function(err) {
       message("Required sample size > 5,000")
-      stop(NULL)
+      stop(NaN)
     }
   )
   type = "correlation"
@@ -1090,7 +1090,7 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
 #' @param f_m_d Cohen's \eqn{f} value for the design prior or the effect-size of the
 #'   point design prior.
 #'
-#' @param N Sample size. If \code{NaN}, sample size determination is performed.
+#' @param N Sample size. If \code{NULL}, sample size determination is performed.
 #'
 #' @param type_rate Either `"positive"` (control true/false positive rates) or
 #'   `"negative"` (control true/false negative rates).
@@ -1345,7 +1345,7 @@ BFpower.f.test <- function(threshold, true_rate, false_rate , p , k ,
 
     message("Required sample size > 10,000")
 
-    return(invisible(NULL))
+    return(NaN)
   })
 
 
@@ -1414,7 +1414,7 @@ BFpower.f.test <- function(threshold, true_rate, false_rate , p , k ,
 #' @param beta_d Parameter for the design beta prior (used when \code{prior_design = "beta"}).
 #' @param location_d Proportion value for the design point prior (\code{prior_design = "Point"}). Represents the true proportion under the alternative hypothesis.
 #' @param scale_d Scale parameter for the design moment prior (used when \code{prior_design = "Moment"}).
-#' @param N Sample size. If \code{NaN}, sample size determination is performed.
+#' @param N Sample size. If \code{NULL}, sample size determination is performed.
 #' @param ROPE Numeric bounds for the interval null (used when computing interval Bayes factors).
 #' @param type_rate Either `"positive"` (controls true/false positive rates) or `"negative"` (controls true/false negative rates).
 #' @param plot_power Logical. Whether to plot power curves when sample size determination is requested.
@@ -1698,7 +1698,7 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
     })
   }, error = function(err) {
     message("Sample size cannot be determined")
-    return(invisible(NULL))
+    return(NaN)
   })
 
   type = "One proportion"
@@ -2012,7 +2012,7 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
     })
   }, error = function(e) {
     message("Required Sample size > 5000 per group")
-    return(NULL)
+    return(NaN)
   })
 
 
@@ -2394,7 +2394,7 @@ BF10.ttest.TwoSample <- function(tval, N1, N2, prior_analysis, location, scale, 
 #' \itemize{
 #'   \item \code{type}: "correlation"
 #'   \item \code{bf10}: Calculated Bayes factor BF10
-#'   \item \code{h0}: NaN value of the correlation
+#'   \item \code{h0}: Null value of the correlation
 #'   \item \code{r}: Observed correlation coefficient
 #'   \item \code{n}: Sample size
 #'   \item \code{analysis_h1}: List of analysis prior parameters including \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, \code{scale}
@@ -2416,7 +2416,7 @@ BF10.cor <- function(r, n, k, alpha, beta, h0, alternative,  scale,  prior_analy
 
   # Check h0
   if (!is.numeric(h0) || length(h0) != 1 || !is.finite(h0) || h0 < -0.8 || h0 > 0.8) {
-    stop("argument [h0] NaN value of rho must be a single numeric scalar between -0.8 and 0.8")
+    stop("argument [h0] null value of rho must be a single numeric scalar between -0.8 and 0.8")
   }
   location = h0
 

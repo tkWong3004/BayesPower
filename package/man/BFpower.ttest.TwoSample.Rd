@@ -61,9 +61,9 @@ right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
 \item{dff_d}{Numeric scalar. Degrees of freedom for the design prior (required if \code{prior_design = "t-distribution"}; ignored otherwise).}
 
-\item{N1}{Sample size for group 1 (used if \code{r = NaN}).}
+\item{N1}{Sample size for group 1 (used if \code{r = NULL}).}
 
-\item{N2}{Sample size for group 2 (used if \code{r = NaN}).}
+\item{N2}{Sample size for group 2 (used if \code{r = NULL}).}
 
 \item{r}{Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).}
 

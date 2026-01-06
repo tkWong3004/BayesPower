@@ -28,7 +28,7 @@ BayesPower::BayesPower_BayesFactor()
 ## Citation
 
 **Software paper**\
-Wong, T. K., Pawel, S., & Tendeiro, J. (2025). BayesPower: A General Application of Power and Sample Size Calculation for the Bayes Factor. *PsyArXiv.* <https://doi.org/10.31234/osf.io/pgdac>
+Wong, T. K., Pawel, S., & Tendeiro, J. (2025). BayesPower: A General Application of Power and Sample Size Calculation for the Bayes Factor. *PsyArXiv.* <https://doi.org/10.31234/osf.io/pgdac_v2>
 
 **Software package**\
 Wong, T. K., Pawel, S., & Tendeiro, J. (2025). BayesPower: Sample Size and Power Calculation for Bayesian Testing with Bayes Factor (Version 1.0.1) [R package]. <https://CRAN.R-project.org/package=BayesPower>

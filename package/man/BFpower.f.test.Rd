@@ -62,7 +62,7 @@ and at least 3 if \code{prior_design = "Moment"}.}
 \item{f_m_d}{Cohen's \eqn{f} value for the design prior or the effect-size of the
 point design prior.}
 
-\item{N}{Sample size. If \code{NaN}, sample size determination is performed.}
+\item{N}{Sample size. If \code{NULL}, sample size determination is performed.}
 
 \item{type_rate}{Either \code{"positive"} (control true/false positive rates) or
 \code{"negative"} (control true/false negative rates).}
