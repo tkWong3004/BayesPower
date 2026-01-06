@@ -73,23 +73,20 @@ BFpower.props(
 }
 \value{
 An object of class \code{BFpower_2p} (a list) containing:
-\item \code{type}: Character, always \code{"Two-proportions"}.
-\item \code{analysis_h0}: List of analysis prior parameters under the null, containing
-\code{a} and \code{b}.
-\item \code{analysis_h1_theta_1}: List of analysis prior parameters for group 1 under the alternative, containing
-\code{a} and \code{b}.
-\item \code{analysis_h1_theta_2}: List of analysis prior parameters for group 2 under the alternative, containing
-\code{a} and \code{b}.
-\item \code{design_h1_theta_1}: List of design prior parameters for group 1 under the alternative, containing
-\code{prior} (prior distribution), \code{a}, \code{b}, and \code{p} (design probability).
-\item \code{design_h1_theta_2}: List of design prior parameters for group 2 under the alternative, containing
-\code{prior} (prior distribution), \code{a}, \code{b}, and \code{p} (design probability).
-\item \code{results}: Data frame of probabilities of compelling and misleading evidence.
-\item \code{grid}: Grid used for computation .
-\item \code{threshold}: threshold of compelling evidence.
-\item \code{mode_bf}: Character string specifying the mode (sample size determination or power calculation).
-\item \code{plot_power}: Logical; whether the power curve is plotted.
-\item \code{plot_rel}: Logical; whether the relationship between the Bayes factor and observed proportion differences is plotted.
+\describe{
+\item{\code{type}}{Character, always \code{"Two-proportions"}.}
+\item{\code{analysis_h0}}{List of analysis prior parameters under the null, containing \code{a} and \code{b}.}
+\item{\code{analysis_h1_theta_1}}{List of analysis prior parameters for group 1 under the alternative, containing \code{a} and \code{b}.}
+\item{\code{analysis_h1_theta_2}}{List of analysis prior parameters for group 2 under the alternative, containing \code{a} and \code{b}.}
+\item{\code{design_h1_theta_1}}{List of design prior parameters for group 1 under the alternative, containing \code{prior}, \code{a}, \code{b}, and \code{p}.}
+\item{\code{design_h1_theta_2}}{List of design prior parameters for group 2 under the alternative, containing \code{prior}, \code{a}, \code{b}, and \code{p}.}
+\item{\code{results}}{Data frame of probabilities of compelling and misleading evidence.}
+\item{\code{grid}}{Grid used for computation.}
+\item{\code{threshold}}{Threshold of compelling evidence.}
+\item{\code{mode_bf}}{Character string specifying the mode (sample size determination or power calculation).}
+\item{\code{plot_power}}{Logical; whether the power curve is plotted.}
+\item{\code{plot_rel}}{Logical; whether the relationship between the Bayes factor and observed proportion differences is plotted.}
+}
 }
 \description{
 Perform sample size determination or calculate probabilities of compelling and misleading evidence

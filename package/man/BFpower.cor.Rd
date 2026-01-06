@@ -31,6 +31,8 @@ BFpower.cor(
 \arguments{
 \item{alternative}{character. The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
+\item{h0}{Numeric scalar. Null rho correlation value. Must be between -0.8 and 0.8.}
+
 \item{ROPE}{Optional numeric vector or scalar specifying bounds for an interval null; used if interval Bayes factor is calculated.
 \itemize{
 \item For \code{alternative = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
@@ -74,8 +76,6 @@ default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"M
 \item{plot_power}{Logical; if TRUE, plots power curves.}
 
 \item{plot_rel}{Logical; if TRUE, plots the relationship between the BF and data.}
-
-\item{rho.h0}{Numeric scalar. Null rho correlation value. Must be between -0.8 and 0.8.}
 }
 \value{
 A list of class \code{BFpower_r} containing:
@@ -148,7 +148,7 @@ If \code{plot_power = TRUE}, the function plots the probability of compelling ev
 \examples{
 BFpower.cor(
  alternative = "greater",
- h0 = 0,
+   h0 = 0,
    threshold = 3,
    true_rate = 0.8,
    false_rate = 0.05,

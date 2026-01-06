@@ -77,18 +77,17 @@ sample size determination is requested.}
 }
 \value{
 A list of class \code{BFpower_f} containing:
-\itemize{
-\item \code{type}: Test type ("Regression/ANOVA").
-\item \code{k}, \code{p}: Model sizes.
-\item \code{ROPE}: Bounds for interval null (if used).
-\item \code{analysis_h1}{List containing the analysis prior specification, including the prior distribution, scale (\code{rscale}), f (\code{f_m}), and degrees of freedom (\code{dff}).}
-\item \code{design_h1}{List containing the design prior specification, including the prior distribution, scale (\code{rscale}), f (\code{f_m}), and  degrees of freedom (\code{dff}, or \code{NULL} if not specified).}
-\item \code{results}: Data frame of the probabilities of compelling/misleading evidence and the required or supplied sample size.
-\item \code{threshold}: Threshold of compelling evidence.
-\item \code{plot_power}: Logical, whether power curves are plotted.
-\item \code{plot_rel}: Logical, whether the relationship between the BF and data is plotted.
+\describe{
+\item{\code{type}}{Test type (always "Regression/ANOVA").}
+\item{\code{k}, \code{p}}{Number of predictors in the full and reduced models.}
+\item{\code{ROPE}}{Bounds for interval null (if used).}
+\item{\code{analysis_h1}}{List containing the analysis prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff}.}
+\item{\code{design_h1}}{List containing the design prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff} (or \code{NULL} if not specified).}
+\item{\code{results}}{Data frame of probabilities of compelling/misleading evidence and the required or supplied sample size.}
+\item{\code{threshold}}{Threshold of compelling evidence.}
+\item{\code{plot_power}}{Logical; whether power curves are plotted.}
+\item{\code{plot_rel}}{Logical; whether the relationship between the Bayes factor and data is plotted.}
 }
-
 If sample size determination fails, the function returns \code{NaN} and prints a message.
 }
 \description{

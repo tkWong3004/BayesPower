@@ -691,7 +691,7 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
 #' analysis and design priors.
 #'
 #' @param alternative character. The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
-#' @param rho.h0 Numeric scalar. Null rho correlation value. Must be between -0.8 and 0.8.
+#' @param h0 Numeric scalar. Null rho correlation value. Must be between -0.8 and 0.8.
 #' @param ROPE Optional numeric vector or scalar specifying bounds for an interval null; used if interval Bayes factor is calculated.
 #'   - For \code{alternative = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
 #'   - For \code{alternative = "greater"}, must be a single numeric scalar > 0.
@@ -781,7 +781,7 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
 #' @examples
 #' BFpower.cor(
 #'  alternative = "greater",
-#'  h0 = 0,
+#'    h0 = 0,
 #'    threshold = 3,
 #'    true_rate = 0.8,
 #'    false_rate = 0.05,
@@ -1154,18 +1154,17 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
 #' If \code{plot_power = TRUE}, the function plots the probability of compelling evidence as a function of sample size. If \code{plot_rel = TRUE}, the relationship between the Bayes factor and Cohen's \code{f} is plotted.
 #'
 #' @return A list of class \code{BFpower_f} containing:
-#' \itemize{
-#'   \item \code{type}: Test type ("Regression/ANOVA").
-#'   \item \code{k}, \code{p}: Model sizes.
-#'   \item \code{ROPE}: Bounds for interval null (if used).
-#'   \item \code{analysis_h1}{List containing the analysis prior specification, including the prior distribution, scale (\code{rscale}), f (\code{f_m}), and degrees of freedom (\code{dff}).}
-#'   \item \code{design_h1}{List containing the design prior specification, including the prior distribution, scale (\code{rscale}), f (\code{f_m}), and  degrees of freedom (\code{dff}, or \code{NULL} if not specified).}
-#'   \item \code{results}: Data frame of the probabilities of compelling/misleading evidence and the required or supplied sample size.
-#'   \item \code{threshold}: Threshold of compelling evidence.
-#'   \item \code{plot_power}: Logical, whether power curves are plotted.
-#'   \item \code{plot_rel}: Logical, whether the relationship between the BF and data is plotted.
+#' \describe{
+#'   \item{\code{type}}{Test type (always "Regression/ANOVA").}
+#'   \item{\code{k}, \code{p}}{Number of predictors in the full and reduced models.}
+#'   \item{\code{ROPE}}{Bounds for interval null (if used).}
+#'   \item{\code{analysis_h1}}{List containing the analysis prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff}.}
+#'   \item{\code{design_h1}}{List containing the design prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff} (or \code{NULL} if not specified).}
+#'   \item{\code{results}}{Data frame of probabilities of compelling/misleading evidence and the required or supplied sample size.}
+#'   \item{\code{threshold}}{Threshold of compelling evidence.}
+#'   \item{\code{plot_power}}{Logical; whether power curves are plotted.}
+#'   \item{\code{plot_rel}}{Logical; whether the relationship between the Bayes factor and data is plotted.}
 #' }
-#'
 #' If sample size determination fails, the function returns \code{NaN} and prints a message.
 #'
 #' @examples
@@ -1832,24 +1831,21 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
 #' If \code{plot_power = TRUE}, a power curve is plotted showing the probability of compelling evidence as a function of sample sizes. If \code{plot_rel = TRUE}, a grid of Bayes factors across possible outcomes is plotted.
 #'
 #' @return An object of class \code{BFpower_2p} (a list) containing:
-#'   \item \code{type}: Character, always \code{"Two-proportions"}.
-#'   \item \code{analysis_h0}: List of analysis prior parameters under the null, containing
-#'     \code{a} and \code{b}.
-#'   \item \code{analysis_h1_theta_1}: List of analysis prior parameters for group 1 under the alternative, containing
-#'     \code{a} and \code{b}.
-#'   \item \code{analysis_h1_theta_2}: List of analysis prior parameters for group 2 under the alternative, containing
-#'     \code{a} and \code{b}.
-#'   \item \code{design_h1_theta_1}: List of design prior parameters for group 1 under the alternative, containing
-#'     \code{prior} (prior distribution), \code{a}, \code{b}, and \code{p} (design probability).
-#'   \item \code{design_h1_theta_2}: List of design prior parameters for group 2 under the alternative, containing
-#'     \code{prior} (prior distribution), \code{a}, \code{b}, and \code{p} (design probability).
-#'   \item \code{results}: Data frame of probabilities of compelling and misleading evidence.
-#'   \item \code{grid}: Grid used for computation .
-#'   \item \code{threshold}: threshold of compelling evidence.
-#'   \item \code{mode_bf}: Character string specifying the mode (sample size determination or power calculation).
-#'   \item \code{plot_power}: Logical; whether the power curve is plotted.
-#'   \item \code{plot_rel}: Logical; whether the relationship between the Bayes factor and observed proportion differences is plotted.
-#'
+#' \describe{
+#'   \item{\code{type}}{Character, always \code{"Two-proportions"}.}
+#'   \item{\code{analysis_h0}}{List of analysis prior parameters under the null, containing \code{a} and \code{b}.}
+#'   \item{\code{analysis_h1_theta_1}}{List of analysis prior parameters for group 1 under the alternative, containing \code{a} and \code{b}.}
+#'   \item{\code{analysis_h1_theta_2}}{List of analysis prior parameters for group 2 under the alternative, containing \code{a} and \code{b}.}
+#'   \item{\code{design_h1_theta_1}}{List of design prior parameters for group 1 under the alternative, containing \code{prior}, \code{a}, \code{b}, and \code{p}.}
+#'   \item{\code{design_h1_theta_2}}{List of design prior parameters for group 2 under the alternative, containing \code{prior}, \code{a}, \code{b}, and \code{p}.}
+#'   \item{\code{results}}{Data frame of probabilities of compelling and misleading evidence.}
+#'   \item{\code{grid}}{Grid used for computation.}
+#'   \item{\code{threshold}}{Threshold of compelling evidence.}
+#'   \item{\code{mode_bf}}{Character string specifying the mode (sample size determination or power calculation).}
+#'   \item{\code{plot_power}}{Logical; whether the power curve is plotted.}
+#'   \item{\code{plot_rel}}{Logical; whether the relationship between the Bayes factor and observed proportion differences is plotted.}
+#' }
+
 #' @examples
 #' BFpower.props(
 #' threshold = 3,
@@ -2583,14 +2579,13 @@ BF10.cor <- function(r, n, k, alpha, beta, h0, alternative,  scale,  prior_analy
 #'   null hypothesis. If provided, must be > 0.
 #'
 #' @return A list of class \code{"BFvalue_f"} containing:
-#' \itemize{
-#'   \item \code{fval} Input F-value
-#'   \item \code{df1, df2} Degrees of freedom
-#'   \item \code{ROPE} Interval bound (if specified)
-#'   \item \code{analysis_h1}{List containing the analysis prior specification, including the prior distribution, scale (\code{rscale}), f (\code{f_m}), and degrees of freedom (\code{dff}).}
-#'   \item \code{bf10} The computed Bayes factor
+#' \describe{
+#'   \item{\code{fval}}{Input F-value.}
+#'   \item{\code{df1}, \code{df2}}{Degrees of freedom.}
+#'   \item{\code{ROPE}}{Interval bound (if specified).}
+#'   \item{\code{analysis_h1}}{List containing the analysis prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff}.}
+#'   \item{\code{bf10}}{The computed Bayes factor.}
 #' }
-#'
 #' @examples
 #' BF10.f.test(
 #'   fval = 4.5,

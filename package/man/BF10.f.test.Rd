@@ -31,12 +31,12 @@ null hypothesis. If provided, must be > 0.}
 }
 \value{
 A list of class \code{"BFvalue_f"} containing:
-\itemize{
-\item \code{fval} Input F-value
-\item \code{df1, df2} Degrees of freedom
-\item \code{ROPE} Interval bound (if specified)
-\item \code{analysis_h1}{List containing the analysis prior specification, including the prior distribution, scale (\code{rscale}), f (\code{f_m}), and degrees of freedom (\code{dff}).}
-\item \code{bf10} The computed Bayes factor
+\describe{
+\item{\code{fval}}{Input F-value.}
+\item{\code{df1}, \code{df2}}{Degrees of freedom.}
+\item{\code{ROPE}}{Interval bound (if specified).}
+\item{\code{analysis_h1}}{List containing the analysis prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff}.}
+\item{\code{bf10}}{The computed Bayes factor.}
 }
 }
 \description{
