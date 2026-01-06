@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BFpower.f.test}
 \alias{BFpower.f.test}
-\title{Sample Size Determination for Bayesian F-test}
+\title{Sample Size Determination for the Bayesian F-test}
 \usage{
 BFpower.f.test(
   threshold,
@@ -28,46 +28,46 @@ BFpower.f.test(
 \arguments{
 \item{threshold}{Numeric scalar. Threshold for compelling evidence (must be > 1).}
 
-\item{true_rate}{Targeted true positive or true negative rate (used only when
+\item{true_rate}{Numeric scalar. Targeted true positive or true negative rate (used only when
 sample size determination is requested; \code{N = NULL}).}
 
-\item{false_rate}{Targeted false positive or false negative rate (used only when
+\item{false_rate}{Numeric scalar. Targeted false positive or false negative rate (used only when
 sample size determination is requested; \code{N = NULL}).}
 
-\item{p}{Number of predictors in the reduced model.}
+\item{p}{Numeric integer. Number of predictors in the reduced model.}
 
-\item{k}{Number of predictors in the full model (must satisfy \code{k > p}).}
+\item{k}{Numeric integer. Number of predictors in the full model (must satisfy \code{k > p}).}
 
-\item{prior_analysis}{Analysis prior model under the alternative hypothesis:
+\item{prior_analysis}{Character. Analysis prior model under the alternative hypothesis:
 \code{"effectsize"} or \code{"Moment"}.}
 
-\item{dff}{Degrees of freedom for the analysis prior under the alternative
+\item{dff}{Numeric scalar. Degrees of freedom for the analysis prior under the alternative
 hypothesis. Must be a positive scalar, and must be at least 3 if
 \code{prior_analysis = "Moment"}.}
 
-\item{rscale}{Scale parameter for the analysis effect-size prior (only used when
+\item{rscale}{Numeric scalar. Scale parameter for the analysis effect-size prior (only used when
 \code{prior_analysis = "effectsize"}).}
 
-\item{f_m}{Cohen's \eqn{f} effect-size parameter for the analysis prior (must be > 0).}
+\item{f_m}{Numeric scalar. Cohen's \eqn{f} effect-size parameter for the analysis prior (must be > 0).}
 
-\item{prior_design}{Design prior model under the alternative hypothesis:
+\item{prior_design}{Character. Design prior model under the alternative hypothesis:
 \code{"effectsize"}, \code{"Moment"}, or \code{"Point"}.}
 
-\item{dff_d}{Degrees of freedom for the design prior. Must be a positive scalar,
+\item{dff_d}{Numeric scalar. Degrees of freedom for the design prior. Must be a positive scalar,
 and at least 3 if \code{prior_design = "Moment"}.}
 
-\item{rscale_d}{Scale parameter for the design effect-size prior
+\item{rscale_d}{Numeric scalar. Scale parameter for the design effect-size prior
 (only used when \code{prior_design = "effectsize"}).}
 
-\item{f_m_d}{Cohen's \eqn{f} value for the design prior or the effect-size of the
+\item{f_m_d}{Numeric scalar. Cohen's \eqn{f} value for the design prior or the effect-size of the
 point design prior.}
 
-\item{N}{Sample size. If \code{NULL}, sample size determination is performed.}
+\item{N}{Numeric integer. Sample size. If \code{NULL}, sample size determination is performed.}
 
-\item{type_rate}{Either \code{"positive"} (control true/false positive rates) or
+\item{type_rate}{Character. Either \code{"positive"} (control true/false positive rates) or
 \code{"negative"} (control true/false negative rates).}
 
-\item{ROPE}{Numeric bounds for the interval null (only used when interval
+\item{ROPE}{Numeric vector. Numeric bounds for the interval null (only used when interval
 Bayes factors are required).}
 
 \item{plot_power}{Logical. Whether to plot power curves when
@@ -81,8 +81,8 @@ A list of class \code{BFpower_f} containing:
 \item \code{type}: Test type ("Regression/ANOVA").
 \item \code{k}, \code{p}: Model sizes.
 \item \code{ROPE}: Bounds for interval null (if used).
-\item \code{analysis_h1}: List describing the analysis prior.
-\item \code{design_h1}: List describing the design prior.
+\item \code{analysis_h1}{List containing the analysis prior specification, including the prior distribution, scale (\code{rscale}), f (\code{f_m}), and degrees of freedom (\code{dff}).}
+\item \code{design_h1}{List containing the design prior specification, including the prior distribution, scale (\code{rscale}), f (\code{f_m}), and  degrees of freedom (\code{dff}, or \code{NULL} if not specified).}
 \item \code{results}: Data frame of the probabilities of compelling/misleading evidence and the required or supplied sample size.
 \item \code{threshold}: Threshold of compelling evidence.
 \item \code{plot_power}: Logical, whether power curves are plotted.

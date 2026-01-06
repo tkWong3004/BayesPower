@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BFpower.cor}
 \alias{BFpower.cor}
-\title{Sample size determination for Bayesian correlation test}
+\title{Sample Size Determination for the Bayesian correlation test}
 \usage{
 BFpower.cor(
   alternative,
@@ -29,47 +29,53 @@ BFpower.cor(
 )
 }
 \arguments{
-\item{alternative}{The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
+\item{alternative}{character. The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{h0}{Null value of the correlation; must be a numeric scalar between -0.8 and 0.8.}
+\item{ROPE}{Optional numeric vector or scalar specifying bounds for an interval null; used if interval Bayes factor is calculated.
+\itemize{
+\item For \code{alternative = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
+\item For \code{alternative = "greater"}, must be a single numeric scalar > 0.
+\item For \code{alternative = "less"}, must be a single numeric scalar < 0.
+}}
 
-\item{ROPE}{Optional numeric vector or scalar specifying bounds for an interval null; used if interval Bayes factor is calculated.}
+\item{threshold}{Numeric scalar. Threshold of compelling evidence (numeric scalar > 1).}
 
-\item{threshold}{Threshold of compelling evidence (numeric scalar > 1).}
+\item{true_rate}{Numeric scalar. Targeted true positive rate (if \code{positive = "positive"}) or true negative rate (if \code{positive = "negative"}).}
 
-\item{true_rate}{Targeted true positive rate (if \code{positive = "positive"}) or true negative rate (if \code{positive = "negative"}).}
+\item{false_rate}{Numeric scalar. Targeted false positive rate (if \code{positive = "positive"}) or false negative rate (if \code{positive = "negative"}).}
 
-\item{false_rate}{Targeted false positive rate (if \code{positive = "positive"}) or false negative rate (if \code{positive = "negative"}).}
+\item{prior_analysis}{character. Analysis prior under the alternative hypothesis:
+default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"Moment"}).}
 
-\item{prior_analysis}{Analysis prior under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"Moment"}).}
+\item{k}{Numeric scalar. Parameter for the default beta prior (\code{"d_beta"}).}
 
-\item{k}{Parameter for the default beta prior (\code{"d_beta"}).}
+\item{alpha}{Numeric scalar. Parameter for the beta prior (\code{"beta"}).}
 
-\item{alpha}{Parameter for the beta prior (\code{"beta"}).}
+\item{beta}{Numeric scalar. Parameter for the beta prior (\code{"beta"}).}
 
-\item{beta}{Parameter for the beta prior (\code{"beta"}).}
+\item{scale}{Numeric scalar. Scale parameter for the normal moment prior (\code{"Moment"}).}
 
-\item{scale}{Scale parameter for the normal moment prior (\code{"Moment"}).}
+\item{prior_design}{character. Design prior  under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), normal moment (\code{"Moment"}), or point (\code{"Point"}).}
 
-\item{prior_design}{Design prior  under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), normal moment (\code{"Moment"}), or point (\code{"Point"}).}
+\item{alpha_d}{Numeric scalar. Parameter for the design beta prior (\code{"beta"}).}
 
-\item{alpha_d}{Parameter for the design beta prior (\code{"beta"}).}
+\item{beta_d}{Numeric scalar. Parameter for the design beta prior (\code{"beta"}).}
 
-\item{beta_d}{Parameter for the design beta prior (\code{"beta"}).}
+\item{location_d}{Numeric scalar. Location parameter for the design point prior (\code{"Point"}).}
 
-\item{location_d}{Location parameter for the design point prior (\code{"Point"}).}
+\item{k_d}{Numeric scalar. Parameter for the design default beta prior (\code{"d_beta"}).}
 
-\item{k_d}{Parameter for the design default beta prior (\code{"d_beta"}).}
+\item{scale_d}{Numeric scalar. Scale parameter for the design normal moment prior (\code{"Moment"}).}
 
-\item{scale_d}{Scale parameter for the design normal moment prior (\code{"Moment"}).}
+\item{N}{Numeric integer. Sample size. Only required if the goal is not sample size determination, but rather to calculate the probability of obtaining compelling or misleading evidence for a given sample size.}
 
-\item{N}{Sample size (numeric scalar).}
-
-\item{type_rate}{Character indicating which rate to control: \code{"positive"} (true/false positive rates) or \code{"negative"} (true/false negative rates).}
+\item{type_rate}{character. Character indicating which rate to control: \code{"positive"} (true/false positive rates) or \code{"negative"} (true/false negative rates).}
 
 \item{plot_power}{Logical; if TRUE, plots power curves.}
 
 \item{plot_rel}{Logical; if TRUE, plots the relationship between the BF and data.}
+
+\item{rho.h0}{Numeric scalar. Null rho correlation value. Must be between -0.8 and 0.8.}
 }
 \value{
 A list of class \code{BFpower_r} containing:
@@ -78,22 +84,23 @@ A list of class \code{BFpower_r} containing:
 \item \code{alternative}: the direction of the alternative hypothesis.
 \item \code{h0}: the value of correlation under the null hypothesis.
 \item \code{ROPE}: Bounds for interval null (if used).
-\item \code{analysis_h1}: Analysis prior parameters under the alternative hypothesis.
-\item \code{design_h1}: Design prior parameters under the alternative hypothesis.
-\item \code{results}: Data frame of probabilities of compelling and misleading evidence.
+\item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
+\item \code{design_h1}: List with the design prior parameters: \code{prior_design}, \code{k}, \code{alpha}, \code{beta}, \code{scale}, and \code{location}.
+\item \code{results}: Data frame with the probabilities of compelling/misleading evidence, and with the required sample size.
 \item \code{threshold}: Threshold of compelling evidence.
 \item \code{plot_power}: Logical, whether power curves are plotted.
-\item \code{plot_rel}: Logical, whether the relationship between the BF and correlation is plotted.
+\item \code{plot_rel}: Logical, whether the relationship between the BF and the correlation is plotted.
 }
 }
 \description{
-Perform sample size determination or calculate probabilities of compelling and misleading evidence
-for a Bayesian correlation test.
+Perform sample size determination or the probability of obtaining compelling or misleading evidence for a Bayesian correlation test.
+Can handle both point-null and interval-null hypothesis, and allows specifying
+analysis and design priors.
 }
 \details{
 \strong{1. Sample size determination mode (when \code{N = NULL}):}
 
-If no sample size is provided, the function calculates the minimum sample size. The user must provide:
+If no sample size is provided, the function determines the minimum sample size required to meet the desired requirements. In this mode, the user must supply the following arguments:
 \itemize{
 \item \code{type_rate} - either \code{"positive"} to control true/false positive rates, or \code{"negative"} to control true/false negative rates.
 \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
@@ -122,7 +129,7 @@ The analysis prior specifies the prior distribution of the correlation under the
 
 \strong{Design Priors (optional):}
 
-A design prior can be specified for planning purposes. If provided, \code{prior_design} must be one of \code{"d_beta"}, \code{"beta"}, \code{"Moment"}, or \code{"Point"}, and the corresponding parameters must be supplied:
+A design prior can be supplied to reflect uncertainty about the correlation during study planning. If provided, \code{prior_design} must be one of \code{"d_beta"}, \code{"beta"}, \code{"Moment"}, or \code{"Point"}, and the corresponding parameters must be supplied:
 \itemize{
 \item \code{d_beta}: \code{k_d} > 0.
 \item \code{beta}: \code{alpha_d} and \code{beta_d} > 0.

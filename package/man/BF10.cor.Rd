@@ -18,25 +18,25 @@ BF10.cor(
 )
 }
 \arguments{
-\item{r}{Observed correlation coefficient. Must be a numeric scalar between -1 and 1.}
+\item{r}{Numeric scalar. Observed correlation coefficient. Must be a numeric scalar between -1 and 1.}
 
-\item{n}{Sample size. Must be a numeric scalar greater than 3.}
+\item{n}{Numeric integer. Sample size. Must be a numeric scalar greater than 3.}
 
-\item{k}{Parameter for the analysis default beta prior (\code{"d_beta"}) under the alternative hypothesis.}
+\item{k}{Numeric scalar. Parameter for the analysis default beta prior (\code{"d_beta"}) under the alternative hypothesis.}
 
-\item{alpha}{Parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.}
+\item{alpha}{Numeric scalar. Parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.}
 
-\item{beta}{Parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.}
+\item{beta}{Numeric scalar. Parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.}
 
-\item{h0}{Null value of the correlation. Must be a numeric scalar between -0.8 and 0.8.}
+\item{h0}{Numeric scalar. Null value of the correlation. Must be a numeric scalar between -0.8 and 0.8.}
 
-\item{alternative}{The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
+\item{alternative}{Character. The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{scale}{Scale parameter for the analysis normal-moment prior (\code{"Moment"}). Must be > 0.}
+\item{scale}{Numeric scalar. Scale parameter for the analysis normal-moment prior (\code{"Moment"}). Must be > 0.}
 
-\item{prior_analysis}{Analysis prior: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"Moment"}).}
+\item{prior_analysis}{Character. Analysis prior: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"Moment"}).}
 
-\item{ROPE}{Optional numeric vector specifying bounds for an interval null hypothesis. For \code{"two.sided"}, must be two distinct finite values between -0.5 and 0.5. For \code{"greater"} or \code{"less"}, must satisfy additional bounds relative to \code{h0}.}
+\item{ROPE}{Numeric vector. Optional numeric vector specifying bounds for an interval null hypothesis. For \code{"two.sided"}, must be two distinct finite values between -0.5 and 0.5. For \code{"greater"} or \code{"less"}, must satisfy additional bounds relative to \code{h0}.}
 }
 \value{
 A list with class \code{"BFvalue_r"} containing:
@@ -46,7 +46,7 @@ A list with class \code{"BFvalue_r"} containing:
 \item \code{h0}: Null value of the correlation
 \item \code{r}: Observed correlation coefficient
 \item \code{n}: Sample size
-\item \code{analysis_h1}: List of analysis prior parameters including \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, \code{scale}
+\item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
 \item \code{alternative}: the direction of the alternative hypothesis
 \item \code{ROPE}: Interval bounds if specified
 }

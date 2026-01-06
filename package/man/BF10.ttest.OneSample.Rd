@@ -55,7 +55,7 @@ A list of class \code{BFvalue_t} containing:
 \item{bf10}{Numeric, the Bayes factor (BF10).}
 \item{tval}{Observed t-value.}
 \item{df}{Degrees of freedom.}
-\item{analysis_h1}{List with the analysis prior parameters under H1: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
+\item{analysis_h1}{List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
 \item{alternative}{Character, the direction of the alternative hypothesis.}
 \item{ROPE}{Optional numeric vector of interval null bounds.}
 }

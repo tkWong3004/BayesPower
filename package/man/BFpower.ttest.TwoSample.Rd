@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BFpower.ttest.TwoSample}
 \alias{BFpower.ttest.TwoSample}
-\title{Sample Size Determination for Two-Sample Bayesian t-Test}
+\title{Sample Size Determination for the Two-Sample Bayesian t-Test}
 \usage{
 BFpower.ttest.TwoSample(
   alternative,
@@ -61,9 +61,9 @@ right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
 \item{dff_d}{Numeric scalar. Degrees of freedom for the design prior (required if \code{prior_design = "t-distribution"}; ignored otherwise).}
 
-\item{N1}{Sample size for group 1 (used if \code{r = NULL}).}
+\item{N1}{Numeric integer. Sample size for group 1 (used if \code{r = NULL}).}
 
-\item{N2}{Sample size for group 2 (used if \code{r = NULL}).}
+\item{N2}{Numeric integer. Sample size for group 2 (used if \code{r = NULL}).}
 
 \item{r}{Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).}
 
@@ -80,8 +80,8 @@ An object of class \code{BFpower_t} containing:
 \item{type}{Character string describing the test type.}
 \item{alternative}{alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).}
 \item{ROPE}{Interval bounds under the null used, if any.}
-\item{analysis_h1}{List of analysis prior parameters used for the alternative hypothesis.}
-\item{design_h1}{List of design prior parameters used for the alternative hypothesis.}
+\item{analysis_h1}{List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
+\item{design_h1}{List with the design prior parameters: \code{prior_design}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).}
 \item{results}{Data frame with probabilities of compelling/misleading evidence.}
 \item{threshold}{Threshold of compelling evidence.}
 \item{plot_power}{Logical flag for plotting power.}

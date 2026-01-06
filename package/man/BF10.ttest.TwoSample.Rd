@@ -19,9 +19,9 @@ BF10.ttest.TwoSample(
 \arguments{
 \item{tval}{Numeric scalar. Observed t-value from the two-sample t-test.}
 
-\item{N1}{Numeric scalar. Sample size of group 1 (must be > 2, will be rounded to nearest integer).}
+\item{N1}{Numeric integer. Sample size of group 1 (must be > 2, will be rounded to nearest integer).}
 
-\item{N2}{Numeric scalar. Sample size of group 2 (must be > 2, will be rounded to nearest integer).}
+\item{N2}{Numeric integer. Sample size of group 2 (must be > 2, will be rounded to nearest integer).}
 
 \item{prior_analysis}{Character. Analysis prior under the alternative hypothesis:
 \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.}
@@ -48,11 +48,11 @@ A list of class \code{BFvalue_t} containing:
 \item{bf10}{Computed Bayes factor BF10.}
 \item{tval}{Observed t-value.}
 \item{df}{Degrees of freedom (currently NA / not computed).}
-\item{analysis_h1}{List of prior model parameters used for the alternative hypothesis.}
+\item{analysis_h1}{List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
 \item{alternative}{Hypothesis tested (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).}
 \item{ROPE}{Interval bounds used, if any.}
-\item{N1}{Sample size of group 1 (rounded integer).}
-\item{N2}{Sample size of group 2 (rounded integer).}
+\item{N1}{Sample size of group 1 .}
+\item{N2}{Sample size of group 2 .}
 }
 }
 \description{

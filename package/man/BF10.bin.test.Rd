@@ -17,27 +17,27 @@ BF10.bin.test(
 )
 }
 \arguments{
-\item{x}{Observed number of successes (non-negative integer scalar, must be \eqn{\le n}).}
+\item{x}{Numeric integer. Observed number of successes (non-negative integer scalar, must be \eqn{\le n}).}
 
-\item{n}{Sample size (positive integer scalar).}
+\item{n}{Numeric integer. Sample size (positive integer scalar).}
 
-\item{alpha}{Shape parameter of the analysis beta prior under the alternative hypothesis
+\item{alpha}{Numeric scalar.  Shape parameter of the analysis beta prior under the alternative hypothesis
 (required if \code{prior_analysis = "beta"}).}
 
-\item{beta}{Shape parameter of the analysis beta prior under the alternative hypothesis
+\item{beta}{Numeric scalar.  Shape parameter of the analysis beta prior under the alternative hypothesis
 (required if \code{prior_analysis = "beta"}).}
 
-\item{h0}{Null proportion value (numeric scalar between 0.1 and 0.9).}
+\item{h0}{Numeric scalar.  Null proportion value (numeric scalar between 0.1 and 0.9).}
 
-\item{scale}{Scale parameter for the analysis prior (only used if \code{prior_analysis = "Moment"}).}
+\item{scale}{Numeric scalar.  Scale parameter for the analysis prior (only used if \code{prior_analysis = "Moment"}).}
 
-\item{prior_analysis}{the analysis prior under the alternative hypothesis:
+\item{prior_analysis}{character. the analysis prior under the alternative hypothesis:
 \code{"beta"} (stretched beta) or \code{"Moment"} (normal-moment prior).}
 
-\item{alternative}{Hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}),
+\item{alternative}{character. Hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}),
 or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric vector specifying bounds for an interval null; used if interval BF is calculated.}
+\item{ROPE}{Numeric vector.  Optional numeric vector specifying bounds for an interval null; used if interval BF is calculated.}
 }
 \value{
 An object of class \code{"BFvalue_bin"} containing:
@@ -47,7 +47,9 @@ An object of class \code{"BFvalue_bin"} containing:
 \item \code{x}: Number of successes.
 \item \code{n}: Sample size.
 \item \code{h0}: Null proportion value.
-\item \code{analysis_h1}: List describing the analysis prior (\code{prior_analysis}, \code{alpha}, \code{beta}, \code{scale}).
+\item \code{analysis_h1}: List describing the analysis prior, containing
+\code{prior} (prior distribution), \code{alpha} (alpha parameter),
+\code{beta} (beta parameter), and \code{scale} (scale parameter).
 \item \code{alternative}: the direction of the alternative hypothesis.
 \item \code{ROPE}: interval null bounds (if specified).
 }

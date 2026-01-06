@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BFpower.bin}
 \alias{BFpower.bin}
-\title{Sample size determination for Bayesian one-proportion test}
+\title{Sample Size Determination for the Bayesian one-proportion test}
 \usage{
 BFpower.bin(
   alternative,
@@ -27,39 +27,44 @@ BFpower.bin(
 )
 }
 \arguments{
-\item{alternative}{The direction of the alternative hypothesis : two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
+\item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
 \item{threshold}{Numeric scalar. Threshold for compelling evidence (must be > 1).}
 
-\item{h0}{Null proportion value for the test (numeric scalar between 0.1 and 0.9).}
+\item{h0}{Numeric scalar. Null proportion value for the test (numeric scalar between 0.1 and 0.9).}
 
-\item{true_rate}{Targeted true positive rate  or true negative rate .}
+\item{true_rate}{Numeric scalar. Targeted true positive rate  or true negative rate .}
 
-\item{false_rate}{Targeted false positive rate  or false negative rate .}
+\item{false_rate}{Numeric scalar. Targeted false positive rate  or false negative rate .}
 
-\item{prior_analysis}{Analysis prior under the alternative hypothesis: \code{"beta"} or \code{"Moment"}.}
+\item{prior_analysis}{Character. Analysis prior under the alternative hypothesis: \code{"beta"} or \code{"Moment"}.}
 
-\item{alpha}{Parameter for the analysis beta prior (used when \code{prior_analysis = "beta"}).}
+\item{alpha}{Numeric scalar. Parameter for the analysis beta prior (used when \code{prior_analysis = "beta"}).}
 
-\item{beta}{Parameter for the analysis beta prior (used when \code{prior_analysis = "beta"}).}
+\item{beta}{Numeric scalar. Parameter for the analysis beta prior (used when \code{prior_analysis = "beta"}).}
 
-\item{scale}{Scale parameter for the analysis moment prior (used when \code{prior_analysis = "Moment"}).}
+\item{scale}{Numeric scalar. Scale parameter for the analysis moment prior (used when \code{prior_analysis = "Moment"}).}
 
-\item{prior_design}{Design prior under the alternative hypothesis: \code{"beta"}, \code{"Moment"}, or \code{"Point"}.}
+\item{prior_design}{Character. Design prior under the alternative hypothesis: \code{"beta"}, \code{"Moment"}, or \code{"Point"}.}
 
-\item{alpha_d}{Parameter for the design beta prior (used when \code{prior_design = "beta"}).}
+\item{alpha_d}{Numeric scalar. Parameter for the design beta prior (used when \code{prior_design = "beta"}).}
 
-\item{beta_d}{Parameter for the design beta prior (used when \code{prior_design = "beta"}).}
+\item{beta_d}{Numeric scalar. Parameter for the design beta prior (used when \code{prior_design = "beta"}).}
 
-\item{location_d}{Proportion value for the design point prior (\code{prior_design = "Point"}). Represents the true proportion under the alternative hypothesis.}
+\item{location_d}{Numeric scalar. Proportion value for the design point prior (\code{prior_design = "Point"}). Represents the true proportion under the alternative hypothesis.}
 
-\item{scale_d}{Scale parameter for the design moment prior (used when \code{prior_design = "Moment"}).}
+\item{scale_d}{Numeric scalar. Scale parameter for the design moment prior (used when \code{prior_design = "Moment"}).}
 
-\item{N}{Sample size. If \code{NULL}, sample size determination is performed.}
+\item{N}{Numeric integer. Sample size. If \code{NULL}, sample size determination is performed.}
 
-\item{ROPE}{Numeric bounds for the interval null (used when computing interval Bayes factors).}
+\item{ROPE}{Numeric vector. Numeric bounds for the interval null (used when computing interval Bayes factors).
+\itemize{
+\item For \code{hypothesis = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
+\item For \code{"greater"}, must be a single numeric scalar > 0.
+\item For \code{"less"}, must be a single numeric scalar < 0.
+}}
 
-\item{type_rate}{Either \code{"positive"} (controls true/false positive rates) or \code{"negative"} (controls true/false negative rates).}
+\item{type_rate}{Character. Either \code{"positive"} (controls true/false positive rates) or \code{"negative"} (controls true/false negative rates).}
 
 \item{plot_power}{Logical. Whether to plot power curves when sample size determination is requested.}
 
@@ -71,8 +76,12 @@ A list of class \code{"BFpower_bin"} containing:
 \item \code{type}: Test type ("One proportion").
 \item \code{alternative}: alternative hypothesis.
 \item \code{h0}: The proportion under the null hypothesis.
-\item \code{analysis_h1}: List describing the analysis prior.
-\item \code{design_h1}: List describing the design prior.
+\item \code{analysis_h1}: List describing the analysis prior, containing
+\code{prior} (prior distribution), \code{alpha} (alpha parameter),
+\code{beta} (beta parameter), and \code{scale} (scale parameter).
+\item \code{design_h1}: List describing the design prior (if provided), containing
+\code{prior} (prior distribution), \code{alpha} (alpha parameter),
+\code{beta} (beta parameter), and \code{scale} (scale parameter).
 \item \code{results}: Data frame of probabilities of compelling/misleading evidence and the required or supplied sample size.
 \item \code{threshold}: Compelling-evidence threshold.
 \item \code{plot_power}: Logical, whether power curves are plotted.

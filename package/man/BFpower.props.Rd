@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BFpower.props}
 \alias{BFpower.props}
-\title{Sample size determination for Bayesian test of two proportions}
+\title{Sample Size Determination for the Bayesian test of two proportions}
 \usage{
 BFpower.props(
   threshold,
@@ -29,56 +29,67 @@ BFpower.props(
 )
 }
 \arguments{
-\item{threshold}{Threshold of compelling evidence.}
+\item{threshold}{Numeric scalar. Threshold of compelling evidence.}
 
-\item{true_rate}{Targeted true positive rate (if \code{positive = "positive"}) or true negative rate (if \code{positive = "negative"}).}
+\item{true_rate}{Numeric scalar. Targeted true positive rate (if \code{positive = "positive"}) or true negative rate (if \code{positive = "negative"}).}
 
-\item{a0}{Alpha parameter of the Beta prior under the null hypothesis.}
+\item{a0}{Numeric scalar. Alpha parameter of the Beta prior under the null hypothesis.}
 
-\item{b0}{Beta parameter of the Beta prior under the null hypothesis.}
+\item{b0}{Numeric scalar. Beta parameter of the Beta prior under the null hypothesis.}
 
-\item{a1}{Alpha parameter of the Beta analysis prior for group 1 under the alternative hypothesis.}
+\item{a1}{Numeric scalar. Alpha parameter of the Beta analysis prior for group 1 under the alternative hypothesis.}
 
-\item{b1}{Beta parameter of the Beta analysis prior for group 1 under the alternative hypothesis.}
+\item{b1}{Numeric scalar. Beta parameter of the Beta analysis prior for group 1 under the alternative hypothesis.}
 
-\item{a2}{Alpha parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
+\item{a2}{Numeric scalar. Alpha parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
 
-\item{b2}{Beta parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
+\item{b2}{Numeric scalar. Beta parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
 
-\item{prior_design_1}{the design prior of group 1: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
+\item{prior_design_1}{Character. The design prior of group 1: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
-\item{a1d}{Alpha parameter of the design prior for group 1 (used if \code{model1 = "beta"}).}
+\item{a1d}{Numeric scalar. Alpha parameter of the design prior for group 1 (used if \code{model1 = "beta"}).}
 
-\item{b1d}{Beta parameter of the design prior for group 1 (used if \code{model1 = "beta"}).}
+\item{b1d}{Numeric scalar. Beta parameter of the design prior for group 1 (used if \code{model1 = "beta"}).}
 
-\item{dp1}{True proportion for group 1 in the design prior (used if \code{model1 = "Point"}).}
+\item{dp1}{Numeric scalar. True proportion for group 1 in the design prior (used if \code{model1 = "Point"}).}
 
-\item{prior_design_2}{the design prior of group 2: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
+\item{prior_design_2}{Character. The design prior of group 2: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
-\item{a2d}{Alpha parameter of the design prior for group 2 (used if \code{model2 = "beta"}).}
+\item{a2d}{Numeric scalar. Alpha parameter of the design prior for group 2 (used if \code{model2 = "beta"}).}
 
-\item{b2d}{Beta parameter of the design prior for group 2 (used if \code{model2 = "beta"}).}
+\item{b2d}{Numeric scalar. Beta parameter of the design prior for group 2 (used if \code{model2 = "beta"}).}
 
-\item{dp2}{True proportion for group 2 in the design prior (used if \code{model2 = "Point"}).}
+\item{dp2}{Numeric scalar. True proportion for group 2 in the design prior (used if \code{model2 = "Point"}).}
 
-\item{n1}{Sample size for group 1.}
+\item{n1}{Numeric integer. Sample size for group 1.}
 
-\item{n2}{Sample size for group 2.}
+\item{n2}{Numeric integer. Sample size for group 2.}
 
-\item{type_rate}{Choose \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.}
+\item{type_rate}{Character. Choose \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.}
 
 \item{plot_power}{Logical; if TRUE, plot the power curve.}
 
 \item{plot_rel}{Logical; if TRUE, plot the grid for the values of BF across all possible combination of x1 and x2.}
 }
 \value{
-An object of class \code{BFpower_2p} containing:
-\itemize{
-\item Analysis priors under the null and alternative.
-\item Design priors for both groups.
-\item Computed probabilities of compelling and misleading evidence.
-\item Sample size results and other inputs.
-}
+An object of class \code{BFpower_2p} (a list) containing:
+\item \code{type}: Character, always \code{"Two-proportions"}.
+\item \code{analysis_h0}: List of analysis prior parameters under the null, containing
+\code{a} and \code{b}.
+\item \code{analysis_h1_theta_1}: List of analysis prior parameters for group 1 under the alternative, containing
+\code{a} and \code{b}.
+\item \code{analysis_h1_theta_2}: List of analysis prior parameters for group 2 under the alternative, containing
+\code{a} and \code{b}.
+\item \code{design_h1_theta_1}: List of design prior parameters for group 1 under the alternative, containing
+\code{prior} (prior distribution), \code{a}, \code{b}, and \code{p} (design probability).
+\item \code{design_h1_theta_2}: List of design prior parameters for group 2 under the alternative, containing
+\code{prior} (prior distribution), \code{a}, \code{b}, and \code{p} (design probability).
+\item \code{results}: Data frame of probabilities of compelling and misleading evidence.
+\item \code{grid}: Grid used for computation .
+\item \code{threshold}: threshold of compelling evidence.
+\item \code{mode_bf}: Character string specifying the mode (sample size determination or power calculation).
+\item \code{plot_power}: Logical; whether the power curve is plotted.
+\item \code{plot_rel}: Logical; whether the relationship between the Bayes factor and observed proportion differences is plotted.
 }
 \description{
 Perform sample size determination or calculate probabilities of compelling and misleading evidence

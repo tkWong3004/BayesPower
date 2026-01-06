@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BFpower.ttest.OneSample}
 \alias{BFpower.ttest.OneSample}
-\title{Sample Size Determination for One-Sample Bayesian t-Test}
+\title{Sample Size Determination for the One-Sample Bayesian t-Test}
 \usage{
 BFpower.ttest.OneSample(
   alternative,
@@ -25,9 +25,14 @@ BFpower.ttest.OneSample(
 )
 }
 \arguments{
-\item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
+\item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric vector. Bounds for an interval null hypothesis.}
+\item{ROPE}{Optional numeric vector. Bounds for an interval null hypothesis.
+\itemize{
+\item For \code{hypothesis = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
+\item For \code{"greater"}, must be a single numeric scalar > 0.
+\item For \code{"less"}, must be a single numeric scalar < 0.
+}}
 
 \item{prior_analysis}{Character. The analysis prior under the alternative hypothesis:
 \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.}
@@ -47,7 +52,7 @@ BFpower.ttest.OneSample(
 
 \item{dff_d}{Numeric scaler. Degrees of freedom for the design prior under the alternative hypothesis (required if \code{prior_design = "t-distribution"}).}
 
-\item{N}{Numeric scaler. Sample size.}
+\item{N}{Numeric integer. Sample size.}
 
 \item{type_rate}{Character. Either \code{"positive"} (controls true/false positive rates) or \code{"negative"} (controls true/false negative rates).}
 
@@ -67,8 +72,8 @@ An object of class \code{BFpower_t} (a list) containing:
 \item{type}{Character, always "One-sample t-test".}
 \item{alternative}{Character, the direction of the alternative hypothesis.}
 \item{ROPE}{Optional numeric vector for interval null bounds.}
-\item{analysis_h1}{List with analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
-\item{design_h1}{List with design prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).}
+\item{analysis_h1}{List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
+\item{design_h1}{List with the design prior parameters: \code{prior_design}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).}
 \item{results}{Data frame of probabilities: compelling/misleading evidence, or \code{NaN} if calculation fails.}
 \item{threshold}{Numeric, threshold of compelling evidence.}
 \item{plot_power}{Logical, whether to plot the power curve.}
@@ -76,8 +81,10 @@ An object of class \code{BFpower_t} (a list) containing:
 }
 }
 \description{
-Performs sample size determination or calculates the probabilities of obtaining compelling or misleading evidence
-for a one-sample Bayesian t-test. Can handle both point-null and interval-null Bayes factors.
+Perform sample size determination or calculate the probability of obtaining
+compelling or misleading evidence for a one-sample Bayesian t-test.
+Can handle both point-null and interval-null hypothesis, and allows specifying
+analysis and design priors.
 }
 \details{
 \strong{1. Sample size determination mode (when \code{N = NULL}):}

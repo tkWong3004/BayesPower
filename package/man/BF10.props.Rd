@@ -7,25 +7,25 @@
 BF10.props(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)
 }
 \arguments{
-\item{a0}{Alpha parameter of the Beta prior under the null hypothesis.}
+\item{a0}{Numeric scalar. Alpha parameter of the Beta prior under the null hypothesis.}
 
-\item{b0}{Beta parameter of the Beta prior under the null hypothesis.}
+\item{b0}{Numeric scalar. Beta parameter of the Beta prior under the null hypothesis.}
 
-\item{a1}{Alpha parameter of the Beta prior for group 1 under the alternative hypothesis.}
+\item{a1}{Numeric scalar. Alpha parameter of the Beta prior for group 1 under the alternative hypothesis.}
 
-\item{b1}{Beta parameter of the Beta prior for group 1 under the alternative hypothesis.}
+\item{b1}{Numeric scalar. Beta parameter of the Beta prior for group 1 under the alternative hypothesis.}
 
-\item{a2}{Alpha parameter of the Beta prior for group 2 under the alternative hypothesis.}
+\item{a2}{Numeric scalar. Alpha parameter of the Beta prior for group 2 under the alternative hypothesis.}
 
-\item{b2}{Beta parameter of the Beta prior for group 2 under the alternative hypothesis.}
+\item{b2}{Numeric scalar. Beta parameter of the Beta prior for group 2 under the alternative hypothesis.}
 
-\item{n1}{Sample size for group 1.}
+\item{n1}{Numeric integer. Sample size for group 1.}
 
-\item{n2}{Sample size for group 2.}
+\item{n2}{Numeric integer. Sample size for group 2.}
 
-\item{x1}{Number of successes observed in group 1.}
+\item{x1}{Numeric integer. Number of successes observed in group 1.}
 
-\item{x2}{Number of successes observed in group 2.}
+\item{x2}{Numeric integer. Number of successes observed in group 2.}
 }
 \value{
 A list of class \code{BFvalue_2p} containing:
