@@ -165,7 +165,7 @@ plot.BFpower_t<-function (x,...){
 
 
       }else{
-        suppressWarnings(Power_t2(x$threshold,x$analysis_h1$prior, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
+       suppressWarnings(Power_t2(x$threshold,x$analysis_h1$prior, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
                                   x$alternative,
                                   x$design_h1$prior, x$design_h1$location, x$design_h1$scale, x$design_h1$dff,de_an_prior,x$results[1,5],x$results[1,6]/x$results[1,5]))
 
@@ -175,7 +175,7 @@ plot.BFpower_t<-function (x,...){
 
     }else {
       if (x$type=="One-sample t-test"){
-        suppressWarnings(Power_t1e(x$threshold,x$analysis_h1$prior, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
+       suppressWarnings(Power_t1e(x$threshold,x$analysis_h1$prior, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
                                    x$alternative,x$design_h1$prior, x$design_h1$location, x$design_h1$scale, x$design_h1$dff,de_an_prior,unlist(x$results[5]) ,x$ROPE))
 
       } else{

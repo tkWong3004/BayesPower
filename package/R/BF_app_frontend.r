@@ -5,7 +5,7 @@ NULL
 
 ui <-
   shiny::navbarPage(id = "id",
-                 "\\(\\text{BayesPower}_{1.0}\\)",
+                 "\\(\\text{BayesPower}_{1.0.2}: \\text{Bayes Factor}\\)",
   shiny::navbarMenu(
     "\\(\\text{Standardized Mean Difference}\\)",
 

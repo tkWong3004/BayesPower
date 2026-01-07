@@ -5,7 +5,7 @@ Authors@R: c(
     person("Tsz Keung", "Wong", email = "t.k.wong3004@gmail.com", role = c("aut", "cre")),
     person("Samuel", "Pawel", role = c("aut")),
     person("Jorge", "Tendeiro", role = c("aut")))
-Description: The goal of 'BayesPower' is to provide tools for Bayesian sample size determination and power analysis across a range of common hypothesis testing scenarios using Bayes factors. The main function, BayesPower_BayesFactor(), launches an interactive 'shiny' application for performing these analyses. The application also provides command-line code for reproducibility. Details of the methods are described in the tutorial by Wong, Pawel, and Tendeiro (2025) <doi:10.31234/osf.io/pgdac_v2>.
+Description: The goal of 'BayesPower' is to provide tools for Bayesian sample size determination and power analysis across a range of common hypothesis testing scenarios using Bayes factors. The main function, BayesPower_BayesFactor(), launches an interactive 'shiny' application for performing these analyses. The application also provides command-line code for reproducibility. Details of the methods are described in the tutorial by Wong, Pawel, and Tendeiro (2025) <doi:10.31234/osf.io/pgdac>.
 BugReports: https://github.com/tkWong3004/BayesPower/issues
 License: GPL (>= 3)
 Encoding: UTF-8
@@ -24,7 +24,8 @@ Imports:
     hypergeo,
     rootSolve,
     shinyWidgets,
-    grDevices
+    grDevices,
+    tidyr
 LinkingTo:
     Rcpp,
     BH
