@@ -104,27 +104,28 @@ print.BFpower_t <- function (x,...) {
 
   cat("\n")
   cat(line)
-  cat("Threshold of compelling evidence: ", x$threshold, "\n\n", sep = "")
-  cat(line)
 
   # Results
   cat("Results:\n")
   cat(line)
-  cat(paste0("  True Positive Rate           = ", round(x$results[1], digits), "\n"))
-  cat(paste0("  False Positive Rate          = ", round(x$results[4], digits), "\n"))
-  cat(paste0("  True Negative Rate           = ", round(x$results[3], digits), "\n"))
-  cat(paste0("  False Negative Rate          = ", round(x$results[2], digits), "\n"))
+  cat(paste0("  True Positive Rate                  = ", round(x$results[1], digits), "\n"))
+  cat(paste0("  False Positive Rate                 = ", round(x$results[4], digits), "\n"))
+  cat(paste0("  True Negative Rate                  = ", round(x$results[3], digits), "\n"))
+  cat(paste0("  False Negative Rate                 = ", round(x$results[2], digits), "\n"))
 
   # Required sample sizes (unlist for CRAN)
   if (x$type == "One-sample t-test") {
-    cat("  Required Sample size         = ",
+         cat("  Required Sample size                = ",
         round(unlist(x$results[5]), 1), "  <---\n", sep = "")
   } else {
-    cat("  Required Sample size Group 1 = ",
+         cat("  Required Sample size Group 1        = ",
         round(unlist(x$results[5]), 1), "  <---\n", sep = "")
-    cat("  Required Sample size Group 2 = ",
+         cat("  Required Sample size Group 2        = ",
         round(unlist(x$results[6]), 1), "  <---\n", sep = "")
   }
+
+        cat("  Threshold of compelling evidence    = ", x$threshold, "\n\n", sep = "")
+
 }
 
 
@@ -441,18 +442,19 @@ print.BFpower_r <- function(x,...) {
   # Threshold
   cat("\n")
   cat(line)
-  cat("Threshold of compelling evidence: ", x$D, "\n\n", sep = "")
-  cat(line)
 
   # Results
   cat("Results:\n")
   cat(line)
-  cat("  True Positive Rate           = ", round(unlist(x$results[1]), digits = digits), "\n", sep = "")
-  cat("  False Positive Rate          = ", round(unlist(x$results[4]), digits = digits), "\n", sep = "")
-  cat("  True Negative Rate           = ", round(unlist(x$results[3]), digits = digits), "\n", sep = "")
-  cat("  False Negative Rate          = ", round(unlist(x$results[2]), digits = digits), "\n", sep = "")
-  cat("  Required Sample size         = ", round(unlist(x$results[5]), digits = 1), "  <---\n", sep = "")
-}
+  cat("  True Positive Rate               = ", round(unlist(x$results[1]), digits = digits), "\n", sep = "")
+  cat("  False Positive Rate              = ", round(unlist(x$results[4]), digits = digits), "\n", sep = "")
+  cat("  True Negative Rate               = ", round(unlist(x$results[3]), digits = digits), "\n", sep = "")
+  cat("  False Negative Rate              = ", round(unlist(x$results[2]), digits = digits), "\n", sep = "")
+  cat("  Required Sample size             = ", round(unlist(x$results[5]), digits = 1), "  <---\n", sep = "")
+  cat("  Threshold of compelling evidence = ", x$threshold, "\n\n", sep = "")
+
+
+  }
 
 #' @export
 #' @method plot BFpower_r
@@ -709,19 +711,19 @@ print.BFpower_f <- function(x,...) {
 
   # Threshold
   cat("\n")
-  cat(line)
-  cat("Threshold of compelling evidence: ", x$D, "\n\n", sep = "")
+
   cat(line)
 
   # Results
   cat("Results:\n")
   cat(line)
-  cat("  True Positive Rate   = ", round(unlist(x$results[1]), digits = digits), "\n", sep = "")
-  cat("  False Positive Rate  = ", round(unlist(x$results[4]), digits = digits), "\n", sep = "")
-  cat("  True Negative Rate   = ", round(unlist(x$results[3]), digits = digits), "\n", sep = "")
-  cat("  False Negative Rate  = ", round(unlist(x$results[2]), digits = digits), "\n", sep = "")
-  cat("  Required Sample size = ", round(unlist(x$results[5]), 1), "  <---\n", sep = "")
-}
+  cat("  True Positive Rate               = ", round(unlist(x$results[1]), digits = digits), "\n", sep = "")
+  cat("  False Positive Rate              = ", round(unlist(x$results[4]), digits = digits), "\n", sep = "")
+  cat("  True Negative Rate               = ", round(unlist(x$results[3]), digits = digits), "\n", sep = "")
+  cat("  False Negative Rate              = ", round(unlist(x$results[2]), digits = digits), "\n", sep = "")
+  cat("  Required Sample size             = ", round(unlist(x$results[5]), 1), "  <---\n", sep = "")
+  cat("  Threshold of compelling evidence = ", x$threshold, "\n\n", sep = "")
+  }
 
 
 
@@ -983,18 +985,17 @@ print.BFpower_bin <- function(x,...) {
   # Threshold
   cat("\n")
   cat(line)
-  cat("Threshold of compelling evidence: ", x$threshold, "\n\n", sep = "")
-  cat(line)
 
   # Results
   cat("Results:\n")
   cat(line)
-  cat("  True Positive Rate  = ", round(unlist(x$results[1]), digits), "\n", sep = "")
-  cat("  False Positive Rate = ", round(unlist(x$results[4]), digits), "\n", sep = "")
-  cat("  True Negative Rate  = ", round(unlist(x$results[3]), digits), "\n", sep = "")
-  cat("  False Negative Rate = ", round(unlist(x$results[2]), digits), "\n", sep = "")
-  cat("  Required Sample size= ", round(unlist(x$results[5]), 1), "  <---\n", sep = "")
-}
+  cat("  True Positive Rate               = ", round(unlist(x$results[1]), digits), "\n", sep = "")
+  cat("  False Positive Rate              = ", round(unlist(x$results[4]), digits), "\n", sep = "")
+  cat("  True Negative Rate               = ", round(unlist(x$results[3]), digits), "\n", sep = "")
+  cat("  False Negative Rate              = ", round(unlist(x$results[2]), digits), "\n", sep = "")
+  cat("  Required Sample size             = ", round(unlist(x$results[5]), 1), "  <---\n", sep = "")
+  cat("  Threshold of compelling evidence = ", x$threshold, "\n\n", sep = "")
+  }
 
 
 
@@ -1180,22 +1181,22 @@ print.BFpower_2p <- function(x,...) {
 
   # Prior under H0
   cat("Analysis/design prior under H", sub0, "\n", sep = "")
-  cat(" ", theta0, " ~ Beta( alpha =", x$analysis_h0$a,
+  cat(" ", theta0, " ~ Beta(alpha = ", x$analysis_h0$a,
       ", beta = ", x$analysis_h0$b, ")\n", sep = "")
 
   # Prior under H1
   cat("Analysis prior under H", sub1, "\n", sep = "")
-  cat(" ", theta1, " ~ Beta( alpha =", x$analysis_h1_theta_1$a,
+  cat(" ", theta1, " ~ Beta(alpha = ", x$analysis_h1_theta_1$a,
       ", beta = ", x$analysis_h1_theta_1$b, ")\n", sep = "")
-  cat(" ", theta2, " ~ Beta( alpha =", x$analysis_h1_theta_2$a,
+  cat(" ", theta2, " ~ Beta(alpha = ", x$analysis_h1_theta_2$a,
       ", beta = ", x$analysis_h1_theta_2$b, ")\n\n", sep = "")
 
   # Design prior under H1
   cat("Design prior under H", sub1, "\n", sep = "")
   if (x$design_h1_theta_1$prior == "same") {
-    cat(" ", theta1, " ~ Beta( alpha =", x$analysis_h1_theta_1$a,
+    cat(" ", theta1, " ~ Beta(alpha = ", x$analysis_h1_theta_1$a,
         ", beta = ", x$analysis_h1_theta_1$b, ")\n", sep = "")
-    cat(" ", theta2, " ~ Beta( alpha =", x$analysis_h1_theta_2$a,
+    cat(" ", theta2, " ~ Beta(alpha = ", x$analysis_h1_theta_2$a,
         ", beta = ", x$analysis_h1_theta_2$b, ")\n", sep = "")
   } else if (x$design_h1_theta_1$prior == "beta") {
     cat(" ", theta1, " ~ Beta( alpha =", x$design_h1_theta_1$a,
@@ -1210,8 +1211,6 @@ print.BFpower_2p <- function(x,...) {
   # Threshold
   cat("\n")
   cat(line)
-  cat("Threshold of compelling evidence: ", x$ROPE, "\n\n", sep = "")
-  cat(line)
 
   # Results
   cat("Results:\n")
@@ -1221,7 +1220,8 @@ print.BFpower_2p <- function(x,...) {
   cat(paste0("  True Negative Rate                    = ", round(x$results[3], digits = digits), "\n"))
   cat(paste0("  False Negative Rate                   = ", round(x$results[2], digits = digits), "\n"))
   cat(paste0("  Required Sample size per group        = ", round(x$results[5], digits = 1), "  <---\n"))
-}
+         cat("  Threshold of compelling evidence      = ", x$threshold, "\n\n", sep = "")
+  }
 
 
 
