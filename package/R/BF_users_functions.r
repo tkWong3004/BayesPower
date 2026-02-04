@@ -629,7 +629,7 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
   )
 
 
-  type = "Indepedent-samples t-test (equal variance)"
+  type = "Independent-samples t-test (equal variance)"
   analysis_h1 <- list(
     prior = prior_analysis,
     location = location,

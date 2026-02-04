@@ -85,15 +85,23 @@ print.BFpower_t <- function (x,...) {
         ")\n", sep = "")
   }
 
-  # Prior under H1
-  cat("Analysis prior under ", H1, ":\n", sep = "")
-  cat( "  ",x$analysis_h1$prior,
-       " (location = ", x$analysis_h1$prior,
-       ", scale = ", x$analysis_h1$scale,
-       if (!is.null(x$analysis_h1$dff)) paste0(", df = ", x$analysis_h1$dff),
-       ")\n", sep = "")
+  # prior under h1 and analysis = design prior
+  if (is.null(x$design_h1$prior)) {
+    cat("Analysis/design prior under ", H1, ":\n", sep = "")
 
-  if (!is.null(x$design_h1$prior)) {
+    cat( "  ",x$analysis_h1$prior,
+         " (location = ", x$analysis_h1$prior,
+         ", scale = ", x$analysis_h1$scale,
+         if (!is.null(x$analysis_h1$dff)) paste0(", df = ", x$analysis_h1$dff),
+         ")\n", sep = "")
+  }else{
+    cat("Analysis prior under ", H1, ":\n", sep = "")
+    cat( "  ",x$analysis_h1$prior,
+         " (location = ", x$analysis_h1$prior,
+         ", scale = ", x$analysis_h1$scale,
+         if (!is.null(x$analysis_h1$dff)) paste0(", df = ", x$analysis_h1$dff),
+         ")\n", sep = "")
+
     cat("Design prior under ", H1, ":\n", sep = "")
     cat( "  ",x$design_h1$prior,
          " (location = ", x$design_h1$prior,
@@ -101,6 +109,7 @@ print.BFpower_t <- function (x,...) {
          if (!is.null(x$design_h1$dff)) paste0(", df = ", x$design_h1$dff),
          ")\n", sep = "")
   }
+
 
   cat("\n")
   cat(line)
@@ -417,26 +426,28 @@ print.BFpower_r <- function(x,...) {
   if (is.null(x$ROPE)) {
     cat("  Point prior (location = ", x$h0, ")\n", sep = "")
   } else {
-    if (x$analysis_h1$prior == "NLP") cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
-    if (x$analysis_h1$prior == "d_beta") cat("  Default Stretched Beta (k =", x$analysis_h1$k, ")\n")
-    if (x$analysis_h1$prior == "beta") cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n")
+    if (x$analysis_h1$prior == "NLP") cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n", sep = "")
+    if (x$analysis_h1$prior == "d_beta") cat("  Default Stretched Beta (k =", x$analysis_h1$k, ")\n", sep = "")
+    if (x$analysis_h1$prior == "beta") cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n", sep = "")
   }
 
   # prior under H1
-  cat("Analysis/design prior under ", H1, ":\n", sep = "")
   if (is.null(x$design_h1$prior)) {
-    if (x$analysis_h1$prior == "NLP") cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
-    if (x$analysis_h1$prior == "d_beta") cat("  Default Stretched Beta (k =", x$analysis_h1$k, ")\n")
-    if (x$analysis_h1$prior == "beta") cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n")
+    cat("Analysis/design prior under ", H1, ":\n", sep = "")
+
+    if (x$analysis_h1$prior == "NLP") cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n", sep = "")
+    if (x$analysis_h1$prior == "d_beta") cat("  Default Stretched Beta (k =", x$analysis_h1$k, ")\n", sep = "")
+    if (x$analysis_h1$prior == "beta") cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n", sep = "")
   } else {
-    if (x$analysis_h1$prior == "NLP") cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
-    if (x$analysis_h1$prior == "d_beta") cat("  Default Stretched Beta (k =", x$analysis_h1$k, ")\n")
-    if (x$analysis_h1$prior == "beta") cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n")
+    cat("Analysis prior under ", H1, ":\n", sep = "")
+    if (x$analysis_h1$prior == "NLP") cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n", sep = "")
+    if (x$analysis_h1$prior == "d_beta") cat("  Default Stretched Beta (k =", x$analysis_h1$k, ")\n", sep = "")
+    if (x$analysis_h1$prior == "beta") cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n", sep = "")
     cat("Design prior under ", H1, ":\n", sep = "")
-    if (x$design_h1$prior == "NLP") cat("  Normal-moment (location =", x$design_h1$location, ", scale =", x$analysis_h1$scale, ")\n")
-    if (x$design_h1$prior == "d_beta") cat("  Default Stretched Beta (k =", x$design_h1$k, ")\n")
-    if (x$design_h1$prior == "beta") cat("  Stretched Beta (alpha =", x$design_h1$alpha, ", beta =", x$design_h1$beta, ")\n")
-    if (x$design_h1$prior == "Point") cat("  Point (location =", x$design_h1$location, ")\n")
+    if (x$design_h1$prior == "NLP") cat("  Normal-moment (location =", x$design_h1$location, ", scale =", x$analysis_h1$scale, ")\n", sep = "")
+    if (x$design_h1$prior == "d_beta") cat("  Default Stretched Beta (k =", x$design_h1$k, ")\n", sep = "")
+    if (x$design_h1$prior == "beta") cat("  Stretched Beta (alpha =", x$design_h1$alpha, ", beta =", x$design_h1$beta, ")\n", sep = "")
+    if (x$design_h1$prior == "Point") cat("  Point (location =", x$design_h1$location, ")\n", sep = "")
   }
 
   # Threshold
@@ -677,37 +688,46 @@ print.BFpower_f <- function(x,...) {
   } else {
     if (x$analysis_h1$prior == "effectsize") {
       cat("  Effect size prior (scale =", x$analysis_h1$rscale,
-          ", ", f2, " = ", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
+          ", ", f2, " = ", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n", sep = "")
     }
     if (x$analysis_h1$prior == "Moment") {
-      cat("  Moment prior (", f2, " =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
+      cat("  Moment prior (", f2, " =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n", sep = "")
     }
   }
 
   # Prior under h1
+  if (is.null(x$design_h1$prior)) {
   cat("Analysis/design prior under H\u2081:\n")
   if (x$analysis_h1$prior == "effectsize") {
     cat("  Effect size prior (scale =", x$analysis_h1$rscale,
-        ", ", f2, " =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
+        ", ", f2, " =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n", sep = "")
   }
   if (x$analysis_h1$prior == "Moment") {
-    cat("  Moment prior (", f2, " =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n")
+    cat("  Moment prior (", f2, " =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n", sep = "")
   }
+  }else{
+    cat("Analysis prior under H\u2081:\n")
+    if (x$analysis_h1$prior == "effectsize") {
+      cat("  Effect size prior (scale =", x$analysis_h1$rscale,
+          ", ", f2, " =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n", sep = "")
+    }
+    if (x$analysis_h1$prior == "Moment") {
+      cat("  Moment prior (", f2, " =", x$analysis_h1$f_m, ", df =", x$analysis_h1$dff, ")\n", sep = "")
+    }
 
-  # Design prior under h1 (if available)
-  if (!is.null(x$design_h1$prior)) {
     cat("Design prior under H\u2081:\n")
     if (x$design_h1$prior == "effectsize") {
       cat("  Effect size prior (scale =", x$design_h1$rscale,
-          ", ", f2, " =", x$design_h1$f_m, ", df =", x$design_h1$dff, ")\n")
+          ", ", f2, " =", x$design_h1$f_m, ", df =", x$design_h1$dff, ")\n", sep = "")
     }
     if (x$design_h1$prior == "Moment") {
-      cat("  Moment prior (", f2, " =", x$design_h1$f_m, ", df =", x$design_h1$dff, ")\n")
+      cat("  Moment prior (", f2, " =", x$design_h1$f_m, ", df =", x$design_h1$dff, ")\n", sep = "")
     }
     if (x$design_h1$prior == "Point") {
-      cat("  Point prior (", f2, " =", x$design_h1$f_m, ")\n")
+      cat("  Point prior (", f2, " =", x$design_h1$f_m, ")\n", sep = "")
     }
-  }
+
+}
 
   # Threshold
   cat("\n")
@@ -952,35 +972,48 @@ print.BFpower_bin <- function(x,...) {
     cat("  Point prior (location = ", x$h0, ")\n", sep = "")
   } else {
     if (x$analysis_h1$prior == "Moment") {
-      cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
+      cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n", sep = "")
     }
     if (x$analysis_h1$prior == "beta") {
-      cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n")
+      cat("  Stretched Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n", sep = "")
     }
   }
 
   # Prior under H1
-  cat("Analysis/design prior under H", sub1, ":\n", sep = "")
-  if (x$analysis_h1$prior == "Moment") {
-    cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n")
-  }
-  if (x$analysis_h1$prior == "beta") {
-    cat("  Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n")
-  }
+  if (is.null(x$design_h1$prior)) {
 
-  # Design prior under H1
-  if (!is.null(x$design_h1$prior)) {
+    cat("Analysis/design prior under H", sub1, ":\n", sep = "")
+    if (x$analysis_h1$prior == "Moment") {
+      cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n", sep = "")
+    }
+    if (x$analysis_h1$prior == "beta") {
+      cat("  Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n", sep = "")
+    }
+
+  }else{
+
+    cat("Analysis prior under H", sub1, ":\n", sep = "")
+    if (x$analysis_h1$prior == "Moment") {
+      cat("  Normal-moment (location =", x$h0, ", scale =", x$analysis_h1$scale, ")\n", sep = "")
+    }
+    if (x$analysis_h1$prior == "beta") {
+      cat("  Beta (alpha =", x$analysis_h1$alpha, ", beta =", x$analysis_h1$beta, ")\n", sep = "")
+    }
     cat("Design prior under H", sub1, ":\n", sep = "")
     if (x$design_h1$prior == "Moment") {
-      cat("  Normal-moment (location =", x$design_h1$location, ", scale =", x$analysis_h1$scale, ")\n")
+      cat("  Normal-moment (location =", x$design_h1$location, ", scale =", x$analysis_h1$scale, ")\n", sep = "")
     }
     if (x$design_h1$prior == "beta") {
-      cat("  Beta (alpha =", x$design_h1$alpha, ", beta =", x$design_h1$beta, ")\n")
+      cat("  Beta (alpha =", x$design_h1$alpha, ", beta =", x$design_h1$beta, ")\n", sep = "")
     }
     if (x$design_h1$prior == "Point") {
-      cat("  Point (location =", x$design_h1$location, ")\n")
+      cat("  Point (location =", x$design_h1$location, ")\n", sep = "")
     }
+
   }
+
+
+
 
   # Threshold
   cat("\n")
@@ -996,8 +1029,6 @@ print.BFpower_bin <- function(x,...) {
   cat("  Required Sample size             = ", round(unlist(x$results[5]), 1), "  <---\n", sep = "")
   cat("  Threshold of compelling evidence = ", x$threshold, "\n\n", sep = "")
   }
-
-
 
 
 

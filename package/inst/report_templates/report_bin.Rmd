@@ -160,18 +160,27 @@ if (isTRUE(params$bin$pc) || isTRUE(params$bin$rela)) {
 
 if (params$bin$pc){
   cat("**Power Curve **\n\n")
-params$pc_bin
+  }
+
+```
+```{r results='asis', echo=FALSE,fig.width= 12, fig.height= 8}
+
+if (params$bin$pc){
+print(params$pc_bin)
   }
 
 ```
 
 
-
 ```{r results='asis', echo=FALSE,  fig.width= 12, fig.height= 8}
 if (params$bin$rela){
 cat("**Relationship between BF and data**\n\n")
-params$rela_bin
 }
 
 ```
+```{r results='asis', echo=FALSE,  fig.width= 12, fig.height= 8}
+if (params$bin$rela){
+print(params$rela_bin)
+}
 
+```

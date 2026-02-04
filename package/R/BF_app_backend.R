@@ -280,7 +280,7 @@ prior_plot_f <-function(q,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,model_d,de_a
   oldpar <- graphics::par(no.readonly = TRUE)
   base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
-  fsq = seq(0.001,15,.2)
+  fsq = seq(0.001,3,.025)
 
   prior.analysis = F_prior(fsq,q,dff,rscale,f_m,model)
   prior.design   <- if (de_an_prior == 0 && model_d != "Point")
@@ -335,7 +335,7 @@ bf10_f <- function(D, n, k, p, dff, rscale, f_m, model) {
   x_breaks_10 <- sort(unique(c(0, 10, round(f.BF10, 2))))
 
   p1 <- ggplot2::ggplot(df10, ggplot2::aes(f, BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +
     ggplot2::geom_vline(xintercept = f.BF10, linetype = "dashed") +
     ggplot2::scale_y_log10() +
     ggplot2::scale_x_continuous(limits = c(0, 10), breaks = x_breaks_10) +
@@ -362,7 +362,7 @@ bf10_f <- function(D, n, k, p, dff, rscale, f_m, model) {
 
   if (impossible) {
     p2 <- ggplot2::ggplot(df01, ggplot2::aes(f, BF)) +
-      ggplot2::geom_line(size = 1.2, color = "black") +
+      ggplot2::geom_line(linewidth = 1.2, color = "black") +
       ggplot2::scale_y_log10() +
       ggplot2::scale_x_continuous(limits = c(0, 10), breaks = c(0, 10)) +
       ggplot2::labs(
@@ -387,7 +387,7 @@ bf10_f <- function(D, n, k, p, dff, rscale, f_m, model) {
     x_breaks_01 <- sort(unique(c(0, 10, round(f.BF01, 2))))
 
     p2 <- ggplot2::ggplot(df01, ggplot2::aes(f, BF)) +
-      ggplot2::geom_line(size = 1.2, color = "black") +
+      ggplot2::geom_line(linewidth = 1.2, color = "black") +
       ggplot2::geom_vline(xintercept = f.BF01, linetype = "dashed") +
       ggplot2::scale_y_log10() +
       ggplot2::scale_x_continuous(limits = c(0, 10), breaks = x_breaks_01) +
@@ -504,7 +504,7 @@ Power_f <- function(D, k, p, dff, rscale, f_m, model,
 
   # BF10 plot
   p1 <- ggplot2::ggplot(df_bf10, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -517,7 +517,7 @@ Power_f <- function(D, k, p, dff, rscale, f_m, model,
 
   # BF01 plot
   p2 <- ggplot2::ggplot(df_bf01, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -798,7 +798,7 @@ prior_plot_fe <-function(q,dff,rscale,f,model,dff_d,rscale_d,f_m_d,model_d,de_an
 
   normalization  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
 
-  fsq = seq(0.001,20,.05)
+  fsq = seq(0.001,3,.025)
   #prior.analysis.h1 = F_prior(fsq,q,dff,rscale,f,model)/normalization
   prior.analysis.h1 = F_prior(fsq,q,dff,rscale,f,model)
   prior.analysis.h1[fsq<e]=0
@@ -874,7 +874,7 @@ bf10_fe <- function(D, n, k, p, dff, rscale, f_m, model, e) {
   x_breaks_10 <- sort(unique(c(0, 10, round(f.BF10, 2))))
 
   p1 <- ggplot2::ggplot(df10, ggplot2::aes(f, BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +
     ggplot2::geom_vline(xintercept = f.BF10, linetype = "dashed") +
     ggplot2::scale_y_log10() +
     ggplot2::scale_x_continuous(limits = c(0, 10), breaks = x_breaks_10) +
@@ -901,7 +901,7 @@ bf10_fe <- function(D, n, k, p, dff, rscale, f_m, model, e) {
 
   if (impossible) {
     p2 <- ggplot2::ggplot(df01, ggplot2::aes(f, BF)) +
-      ggplot2::geom_line(size = 1.2, color = "black") +
+      ggplot2::geom_line(linewidth = 1.2, color = "black") +
       ggplot2::scale_y_log10() +
       ggplot2::scale_x_continuous(limits = c(0, 10), breaks = c(0, 10)) +
       ggplot2::labs(
@@ -926,7 +926,7 @@ bf10_fe <- function(D, n, k, p, dff, rscale, f_m, model, e) {
     x_breaks_01 <- sort(unique(c(0, 10, round(f.BF01, 2))))
 
     p2 <- ggplot2::ggplot(df01, ggplot2::aes(f, BF)) +
-      ggplot2::geom_line(size = 1.2, color = "black") +
+      ggplot2::geom_line(linewidth = 1.2, color = "black") +
       ggplot2::geom_vline(xintercept = f.BF01, linetype = "dashed") +
       ggplot2::scale_y_log10() +
       ggplot2::scale_x_continuous(limits = c(0, 10), breaks = x_breaks_01) +
@@ -1044,7 +1044,7 @@ Power_fe <- function(D, k, p, dff, rscale, f_m, model,
 
   # BF10 plot
   p1 <- ggplot2::ggplot(df_bf10, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -1057,7 +1057,7 @@ Power_fe <- function(D, k, p, dff, rscale, f_m, model,
 
   # BF01 plot
   p2 <- ggplot2::ggplot(df_bf01, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -1641,7 +1641,7 @@ bin_bf10<- function(D, n, alpha, beta, location, scale, model, hypothesis) {
   x_breaks_10 <- sort(unique(c(0, n, round(b.BF10, 2))))
 
   p1 <- ggplot2::ggplot(df_bf10, ggplot2::aes(x = x, y = BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +
     ggplot2::geom_vline(xintercept = b.BF10, linetype = "dashed") +
     ggplot2::scale_y_log10() +
     ggplot2::scale_x_continuous(limits = c(0, n), breaks = x_breaks_10) +
@@ -1657,7 +1657,7 @@ bin_bf10<- function(D, n, alpha, beta, location, scale, model, hypothesis) {
   else sort(unique(c(0, n, round(b.BF01, 2))))
 
   p2 <- ggplot2::ggplot(df_bf01, ggplot2::aes(x = x, y = BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +
     ggplot2::geom_vline(
       xintercept = if (!impossible) b.BF01 else NA,
       linetype = "dashed"
@@ -1763,7 +1763,7 @@ Power_bin <- function(D, h0, alpha, beta, location, scale, model, hypothesis,
 
   # ---------- BF10 Plot ----------
   p1 <- ggplot2::ggplot(df_BF10, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -1776,7 +1776,7 @@ Power_bin <- function(D, h0, alpha, beta, location, scale, model, hypothesis,
 
   # ---------- BF01 Plot ----------
   p2 <- ggplot2::ggplot(df_BF01, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -2509,7 +2509,7 @@ bin_e_bf10 <- function(D, n, alpha, beta, location, scale, model, hypothesis, e)
   x_breaks_10 <- sort(unique(c(0, n, round(b.BF10, 2))))
 
   p1 <- ggplot2::ggplot(df_bf10, ggplot2::aes(x = x, y = BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +
     ggplot2::geom_vline(xintercept = b.BF10, linetype = "dashed") +
     ggplot2::scale_y_log10() +
     ggplot2::scale_x_continuous(limits = c(0, n), breaks = x_breaks_10) +
@@ -2525,7 +2525,7 @@ bin_e_bf10 <- function(D, n, alpha, beta, location, scale, model, hypothesis, e)
   else sort(unique(c(0, n, round(b.BF01, 2))))
 
   p2 <- ggplot2::ggplot(df_bf01, ggplot2::aes(x = x, y = BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +
     ggplot2::geom_vline(
       xintercept = if (!impossible) b.BF01 else NA,
       linetype = "dashed"
@@ -2635,7 +2635,7 @@ Power_e_bin <- function(D, h0, alpha, beta, location, scale, model, hypothesis,
 
   # BF10 plot
   p1 <- ggplot2::ggplot(df_bf10, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -2648,7 +2648,7 @@ Power_e_bin <- function(D, h0, alpha, beta, location, scale, model, hypothesis,
 
   # BF01 plot
   p2 <- ggplot2::ggplot(df_bf01, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -3331,7 +3331,7 @@ r_bf10_p <- function(D, n, k, alpha, beta, h0, hypothesis,
   x_breaks_10 <- sort(unique(c(-1, 1, round(r.BF10, 2))))
 
   p1 <- ggplot2::ggplot(df10, ggplot2::aes(r, BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +
     ggplot2::geom_vline(xintercept = r.BF10, linetype = "dashed") +
     ggplot2::scale_y_log10() +
     ggplot2::scale_x_continuous(limits = c(-1, 1), breaks = x_breaks_10) +
@@ -3347,7 +3347,7 @@ r_bf10_p <- function(D, n, k, alpha, beta, h0, hypothesis,
   else sort(unique(c(-1, 1, round(r.BF01, 2))))
 
   p2 <- ggplot2::ggplot(df01, ggplot2::aes(r, BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +   # ← all black now
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +   # ← all black now
     ggplot2::geom_vline(
       xintercept = if (!impossible) r.BF01 else NA,
       linetype = "dashed"
@@ -3458,7 +3458,7 @@ Power_r <- function(D, k, alpha, beta, h0, hypothesis,
   ## ---------- Plots ----------
   p1 <- ggplot2::ggplot(df1,
                         ggplot2::aes(SampleSize, Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -3471,7 +3471,7 @@ Power_r <- function(D, k, alpha, beta, h0, hypothesis,
 
   p2 <- ggplot2::ggplot(df2,
                         ggplot2::aes(SampleSize, Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -4202,7 +4202,7 @@ re_bf10_p <- function(D, n, k, alpha, beta, h0, hypothesis,
 
   # BF10 plot
   p1 <- ggplot2::ggplot(df10, ggplot2::aes(r, BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +
     ggplot2::geom_vline(xintercept = r.BF10, linetype = "dashed", color = "black") +
     ggplot2::scale_y_log10() +
     ggplot2::scale_x_continuous(limits = c(-1, 1), breaks = sort(unique(c(-1, 1, round(r.BF10, 2))))) +
@@ -4217,7 +4217,7 @@ re_bf10_p <- function(D, n, k, alpha, beta, h0, hypothesis,
   x_breaks_01 <- if (impossible) c(-1, 1) else sort(unique(c(-1, 1, round(r.BF01, 2))))
 
   p2 <- ggplot2::ggplot(df01, ggplot2::aes(r, BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +   # all black line
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +   # all black line
     ggplot2::geom_vline(
       xintercept = if (!impossible) r.BF01 else NA,
       linetype = "dashed", color = "black"
@@ -4314,7 +4314,7 @@ Power_re <- function(D, k, alpha, beta, h0, hypothesis,
   )
 
   p1 <- ggplot2::ggplot(df1, ggplot2::aes(SampleSize, Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -4325,7 +4325,7 @@ Power_re <- function(D, k, alpha, beta, h0, hypothesis,
     clean_theme + legend_theme
 
   p2 <- ggplot2::ggplot(df2, ggplot2::aes(SampleSize, Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -4827,6 +4827,7 @@ bf10_t1 <- function(D = 3, df, target = 0.8,
   print(patchwork::wrap_plots(p1, p2, ncol = 2))
 }
 
+
 # Power curve function for BF10 > D under H1:
 Power_t1 <- function(D, model, location, scale, dff, hypothesis,
                         model_d, location_d, scale_d, dff_d,
@@ -4917,7 +4918,7 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
 
   # Plot BF10
   p1 <- ggplot2::ggplot(df1, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -4930,7 +4931,7 @@ Power_t1 <- function(D, model, location, scale, dff, hypothesis,
 
   # Plot BF01
   p2 <- ggplot2::ggplot(df2, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -5563,7 +5564,7 @@ te1_BF<- function(D, df,
   x_breaks_10 <- sort(unique(c(-5, 5, round(t.BF10, 2))))
 
   p1 <- ggplot2::ggplot(df10, ggplot2::aes(t, BF)) +
-    ggplot2::geom_line(size = 1.1) +
+    ggplot2::geom_line(linewidth = 1.1) +
     ggplot2::scale_y_log10() +
     ggplot2::geom_vline(xintercept = t.BF10) +
     ggplot2::scale_x_continuous(
@@ -5595,7 +5596,7 @@ te1_BF<- function(D, df,
   if (impossible) {
 
     p2 <- ggplot2::ggplot(df01, ggplot2::aes(t, BF)) +
-      ggplot2::geom_line(size = 1.1) +
+      ggplot2::geom_line(linewidth = 1.1) +
       ggplot2::scale_y_log10() +
       ggplot2::scale_x_continuous(
         limits = c(-5, 5),
@@ -5626,7 +5627,7 @@ te1_BF<- function(D, df,
     x_breaks_01 <- sort(unique(c(-5, 5, round(t.BF01, 2))))
 
     p2 <- ggplot2::ggplot(df01, ggplot2::aes(t, BF)) +
-      ggplot2::geom_line(size = 1.1) +
+      ggplot2::geom_line(linewidth = 1.1) +
       ggplot2::scale_y_log10() +
       ggplot2::geom_vline(xintercept = t.BF01) +
       ggplot2::scale_x_continuous(
@@ -5740,7 +5741,7 @@ Power_t1e<- function(D, model, location, scale, dff, hypothesis,
 
   # BF10 plot
   p1 <- ggplot2::ggplot(df1, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -5753,7 +5754,7 @@ Power_t1e<- function(D, model, location, scale, dff, hypothesis,
 
   # BF01 plot
   p2 <- ggplot2::ggplot(df2, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -5986,7 +5987,7 @@ Power_p2 <- function(D, n1, a0, b0, a1, b1, a2, b2, r,
 
   # Plot BF10
   p1 <- ggplot2::ggplot(df1, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -5999,7 +6000,7 @@ Power_p2 <- function(D, n1, a0, b0, a1, b1, a2, b2, r,
 
   # Plot BF01
   p2 <- ggplot2::ggplot(df2, ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -6310,38 +6311,55 @@ shiny::observeEvent(input$runbin, {
 
   if (isTRUE(bin$pc)) {
 
-    output$plot_power_bin_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$"))
-      )
-    })
+    if (identical(dat, "Error")) {
 
-    output$plot_power_bin <- shiny::renderPlot({
+      output$plot_power_bin_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Power curve is not shown due to an error}$$")
+        )
+      })
 
-      suppressWarnings(
-        switch(
-          bin$interval,
+      output$plot_power_bin <- shiny::renderPlot({
+        NULL
+      })
 
-          "1" = Power_bin(
-            bin$D, bin$h0, bin$alpha, bin$beta, bin$location, bin$scale,
-            bin$model, bin$hypothesis,
-            bin$alpha_d, bin$beta_d, bin$location_d,
-            bin$scale_d, bin$model_d, bin$de_an_prior,
-            dat[1,5]
-          ),
+    } else {
 
-          "2" = Power_e_bin(
-            bin$D, bin$h0, bin$alpha, bin$beta, bin$location, bin$scale,
-            bin$model, bin$hypothesis,
-            bin$alpha_d, bin$beta_d, bin$location_d,
-            bin$scale_d, bin$model_d, bin$de_an_prior,
-            dat[1,5], bin$e
+      output$plot_power_bin_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Power Curve}$$")
           )
         )
-      )
+      })
 
-      pc_bin(grDevices::recordPlot())
-    })
+      output$plot_power_bin <- shiny::renderPlot({
+
+        suppressWarnings(
+          switch(
+            bin$interval,
+
+            "1" = Power_bin(
+              bin$D, bin$h0, bin$alpha, bin$beta, bin$location, bin$scale,
+              bin$model, bin$hypothesis,
+              bin$alpha_d, bin$beta_d, bin$location_d,
+              bin$scale_d, bin$model_d, bin$de_an_prior,
+              dat[1, 5]
+            ),
+
+            "2" = Power_e_bin(
+              bin$D, bin$h0, bin$alpha, bin$beta, bin$location, bin$scale,
+              bin$model, bin$hypothesis,
+              bin$alpha_d, bin$beta_d, bin$location_d,
+              bin$scale_d, bin$model_d, bin$de_an_prior,
+              dat[1, 5], bin$e
+            )
+          )
+        )
+
+        pc_bin(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -6357,32 +6375,51 @@ shiny::observeEvent(input$runbin, {
 
   if (isTRUE(bin$rela)) {
 
-    output$plot_rel_bin_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$"))
-      )
-    })
+    if (identical(dat, "Error")) {
 
-    output$plot_rel_bin <- shiny::renderPlot({
+      output$plot_rel_bin_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Relationship plot is not shown due to an error}$$")
+        )
+      })
 
-      suppressWarnings(
-        switch(
-          bin$interval,
+      output$plot_rel_bin <- shiny::renderPlot({
+        NULL
+      })
 
-          "1" = bin_bf10(
-            bin$D, dat[1,5], bin$alpha, bin$beta, bin$location, bin$scale,
-            bin$model, bin$hypothesis
-          ),
+    } else {
 
-          "2" = bin_e_bf10(
-            bin$D, dat[1,5], bin$alpha, bin$beta, bin$location, bin$scale,
-            bin$model, bin$hypothesis, bin$e
+      output$plot_rel_bin_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Relationship between BF and data}$$")
           )
         )
-      )
+      })
 
-      rela_bin(grDevices::recordPlot())
-    })
+      output$plot_rel_bin <- shiny::renderPlot({
+
+        n <- dat[1, 5]
+
+        suppressWarnings(
+          switch(
+            bin$interval,
+
+            "1" = bin_bf10(
+              bin$D, n, bin$alpha, bin$beta, bin$location, bin$scale,
+              bin$model, bin$hypothesis
+            ),
+
+            "2" = bin_e_bf10(
+              bin$D, n, bin$alpha, bin$beta, bin$location, bin$scale,
+              bin$model, bin$hypothesis, bin$e
+            )
+          )
+        )
+
+        rela_bin(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -6760,39 +6797,56 @@ shiny::observeEvent(input$runf, {
 
   if (isTRUE(ff$pc)) {
 
-    output$plot_power_f_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$${\\text{Power Curve}}$$"))
-      )
-    })
+    if (identical(dat, "Error")) {
 
-    output$plot_power_f <- shiny::renderPlot({
+      output$plot_power_f_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Power curve is not shown due to an error}$$")
+        )
+      })
 
-      suppressWarnings(
-        switch(
-          ff$inter,
+      output$plot_power_f <- shiny::renderPlot({
+        NULL
+      })
 
-          "1" = Power_f(
-            ff$D, ff$k, ff$p, ff$dff, ff$rscale,
-            ff$f_m, ff$model,
-            ff$k_d, ff$p_d, ff$dff_d, ff$rscale_d, ff$f_m_d, ff$model_d,
-            ff$de_an_prior,
-            dat[1,5]
-          ),
+    } else {
 
-          "2" = Power_fe(
-            ff$D, ff$k, ff$p, ff$dff, ff$rscale,
-            ff$f_m, ff$model,
-            ff$k_d, ff$p_d, ff$dff_d, ff$rscale_d, ff$f_m_d, ff$model_d,
-            ff$de_an_prior,
-            dat[1,5],
-            ff$e
+      output$plot_power_f_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Power Curve}$$")
           )
         )
-      )
+      })
 
-      pc_f(grDevices::recordPlot())
-    })
+      output$plot_power_f <- shiny::renderPlot({
+
+        suppressWarnings(
+          switch(
+            ff$inter,
+
+            "1" = Power_f(
+              ff$D, ff$k, ff$p, ff$dff, ff$rscale,
+              ff$f_m, ff$model,
+              ff$k_d, ff$p_d, ff$dff_d, ff$rscale_d, ff$f_m_d, ff$model_d,
+              ff$de_an_prior,
+              dat[1, 5]
+            ),
+
+            "2" = Power_fe(
+              ff$D, ff$k, ff$p, ff$dff, ff$rscale,
+              ff$f_m, ff$model,
+              ff$k_d, ff$p_d, ff$dff_d, ff$rscale_d, ff$f_m_d, ff$model_d,
+              ff$de_an_prior,
+              dat[1, 5],
+              ff$e
+            )
+          )
+        )
+
+        pc_f(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -6802,37 +6856,54 @@ shiny::observeEvent(input$runf, {
   }
 
 
-
   # ===================================================
   #           RELATIONSHIP BETWEEN BF & DATA (F)
   # ===================================================
-
   if (isTRUE(ff$rela)) {
 
-    output$plot_rel_f_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$${\\text{Relationship between BF and data}}$$"))
-      )
-    })
+    if (identical(dat, "Error")) {
 
-    output$plot_rel_f <- shiny::renderPlot({
+      output$plot_rel_f_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Relationship plot is not shown due to an error}$$")
+        )
+      })
 
-      suppressWarnings(
-        switch(
-          ff$inter,
+      output$plot_rel_f <- shiny::renderPlot({
+        NULL
+      })
 
-          "1" = bf10_f(
-            ff$D, dat[1,5], ff$k, ff$p, ff$dff, ff$rscale, ff$f_m, ff$model
-          ),
+    } else {
 
-          "2" = bf10_fe(
-            ff$D, dat[1,5], ff$k, ff$p, ff$dff, ff$rscale, ff$f_m, ff$model, ff$e
+      output$plot_rel_f_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Relationship between BF and data}$$")
           )
         )
-      )
+      })
 
-      rela_f(grDevices::recordPlot())
-    })
+      output$plot_rel_f <- shiny::renderPlot({
+
+        n <- dat[1, 5]
+
+        suppressWarnings(
+          switch(
+            ff$inter,
+
+            "1" = bf10_f(
+              ff$D, n, ff$k, ff$p, ff$dff, ff$rscale, ff$f_m, ff$model
+            ),
+
+            "2" = bf10_fe(
+              ff$D, n, ff$k, ff$p, ff$dff, ff$rscale, ff$f_m, ff$model, ff$e
+            )
+          )
+        )
+
+        rela_f(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -6840,6 +6911,7 @@ shiny::observeEvent(input$runf, {
     output$plot_rel_f_text <- shiny::renderUI(NULL)
     output$plot_rel_f      <- shiny::renderPlot(NULL)
   }
+
 
 
   output$export_f <- shiny::downloadHandler(
@@ -6939,8 +7011,8 @@ shiny::observeEvent(input$calf, {
       # Create the LaTeX formatted string with proper escaping
       table_latex <- paste0(
         "$$ \\textit{F}(", ff$df1, ",", ff$df2,
-        ") = ", round(ff$fval, 3),
-        ",\\ \\textit{BF}_{10} = ", round(BF10, 4),", \\textit{BF}_{01} =" ,round(1/BF10, 4)," $$"
+        ") = ", round(ff$fval, 3),", \\textit{f} = ", round(sqrt(ff$fval*ff$df1/ff$df2), 4),
+        ",\\\\ \\textit{BF}_{10} = ", round(BF10, 4),", \\textit{BF}_{01} =" ,round(1/BF10, 4)," $$"
       )
 
       shiny::tagList(
@@ -7124,24 +7196,41 @@ shiny::observeEvent(input$runp2, {
 
   if (isTRUE(p2$pc)) {
 
-    output$plot_power_p2_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$"))
-      )
-    })
+    if (identical(table, "Error")) {
 
-    output$plot_power_p2 <- shiny::renderPlot({
-
-      suppressWarnings(
-        Power_p2(
-          p2$D, table[1,5], p2$a0, p2$b0, p2$a1, p2$b1, p2$a2,
-          p2$b2, table[1,6] / table[1,5], p2$model1, p2$a1d, p2$b1d, p2$dp1,
-          p2$model2, p2$a2d, p2$b2d, p2$dp2
+      output$plot_power_p2_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Power curve is not shown due to an error}$$")
         )
-      )
+      })
 
-      pc_p2(grDevices::recordPlot())
-    })
+      output$plot_power_p2 <- shiny::renderPlot({
+        NULL
+      })
+
+    } else {
+
+      output$plot_power_p2_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Power Curve}$$")
+          )
+        )
+      })
+
+      output$plot_power_p2 <- shiny::renderPlot({
+
+        suppressWarnings(
+          Power_p2(
+            p2$D, table[1, 5], p2$a0, p2$b0, p2$a1, p2$b1, p2$a2,
+            p2$b2, table[1, 6] / table[1, 5], p2$model1, p2$a1d, p2$b1d, p2$dp1,
+            p2$model2, p2$a2d, p2$b2d, p2$dp2
+          )
+        )
+
+        pc_p2(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -7156,20 +7245,38 @@ shiny::observeEvent(input$runp2, {
 
   if (isTRUE(p2$rela)) {
 
-    output$plot_rel_p2_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$"))
-      )
-    })
+    if (identical(dat, "Error")) {
 
-    output$plot_rel_p2 <- shiny::renderPlot({
-      # Explicitly assign and print the ggplot
-      plt <- heatmap_p2(dat[[2]], p2$D)
-      print(plt)
+      output$plot_rel_p2_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Relationship plot is not shown due to an error}$$")
+        )
+      })
 
-      # Save the plot for later
-      rela_p2(grDevices::recordPlot())
-    })
+      output$plot_rel_p2 <- shiny::renderPlot({
+        NULL
+      })
+
+    } else {
+
+      output$plot_rel_p2_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Relationship between BF and data}$$")
+          )
+        )
+      })
+
+      output$plot_rel_p2 <- shiny::renderPlot({
+
+        # Explicitly assign and print the ggplot
+        plt <- heatmap_p2(dat[[2]], p2$D)
+        print(plt)
+
+        # Save the plot for later
+        rela_p2(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -7177,6 +7284,7 @@ shiny::observeEvent(input$runp2, {
     output$plot_rel_p2_text <- shiny::renderUI(NULL)
     output$plot_rel_p2      <- shiny::renderPlot(NULL)
   }
+
 
   # Download handler
   output$export_p2 <- shiny::downloadHandler(
@@ -7520,36 +7628,53 @@ shiny::observeEvent(input$runr, {
 
   if (isTRUE(rr$pc)) {
 
-    output$plot_power_r_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$"))
-      )
-    })
+    if (identical(dat, "Error")) {
 
-    output$plot_power_r <- shiny::renderPlot({
+      output$plot_power_r_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Power curve is not shown due to an error}$$")
+        )
+      })
 
-      suppressWarnings(
-        switch(
-          rr$interval,
+      output$plot_power_r <- shiny::renderPlot({
+        NULL
+      })
 
-          "1" = Power_r(
-            rr$D, rr$k, rr$alpha, rr$beta, rr$h0, rr$hypothesis,
-            rr$location, rr$scale, rr$dff, rr$model,
-            rr$k_d, rr$alpha_d, rr$beta_d, rr$location_d, rr$scale_d,
-            rr$dff_d, rr$model_d, rr$de_an_prior, dat[1,5]
-          ),
+    } else {
 
-          "2" = Power_re(
-            rr$D, rr$k, rr$alpha, rr$beta, rr$h0, rr$hypothesis,
-            rr$location, rr$scale, rr$dff, rr$model,
-            rr$k_d, rr$alpha_d, rr$beta_d, rr$location_d, rr$scale_d,
-            rr$dff_d, rr$model_d, rr$de_an_prior, dat[1,5], rr$e
+      output$plot_power_r_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Power Curve}$$")
           )
         )
-      )
+      })
 
-      pc_r(grDevices::recordPlot())
-    })
+      output$plot_power_r <- shiny::renderPlot({
+
+        suppressWarnings(
+          switch(
+            rr$interval,
+
+            "1" = Power_r(
+              rr$D, rr$k, rr$alpha, rr$beta, rr$h0, rr$hypothesis,
+              rr$location, rr$scale, rr$dff, rr$model,
+              rr$k_d, rr$alpha_d, rr$beta_d, rr$location_d, rr$scale_d,
+              rr$dff_d, rr$model_d, rr$de_an_prior, dat[1, 5]
+            ),
+
+            "2" = Power_re(
+              rr$D, rr$k, rr$alpha, rr$beta, rr$h0, rr$hypothesis,
+              rr$location, rr$scale, rr$dff, rr$model,
+              rr$k_d, rr$alpha_d, rr$beta_d, rr$location_d, rr$scale_d,
+              rr$dff_d, rr$model_d, rr$de_an_prior, dat[1, 5], rr$e
+            )
+          )
+        )
+
+        pc_r(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -7560,38 +7685,58 @@ shiny::observeEvent(input$runr, {
 
 
 
+
   # ===================================================
   #                RELATIONSHIP (r)
   # ===================================================
 
   if (isTRUE(rr$rela)) {
 
-    output$plot_rel_r_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$"))
-      )
-    })
+    if (identical(dat, "Error")) {
 
-    output$plot_rel_r <- shiny::renderPlot({
+      output$plot_rel_r_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Relationship plot is not shown due to an error}$$")
+        )
+      })
 
-      suppressWarnings(
-        switch(
-          rr$interval,
+      output$plot_rel_r <- shiny::renderPlot({
+        NULL
+      })
 
-          "1" = r_bf10_p(
-            rr$D, dat[1,5], rr$k, rr$alpha, rr$beta, rr$h0,
-            rr$hypothesis, rr$location, rr$scale, rr$dff, rr$model
-          ),
+    } else {
 
-          "2" = re_bf10_p(
-            rr$D, dat[1,5], rr$k, rr$alpha, rr$beta, rr$h0,
-            rr$hypothesis, rr$location, rr$scale, rr$dff, rr$model, rr$e
+      output$plot_rel_r_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Relationship between BF and data}$$")
           )
         )
-      )
+      })
 
-      rela_r(grDevices::recordPlot())
-    })
+      output$plot_rel_r <- shiny::renderPlot({
+
+        n <- dat[1, 5]
+
+        suppressWarnings(
+          switch(
+            rr$interval,
+
+            "1" = r_bf10_p(
+              rr$D, n, rr$k, rr$alpha, rr$beta, rr$h0,
+              rr$hypothesis, rr$location, rr$scale, rr$dff, rr$model
+            ),
+
+            "2" = re_bf10_p(
+              rr$D, n, rr$k, rr$alpha, rr$beta, rr$h0,
+              rr$hypothesis, rr$location, rr$scale, rr$dff, rr$model, rr$e
+            )
+          )
+        )
+
+        rela_r(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -7599,6 +7744,7 @@ shiny::observeEvent(input$runr, {
     output$plot_rel_r_text <- shiny::renderUI(NULL)
     output$plot_rel_r      <- shiny::renderPlot(NULL)
   }
+
 
   output$export_r <- shiny::downloadHandler(
     filename = function() {
@@ -7951,33 +8097,50 @@ shiny::observeEvent(input$runt1, {
   # ===============================
 
   if (isTRUE(x$pc)) {
+    if (identical(dat, "Error")) {
 
-    output$plot_power_t1_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$"))
-      )
-    })
+      output$plot_power_t1_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Power curve is not shown due to an error}$$")
+        )
+      })
 
-    output$plot_power_t1 <- shiny::renderPlot({
+      output$plot_power_t1 <- shiny::renderPlot({
+        NULL
+      })
 
-      plt <-suppressWarnings(
-        switch(
-          x$interval,
-          "1" = Power_t1(
-            x$D, x$model, x$location, x$scale, x$dff, x$hypothesis,
-            x$model_d, x$location_d, x$scale_d, x$dff_d,
-            x$de_an_prior, dat[1,5]
-          ),
-          "2" = Power_t1e(
-            x$D, x$model, x$location, x$scale, x$dff, x$hypothesis,
-            x$model_d, x$location_d, x$scale_d, x$dff_d,
-            x$de_an_prior, dat[1,5], x$e
+    } else {
+
+      output$plot_power_t1_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Power Curve}$$")
           )
         )
-      )
-      print(plt)
-      pc_t1(grDevices::recordPlot())
-    })
+      })
+
+      output$plot_power_t1 <- shiny::renderPlot({
+
+        plt <- suppressWarnings(
+          switch(
+            x$interval,
+            "1" = Power_t1(
+              x$D, x$model, x$location, x$scale, x$dff, x$hypothesis,
+              x$model_d, x$location_d, x$scale_d, x$dff_d,
+              x$de_an_prior, dat[1,5]
+            ),
+            "2" = Power_t1e(
+              x$D, x$model, x$location, x$scale, x$dff, x$hypothesis,
+              x$model_d, x$location_d, x$scale_d, x$dff_d,
+              x$de_an_prior, dat[1,5], x$e
+            )
+          )
+        )
+
+        print(plt)
+        pc_t1(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -7994,38 +8157,55 @@ shiny::observeEvent(input$runt1, {
 
   if (isTRUE(x$rela)) {
 
-    output$plot_rel_t1_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$"))
-      )
-    })
+    if (identical(dat, "Error")) {
 
-    output$plot_rel_t1 <- shiny::renderPlot({
-
-      plt<-suppressWarnings(
-        switch(
-          x$interval,
-          "1" =
-            bf10_t1(
-              D         = x$D,
-              df        = dat[1,5],
-              target    = x$target,
-              model     = x$model,
-              location  = x$location,
-              scale     = x$scale,
-              dff       = x$dff,
-              hypothesis = x$hypothesis
-            ),
-          "2" =
-            te1_BF(
-              x$D, dat[1,5], x$model, x$location, x$scale, x$dff,
-              x$hypothesis, x$e
-            )
+      output$plot_rel_t1_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Relationship plot is not shown due to an error}$$")
         )
-      )
+      })
 
-      rela_t1(grDevices::recordPlot())
-    })
+      output$plot_rel_t1 <- shiny::renderPlot({
+        NULL
+      })
+
+    } else {
+
+      output$plot_rel_t1_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Relationship between BF and data}$$")
+          )
+        )
+      })
+
+      output$plot_rel_t1 <- shiny::renderPlot({
+
+        plt <- suppressWarnings(
+          switch(
+            x$interval,
+            "1" =
+              bf10_t1(
+                D          = x$D,
+                df         = dat[1,5],
+                target     = x$target,
+                model      = x$model,
+                location   = x$location,
+                scale      = x$scale,
+                dff        = x$dff,
+                hypothesis = x$hypothesis
+              ),
+            "2" =
+              te1_BF(
+                x$D, dat[1,5], x$model, x$location, x$scale, x$dff,
+                x$hypothesis, x$e
+              )
+          )
+        )
+
+        rela_t1(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -8176,11 +8356,11 @@ shiny::observeEvent(input$cal1, {
   BF10 <- suppressWarnings(switch(x$interval,
                  "1" = t1_BF10(x$tval,x$N,x$model ,x$location,x$scale,x$dff , x$hypothesis ),
                  "2" = t1e_BF10(x$tval,x$N,x$model,x$location,x$scale,x$dff , x$hypothesis,x$e )))
-
+  d.obs <- x$tval/sqrt(x$N)
   output$BFt1 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('
-    \\textit{t}(', x$N , ') = ',x$tval,', \\textit{BF}_{10} = ', round(BF10, 4),", \\textit{BF}_{01} = ",round(1/BF10, 4), '
+    \\textit{t}(', x$N , ') = ',x$tval,', \\textit{d} = ',round(d.obs,4),',\\\\ \\textit{BF}_{10} = ', round(BF10, 4),", \\textit{BF}_{01} = ",round(1/BF10, 4), '
 ')
 
 
@@ -8425,39 +8605,56 @@ shiny::observeEvent(input$runt2, {
 
   if (isTRUE(t2$pc)) {
 
-    output$plot_power_t2_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$$\\text{Power Curve}$$"))
-      )
-    })
+    if (identical(dat, "Error")) {
 
-    output$plot_power_t2 <- shiny::renderPlot({
+      output$plot_power_t2_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Power curve is not shown due to an error}$$")
+        )
+      })
 
-      suppressWarnings(
-        switch(
-          t2$interval,
+      output$plot_power_t2 <- shiny::renderPlot({
+        NULL
+      })
 
-          "1" = Power_t2(
-            t2$D, t2$model, t2$location, t2$scale, t2$dff, t2$hypothesis,
-            t2$model_d, t2$location_d, t2$scale_d, t2$dff_d,
-            t2$de_an_prior,
-            dat[1,5],
-            dat[1,6] / dat[1,5]
-          ),
+    } else {
 
-          "2" = Power_t2e(
-            t2$D, t2$model, t2$location, t2$scale, t2$dff, t2$hypothesis,
-            t2$model_d, t2$location_d, t2$scale_d, t2$dff_d,
-            t2$de_an_prior,
-            dat[1,5],
-            dat[1,6] / dat[1,5],
-            t2$e
+      output$plot_power_t2_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Power Curve}$$")
           )
         )
-      )
+      })
 
-      pc_t2(grDevices::recordPlot())
-    })
+      output$plot_power_t2 <- shiny::renderPlot({
+
+        plt<-suppressWarnings(
+          switch(
+            t2$interval,
+
+            "1" = Power_t2(
+              t2$D, t2$model, t2$location, t2$scale, t2$dff, t2$hypothesis,
+              t2$model_d, t2$location_d, t2$scale_d, t2$dff_d,
+              t2$de_an_prior,
+              unlist(dat[1,5]),
+              unlist(dat[1,6]) / unlist(dat[1,5])
+            ),
+
+            "2" = Power_t2e(
+              t2$D, t2$model, t2$location, t2$scale, t2$dff, t2$hypothesis,
+              t2$model_d, t2$location_d, t2$scale_d, t2$dff_d,
+              t2$de_an_prior,
+              dat[1,5],
+              dat[1,6] / dat[1,5],
+              t2$e
+            )
+          )
+        )
+        print(plt)
+        pc_t2(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -8473,34 +8670,51 @@ shiny::observeEvent(input$runt2, {
 
   if (isTRUE(t2$rela)) {
 
-    output$plot_rel_t2_text <- shiny::renderUI({
-      shiny::tagList(
-        shiny::withMathJax(shiny::em("$$\\text{Relationship between BF and data}$$"))
-      )
-    })
+    if (identical(dat, "Error")) {
 
-    output$plot_rel_t2 <- shiny::renderPlot({
+      output$plot_rel_t2_text <- shiny::renderUI({
+        shiny::withMathJax(
+          shiny::em("$$\\text{Relationship plot is not shown due to an error}$$")
+        )
+      })
 
-      suppressWarnings(
-        switch(
-          t2$interval,
+      output$plot_rel_t2 <- shiny::renderPlot({
+        NULL
+      })
 
-          "1" = t2_BF(
-            t2$D, dat[1,5], t2$r, t2$target,
-            t2$model, t2$location, t2$scale, t2$dff,
-            t2$hypothesis
-          ),
+    } else {
 
-          "2" = t2e_BF(
-            t2$D, dat[1,5], t2$r,
-            t2$model, t2$location, t2$scale, t2$dff,
-            t2$hypothesis, t2$e
+      output$plot_rel_t2_text <- shiny::renderUI({
+        shiny::tagList(
+          shiny::withMathJax(
+            shiny::em("$$\\text{Relationship between BF and data}$$")
           )
         )
-      )
+      })
 
-      rela_t2(grDevices::recordPlot())
-    })
+      output$plot_rel_t2 <- shiny::renderPlot({
+
+        plt<-suppressWarnings(
+          switch(
+            t2$interval,
+
+            "1" = t2_BF(
+              t2$D, dat[1, 5], t2$r, t2$target,
+              t2$model, t2$location, t2$scale, t2$dff,
+              t2$hypothesis
+            ),
+
+            "2" = t2e_BF(
+              t2$D, dat[1, 5], t2$r,
+              t2$model, t2$location, t2$scale, t2$dff,
+              t2$hypothesis, t2$e
+            )
+          )
+        )
+        print(plt)
+        rela_t2(grDevices::recordPlot())
+      })
+    }
 
   } else {
 
@@ -8662,12 +8876,17 @@ shiny::observeEvent(input$cal2, {
   })
 
 
+  d.obs <-  t2$tval / sqrt((t2$N1 * t2$N2) / (t2$N1 + t2$N2))
 
   output$BFt2 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
-    table_html <- paste0('
-    \\textit{t}(', ddff, ') = ',t2$tval,', \\textit{BF}_{10} = ', round(BF10, 4),", \\textit{BF}_{01} = " ,round(1/BF10, 4),'
-')
+    table_html <- paste0(
+      '\\textit{t}(', ddff, ') = ', t2$tval,
+      ', \\textit{d} = ', round(d.obs, 4), ', \\\\ ',
+      '\\textit{BF}_{10} = ', round(BF10, 4),
+      ', \\textit{BF}_{01} = ', round(1/BF10, 4)
+    )
+
 
 
     # Render the table using MathJax
@@ -9101,7 +9320,7 @@ t2_BF <- function(D, n1, r, target,
   x_breaks_10 <- sort(unique(c(-5, 5, round(t.BF10, 2))))
 
   p1 <- ggplot2::ggplot(df10, ggplot2::aes(t, BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +
     ggplot2::geom_vline(xintercept = t.BF10, linetype = "solid") +
     ggplot2::scale_y_log10() +
     ggplot2::scale_x_continuous(limits = c(-5, 5), breaks = x_breaks_10) +
@@ -9131,7 +9350,7 @@ t2_BF <- function(D, n1, r, target,
   if (impossible) {
 
     p2 <- ggplot2::ggplot(df01, ggplot2::aes(t, BF)) +
-      ggplot2::geom_line(size = 1.2, color = "black") +
+      ggplot2::geom_line(linewidth = 1.2, color = "black") +
       ggplot2::scale_y_log10() +
       ggplot2::scale_x_continuous(limits = c(-5, 5), breaks = c(-5, 5)) +
       ggplot2::labs(
@@ -9159,7 +9378,7 @@ t2_BF <- function(D, n1, r, target,
     x_breaks_01 <- sort(unique(c(-5, 5, round(t.BF01, 2))))
 
     p2 <- ggplot2::ggplot(df01, ggplot2::aes(t, BF)) +
-      ggplot2::geom_line(size = 1.2, color = "black") +
+      ggplot2::geom_line(linewidth = 1.2, color = "black") +
       ggplot2::geom_vline(xintercept = t.BF01, linetype = "solid") +
       ggplot2::scale_y_log10() +
       ggplot2::scale_x_continuous(limits = c(-5, 5), breaks = x_breaks_01) +
@@ -9279,7 +9498,7 @@ Power_t2 <- function(D, model, location, scale, dff, hypothesis,
                         ggplot2::aes(x = SampleSize,
                                      y = Probability,
                                      color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -9294,7 +9513,7 @@ Power_t2 <- function(D, model, location, scale, dff, hypothesis,
                         ggplot2::aes(x = SampleSize,
                                      y = Probability,
                                      color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -9736,7 +9955,7 @@ t2e_BF <- function(D, n1, r,
   x_breaks_10 <- sort(unique(c(-5, 5, round(t.BF10, 2))))
 
   p1 <- ggplot2::ggplot(df10, ggplot2::aes(t, BF)) +
-    ggplot2::geom_line(size = 1.2, color = "black") +
+    ggplot2::geom_line(linewidth = 1.2, color = "black") +
     ggplot2::geom_vline(xintercept = t.BF10, linetype = "dashed") +
     ggplot2::scale_y_log10() +
     ggplot2::scale_x_continuous(limits = c(-5, 5), breaks = x_breaks_10) +
@@ -9765,7 +9984,7 @@ t2e_BF <- function(D, n1, r,
   if (impossible) {
 
     p2 <- ggplot2::ggplot(df01, ggplot2::aes(t, BF)) +
-      ggplot2::geom_line(size = 1.2, color = "black") +
+      ggplot2::geom_line(linewidth = 1.2, color = "black") +
       ggplot2::scale_y_log10() +
       ggplot2::scale_x_continuous(limits = c(-5, 5), breaks = c(-5, 5)) +
       ggplot2::labs(
@@ -9793,7 +10012,7 @@ t2e_BF <- function(D, n1, r,
     x_breaks_01 <- sort(unique(c(-5, 5, round(t.BF01, 2))))
 
     p2 <- ggplot2::ggplot(df01, ggplot2::aes(t, BF)) +
-      ggplot2::geom_line(size = 1.2, color = "black") +
+      ggplot2::geom_line(linewidth = 1.2, color = "black") +
       ggplot2::geom_vline(xintercept = t.BF01, linetype = "dashed") +
       ggplot2::scale_y_log10() +
       ggplot2::scale_x_continuous(limits = c(-5, 5), breaks = x_breaks_01) +
@@ -9908,7 +10127,7 @@ Power_t2e <- function(D, model, location, scale, dff, hypothesis,
   ## ---------- BF10 plot ----------
   p1 <- ggplot2::ggplot(df1,
                         ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(
@@ -9922,7 +10141,7 @@ Power_t2e <- function(D, model, location, scale, dff, hypothesis,
   ## ---------- BF01 plot ----------
   p2 <- ggplot2::ggplot(df2,
                         ggplot2::aes(x = SampleSize, y = Probability, color = Type)) +
-    ggplot2::geom_line(size = 1.2) +
+    ggplot2::geom_line(linewidth = 1.2) +
     ggplot2::scale_color_manual(values = type_colors) +
     ggplot2::ylim(0, 1) +
     ggplot2::labs(

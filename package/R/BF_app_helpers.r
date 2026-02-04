@@ -1,4 +1,3 @@
-
 show_t1_code <- function(x) {
 
   args <- c(
@@ -17,10 +16,8 @@ show_t1_code <- function(x) {
 
     ## OMITTING RULES
     if (!is.null(x$interval) && x$interval == 1 && arg == "e") return(NULL)
-
     if (!is.null(x$de_an_prior) && x$de_an_prior == 1 &&
         arg %in% c("model_d","location_d","scale_d","dff_d")) return(NULL)
-
     if (is.null(val)) return(NULL)
 
     ## SPECIAL RENAMING
@@ -31,7 +28,7 @@ show_t1_code <- function(x) {
     if (arg == "direct") {
       if (val != "h0") return(NULL)
       arg_print <- "type_rate"
-      val <- "\"negative\""
+      val <- "negative"
     }
 
     if (arg == "pc") {
@@ -46,20 +43,15 @@ show_t1_code <- function(x) {
       val <- TRUE
     }
 
-
     ## HYPOTHESIS > ALTERNATIVE RULE
     if (arg == "hypothesis") {
-
       arg_print <- "alternative"
-
       val <- switch(val,
                     "<"  = "less",
                     "!=" = "two.sided",
                     ">"  = "greater",
                     stop("Invalid hypothesis")
       )
-
-      val <- shQuote(val)
     }
 
     ## D > threshold
@@ -68,33 +60,30 @@ show_t1_code <- function(x) {
     ## e > ROPE
     if (arg == "e") arg_print <- "ROPE"
 
-
     ## model > prior_analysis
     if (arg == "model") arg_print <- "prior_analysis"
 
     ## model_d > prior_design
     if (arg == "model_d") arg_print <- "prior_design"
 
-
     ## VALUE FORMATTING
-    if (is.character(val) && !grepl("^\"", val)) val <- shQuote(val)
-    else if (is.vector(val) && length(val) > 1)
+    if (is.character(val)) {
+      # wrap in double quotes exactly once
+      val <- paste0('"', gsub('^"|"$', '', val), '"')
+    } else if (is.vector(val) && length(val) > 1) {
       val <- paste0("c(", paste(val, collapse = ", "), ")")
+    }
 
     glue::glue("  {arg_print} = {val},")
   })
 
   code_lines <- code_lines[!sapply(code_lines, is.null)]
 
-  ## -----------------------------------
-  ## N LOGIC (the corrected part)
-  ## -----------------------------------
-  if ( x$mode_bf != 1) {
-    # Print N always (even if NULL)
+  ## N LOGIC
+  if (x$mode_bf != 1) {
     Nval <- if (is.null(x$N)) "NULL" else x$N
     code_lines <- c(code_lines, glue::glue("  N = {Nval}"))
   }
-  # If mode_bf == 1 > skip printing N entirely
 
   ## Remove trailing comma
   if (length(code_lines) > 0)
@@ -129,14 +118,9 @@ show_t2_code <- function(x) {
     ## OMITTING RULES
     ## -----------------------------
     if (!is.null(x$interval) && x$interval == 1 && arg == "e") return(NULL)
-
     if (!is.null(x$de_an_prior) && x$de_an_prior == 1 &&
         arg %in% c("model_d","location_d","scale_d","dff_d")) return(NULL)
-
-    ## NEW RULE:
-    ## If mode_bf != 1 > DO NOT print r
     if (x$mode_bf != 1 && arg == "r") return(NULL)
-
     if (is.null(val)) return(NULL)
 
     ## -----------------------------
@@ -149,7 +133,7 @@ show_t2_code <- function(x) {
     if (arg == "direct") {
       if (val != "h0") return(NULL)
       arg_print <- "type_rate"
-      val <- "\"negative\""
+      val <- "negative"  # plain string, will quote later
     }
 
     if (arg == "pc") {
@@ -164,21 +148,15 @@ show_t2_code <- function(x) {
       val <- TRUE
     }
 
-
-
     ## HYPOTHESIS > ALTERNATIVE RULE
     if (arg == "hypothesis") {
-
       arg_print <- "alternative"
-
       val <- switch(val,
                     "<"  = "less",
                     "!=" = "two.sided",
                     ">"  = "greater",
                     stop("Invalid hypothesis")
       )
-
-      val <- shQuote(val)
     }
 
     ## D > threshold
@@ -187,19 +165,17 @@ show_t2_code <- function(x) {
     ## e > ROPE
     if (arg == "e") arg_print <- "ROPE"
 
-
     ## model > prior_analysis
     if (arg == "model") arg_print <- "prior_analysis"
 
     ## model_d > prior_design
     if (arg == "model_d") arg_print <- "prior_design"
 
-
     ## -----------------------------
     ## VALUE FORMATTING
     ## -----------------------------
-    if (is.character(val) && !grepl("^\"", val)) {
-      val <- shQuote(val)
+    if (is.character(val)) {
+      val <- shQuote(val, type = "cmd")  # always double quotes
     } else if (is.vector(val) && length(val) > 1) {
       val <- paste0("c(", paste(val, collapse = ", "), ")")
     }
@@ -210,13 +186,11 @@ show_t2_code <- function(x) {
   code_lines <- code_lines[!sapply(code_lines, is.null)]
 
   ## -----------------------------
-  ## N1 / N2 LOGIC (parallel to t1 code)
+  ## N1 / N2 LOGIC
   ## -----------------------------
   if (x$mode_bf != 1) {
-
     N1val <- if (is.null(x$N1)) "NULL" else x$N1
     N2val <- if (is.null(x$N2)) "NULL" else x$N2
-
     code_lines <- c(
       code_lines,
       glue::glue("  N1 = {N1val},"),
@@ -224,9 +198,7 @@ show_t2_code <- function(x) {
     )
   }
 
-  ## -----------------------------
   ## Remove trailing comma
-  ## -----------------------------
   if (length(code_lines) > 0) {
     code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
   }
@@ -237,6 +209,7 @@ show_t2_code <- function(x) {
     "\n)"
   )
 }
+
 
 
 
@@ -254,136 +227,89 @@ show_cor_code <- function(x) {
 
     val <- x[[arg]]
 
-    ## ---------------------------------------------------------
+    ## -----------------------------
     ## OMISSION RULES
-    ## ---------------------------------------------------------
-
-    # hide e if interval==1 ("no equivalence")
+    ## -----------------------------
     if (!is.null(x$interval) && x$interval == 1 && arg == "e") return(NULL)
-
-    # hide N unless mode_bf == 0
     if (arg == "N" && x$mode_bf != 0) return(NULL)
-
-    # hide target/FP (true/false rates) when mode_bf==0 (sample-size mode)
     if (x$mode_bf == 0 && arg %in% c("target","FP")) return(NULL)
-
-    # hide all design-prior args when de_an_prior == 1
     if (!is.null(x$de_an_prior) && x$de_an_prior == 1 &&
         arg %in% c("model_d","alpha_d","beta_d","location_d","k_d","scale_d","dff_d"))
       return(NULL)
-
-    # hide internal dff and dff_d always
     if (arg %in% c("dff_d")) return(NULL)
 
     # analysis prior model-specific rules
     if (!is.null(x$model)) {
-      if (x$model == "d_beta" &&
-          arg %in% c("alpha","beta","scale")) return(NULL)
-      if (x$model == "beta" &&
-          arg %in% c("k","scale")) return(NULL)
-      if (x$model == "NLP" &&
-          arg %in% c("k","alpha","beta")) return(NULL)
+      if (x$model == "d_beta" && arg %in% c("alpha","beta","scale")) return(NULL)
+      if (x$model == "beta"   && arg %in% c("k","scale")) return(NULL)
+      if (x$model == "NLP"    && arg %in% c("k","alpha","beta")) return(NULL)
     }
 
     # design prior model-specific rules
     if (!is.null(x$de_an_prior) && x$de_an_prior == 0 && !is.null(x$model_d)) {
-
-      if (x$model_d == "d_beta" &&
-          arg %in% c("alpha_d","beta_d","location_d","scale_d")) return(NULL)
-      if (x$model_d == "beta" &&
-          arg %in% c("k_d","location_d","scale_d")) return(NULL)
-      if (x$model_d == "NLP" &&
-          arg %in% c("k_d","alpha_d","beta_d")) return(NULL)
-      if (x$model_d == "Point" &&
-          arg %in% c("alpha_d","beta_d","k_d","scale_d")) return(NULL)
+      if (x$model_d == "d_beta" && arg %in% c("alpha_d","beta_d","location_d","scale_d")) return(NULL)
+      if (x$model_d == "beta"   && arg %in% c("k_d","location_d","scale_d")) return(NULL)
+      if (x$model_d == "NLP"    && arg %in% c("k_d","alpha_d","beta_d")) return(NULL)
+      if (x$model_d == "Point"  && arg %in% c("alpha_d","beta_d","k_d","scale_d")) return(NULL)
     }
 
-    # skip null fields generally
     if (is.null(val)) return(NULL)
 
-    ## ---------------------------------------------------------
+    ## -----------------------------
     ## RENAME ARGUMENTS
-    ## ---------------------------------------------------------
-
+    ## -----------------------------
     arg_print <- arg
-
-    # target > true_rate, FP > false_rate
     if (arg == "target") arg_print <- "true_rate"
     if (arg == "FP")     arg_print <- "false_rate"
 
-    # direct > positive only when val=="h0" > positive="negative"
     if (arg == "direct") {
       if (val == "h0") {
         arg_print <- "type_rate"
-        val <- "negative"
-      } else {
-        return(NULL) # skip h1 / positive
-      }
+        val <- "negative"  # plain string
+      } else return(NULL)
     }
 
-    # pc > plot_power only if TRUE
     if (arg == "pc") {
       if (!isTRUE(val)) return(NULL)
       arg_print <- "plot_power"
       val <- TRUE
     }
 
-    # rel > plot_rel only if TRUE
     if (arg == "rela") {
       if (!isTRUE(val)) return(NULL)
       arg_print <- "plot_rel"
       val <- TRUE
     }
 
-    ## HYPOTHESIS > ALTERNATIVE RULE
     if (arg == "hypothesis") {
-
       arg_print <- "alternative"
-
       val <- switch(val,
                     "<"  = "less",
                     "!=" = "two.sided",
                     ">"  = "greater",
                     stop("Invalid hypothesis")
       )
-
-      val <- shQuote(val)
     }
 
-    ## D > threshold
     if (arg == "D") arg_print <- "threshold"
-
-    ## e > ROPE
     if (arg == "e") arg_print <- "ROPE"
-
-
-    ## model > prior_analysis
     if (arg == "model") arg_print <- "prior_analysis"
-
-    ## model_d > prior_design
     if (arg == "model_d") arg_print <- "prior_design"
 
-
-
-    ## ---------------------------------------------------------
+    ## -----------------------------
     ## VALUE FORMATTING
-    ## ---------------------------------------------------------
-
-    if (is.character(val) && !grepl("^\"", val))
-      val <- shQuote(val)
-
-    if (is.vector(val) && length(val) > 1)
-      val <- paste0("c(", paste(val, collapse = ", "), ")")
+    ## -----------------------------
+    if (is.character(val)) val <- shQuote(val, type = "cmd")  # always double quotes
+    if (is.vector(val) && length(val) > 1) val <- paste0("c(", paste(val, collapse = ", "), ")")
 
     glue::glue("  {arg_print} = {val},")
   })
 
-  # remove NULL entries
   code_lines <- code_lines[!sapply(code_lines, is.null)]
 
-  ## remove trailing comma
-  if (length(code_lines) > 0)
+  if (length(code_lines) > 0) {
     code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
+  }
 
   paste0(
     "BFpower.cor(\n",
@@ -391,6 +317,7 @@ show_cor_code <- function(x) {
     "\n)"
   )
 }
+
 
 
 

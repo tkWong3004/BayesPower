@@ -138,27 +138,39 @@ cat("```\n")  # end of code block in markdown
 
 ```{r results='asis', echo=FALSE}
 if (isTRUE(params$x$pc) || isTRUE(params$x$rela)) {
-  cat("\\newpage\n")
+  cat("\\newpage\n\n")
 }
 ```
 
-
-```{r echo=FALSE, fig.height=7, fig.width=12, results='asis'}
-
-
-if (params$x$pc){
-      cat("**Power Curve **\n\n")
-replayPlot(params$pc_t1)
-}
-
-```
 
 
 ```{r results='asis', echo=FALSE,  fig.width= 12, fig.height= 8}
-if (params$x$rela){
-      cat("**Relationship between BF and data **\n\n")
+if (params$x$pc && !is.null(params$pc_t1)) {
 
-params$rela_t1
+      cat("**Power Curve**\n\n")
+
+}
+
+```
+
+```{r results='asis', echo=FALSE,  fig.width= 12, fig.height= 8}
+if (params$x$pc && !is.null(params$pc_t1)) {
+
+  # Print the plot
+  print(params$pc_t1)
+}
+
+```
+
+```{r results='asis', echo=FALSE,  fig.width= 12, fig.height= 8}
+if (params$x$rela){
+  cat("**Relationship between BF and data **\n\n")
+}
+
+```
+```{r results='asis', echo=FALSE,  fig.width= 12, fig.height= 8}
+if (params$x$rela){
+print(params$rela_t1)
 }
 
 ```

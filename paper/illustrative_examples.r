@@ -29,18 +29,17 @@ p_value <- 2 * pt(abs(t_value), df = df, lower.tail = FALSE)
 
 # Bayes Factor
 
-BF10.t.test.two_sample(
-  tval = t_value,
+BF10.ttest.TwoSample(
+  tval = -1.148,
   N1 = 53,
   N2 = 48,
-  model = "t-distribution",
+  prior_analysis = "t-distribution",
   location = 0,
   scale = 0.707,
   dff = 1,
-  hypothesis = "!=",
-  e = c(-0.36, 0.36)
+  alternative = "two.sided",
+  ROPE = c(-0.36,0.36)
 )
-1/ 0.1104477
 
 # variance of d
 var_d <- (n1 + n2) / (n1 * n2) + (d^2) / (2 * (n1 + n2))
@@ -49,21 +48,20 @@ var_d <- (n1 + n2) / (n1 * n2) + (d^2) / (2 * (n1 + n2))
 round(sqrt(var_d),3)
 
 # power analysis for future study
-BFpower.t.test_two_sample(
-  hypothesis = "!=",
-  e = c(-0.36, 0.36),
-  interval = "2",
-  D = 3,
-  target = 0.8,
-  alpha = 0.05,
-  model = "Normal",
+BFpower.ttest.TwoSample(
+  alternative = "two.sided",
+  ROPE = c(-0.36, 0.36),
+  threshold = 3,
+  true_rate = 0.8,
+  false_rate = 0.05,
+  prior_analysis = "Normal",
   location = -0.23,
   scale = 0.2,
   dff = 1,
-  de_an_prior = 1,
-  r = 1,
-  mode_bf = 1,
-  direct = "h0"
+  type_rate = "negative",
+  plot_power = TRUE,
+  plot_rel = TRUE,
+  r = 1
 )
 
 #### Example 2 - Correlation
@@ -72,65 +70,52 @@ BFpower.t.test_two_sample(
 BF10.cor(
   r = 0.393,
   n = 46,
+  prior_analysis = "d_beta",
   k = 1,
-  alpha = 1,
-  beta = 1,
   h0 = 0,
-  hypothesis = "!=",
-  location = 0,
-  scale = 0.01,
-  dff = 1,
-  model = "d_beta"
+  alternative = "two.sided"
 )
 
 # if r is not rounded, the bayes factors between ours and Ly et al will be the same
-
 BF10.cor(
   r = 0.3930924,
   n = 46,
+  prior_analysis = "d_beta",
   k = 1,
-  alpha = 1,
-  beta = 1,
   h0 = 0,
-  hypothesis = "!=",
-  location = 0,
-  scale = 0.01,
-  dff = 1,
-  model = "d_beta"
+  alternative = "two.sided"
 )
 
 # power analysis
 BFpower.cor(
-  hypothesis = ">",
+  alternative = "greater",
   h0 = 0,
-  D = 3,
-  target = 0.8,
-  FP = 0.05,
-  model = "d_beta",
+  threshold = 3,
+  true_rate = 0.8,
+  false_rate = 0.05,
+  prior_analysis = "d_beta",
   k = 1,
-  model_d = "Point",
+  prior_design = "Point",
   location_d = 0.3,
-  de_an_prior = 0,
-  mode_bf = 1,
-  direct = "h1"
+  plot_power = TRUE,
+  plot_rel = TRUE
 )
 
 #### Example 3 - ANOVA
-BFpower.f(
-  inter = "1",
-  D = 3,
-  target = 0.8,
+BFpower.f.test(
+  threshold = 3,
+  true_rate = 0.8,
+  false_rate = 0.05,
   p = 3,
   k = 4,
-  model = "effectsize",
+  prior_analysis = "effectsize",
   dff = 3,
   rscale = 0.18,
   f_m = 0.1,
-  model_d = "Point",
+  prior_design = "Point",
   f_m_d = 0.1,
-  de_an_prior = 0,
-  mode_bf = 1,
-  direct = "h1"
+  plot_power = TRUE,
+  plot_rel = TRUE
 )
 
 #### Example 4 - one proportion
@@ -138,28 +123,24 @@ BFpower.f(
 BF10.bin.test(
   x = 42,
   n = 52,
+  h0 = 0.5,
+  prior_analysis = "beta",
+  alternative = "greater",
   alpha = 1,
-  beta = 1,
-  location = 0.5,
-  scale = 1,
-  model = "beta",
-  hypothesis = ">"
+  beta = 1
 )
 # power analysis
 BFpower.bin(
-  hypothesis = ">",
-  interval = "1",
-  D = 3,
-  target = 0.8,
-  FP = 0.05,
+  alternative = "greater",
+  threshold = 3,
+  true_rate = 0.8,
+  false_rate = 0.05,
   h0 = 0.5,
-  location = 0.5,
-  model = "beta",
+  prior_analysis = "beta",
   alpha = 1,
   beta = 1,
-  de_an_prior = 1,
-  mode_bf = 1,
-  direct = "h1"
+  plot_rel = TRUE,
+  plot_power = TRUE
 )
 
 #### Example 5 - two proportions
@@ -176,19 +157,17 @@ BF10.props(
   x1 = 155,
   x2 = 150
 )
-1/0.07604026
 # power analysis
 BFpower.props(
-  D = 3,
-  target = 0.8,
+  threshold = 3,
+  true_rate = 0.8,
   a0 = 1,
   b0 = 1,
-  model1 = "same",
   a1 = 156,
   b1 = 339,
   a2 = 151,
   b2 = 339,
-  model2 = "same",
-  mode_bf = 1,
-  direct = "h1"
+  plot_power = TRUE,
+  plot_rel = TRUE
 )
+
