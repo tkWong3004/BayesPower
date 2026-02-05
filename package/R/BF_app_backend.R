@@ -280,7 +280,7 @@ prior_plot_f <-function(q,dff,rscale,f_m,model,dff_d,rscale_d,f_m_d,model_d,de_a
   oldpar <- graphics::par(no.readonly = TRUE)
   base::on.exit(graphics::par(oldpar))
   graphics::par(mfrow = c(1, 1))
-  fsq = seq(0.001,3,.025)
+  fsq = seq(0.01,3,.025)
 
   prior.analysis = F_prior(fsq,q,dff,rscale,f_m,model)
   prior.design   <- if (de_an_prior == 0 && model_d != "Point")
@@ -798,7 +798,7 @@ prior_plot_fe <-function(q,dff,rscale,f,model,dff_d,rscale_d,f_m_d,model_d,de_an
 
   normalization  <- stats::integrate(function(fsq)F_prior(fsq,q,dff,rscale,f,model),lower = e,upper = Inf,rel.tol = 1e-10)$value
 
-  fsq = seq(0.001,3,.025)
+  fsq = seq(0.01,3,.025)
   #prior.analysis.h1 = F_prior(fsq,q,dff,rscale,f,model)/normalization
   prior.analysis.h1 = F_prior(fsq,q,dff,rscale,f,model)
   prior.analysis.h1[fsq<e]=0
@@ -6217,7 +6217,7 @@ output$bin_upper<-shiny::renderUI({
  bin = input_bin()
 
   table_html <-  paste0('
-                        \\theta_0 - \\epsilon = ', bin$location+bin$ubbin,'')
+                        \\theta_0 + \\epsilon = ', bin$location+bin$ubbin,'')
 
   shiny::tagList(
     # Render the table using MathJax
@@ -8895,7 +8895,7 @@ shiny::observeEvent(input$cal2, {
 
 
   d.obs <-  t2$tval / sqrt((t2$N1 * t2$N2) / (t2$N1 + t2$N2))
-  ROPE <- switch(t2$interval,"1" = NULL,"2" = x$e)
+  ROPE <- switch(t2$interval,"1" = NULL,"2" = t2$e)
   p.value <- t.pval(t2$tval, t2$N1, t2$N2, t2$hypothesis, ROPE = ROPE, type = "two")
   output$BFt2 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table

@@ -22,8 +22,8 @@ t.pval <- function(tval, n1, n2 = NULL, alternative, ROPE = NULL, type = "One-sa
       # ROPE must be length 1 for one-sided tests
       ncp <- ROPE * constant
       p <- switch(alternative,
-                  "<" = stats::pt(tval, df, ncp = ncp, lower.tail = TRUE),
-                  ">" = stats::pt(tval, df, ncp = ncp, lower.tail = FALSE))
+                  "<" = stats::pt(tval, df, ncp = ncp, lower.tail = FALSE),
+                  ">" = stats::pt(tval, df, ncp = ncp, lower.tail = TRUE))
     } else if (alternative == "!=") {
       # ROPE must be length 2 for two-sided
       if (length(ROPE) != 2) stop("For alternative '!=', ROPE must be of length 2.")
