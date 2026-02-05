@@ -36,6 +36,8 @@ A list of class \code{BFvalue_2p} containing:
 \item \code{analysis_h1_theta_2}: list with \code{a} and \code{b} for group 2 prior under H1.
 \item \code{bf10}: the computed Bayes factor (BF10).
 \item \code{n1}, \code{x1}, \code{n2}, \code{x2}: the input sample sizes and observed successes.
+\item \code{OddRatio}: observed odd ratio.
+\item \code{p.value}: p.value.
 }
 }
 \description{

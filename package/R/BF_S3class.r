@@ -333,14 +333,16 @@ print.BFvalue_t <- function (x,...) {
   cat(line)
 
   cat(
-    "t(df=", x$df, ") = ", x$tval,
-    ", ", BF10, " = ", x$bf10,
+    "  t(df=", x$df, ") = ", x$tval,
+    ", p = ", x$p.value,
+    ", d = ",x$d,
+    ",\n  ", BF10, " = ", x$bf10,
     ", ", BF01, " = ", 1 / x$bf10,
     "\n", sep = ""
   )
 
   if (x$type == "Indepedent-samples t-test (equal variance)") {
-    cat("N1 = ", x$N1, ", N2 = ", x$N2, "\n", sep = "")
+    cat("  N1 = ", x$N1, ", N2 = ", x$N2, "\n", sep = "")
   }
 
 }
@@ -625,7 +627,9 @@ print.BFvalue_r <- function(x,...) {
   cat(line)
   cat("Results\n")
   cat(line)
-  cat("  r (n = ", x$n, ") = ", x$r, ", BF\u2081\u2080 = ", x$bf10, ", BF\u2080\u2081 = ", 1 / x$bf10, "\n", sep = "")
+  cat("  r (n = ", x$n, ") = ", x$r,
+      ", p = ",x$p.value,
+      ",\n  BF\u2081\u2080 = ", x$bf10, ", BF\u2080\u2081 = ", 1 / x$bf10, "\n", sep = "")
 }
 
 
@@ -891,8 +895,8 @@ print.BFvalue_f <- function(x,...) {
   # Results
   cat("Results\n")
   cat(line)
-  cat("  F(df", sub1, " =", x$df1, ", df", sub2, " =", x$df2, ") = ", x$fval,
-      ", ", BF10, " = ", x$bf10, ", ", BF01, " = ", 1 / x$bf10, "\n", sep = "")
+  cat("  F(df", sub1, " =", x$df1, ", df", sub2, " =", x$df2, ") = ", x$fval,", p = ",x$p.value,
+      ",\n  ", BF10, " = ", x$bf10, ", ", BF01, " = ", 1 / x$bf10, "\n", sep = "")
 }
 
 
@@ -1162,7 +1166,7 @@ print.BFvalue_bin <- function(x,...) {
   cat(line)
   cat("Results\n")
   cat(line)
-  cat("  n = ", x$n, ", x = ", x$x, ", BF", sub1, sub0, " = ", x$bf10, ", BF", sub0, sub1, " = ", 1 / x$bf10, "\n", sep = "")
+  cat("  n = ", x$n, ", x = ", x$x,", p = ",x$p.value, ",\n  BF", sub1, sub0, " = ", x$bf10, ", BF", sub0, sub1, " = ", 1 / x$bf10, "\n", sep = "")
 }
 
 
@@ -1351,7 +1355,7 @@ print.BFvalue_2p <- function(x,...) {
   cat(line)
   cat("Results:\n")
   cat(line)
-  cat("  n", sub1, " = ", x$n1, ", x", sub1, " = ", x$x1, ", n", sub2, " = ", x$n2, ", x", sub2, " = ", x$x2, "\n", sep = "")
+  cat("  n", sub1, " = ", x$n1, ", x", sub1, " = ", x$x1, ", n", sub2, " = ", x$n2, ", x", sub2, " = ", x$x2, ",\n  Odd Ratio = ",x$OddRatio,",  p = ",x$p.value," \n", sep = "")
   cat("  BF", sub1, sub0, " = ", x$bf10, ", BF", sub0, sub1, " = ", 1 / x$bf10, "\n", sep = "")
 }
 

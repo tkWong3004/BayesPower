@@ -123,7 +123,7 @@ ui <-
                    #,shiny::conditionalPanel("input.h0t1 == 2", shiny::em("\\(\\text{Location = 0}\\)"))
             ),
             shiny::column(4,
-                   shiny::sliderInput("st1", "\\(\\text{Scale}\\)", min = 0.01, max = 3, value = 0.707, step = 0.001, ticks = FALSE)
+                   shiny::sliderInput("st1", "\\(\\text{Scale}\\)", min = 0.01, max = 3, value = 0.707, step = 0.01, ticks = FALSE)
             ),
             shiny::column(4,
                    shiny::conditionalPanel("input.modelt1 == 1",
@@ -163,7 +163,7 @@ ui <-
                                               ),
                                               shiny::column(4,
                                                      shiny::conditionalPanel("input.modelt1d != 4",
-                                                                      shiny::sliderInput("st1d", "\\(\\text{Scale}\\)", min = 0.01, max = 3, value = 0.707, step = 0.001, ticks = FALSE)
+                                                                      shiny::sliderInput("st1d", "\\(\\text{Scale}\\)", min = 0.01, max = 3, value = 0.707, step = 0.01, ticks = FALSE)
                                                      )
                                               ),
                                               shiny::column(4,
@@ -404,7 +404,7 @@ ui <-
             ),
             shiny::column(
               width = 4,
-              shiny::sliderInput("st2", label = "\\(\\text{Scale}\\)", min = 0.01, max = 3, value = .707, step = 0.001, ticks = FALSE)
+              shiny::sliderInput("st2", label = "\\(\\text{Scale}\\)", min = 0.01, max = 3, value = .707, step = 0.01, ticks = FALSE)
             ),
             shiny::column(
               width = 4,
@@ -684,20 +684,20 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
              shiny::fluidRow(
                shiny::column(4,
                       shiny::conditionalPanel("input.modelr == 1",
-                                       shiny::sliderInput("kr", "\\(k \\)", min = 0.01, max = 10, value = 1, step = 0.01, ticks = FALSE)
+                                       shiny::sliderInput("kr", "\\(k \\)", min = 0.01, max = 100, value = 1, step = 0.01, ticks = FALSE)
                       ),
                       shiny::conditionalPanel("input.modelr == 3",
-                                       shiny::sliderInput("sr", "\\(Scale \\)", min = 0.01, max = 1, value = 0.01, step = 0.01, ticks = FALSE)
+                                       shiny::sliderInput("sr", "\\( \\text{Scale} \\)", min = 0.01, max = 1, value = 0.01, step = 0.01, ticks = FALSE)
                       )
                ),
                shiny::column(4,
                       shiny::conditionalPanel("input.modelr == 2",
-                                       shiny::sliderInput("ralpha", "\\(\\alpha \\)", min = 0.01, max = 10, value = 1, step = 0.01, ticks = FALSE)
+                                       shiny::sliderInput("ralpha", "\\(\\alpha \\)", min = 0.01, max = 100, value = 1, step = 0.01, ticks = FALSE)
                       )
                ),
                shiny::column(4,
                       shiny::conditionalPanel("input.modelr == 2",
-                                       shiny::sliderInput("rbeta", "\\(\\beta \\)", min = 0.01, max = 10, value = 1, step = 0.01, ticks = FALSE)
+                                       shiny::sliderInput("rbeta", "\\(\\beta \\)", min = 0.01, max = 100, value = 1, step = 0.01, ticks = FALSE)
                       )
                )
              ),
@@ -731,7 +731,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                                                shiny::fluidRow(
                                                  shiny::column(4,
                                                         shiny::conditionalPanel("input.modelrd == 1",
-                                                                         shiny::sliderInput("rkd", "\\( k \\)", min = 0.01, max = 10, value = 1, step = 0.01, ticks = FALSE)
+                                                                         shiny::sliderInput("rkd", "\\( k \\)", min = 0.01, max = 100, value = 1, step = 0.01, ticks = FALSE)
 
                                                                          ),
                                                         shiny::conditionalPanel("input.modelrd == 4||input.modelrd == 3",
@@ -741,7 +741,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                                                  ),
                                                  shiny::column(4,
                                                         shiny::conditionalPanel("input.modelrd == 2",
-                                                                         shiny::sliderInput("ralphad", "\\(\\alpha \\)", min = 0.01, max = 10, value = 0.1, step = 0.01, ticks = FALSE)
+                                                                         shiny::sliderInput("ralphad", "\\(\\alpha \\)", min = 0.01, max = 100, value = 0.1, step = 0.01, ticks = FALSE)
                                                         ),
 
                                                         shiny::conditionalPanel("input.modelrd == 3",
@@ -750,7 +750,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                                                  ),
                                                  shiny::column(4,
                                                         shiny::conditionalPanel("input.modelrd == 2",
-                                                                         shiny::sliderInput("rbetad", "\\(\\beta \\)", min = 0.01, max = 10, value = 0.1, step = 0.01, ticks = FALSE)
+                                                                         shiny::sliderInput("rbetad", "\\(\\beta \\)", min = 0.01, max = 100, value = 0.1, step = 0.01, ticks = FALSE)
                                                         )
                                                  )
                                                )

@@ -1,7 +1,7 @@
 ---
 title: "BayesPower: Output"
 output:
-  pdf_document: default
+  html_document: default
 fontsize: 12pt
 params:
   p2: NA
@@ -17,7 +17,7 @@ A Bayes Factor design analysis for testing one proportion was conducted on `r Sy
 # Generate the reproducible code
 
 cat("```r\n")
-cat(show_props_code(params$p2))
+cat(BayesPower:::show_props_code(params$p2))
 cat("\n```")
 
 

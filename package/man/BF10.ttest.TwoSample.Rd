@@ -53,6 +53,8 @@ A list of class \code{BFvalue_t} containing:
 \item{ROPE}{Interval bounds used, if any.}
 \item{N1}{Sample size of group 1 .}
 \item{N2}{Sample size of group 2 .}
+\item{d}{Numeric, observed Cohen's d.}
+\item{p.value}{Numeric, p.value.}
 }
 }
 \description{

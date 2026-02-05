@@ -49,6 +49,7 @@ A list with class \code{"BFvalue_r"} containing:
 \item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
 \item \code{alternative}: the direction of the alternative hypothesis
 \item \code{ROPE}: Interval bounds if specified
+\item \code{p.value}: Numeric, p.value.
 }
 }
 \description{

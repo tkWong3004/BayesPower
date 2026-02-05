@@ -6461,8 +6461,10 @@ shiny::observeEvent(input$calbin, {
 
   output$BFbin <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
+    ROPE    <- switch(bin$interval,"1"=NULL,"2"=bin$e)
+    p.value <- bin.pval(bin$Suc,bin$N,bin$h0,bin$hypothesis,ROPE)
     table_html <- paste0('
-    N = ', bin$N, ', x = ', bin$Suc, '; \\textit{BF}_{10} = ', round(BF10, 4), ', \\textit{BF}_{01} = ',round(1/BF10, 4),'
+    N = ', bin$N, ', x = ', bin$Suc,', \\textit{p} = ',round(p.value,4), ',\\\\ \\textit{BF}_{10} = ', round(BF10, 4), ', \\textit{BF}_{01} = ',round(1/BF10, 4),'
 ')
 
     output$result_bin <- shiny::renderText({
@@ -7006,12 +7008,15 @@ shiny::observeEvent(input$calf, {
 
 
   output$BFcalf <- shiny::renderUI({
+    ROPE <- switch(ff$inter,"1" = NULL,"2" = ff$e)
+    p.value <- f.pval(ff$fval, ff$df1,ff$df2,ROPE=ROPE)
+
     # Create the LaTeX formatted strings for the table
     output$BFcalf <- shiny::renderUI({
       # Create the LaTeX formatted string with proper escaping
       table_latex <- paste0(
         "$$ \\textit{F}(", ff$df1, ",", ff$df2,
-        ") = ", round(ff$fval, 3),", \\textit{f} = ", round(sqrt(ff$fval*ff$df1/ff$df2), 4),
+        ") = ", round(ff$fval, 3),", \\textit{p} = ",round(p.value,4) ,
         ",\\\\ \\textit{BF}_{10} = ", round(BF10, 4),", \\textit{BF}_{01} =" ,round(1/BF10, 4)," $$"
       )
 
@@ -7310,7 +7315,13 @@ shiny::observeEvent(input$runp2, {
 shiny::observeEvent(input$calp2, {
   p2 = input_p2()
   BF10 <- BF10_p2(p2$a0, p2$b0, p2$a1, p2$b1, p2$a2, p2$b2,p2$n1,p2$n2,p2$k1,p2$k2)
-
+  tab <- matrix(
+    c(p2$k1, p2$n1 - p2$k1,
+      p2$k2, p2$n2 - p2$k2),
+    nrow = 2,
+    byrow = TRUE
+  )
+  results <-stats::fisher.test(tab)
   output$BFp2 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     table_html <- paste0(
@@ -7318,6 +7329,7 @@ shiny::observeEvent(input$calp2, {
       'n_2 = ', p2$n2, ', ',
       'x_1 = ', p2$k1, ', ',
       'x_2 = ', p2$k2, ' \\\\ ',
+      '\\textit{Odd Ratio = }',round(results$estimate,4),', \\textit{p} = ',round(results$p.value,4),' \\\\ ',
       '\\textit{BF}_{10} = ', round(BF10, 4),
       ', \\textit{BF}_{01} = ', round(1/BF10, 4)
     )
@@ -7893,9 +7905,13 @@ shiny::observeEvent(input$calr, {
 
 
   output$BFrv <- shiny::renderUI({
+
+    ROPE <- switch(rr$interval,"1" = NULL,"2" = rr$e)
+      p.value <- r.pval(rr$rval, rr$N,rr$h0, rr$hypothesis , ROPE = ROPE)
+
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('
-    \\textit{r}(n = ', rr$N , ') = ',rr$rval,', \\textit{BF}_{10} = ', round(BF10, 4),", \\textit{BF}_{01} = ",round(1/BF10, 4), '
+    \\textit{r}(n = ', rr$N , ') = ',rr$rval,', \\textit{p} = ',round(p.value,4),', \\\\ \\textit{BF}_{10} = ', round(BF10, 4),", \\textit{BF}_{01} = ",round(1/BF10, 4), '
 ')
 
 
@@ -8357,10 +8373,12 @@ shiny::observeEvent(input$cal1, {
                  "1" = t1_BF10(x$tval,x$N,x$model ,x$location,x$scale,x$dff , x$hypothesis ),
                  "2" = t1e_BF10(x$tval,x$N,x$model,x$location,x$scale,x$dff , x$hypothesis,x$e )))
   d.obs <- x$tval/sqrt(x$N)
+  ROPE <- switch(x$interval,"1" = NULL,"2" = x$e)
+  p.value <- t.pval(x$tval, x$N+1, n2 = NULL, x$hypothesis, ROPE = ROPE, type = "One-sample t-test")
   output$BFt1 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     table_html <- paste0('
-    \\textit{t}(', x$N , ') = ',x$tval,', \\textit{d} = ',round(d.obs,4),',\\\\ \\textit{BF}_{10} = ', round(BF10, 4),", \\textit{BF}_{01} = ",round(1/BF10, 4), '
+    \\textit{t}(', x$N , ') = ',x$tval,', \\textit{p} = ',round(p.value,4),', \\textit{d} = ',round(d.obs,4),',\\\\ \\textit{BF}_{10} = ', round(BF10, 4),", \\textit{BF}_{01} = ",round(1/BF10, 4), '
 ')
 
 
@@ -8877,11 +8895,12 @@ shiny::observeEvent(input$cal2, {
 
 
   d.obs <-  t2$tval / sqrt((t2$N1 * t2$N2) / (t2$N1 + t2$N2))
-
+  ROPE <- switch(t2$interval,"1" = NULL,"2" = x$e)
+  p.value <- t.pval(t2$tval, t2$N1, t2$N2, t2$hypothesis, ROPE = ROPE, type = "two")
   output$BFt2 <- shiny::renderUI({
     # Create the LaTeX formatted strings for the table
     table_html <- paste0(
-      '\\textit{t}(', ddff, ') = ', t2$tval,
+      '\\textit{t}(', ddff, ') = ', t2$tval,', \\textit{p} = ',round(p.value,4),
       ', \\textit{d} = ', round(d.obs, 4), ', \\\\ ',
       '\\textit{BF}_{10} = ', round(BF10, 4),
       ', \\textit{BF}_{01} = ', round(1/BF10, 4)
@@ -9321,7 +9340,7 @@ t2_BF <- function(D, n1, r, target,
 
   p1 <- ggplot2::ggplot(df10, ggplot2::aes(t, BF)) +
     ggplot2::geom_line(linewidth = 1.2, color = "black") +
-    ggplot2::geom_vline(xintercept = t.BF10, linetype = "solid") +
+    ggplot2::geom_vline(xintercept = t.BF10, linetype = "dashed") +
     ggplot2::scale_y_log10() +
     ggplot2::scale_x_continuous(limits = c(-5, 5), breaks = x_breaks_10) +
     ggplot2::labs(
@@ -9379,7 +9398,7 @@ t2_BF <- function(D, n1, r, target,
 
     p2 <- ggplot2::ggplot(df01, ggplot2::aes(t, BF)) +
       ggplot2::geom_line(linewidth = 1.2, color = "black") +
-      ggplot2::geom_vline(xintercept = t.BF01, linetype = "solid") +
+      ggplot2::geom_vline(xintercept = t.BF01, linetype = "dashed") +
       ggplot2::scale_y_log10() +
       ggplot2::scale_x_continuous(limits = c(-5, 5), breaks = x_breaks_01) +
       ggplot2::labs(

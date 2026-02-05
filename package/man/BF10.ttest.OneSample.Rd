@@ -58,6 +58,8 @@ A list of class \code{BFvalue_t} containing:
 \item{analysis_h1}{List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
 \item{alternative}{Character, the direction of the alternative hypothesis.}
 \item{ROPE}{Optional numeric vector of interval null bounds.}
+\item{d}{Numeric, observed Cohen's d.}
+\item{p.value}{Numeric, p.value.}
 }
 }
 \description{

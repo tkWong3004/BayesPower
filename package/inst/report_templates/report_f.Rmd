@@ -1,7 +1,7 @@
 ---
 title: "BayesPower: Output"
 output:
-  pdf_document: default
+  html_document: default
 fontsize: 12pt
 params:
   ff: NA
@@ -17,7 +17,7 @@ A Bayes Factor design analysis for regression/ANOVA was conducted on `r Sys.time
 # Generate the reproducible code
 
 cat("```r\n")
-cat(show_f_code(params$ff))
+cat(BayesPower:::show_f_code(params$ff))
 cat("\n```")
 
 

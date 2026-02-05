@@ -2126,6 +2126,8 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
 #'     \item{analysis_h1}{List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
 #'     \item{alternative}{Character, the direction of the alternative hypothesis.}
 #'     \item{ROPE}{Optional numeric vector of interval null bounds.}
+#'     \item{d}{Numeric, observed Cohen's d.}
+#'     \item{p.value}{Numeric, p.value.}
 #'   }
 #'
 #' @examples
@@ -2219,8 +2221,9 @@ BF10.ttest.OneSample <- function(tval, df, prior_analysis, location, scale, dff,
       bf10=t1e_BF10(tval, df, prior_analysis, location, scale, dff, alternative, ROPE)
     }
   )
-
   type = "One-sample t-test"
+
+  p.value <- t.pval(tval=tval, n1=df+1, n2 = NULL, alternative, ROPE = ROPE, type = "One-sample t-test")
   analysis_h1 <- list(
     prior = prior_analysis,
     location = location,
@@ -2229,7 +2232,7 @@ BF10.ttest.OneSample <- function(tval, df, prior_analysis, location, scale, dff,
   if (prior_analysis == "t-distribution") {
     analysis_h1$dff <- dff
   }
-  object=list(type=type,bf10=bf10,tval=tval,df=df,analysis_h1=analysis_h1,alternative=alternative,ROPE=ROPE)
+  object=list(type=type,bf10=bf10,tval=tval,df=df,analysis_h1=analysis_h1,alternative=alternative,ROPE=ROPE,d=tval/sqrt(df+1),p.value=p.value)
 
   class(object) <- "BFvalue_t"
 
@@ -2267,6 +2270,8 @@ BF10.ttest.OneSample <- function(tval, df, prior_analysis, location, scale, dff,
 #'   \item{ROPE}{Interval bounds used, if any.}
 #'   \item{N1}{Sample size of group 1 .}
 #'   \item{N2}{Sample size of group 2 .}
+#'   \item{d}{Numeric, observed Cohen's d.}
+#'   \item{p.value}{Numeric, p.value.}
 #' }
 #'
 #' @examples
@@ -2380,6 +2385,8 @@ BF10.ttest.TwoSample <- function(tval, N1, N2, prior_analysis, location, scale, 
   )
 
   type = "Indepedent-samples t-test (equal variance)"
+  p.value <- t.pval(tval=tval, n1=n1, n2 = n2, alternative, ROPE = ROPE, type = "Indepedent-samples t-test (equal variance)")
+
   analysis_h1 <- list(
     prior = prior_analysis,
     location = location,
@@ -2388,7 +2395,7 @@ BF10.ttest.TwoSample <- function(tval, N1, N2, prior_analysis, location, scale, 
   if (prior_analysis == "t-distribution") {
     analysis_h1$dff <- dff
   }
-  object=list(type=type,bf10=bf10,tval=tval,df=df,analysis_h1=analysis_h1,alternative=alternative,ROPE=ROPE,N1=N1,N2=N2)
+  object=list(type=type,bf10=bf10,tval=tval,df=df,analysis_h1=analysis_h1,alternative=alternative,ROPE=ROPE,N1=N1,N2=N2,d=tval/sqrt((n1*n2)/(n1+n2)),p.value=p.value)
 
   class(object) <- "BFvalue_t"
 
@@ -2424,6 +2431,7 @@ BF10.ttest.TwoSample <- function(tval, N1, N2, prior_analysis, location, scale, 
 #'   \item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
 #'   \item \code{alternative}: the direction of the alternative hypothesis
 #'   \item \code{ROPE}: Interval bounds if specified
+#'   \item \code{p.value}: Numeric, p.value.
 #' }
 #'
 #' @examples
@@ -2541,6 +2549,8 @@ BF10.cor <- function(r, n, k, alpha, beta, h0, alternative,  scale,  prior_analy
   )
 
   type = "correlation"
+  p.value <- r.pval(r, n,h0, alternative , ROPE)
+
   analysis_h1 <- list(
     prior = prior_analysis,
     k = k,
@@ -2548,7 +2558,7 @@ BF10.cor <- function(r, n, k, alpha, beta, h0, alternative,  scale,  prior_analy
     beta=beta,
     scale=scale
   )
-  object=list(type=type,bf10=bf10,h0=h0,r=r,n=n,analysis_h1=analysis_h1,alternative=alternative,ROPE=ROPE)
+  object=list(type=type,bf10=bf10,h0=h0,r=r,n=n,analysis_h1=analysis_h1,alternative=alternative,ROPE=ROPE,p.value=p.value)
 
   class(object) <- "BFvalue_r"
   return(object)
@@ -2585,6 +2595,7 @@ BF10.cor <- function(r, n, k, alpha, beta, h0, alternative,  scale,  prior_analy
 #'   \item{\code{ROPE}}{Interval bound (if specified).}
 #'   \item{\code{analysis_h1}}{List containing the analysis prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff}.}
 #'   \item{\code{bf10}}{The computed Bayes factor.}
+#'   \item{\code{p.value}}{p-value.}
 #' }
 #' @examples
 #' BF10.f.test(
@@ -2664,6 +2675,7 @@ BF10.f.test <- function(fval, df1, df2, dff, rscale, f_m, prior_analysis, ROPE =
   )
 
   type = "Regression/ANOVA"
+  p.value <- f.pval(fval, df1,df2,ROPE)
   analysis_h1 <- list(
     prior = prior_analysis,
     rscale = rscale,
@@ -2677,7 +2689,8 @@ BF10.f.test <- function(fval, df1, df2, dff, rscale, f_m, prior_analysis, ROPE =
     analysis_h1 = analysis_h1,
     df1=df1,
     df2=df2,
-    bf10=bf10
+    bf10=bf10,
+    p.value=p.value
   )
   class(object) <- "BFvalue_f"
   return(object)
@@ -2714,6 +2727,7 @@ BF10.f.test <- function(fval, df1, df2, dff, rscale, f_m, prior_analysis, ROPE =
 #'     \code{beta} (beta parameter), and \code{scale} (scale parameter).
 #'     \item \code{alternative}: the direction of the alternative hypothesis.
 #'     \item \code{ROPE}: interval null bounds (if specified).
+#'     \item \code{p.value}: p-value.
 #'   }
 #'
 #' @examples
@@ -2835,14 +2849,17 @@ BF10.bin.test <- function(x, n, alpha, beta, h0, scale, prior_analysis, alternat
       bin_e_BF(x, n, alpha, beta, h0, scale, prior_analysis, alternative, ROPE)
     }
   )
+
   type = "one-proportion"
+  p.value <- bin.pval(x,n,h0,alternative,ROPE)
+
   analysis_h1 <- list(
     prior = prior_analysis,
     alpha=alpha,
     beta=beta,
     scale=scale
   )
-  object=list(type=type,bf10=bf10,h0=h0,x=x,n=n,analysis_h1=analysis_h1,alternative=alternative,ROPE=ROPE)
+  object=list(type=type,bf10=bf10,h0=h0,x=x,n=n,analysis_h1=analysis_h1,alternative=alternative,ROPE=ROPE,p.value=p.value)
 
   class(object) <- "BFvalue_bin"
   return(object)
@@ -2871,8 +2888,9 @@ BF10.bin.test <- function(x, n, alpha, beta, h0, scale, prior_analysis, alternat
 #'   \item \code{analysis_h1_theta_2}: list with \code{a} and \code{b} for group 2 prior under H1.
 #'   \item \code{bf10}: the computed Bayes factor (BF10).
 #'   \item \code{n1}, \code{x1}, \code{n2}, \code{x2}: the input sample sizes and observed successes.
+#'    \item \code{OddRatio}: observed odd ratio.
+#'    \item \code{p.value}: p.value.
 #' }
-#'
 #' @examples
 #' BF10.props(
 #' a0 = 1,
@@ -2946,6 +2964,14 @@ BF10.props <- function(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2) {
   }
 
   bf10=BF10_p2(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)
+  tab <- matrix(
+    c(x1, n1 - x1,
+      x2, n2 - x2),
+    nrow = 2,
+    byrow = TRUE
+  )
+  results <- stats::fisher.test(tab)
+
   type = "Two-proportions"
   analysis_h0 <- list(
     a = a0,
@@ -2970,7 +2996,9 @@ BF10.props <- function(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2) {
     n1=n1,
     x1=x1,
     n2=n2,
-    x2=x2
+    x2=x2,
+    OddRatio = results$estimate,
+    p.value=results$p.value
   )
   class(object) <- "BFvalue_2p"
   return(object)

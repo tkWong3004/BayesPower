@@ -37,6 +37,7 @@ A list of class \code{"BFvalue_f"} containing:
 \item{\code{ROPE}}{Interval bound (if specified).}
 \item{\code{analysis_h1}}{List containing the analysis prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff}.}
 \item{\code{bf10}}{The computed Bayes factor.}
+\item{\code{p.value}}{p-value.}
 }
 }
 \description{
