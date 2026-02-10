@@ -25,9 +25,19 @@ df <- n1 + n2 - 2
 # two-sided p-value
 p_value <- 2 * pt(abs(t_value), df = df, lower.tail = FALSE)
 
+# Bayes factor
+BF10.ttest.TwoSample(
+  tval = -1.148,
+  N1 = 53,
+  N2 = 48,
+  prior_analysis = "t-distribution",
+  location = 0,
+  scale = 0.707,
+  dff = 1,
+  alternative = "two.sided"
+)
 
-
-# Bayes Factor
+# interval Bayes Factor and equivalence test
 
 BF10.ttest.TwoSample(
   tval = -1.148,
