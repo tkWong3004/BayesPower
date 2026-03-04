@@ -30,20 +30,20 @@ if (params$t2$interval == 1) {
   cat("\\(\\mathcal{H}_0: \\delta = 0\\) vs ")
 
   cat(switch(
-    params$t2$hypothesis,
-    ">" = "\\(\\mathcal{H}_1: \\delta > 0\\)\n",
-    "<" = "\\(\\mathcal{H}_1: \\delta < 0\\)\n",
+    params$t2$alternative,
+    "greater" = "\\(\\mathcal{H}_1: \\delta > 0\\)\n",
+    "less" = "\\(\\mathcal{H}_1: \\delta < 0\\)\n",
     "\\(\\mathcal{H}_1: \\delta \\neq 0\\)\n"
   ))
 } else if (params$t2$interval == 2) {
   # Extract epsilon values
-  hyp <- params$t2$hypothesis
-e <- params$t2$e
+  hyp <- params$t2$alternative
+e <- params$t2$ROPE
 
 eps <- switch(hyp,
-  ">"  = list(eps_neg = 0,       eps_pos = e),
-  "<"  = list(eps_neg = e,       eps_pos = 0),
-  "!=" = list(eps_neg = e[1],    eps_pos = e[2]),
+  "greater"  = list(eps_neg = 0,       eps_pos = e),
+  "less"  = list(eps_neg = e,       eps_pos = 0),
+  "two.sided" = list(eps_neg = e[1],    eps_pos = e[2]),
   list(eps_neg = NA,             eps_pos = NA)  # default/fallback
 )
 
@@ -65,9 +65,9 @@ if (params$t2$de_an_prior == 0) {
 if (params$t2$de_an_prior == 1) {
   cat("**Analysis and design prior**  \n")}
 
-cat(paste0(params$t2$model,"(location = ", params$t2$location,", scale = ",params$t2$scale)
+cat(paste0(params$t2$prior_analysis,"(location = ", params$t2$location,", scale = ",params$t2$scale)
     )
-if (params$t2$model == "t-distribution"){
+if (params$t2$prior_analysis == "t-distribution"){
   cat(paste0(", df = ",params$t2$dff),")")
 }else cat(paste0(")"))
 
@@ -78,15 +78,15 @@ if (params$t2$model == "t-distribution"){
 if (params$t2$de_an_prior == 0) {
   cat("**Design prior**  \n")
   
-  if (params$t2$model_d == "Point") {
+  if (params$t2$prior_design == "Point") {
     cat(sprintf("Point(location = %s)  \n", params$t2$location_d))
   } else {
     cat(sprintf("%s(location = %s, scale = %s", 
-                params$t2$model_d, 
+                params$t2$prior_design, 
                 params$t2$location_d, 
                 params$t2$scale_d))
     
-    if (params$t2$model_d == "t-distribution") {
+    if (params$t2$prior_design == "t-distribution") {
       cat(sprintf(", df = %s)\n", params$t2$dff_d))
     } else {
       cat(")\n")

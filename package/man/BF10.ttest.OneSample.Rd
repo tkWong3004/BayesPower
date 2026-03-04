@@ -36,9 +36,9 @@ Choices are:
 
 \item{alternative}{Character string. The direction of the alternative hypothesis. One of:
 \describe{
-\item{"!="}{Two-sided (difference from 0).}
-\item{">"}{Right-sided (greater than 0).}
-\item{"<"}{Left-sided (less than 0).}
+\item{"two.sided"}{Two-sided (difference from 0).}
+\item{"greater"}{Right-sided (greater than 0).}
+\item{"less"}{Left-sided (less than 0).}
 }}
 
 \item{ROPE}{Optional numeric vector. Specifies bounds for an interval null hypothesis. For:

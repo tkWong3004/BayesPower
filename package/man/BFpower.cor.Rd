@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BFpower.cor}
 \alias{BFpower.cor}
-\title{Sample Size Determination for the Bayesian correlation test}
+\title{Sample Size Determination for the Bayesian Correlation Test}
 \usage{
 BFpower.cor(
   alternative,
@@ -23,9 +23,7 @@ BFpower.cor(
   k_d,
   scale_d,
   N = NULL,
-  type_rate = "positive",
-  plot_power = FALSE,
-  plot_rel = FALSE
+  type_rate = "positive"
 )
 }
 \arguments{
@@ -72,10 +70,6 @@ default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"M
 \item{N}{Numeric integer. Sample size. Only required if the goal is not sample size determination, but rather to calculate the probability of obtaining compelling or misleading evidence for a given sample size.}
 
 \item{type_rate}{character. Character indicating which rate to control: \code{"positive"} (true/false positive rates) or \code{"negative"} (true/false negative rates).}
-
-\item{plot_power}{Logical; if TRUE, plots power curves.}
-
-\item{plot_rel}{Logical; if TRUE, plots the relationship between the BF and data.}
 }
 \value{
 A list of class \code{BFpower_r} containing:
@@ -88,8 +82,6 @@ A list of class \code{BFpower_r} containing:
 \item \code{design_h1}: List with the design prior parameters: \code{prior_design}, \code{k}, \code{alpha}, \code{beta}, \code{scale}, and \code{location}.
 \item \code{results}: Data frame with the probabilities of compelling/misleading evidence, and with the required sample size.
 \item \code{threshold}: Threshold of compelling evidence.
-\item \code{plot_power}: Logical, whether power curves are plotted.
-\item \code{plot_rel}: Logical, whether the relationship between the BF and the correlation is plotted.
 }
 }
 \description{
@@ -140,10 +132,6 @@ A design prior can be supplied to reflect uncertainty about the correlation duri
 \strong{interval null Hypothesis:}
 
 If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval null. Otherwise, a point-null hypothesis is assumed.
-
-\strong{Plotting:}
-
-If \code{plot_power = TRUE}, the function plots the probability of compelling evidence as a function of sample size. If \code{plot_rel = TRUE}, the relationship between the BF and correlation is plotted.
 }
 \examples{
 BFpower.cor(
@@ -155,9 +143,7 @@ BFpower.cor(
    prior_analysis = "d_beta",
    k = 1,
    prior_design = "Point",
-   location_d = 0.3,
-   plot_power = TRUE,
-   plot_rel = TRUE
+   location_d = 0.3
  )
 
 }

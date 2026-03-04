@@ -33,7 +33,7 @@ if (params$ff$inter == 1) {
  
 } else if (params$ff$inter == 2) {
   # Extract epsilon values
-e <- params$ff$e
+e <- params$ff$ROPE
 
 cat(sprintf("\\(\\mathcal{H}_0: \\lambda^2 \\in \\{ 0, %.2f \\} \\) vs ", e))
 
@@ -55,7 +55,7 @@ if (params$ff$de_an_prior == 1) {
   cat("**Analysis and design prior**  \n")
 }
 
-model <- params$ff$model
+model <- params$ff$prior_analysis
 
 if (model == "tdis") {
   cat(sprintf("Effect size prior (r = %.2f, \\(f^2 = %.2f\\), df = %.2f)\n", 
@@ -74,7 +74,7 @@ if (params$ff$de_an_prior == 0) {
   
   
   
-  model <- params$ff$model_d
+  model <- params$ff$prior_design
 
 if (model == "tdis") {
   cat(sprintf("Effect size prior (r = %.2f, \\(f^2 = %.2f\\), df = %.2f)\n", 

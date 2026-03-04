@@ -13,18 +13,18 @@ t.pval <- function(tval, n1, n2 = NULL, alternative, ROPE = NULL, type = "One-sa
   # No ROPE: standard p-values
   if (is.null(ROPE)) {
     p <- switch(alternative,
-                "<" = stats::pt(tval, df),
-                ">" = stats::pt(tval, df, lower.tail = FALSE),
-                "!=" = 2 * stats::pt(abs(tval), df, lower.tail = FALSE))
+                "less" = stats::pt(tval, df),
+                "greater" = stats::pt(tval, df, lower.tail = FALSE),
+                "two.sided" = 2 * stats::pt(abs(tval), df, lower.tail = FALSE))
   } else {
     # ROPE specified
-    if (alternative %in% c("<", ">")) {
+    if (alternative %in% c("less", "greater")) {
       # ROPE must be length 1 for one-sided tests
       ncp <- ROPE * constant
       p <- switch(alternative,
-                  "<" = stats::pt(tval, df, ncp = ncp, lower.tail = FALSE),
-                  ">" = stats::pt(tval, df, ncp = ncp, lower.tail = TRUE))
-    } else if (alternative == "!=") {
+                  "less" = stats::pt(tval, df, ncp = ncp, lower.tail = FALSE),
+                  "greater" = stats::pt(tval, df, ncp = ncp, lower.tail = TRUE))
+    } else if (alternative == "two.sided") {
       # ROPE must be length 2 for two-sided
       if (length(ROPE) != 2) stop("For alternative '!=', ROPE must be of length 2.")
       ncp_lower <- ROPE[1] * constant
@@ -50,18 +50,18 @@ r.pval <- function(r, n,h0, alternative , ROPE = NULL) {
    Z.h0  <- r_mean(h0)
   if (is.null(ROPE)) {
     p <- switch(alternative,
-                "<" = stats::pnorm(Z.obs, mean=Z.h0,sd=Z.sd),
-                ">" = stats::pnorm(Z.obs, mean=Z.h0,sd=Z.sd,lower=F),
-                "!=" = min(stats::pnorm(Z.obs, mean=Z.h0,sd=Z.sd,lower=F),stats::pnorm(Z.obs, mean=Z.h0,sd=Z.sd,lower=T))*2)
+                "less" = stats::pnorm(Z.obs, mean=Z.h0,sd=Z.sd),
+                "greater" = stats::pnorm(Z.obs, mean=Z.h0,sd=Z.sd,lower=F),
+                "two.sided" = min(stats::pnorm(Z.obs, mean=Z.h0,sd=Z.sd,lower=F),stats::pnorm(Z.obs, mean=Z.h0,sd=Z.sd,lower=T))*2)
   } else {
     ROPE = h0+ROPE
 
     Z.h1  <- r_mean(ROPE)
 
     p <- switch(alternative,
-                "<" = stats::pnorm(Z.obs, mean=Z.h1,sd=Z.sd,lower.tail = F),
-                ">" = stats::pnorm(Z.obs, mean=Z.h1,sd=Z.sd,lower.tail = T),
-                "!=" = max(stats::pnorm(Z.obs, mean=max(Z.h1),sd=Z.sd,lower.tail = T),
+                "less" = stats::pnorm(Z.obs, mean=Z.h1,sd=Z.sd,lower.tail = F),
+                "greater" = stats::pnorm(Z.obs, mean=Z.h1,sd=Z.sd,lower.tail = T),
+                "two.sided" = max(stats::pnorm(Z.obs, mean=max(Z.h1),sd=Z.sd,lower.tail = T),
                            stats::pnorm(Z.obs, mean=min(Z.h1),sd=Z.sd,lower.tail = F)))
   }
 
@@ -81,9 +81,9 @@ f.pval <- function(fval, df1,df2,ROPE=NULL) {
 ########## ONE-proportion ##########
 bin.pval <-function(x,n,h0,alternative,ROPE=NULL){
   alternative <- switch(alternative,
-                        "!=" = "two.sided",
-                        "<"  = "less",
-                        ">"  = "greater")
+                        "two.sided" = "two.sided",
+                        "less"  = "less",
+                        "greater"  = "greater")
   if (is.null(ROPE)) {
     p <- stats::binom.test(x, n, p = h0,
                     alternative = alternative,

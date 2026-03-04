@@ -5,7 +5,8 @@ NULL
 
 ui <-
   shiny::navbarPage(id = "id",
-                 "\\(\\text{BayesPower}_{1.0.2}: \\text{Bayes Factor}\\)",
+                    windowTitle = "BayesPower: Bayes Factor",
+                 "\\(\\text{BayesPower}_{1.0.3}: \\text{Bayes Factor}\\)",
   shiny::navbarMenu(
     "\\(\\text{Standardized Mean Difference}\\)",
 
@@ -183,7 +184,7 @@ ui <-
           # Power / error control
           shiny::conditionalPanel("input.Modet1 == 1",
                                   shinyWidgets::prettyRadioButtons(
-                                    inputId = "t1_direct",
+                                    inputId = "t1_type_rate",
                                     label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                                     choices = list(
                                       "\\(\\text{Positive rates}\\)" = 1,
@@ -196,23 +197,23 @@ ui <-
                            shiny::em("\\(\\text{The targeted probabilities of}\\)"),
                            shiny::fluidRow(
                              shiny::column(6,
-                                           shiny::conditionalPanel("input.t1_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
-                                           shiny::conditionalPanel("input.t1_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
+                                           shiny::conditionalPanel("input.t1_type_rate == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                                           shiny::conditionalPanel("input.t1_type_rate == 0",shiny::em("\\(\\text{True negative:}\\)")),
 
-                                           shiny::sliderInput("powert1", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
+                                           shiny::sliderInput("true_rate_t1", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
                              ),
                              shiny::column(6,
 
-                                           shiny::conditionalPanel("input.t1_direct == 1",shiny::em("\\(\\text{False positive:}\\)")),
-                                           shiny::conditionalPanel("input.t1_direct == 0",shiny::em("\\(\\text{False negative:}\\)")),
-                                           shiny::sliderInput("alphat1", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
+                                           shiny::conditionalPanel("input.t1_type_rate == 1",shiny::em("\\(\\text{False positive:}\\)")),
+                                           shiny::conditionalPanel("input.t1_type_rate == 0",shiny::em("\\(\\text{False negative:}\\)")),
+                                           shiny::sliderInput("false_rate_t1", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
                              )
                            )
           ),
 
           # Bound
           shiny::conditionalPanel("input.Modet1 == 1 || input.Modet1 == 2",
-                           shiny::sliderInput("bt1", "\\(\\text{Bound of compelling evidence:}\\)", min = 1, max = 20, value = 3, ticks = FALSE)
+                           shiny::sliderInput("threshold_t1", "\\(\\text{Bound of compelling evidence:}\\)", min = 1, max = 20, value = 3, ticks = FALSE)
           ),
 
           # Sample size input
@@ -263,7 +264,7 @@ ui <-
           ),
 
           shiny::conditionalPanel(
-            condition = "input.Modet1 == 1",
+            condition = "input.Modet1 == 1||input.Modet1 == 2",
             shiny::checkboxGroupInput(
               "o_plot_t1",
               label = "\\(\\text{Additional Plots (computationally intensive):}\\)",
@@ -475,7 +476,7 @@ ui <-
           # Controls for sample size determination
           shiny::conditionalPanel("input.Modet2 == 1",
                                   shinyWidgets::prettyRadioButtons(
-                                    inputId = "t2_direct",
+                                    inputId = "t2_type_rate",
                                     label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                                     choices = list(
                                       "\\(\\text{Positive rates}\\)" = 1,
@@ -488,18 +489,18 @@ ui <-
                            shiny::fluidRow(
                              shiny::column(6,
 
-                                           shiny::conditionalPanel("input.t2_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
-                                           shiny::conditionalPanel("input.t2_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
-                                           shiny::sliderInput("powert2", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)),
+                                           shiny::conditionalPanel("input.t2_type_rate == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                                           shiny::conditionalPanel("input.t2_type_rate == 0",shiny::em("\\(\\text{True negative:}\\)")),
+                                           shiny::sliderInput("true_rate_t2", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)),
                              shiny::column(6,
-                                           shiny::conditionalPanel("input.t2_direct == 1",shiny::em("\\(\\text{False positive:}\\)")),
-                                           shiny::conditionalPanel("input.t2_direct == 0",shiny::em("\\(\\text{False negative:}\\)")),
-                                           shiny::sliderInput("alphat2", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE))
+                                           shiny::conditionalPanel("input.t2_type_rate == 1",shiny::em("\\(\\text{False positive:}\\)")),
+                                           shiny::conditionalPanel("input.t2_type_rate == 0",shiny::em("\\(\\text{False negative:}\\)")),
+                                           shiny::sliderInput("false_rate_t2", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE))
                            )
           ),
 
           # Shared parameters
-          shiny::conditionalPanel("input.Modet2 == 1 || input.Modet2 == 2", shiny::sliderInput("bt2", "\\(\\text{Bound of compelling evidence:}\\)", min = 1, max = 20, value = 3, ticks = FALSE)),
+          shiny::conditionalPanel("input.Modet2 == 1 || input.Modet2 == 2", shiny::sliderInput("threshold_t2", "\\(\\text{Bound of compelling evidence:}\\)", min = 1, max = 20, value = 3, ticks = FALSE)),
           shiny::conditionalPanel("input.Modet2 == 1", shiny::sliderInput("rt2", "\\(N_2/N_1\\)", min = 1, max = 10, value = 1, ticks = FALSE)),
 
           # Fixed sample sizes
@@ -539,7 +540,7 @@ ui <-
 
           ),
           shiny::conditionalPanel(
-            condition = "input.Modet2 == 1",
+            condition = "input.Modet2 == 1||input.Modet2 == 2",
             shiny::checkboxGroupInput(
               "o_plot_t2",
               label = "\\(\\text{Additional Plots (computationally intensive):}\\)",
@@ -684,7 +685,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
              shiny::fluidRow(
                shiny::column(4,
                       shiny::conditionalPanel("input.modelr == 1",
-                                       shiny::sliderInput("kr", "\\(k \\)", min = 0.01, max = 100, value = 1, step = 0.01, ticks = FALSE)
+                                       shiny::sliderInput("kr", "\\(k \\)", min = 0.01, max = 100, value = 1, step = 0.1, ticks = FALSE)
                       ),
                       shiny::conditionalPanel("input.modelr == 3",
                                        shiny::sliderInput("sr", "\\( \\text{Scale} \\)", min = 0.01, max = 1, value = 0.01, step = 0.01, ticks = FALSE)
@@ -692,12 +693,12 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                ),
                shiny::column(4,
                       shiny::conditionalPanel("input.modelr == 2",
-                                       shiny::sliderInput("ralpha", "\\(\\alpha \\)", min = 0.01, max = 100, value = 1, step = 0.01, ticks = FALSE)
+                                       shiny::sliderInput("ralpha", "\\(\\alpha \\)", min = 0.01, max = 100, value = 1, step = 0.1, ticks = FALSE)
                       )
                ),
                shiny::column(4,
                       shiny::conditionalPanel("input.modelr == 2",
-                                       shiny::sliderInput("rbeta", "\\(\\beta \\)", min = 0.01, max = 100, value = 1, step = 0.01, ticks = FALSE)
+                                       shiny::sliderInput("rbeta", "\\(\\beta \\)", min = 0.01, max = 100, value = 1, step = 0.1, ticks = FALSE)
                       )
                )
              ),
@@ -731,7 +732,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                                                shiny::fluidRow(
                                                  shiny::column(4,
                                                         shiny::conditionalPanel("input.modelrd == 1",
-                                                                         shiny::sliderInput("rkd", "\\( k \\)", min = 0.01, max = 100, value = 1, step = 0.01, ticks = FALSE)
+                                                                         shiny::sliderInput("rkd", "\\( k \\)", min = 0.01, max = 100, value = 1, step = 0.1, ticks = FALSE)
 
                                                                          ),
                                                         shiny::conditionalPanel("input.modelrd == 4||input.modelrd == 3",
@@ -741,7 +742,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                                                  ),
                                                  shiny::column(4,
                                                         shiny::conditionalPanel("input.modelrd == 2",
-                                                                         shiny::sliderInput("ralphad", "\\(\\alpha \\)", min = 0.01, max = 100, value = 0.1, step = 0.01, ticks = FALSE)
+                                                                         shiny::sliderInput("ralphad", "\\(\\alpha \\)", min = 0.01, max = 100, value = 1, step = 0.1, ticks = FALSE)
                                                         ),
 
                                                         shiny::conditionalPanel("input.modelrd == 3",
@@ -750,7 +751,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                                                  ),
                                                  shiny::column(4,
                                                         shiny::conditionalPanel("input.modelrd == 2",
-                                                                         shiny::sliderInput("rbetad", "\\(\\beta \\)", min = 0.01, max = 100, value = 0.1, step = 0.01, ticks = FALSE)
+                                                                         shiny::sliderInput("rbetad", "\\(\\beta \\)", min = 0.01, max = 100, value = 1, step = 0.1, ticks = FALSE)
                                                         )
                                                  )
                                                )
@@ -763,7 +764,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
              # Power planning
              shiny::conditionalPanel("input.Moder == 1",
                                      shinyWidgets::prettyRadioButtons(
-                                       inputId = "r_direct",
+                                       inputId = "r_type_rate",
                                        label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                                        choices = list(
                                          "\\(\\text{Positive rates}\\)" = 1,
@@ -775,14 +776,14 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                               shiny::em("\\(\\text{The targeted probabilities of}\\)"),
                               shiny::fluidRow(
                                 shiny::column(6,
-                                              shiny::conditionalPanel("input.r_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
-                                              shiny::conditionalPanel("input.r_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
-                                       shiny::sliderInput("powerr", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
+                                              shiny::conditionalPanel("input.r_type_rate == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                                              shiny::conditionalPanel("input.r_type_rate == 0",shiny::em("\\(\\text{True negative:}\\)")),
+                                       shiny::sliderInput("true_rate_r", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
                                 ),
                               shiny::column(6,
-                                            shiny::conditionalPanel("input.r_direct == 1",shiny::em("\\(\\text{False positive:}\\)")),
-                                            shiny::conditionalPanel("input.r_direct == 0",shiny::em("\\(\\text{False negative:}\\)")),
-                                        shiny::sliderInput("alphapr", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
+                                            shiny::conditionalPanel("input.r_type_rate == 1",shiny::em("\\(\\text{False positive:}\\)")),
+                                            shiny::conditionalPanel("input.r_type_rate == 0",shiny::em("\\(\\text{False negative:}\\)")),
+                                        shiny::sliderInput("false_rate_r", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
 
                                 )
                               )
@@ -790,7 +791,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
 
              # Common for Mode 1 and 2
              shiny::conditionalPanel("input.Moder == 1 | input.Moder == 2",
-                              shiny::sliderInput("br", "\\( \\text{Bound of compelling evidence:} \\)", min = 1, max = 20, value = 3, ticks = FALSE)
+                              shiny::sliderInput("threshold_r", "\\( \\text{Bound of compelling evidence:} \\)", min = 1, max = 20, value = 3, ticks = FALSE)
              ),
 
              shiny::conditionalPanel("input.Moder == 2",
@@ -815,7 +816,7 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                               shiny::htmlOutput("BFrv")
              ),
              shiny::conditionalPanel(
-               condition = "input.Moder == 1",
+               condition = "input.Moder == 1||input.Moder == 2",
                shiny::checkboxGroupInput(
                  "o_plot_r",
                  label = "\\(\\text{Additional Plots (computationally intensive):}\\)",
@@ -1082,7 +1083,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
              # Sample size determination controls
              shiny::conditionalPanel(condition = "input.Modef == 1",
                                      shinyWidgets::prettyRadioButtons(
-                                       inputId = "f_direct",
+                                       inputId = "f_type_rate",
                                        label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                                        choices = list(
                                          "\\(\\text{Positive rates}\\)" = 1,
@@ -1094,20 +1095,20 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                               shiny::fluidRow(
                                 shiny::column(width = 6,
 
-                                              shiny::conditionalPanel("input.f_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
-                                              shiny::conditionalPanel("input.f_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
-                                              shiny::sliderInput("powerf", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
+                                              shiny::conditionalPanel("input.f_type_rate == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                                              shiny::conditionalPanel("input.f_type_rate == 0",shiny::em("\\(\\text{True negative:}\\)")),
+                                              shiny::sliderInput("true_rate_f", "", min = 0.5, max = 0.99, value = 0.8, step = 0.01, ticks = FALSE)
                                 ),
                                 shiny::column(width = 6,
-                                              shiny::conditionalPanel("input.f_direct == 1",shiny::em("\\(\\text{False positive:}\\)")),
-                                              shiny::conditionalPanel("input.f_direct == 0",shiny::em("\\(\\text{False negative:}\\)")),
-                                              shiny::sliderInput("alphaf", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
+                                              shiny::conditionalPanel("input.f_type_rate == 1",shiny::em("\\(\\text{False positive:}\\)")),
+                                              shiny::conditionalPanel("input.f_type_rate == 0",shiny::em("\\(\\text{False negative:}\\)")),
+                                              shiny::sliderInput("false_rate_f", "", min = 0.001, max = 0.05, value = 0.05, step = 0.001, ticks = FALSE)
                                 )
                               )
              ),
 
              shiny::conditionalPanel(condition = "input.Modef == 1|input.Modef == 2",
-                              shiny::sliderInput("bff", "\\( \\text{Bound of compelling evidence:} \\)", min = 1, max = 20, value = 3, ticks = FALSE)
+                              shiny::sliderInput("threshold_f", "\\( \\text{Bound of compelling evidence:} \\)", min = 1, max = 20, value = 3, ticks = FALSE)
              ),
              shiny::conditionalPanel(condition = "input.Modef == 2",
                               shiny::numericInput("nf", "\\( \\text{Sample Size } N: \\)", value = 50)
@@ -1130,7 +1131,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
              shiny::em("\\( \\text{Recommended hyperparameters:} \\)"),
              shiny::htmlOutput("prior_suggest"),
              shiny::conditionalPanel(
-               condition = "input.Modef == 1",
+               condition = "input.Modef == 1||input.Modef == 2",
                shiny::checkboxGroupInput(
                  "o_plot_f",
                  label = "\\(\\text{Additional Plots (computationally intensive):}\\)",
@@ -1306,7 +1307,7 @@ shiny::navbarMenu(
 
                shiny::conditionalPanel("input.Modebin == 1",
                                        shinyWidgets::prettyRadioButtons(
-                                         inputId = "bin_direct",
+                                         inputId = "bin_type_rate",
                                          label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                                          choices = list(
                                            "\\(\\text{Positive rates}\\)" = 1,
@@ -1318,18 +1319,18 @@ shiny::navbarMenu(
                                 shiny::em("\\(\\text{The targeted probabilities of}\\)"),
                                 shiny::fluidRow(
                                   shiny::column(6,
-                                                shiny::conditionalPanel("input.bin_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
-                                                shiny::conditionalPanel("input.bin_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
-                                                shiny::sliderInput("powerbin", "", min = .5, max = .99, value = .8, step = .01, ticks = FALSE)),
+                                                shiny::conditionalPanel("input.bin_type_rate == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                                                shiny::conditionalPanel("input.bin_type_rate == 0",shiny::em("\\(\\text{True negative:}\\)")),
+                                                shiny::sliderInput("true_rate_bin", "", min = .5, max = .99, value = .8, step = .01, ticks = FALSE)),
                                   shiny::column(6,
-                                                shiny::conditionalPanel("input.bin_direct == 1",shiny::em("\\(\\text{False positive:}\\)")),
-                                                shiny::conditionalPanel("input.bin_direct == 0",shiny::em("\\(\\text{False negative:}\\)")),
-                                                shiny::sliderInput("FP_bin", "", min = .001, max = .05, value = .05, step = .001, ticks = FALSE))
+                                                shiny::conditionalPanel("input.bin_type_rate == 1",shiny::em("\\(\\text{False positive:}\\)")),
+                                                shiny::conditionalPanel("input.bin_type_rate == 0",shiny::em("\\(\\text{False negative:}\\)")),
+                                                shiny::sliderInput("false_rate_bin", "", min = .001, max = .05, value = .05, step = .001, ticks = FALSE))
                                 )
                ),
 
                shiny::conditionalPanel("input.Modebin == 1 || input.Modebin == 2",
-                                shiny::sliderInput("bbin", "\\(\\text{Bound of compelling evidence:}\\)", min = 1, max = 20, value = 3, ticks = FALSE)),
+                                shiny::sliderInput("threshold_bin", "\\(\\text{Bound of compelling evidence:}\\)", min = 1, max = 20, value = 3, ticks = FALSE)),
 
                shiny::conditionalPanel("input.Modebin == 2 || input.Modebin == 3",
                                 shiny::fluidRow(
@@ -1348,7 +1349,7 @@ shiny::navbarMenu(
                                 shiny::actionButton("calbin", label = "\\(\\text{Calculate}\\)"),
                                 shiny::htmlOutput("BFbin")),
                shiny::conditionalPanel(
-                 condition = "input.Modebin == 1",
+                 condition = "input.Modebin == 1||input.Modebin == 2",
                  shiny::checkboxGroupInput(
                    "o_plot_bin",
                    label = "\\(\\text{Additional Plots (computationally intensive):}\\)",
@@ -1495,7 +1496,7 @@ shiny::sidebarLayout(shiny::sidebarPanel(
 
   shiny::conditionalPanel("input.Modep2 == 1",
                           shinyWidgets::prettyRadioButtons(
-                            inputId = "p2_direct",
+                            inputId = "p2_type_rate",
                             label = shiny::em("\\(\\text{ Controlling for:}\\)"),
                             choices = list(
                               "\\(\\text{True Positive rate}\\)" = 1,
@@ -1507,16 +1508,16 @@ shiny::sidebarLayout(shiny::sidebarPanel(
 
                    shiny::em("\\(\\text{The targeted probability of}\\)"),
 
-                     shiny::conditionalPanel("input.p2_direct == 1",shiny::em("\\(\\text{True positive:}\\)")),
-                     shiny::conditionalPanel("input.p2_direct == 0",shiny::em("\\(\\text{True negative:}\\)")),
-                    shiny::sliderInput("powerp2", "", min = .5, max = .99, value = .8, step = .01, ticks = FALSE)
+                     shiny::conditionalPanel("input.p2_type_rate == 1",shiny::em("\\(\\text{True positive:}\\)")),
+                     shiny::conditionalPanel("input.p2_type_rate == 0",shiny::em("\\(\\text{True negative:}\\)")),
+                    shiny::sliderInput("true_rate_p2", "", min = .5, max = .99, value = .8, step = .01, ticks = FALSE)
 
                      #shiny::column(12, shiny::sliderInput("powerp2", "", min = .5, max = .99, value = .8, step = .01, ticks = FALSE)),
                      #shiny::column(6, shiny::sliderInput("FP_p2", "\\(\\text{False Positive Evidence:}\\)", min = .001, max = .05, value = .05, step = .001, ticks = FALSE))
 
   ),
   shiny::conditionalPanel("input.Modep2 == 1 || input.Modep2 == 2",
-                   shiny::sliderInput("bp2", "\\(\\text{Bound of compelling evidence:}\\)", min = 1, max = 20, value = 3, ticks = FALSE)),
+                   shiny::sliderInput("threshold_p2", "\\(\\text{Bound of compelling evidence:}\\)", min = 1, max = 20, value = 3, ticks = FALSE)),
 
   shiny::conditionalPanel("input.Modep2 == 2 ||input.Modep2 == 3 ",
                    shiny::em("\\( \\text{Sample size per group} \\)"),
@@ -1542,7 +1543,7 @@ shiny::sidebarLayout(shiny::sidebarPanel(
   ),
 
   shiny::conditionalPanel(
-    condition = "input.Modep2 == 1",
+    condition = "input.Modep2 == 1||input.Modep2 == 2",
     shiny::checkboxGroupInput(
       "o_plot_p2",
       label = "\\(\\text{Additional Plots (computationally very intensive):}\\)",

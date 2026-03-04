@@ -19,9 +19,7 @@ BFpower.ttest.OneSample(
   type_rate = "positive",
   true_rate,
   false_rate,
-  threshold,
-  plot_power = FALSE,
-  plot_rel = FALSE
+  threshold
 )
 }
 \arguments{
@@ -29,7 +27,7 @@ BFpower.ttest.OneSample(
 
 \item{ROPE}{Optional numeric vector. Bounds for an interval null hypothesis.
 \itemize{
-\item For \code{hypothesis = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
+\item For \code{alternative "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
 \item For \code{"greater"}, must be a single numeric scalar > 0.
 \item For \code{"less"}, must be a single numeric scalar < 0.
 }}
@@ -61,10 +59,6 @@ BFpower.ttest.OneSample(
 \item{false_rate}{Numeric scaler. Target false positive or false negative rate (between 0.001 and 0.1).}
 
 \item{threshold}{Numeric scaler. Threshold of compelling evidence (must be > 1).}
-
-\item{plot_power}{Logical. If \code{TRUE}, plots power curve.}
-
-\item{plot_rel}{Logical. If \code{TRUE}, plots the relationship between the BF and data.}
 }
 \value{
 An object of class \code{BFpower_t} (a list) containing:
@@ -76,8 +70,6 @@ An object of class \code{BFpower_t} (a list) containing:
 \item{design_h1}{List with the design prior parameters: \code{prior_design}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).}
 \item{results}{Data frame of probabilities: compelling/misleading evidence, or \code{NaN} if calculation fails.}
 \item{threshold}{Numeric, threshold of compelling evidence.}
-\item{plot_power}{Logical, whether to plot the power curve.}
-\item{plot_rel}{Logical, whether the relationship between the BF and t-value is plotted.}
 }
 }
 \description{
@@ -137,11 +129,6 @@ during study planning. If provided, the following must be supplied:
 The argument \code{ROPE} specifies the bounds of an interval null hypothesis.
 If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval
 null hypothesis. For a point-null hypothesis, \code{ROPE} should be left as \code{NULL}.
-
-\strong{Plotting:}
-
-If \code{plot_power = TRUE}, the function plots the probability of compelling
-evidence as a function of sample size. If \code{plot_rel = TRUE}, the relationship betwwen the BF and data is plotted.
 }
 \examples{
 BFpower.ttest.OneSample(
@@ -152,8 +139,6 @@ BFpower.ttest.OneSample(
  prior_analysis = "t-distribution",
  location = 0,
  scale = 0.707,
- dff = 1,
- plot_power = TRUE,
- plot_rel = TRUE
+ dff = 1
 )
 }

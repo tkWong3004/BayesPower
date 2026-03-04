@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BFpower.props}
 \alias{BFpower.props}
-\title{Sample Size Determination for the Bayesian test of two proportions}
+\title{Sample Size Determination for the Bayesian Test of Two Proportions}
 \usage{
 BFpower.props(
   threshold,
@@ -23,9 +23,7 @@ BFpower.props(
   dp2,
   n1 = NULL,
   n2 = NULL,
-  type_rate = "positive",
-  plot_power = FALSE,
-  plot_rel = FALSE
+  type_rate = "positive"
 )
 }
 \arguments{
@@ -66,13 +64,9 @@ BFpower.props(
 \item{n2}{Numeric integer. Sample size for group 2.}
 
 \item{type_rate}{Character. Choose \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.}
-
-\item{plot_power}{Logical; if TRUE, plot the power curve.}
-
-\item{plot_rel}{Logical; if TRUE, plot the grid for the values of BF across all possible combination of x1 and x2.}
 }
 \value{
-An object of class \code{BFpower_2p} (a list) containing:
+An object of class \code{BFpower} (a list) containing:
 \describe{
 \item{\code{type}}{Character, always \code{"Two-proportions"}.}
 \item{\code{analysis_h0}}{List of analysis prior parameters under the null, containing \code{a} and \code{b}.}
@@ -84,8 +78,6 @@ An object of class \code{BFpower_2p} (a list) containing:
 \item{\code{grid}}{Grid used for computation.}
 \item{\code{threshold}}{Threshold of compelling evidence.}
 \item{\code{mode_bf}}{Character string specifying the mode (sample size determination or power calculation).}
-\item{\code{plot_power}}{Logical; whether the power curve is plotted.}
-\item{\code{plot_rel}}{Logical; whether the relationship between the Bayes factor and observed proportion differences is plotted.}
 }
 }
 \description{
@@ -122,10 +114,6 @@ Design priors for the alternative hypothesis can optionally be specified:
 \item \code{prior_design_1}, \code{a1d}, \code{b1d}, \code{dp1} - design prior for group 1 (\code{"same"} uses the analysis prior, \code{"beta"} requires Beta parameters, \code{"Point"} uses a fixed proportion).
 \item \code{prior_design_2}, \code{a2d}, \code{b2d}, \code{dp2} - design prior for group 2.
 }
-
-\strong{Plotting:}
-
-If \code{plot_power = TRUE}, a power curve is plotted showing the probability of compelling evidence as a function of sample sizes. If \code{plot_rel = TRUE}, a grid of Bayes factors across possible outcomes is plotted.
 }
 \examples{
 BFpower.props(
@@ -136,8 +124,6 @@ b0 = 1,
 a1 = 156,
 b1 = 339,
 a2 = 151,
-b2 = 339,
-plot_power = TRUE,
-plot_rel = TRUE)
+b2 = 339)
 
 }

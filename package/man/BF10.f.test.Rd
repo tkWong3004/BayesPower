@@ -7,7 +7,7 @@
 BF10.f.test(fval, df1, df2, dff, rscale, f_m, prior_analysis, ROPE = NULL)
 }
 \arguments{
-\item{fval}{Numeric scalar. Observed F statistic (must be ≥ 0).}
+\item{fval}{Numeric scalar. Observed F statistic (must be at least 0).}
 
 \item{df1}{Numeric scalar. Numerator degrees of freedom (must be > 0).}
 

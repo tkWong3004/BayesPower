@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BF10.ttest.TwoSample}
 \alias{BF10.ttest.TwoSample}
-\title{Bayes Factor for Two-Sample Bayesian t-Test}
+\title{Bayes Factor for a Two-Sample Bayesian t-Test}
 \usage{
 BF10.ttest.TwoSample(
   tval,

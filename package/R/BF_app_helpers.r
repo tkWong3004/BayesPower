@@ -1,74 +1,41 @@
 show_t1_code <- function(x) {
 
   args <- c(
-    "hypothesis","e","D",
-    "target","alpha",
-    "model","location","scale","dff",
-    "model_d","location_d","scale_d","dff_d",
-    "direct",
-    "pc","rela"
+    "alternative","ROPE","threshold",
+    "true_rate","false_rate","type_rate",
+    "prior_analysis","location","scale","dff",
+    "prior_design","location_d","scale_d","dff_d"
   )
-  # NOTE: N and mode_bf handled separately
 
   code_lines <- sapply(args, function(arg) {
 
     val <- x[[arg]]
 
+    ## -----------------------------
     ## OMITTING RULES
-    if (!is.null(x$interval) && x$interval == 1 && arg == "e") return(NULL)
+    ## -----------------------------
+    if (!is.null(x$interval) && x$interval == 1 && arg == "ROPE") return(NULL)
     if (!is.null(x$de_an_prior) && x$de_an_prior == 1 &&
-        arg %in% c("model_d","location_d","scale_d","dff_d")) return(NULL)
+        arg %in% c("prior_design","location_d","scale_d","dff_d")) return(NULL)
     if (is.null(val)) return(NULL)
 
+    ## -----------------------------
     ## SPECIAL RENAMING
+    ## -----------------------------
     arg_print <- arg
-    if (arg == "target") arg_print <- "true_rate"
-    if (arg == "alpha") arg_print <- "false_rate"
+    if (arg == "true_rate") arg_print <- "true_rate"
+    if (arg == "false_rate") arg_print <- "false_rate"
+    if (arg == "alternative") arg_print <- "alternative"
+    if (arg == "threshold") arg_print <- "threshold"
+    if (arg == "ROPE") arg_print <- "ROPE"
+    if (arg == "prior_analysis") arg_print <- "prior_analysis"
+    if (arg == "prior_design") arg_print <- "prior_design"
+    if (arg == "type_rate") { if (val == "positive") return(NULL)}
 
-    if (arg == "direct") {
-      if (val != "h0") return(NULL)
-      arg_print <- "type_rate"
-      val <- "negative"
-    }
-
-    if (arg == "pc") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_power"
-      val <- TRUE
-    }
-
-    if (arg == "rela") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_rel"
-      val <- TRUE
-    }
-
-    ## HYPOTHESIS > ALTERNATIVE RULE
-    if (arg == "hypothesis") {
-      arg_print <- "alternative"
-      val <- switch(val,
-                    "<"  = "less",
-                    "!=" = "two.sided",
-                    ">"  = "greater",
-                    stop("Invalid hypothesis")
-      )
-    }
-
-    ## D > threshold
-    if (arg == "D") arg_print <- "threshold"
-
-    ## e > ROPE
-    if (arg == "e") arg_print <- "ROPE"
-
-    ## model > prior_analysis
-    if (arg == "model") arg_print <- "prior_analysis"
-
-    ## model_d > prior_design
-    if (arg == "model_d") arg_print <- "prior_design"
-
+    ## -----------------------------
     ## VALUE FORMATTING
+    ## -----------------------------
     if (is.character(val)) {
-      # wrap in double quotes exactly once
       val <- paste0('"', gsub('^"|"$', '', val), '"')
     } else if (is.vector(val) && length(val) > 1) {
       val <- paste0("c(", paste(val, collapse = ", "), ")")
@@ -79,7 +46,9 @@ show_t1_code <- function(x) {
 
   code_lines <- code_lines[!sapply(code_lines, is.null)]
 
+  ## -----------------------------
   ## N LOGIC
+  ## -----------------------------
   if (x$mode_bf != 1) {
     Nval <- if (is.null(x$N)) "NULL" else x$N
     code_lines <- c(code_lines, glue::glue("  N = {Nval}"))
@@ -89,24 +58,48 @@ show_t1_code <- function(x) {
   if (length(code_lines) > 0)
     code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
 
-  paste0(
-    "BFpower.ttest.OneSample(\n",
+  ## -----------------------------
+  ## Determine plot() arguments based on "pc" and "rela"
+  ## -----------------------------
+  plot_args <- c()
+
+  if (isTRUE(x$pc)) {
+    plot_args <- c(plot_args, "plot_power = TRUE")
+  }
+
+  if (isTRUE(x$rela)) {
+    plot_args <- c(plot_args, "plot_rel = TRUE")
+  }
+
+  plot_args_text <- if (length(plot_args)) {
+    paste0(", ", paste(plot_args, collapse = ", "))
+  } else {
+    ""
+  }
+
+  ## -----------------------------
+  ## Final code
+  ## -----------------------------
+  code <- paste0(
+    "results = BFpower.ttest.OneSample(\n",
     paste(code_lines, collapse = "\n"),
-    "\n)"
+    "\n)\n",
+    "print(results)\n",
+    "plot(results",
+    plot_args_text,
+    ")"
   )
+
+  code
 }
-
-
 
 show_t2_code <- function(x) {
 
   args <- c(
-    "hypothesis","e","D",
-    "target","alpha",
-    "model","location","scale","dff",
-    "model_d","location_d","scale_d","dff_d",
-    "direct",
-    "pc","rela",
+    "alternative","ROPE","threshold",
+    "true_rate","false_rate","type_rate",
+    "prior_analysis","location","scale","dff",
+    "prior_design","location_d","scale_d","dff_d",
     "r"    # keep r inside main arg loop
   )
 
@@ -117,59 +110,25 @@ show_t2_code <- function(x) {
     ## -----------------------------
     ## OMITTING RULES
     ## -----------------------------
-    if (!is.null(x$interval) && x$interval == 1 && arg == "e") return(NULL)
+    if (!is.null(x$interval) && x$interval == 1 && arg == "ROPE") return(NULL)
     if (!is.null(x$de_an_prior) && x$de_an_prior == 1 &&
-        arg %in% c("model_d","location_d","scale_d","dff_d")) return(NULL)
+        arg %in% c("prior_design","location_d","scale_d","dff_d")) return(NULL)
     if (x$mode_bf != 1 && arg == "r") return(NULL)
+    if (arg == "type_rate") { if (val == "positive") return(NULL)}
+
     if (is.null(val)) return(NULL)
 
     ## -----------------------------
     ## SPECIAL RENAMING
     ## -----------------------------
     arg_print <- arg
-    if (arg == "target") arg_print <- "true_rate"
-    if (arg == "alpha") arg_print <- "false_rate"
-
-    if (arg == "direct") {
-      if (val != "h0") return(NULL)
-      arg_print <- "type_rate"
-      val <- "negative"  # plain string, will quote later
-    }
-
-    if (arg == "pc") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_power"
-      val <- TRUE
-    }
-
-    if (arg == "rela") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_rel"
-      val <- TRUE
-    }
-
-    ## HYPOTHESIS > ALTERNATIVE RULE
-    if (arg == "hypothesis") {
-      arg_print <- "alternative"
-      val <- switch(val,
-                    "<"  = "less",
-                    "!=" = "two.sided",
-                    ">"  = "greater",
-                    stop("Invalid hypothesis")
-      )
-    }
-
-    ## D > threshold
-    if (arg == "D") arg_print <- "threshold"
-
-    ## e > ROPE
-    if (arg == "e") arg_print <- "ROPE"
-
-    ## model > prior_analysis
-    if (arg == "model") arg_print <- "prior_analysis"
-
-    ## model_d > prior_design
-    if (arg == "model_d") arg_print <- "prior_design"
+    if (arg == "true_rate") arg_print <- "true_rate"
+    if (arg == "false_rate") arg_print <- "false_rate"
+    if (arg == "alternative") arg_print <- "alternative"
+    if (arg == "threshold") arg_print <- "threshold"
+    if (arg == "ROPE") arg_print <- "ROPE"
+    if (arg == "prior_analysis") arg_print <- "prior_analysis"
+    if (arg == "prior_design") arg_print <- "prior_design"
 
     ## -----------------------------
     ## VALUE FORMATTING
@@ -203,24 +162,47 @@ show_t2_code <- function(x) {
     code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
   }
 
-  paste0(
-    "BFpower.ttest.TwoSample(\n",
+  ## -----------------------------
+  ## Determine plot() arguments based on "pc" and "rela"
+  ## -----------------------------
+  plot_args <- c()
+
+  if (isTRUE(x$pc)) {
+    plot_args <- c(plot_args, "plot_power = TRUE")
+  }
+
+  if (isTRUE(x$rela)) {
+    plot_args <- c(plot_args, "plot_rel = TRUE")
+  }
+
+  plot_args_text <- if (length(plot_args)) {
+    paste0(", ", paste(plot_args, collapse = ", "))
+  } else {
+    ""
+  }
+  ## -----------------------------
+  ## Final code
+  ## -----------------------------
+  code <- paste0(
+    "results = BFpower.ttest.TwoSample(\n",
     paste(code_lines, collapse = "\n"),
-    "\n)"
+    "\n)\n",
+    "print(results)\n",
+    "plot(results",
+    plot_args_text,
+    ")"
   )
+
+  code
 }
-
-
-
 
 show_cor_code <- function(x) {
 
   args <- c(
-    "hypothesis","h0","e","D","target","FP",
-    "model","k","alpha","beta","scale",
-    "model_d","alpha_d","beta_d","location_d","k_d","scale_d","dff_d",
-    "N","direct",
-    "pc","rela"
+    "alternative","h0","ROPE","threshold","true_rate","false_rate",
+    "prior_analysis","k","alpha","beta","scale",
+    "prior_design","alpha_d","beta_d","location_d","k_d","scale_d","dff_d",
+    "N","type_rate"
   )
 
   code_lines <- sapply(args, function(arg) {
@@ -228,29 +210,29 @@ show_cor_code <- function(x) {
     val <- x[[arg]]
 
     ## -----------------------------
-    ## OMISSION RULES
+    ## OMITTING RULES
     ## -----------------------------
-    if (!is.null(x$interval) && x$interval == 1 && arg == "e") return(NULL)
+    if (!is.null(x$interval) && x$interval == 1 && arg == "ROPE") return(NULL)
     if (arg == "N" && x$mode_bf != 0) return(NULL)
-    if (x$mode_bf == 0 && arg %in% c("target","FP")) return(NULL)
+    if (x$mode_bf == 0 && arg %in% c("true_rate","false_rate")) return(NULL)
     if (!is.null(x$de_an_prior) && x$de_an_prior == 1 &&
-        arg %in% c("model_d","alpha_d","beta_d","location_d","k_d","scale_d","dff_d"))
+        arg %in% c("prior_design","alpha_d","beta_d","location_d","k_d","scale_d","dff_d"))
       return(NULL)
     if (arg %in% c("dff_d")) return(NULL)
 
     # analysis prior model-specific rules
-    if (!is.null(x$model)) {
-      if (x$model == "d_beta" && arg %in% c("alpha","beta","scale")) return(NULL)
-      if (x$model == "beta"   && arg %in% c("k","scale")) return(NULL)
-      if (x$model == "NLP"    && arg %in% c("k","alpha","beta")) return(NULL)
+    if (!is.null(x$prior_analysis)) {
+      if (x$prior_analysis == "d_beta" && arg %in% c("alpha","beta","scale")) return(NULL)
+      if (x$prior_analysis == "beta"   && arg %in% c("k","scale")) return(NULL)
+      if (x$prior_analysis == "Moment" && arg %in% c("k","alpha","beta")) return(NULL)
     }
 
     # design prior model-specific rules
-    if (!is.null(x$de_an_prior) && x$de_an_prior == 0 && !is.null(x$model_d)) {
-      if (x$model_d == "d_beta" && arg %in% c("alpha_d","beta_d","location_d","scale_d")) return(NULL)
-      if (x$model_d == "beta"   && arg %in% c("k_d","location_d","scale_d")) return(NULL)
-      if (x$model_d == "NLP"    && arg %in% c("k_d","alpha_d","beta_d")) return(NULL)
-      if (x$model_d == "Point"  && arg %in% c("alpha_d","beta_d","k_d","scale_d")) return(NULL)
+    if (!is.null(x$de_an_prior) && x$de_an_prior == 0 && !is.null(x$prior_design)) {
+      if (x$prior_design == "d_beta" && arg %in% c("alpha_d","beta_d","location_d","scale_d")) return(NULL)
+      if (x$prior_design == "beta"   && arg %in% c("k_d","location_d","scale_d")) return(NULL)
+      if (x$prior_design == "Moment" && arg %in% c("k_d","alpha_d","beta_d")) return(NULL)
+      if (x$prior_design == "Point"  && arg %in% c("alpha_d","beta_d","k_d","scale_d")) return(NULL)
     }
 
     if (is.null(val)) return(NULL)
@@ -259,47 +241,19 @@ show_cor_code <- function(x) {
     ## RENAME ARGUMENTS
     ## -----------------------------
     arg_print <- arg
-    if (arg == "target") arg_print <- "true_rate"
-    if (arg == "FP")     arg_print <- "false_rate"
-
-    if (arg == "direct") {
-      if (val == "h0") {
-        arg_print <- "type_rate"
-        val <- "negative"  # plain string
-      } else return(NULL)
-    }
-
-    if (arg == "pc") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_power"
-      val <- TRUE
-    }
-
-    if (arg == "rela") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_rel"
-      val <- TRUE
-    }
-
-    if (arg == "hypothesis") {
-      arg_print <- "alternative"
-      val <- switch(val,
-                    "<"  = "less",
-                    "!=" = "two.sided",
-                    ">"  = "greater",
-                    stop("Invalid hypothesis")
-      )
-    }
-
-    if (arg == "D") arg_print <- "threshold"
-    if (arg == "e") arg_print <- "ROPE"
-    if (arg == "model") arg_print <- "prior_analysis"
-    if (arg == "model_d") arg_print <- "prior_design"
+    if (arg == "true_rate") arg_print <- "true_rate"
+    if (arg == "false_rate")     arg_print <- "false_rate"
+    if (arg == "type_rate") { if (val == "positive") return(NULL)}
+    if (arg == "alternative") arg_print <- "alternative"
+    if (arg == "threshold") arg_print <- "threshold"
+    if (arg == "ROPE") arg_print <- "ROPE"
+    if (arg == "prior_analysis") arg_print <- "prior_analysis"
+    if (arg == "prior_design") arg_print <- "prior_design"
 
     ## -----------------------------
     ## VALUE FORMATTING
     ## -----------------------------
-    if (is.character(val)) val <- shQuote(val, type = "cmd")  # always double quotes
+    if (is.character(val)) val <- shQuote(val, type = "cmd")
     if (is.vector(val) && length(val) > 1) val <- paste0("c(", paste(val, collapse = ", "), ")")
 
     glue::glue("  {arg_print} = {val},")
@@ -307,122 +261,102 @@ show_cor_code <- function(x) {
 
   code_lines <- code_lines[!sapply(code_lines, is.null)]
 
+  ## Remove trailing comma
   if (length(code_lines) > 0) {
     code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
   }
 
-  paste0(
-    "BFpower.cor(\n",
+  ## -----------------------------
+  ## Determine plot() arguments based on "pc" and "rela"
+  ## -----------------------------
+  plot_args <- c()
+
+  if (isTRUE(x$pc)) {
+    plot_args <- c(plot_args, "plot_power = TRUE")
+  }
+
+  if (isTRUE(x$rela)) {
+    plot_args <- c(plot_args, "plot_rel = TRUE")
+  }
+
+  plot_args_text <- if (length(plot_args)) {
+    paste0(", ", paste(plot_args, collapse = ", "))
+  } else {
+    ""
+  }
+
+  ## -----------------------------
+  ## Final code
+  ## -----------------------------
+  code <- paste0(
+    "results = BFpower.cor(\n",
     paste(code_lines, collapse = "\n"),
-    "\n)"
+    "\n)\n",
+    "print(results)\n",
+    "plot(results",
+    plot_args_text,
+    ")"
   )
+
+  code
 }
 
-
-
-
-
 show_f_code <- function(x) {
-  args <- c("inter","e", "D", "target","alpha", "p", "k",
-            "model", "dff", "rscale", "f_m",
-            "model_d","dff_d", "rscale_d", "f_m_d",
-            "de_an_prior","N","mode_bf","direct",
-            "pc","rela") # include plotting flags
+  args <- c("inter","ROPE", "threshold", "true_rate","false_rate", "p", "k",
+            "prior_analysis", "dff", "rscale", "f_m",
+            "prior_design","dff_d", "rscale_d", "f_m_d",
+            "de_an_prior","N","type_rate")
 
   code_lines <- sapply(args, function(arg) {
     val <- x[[arg]]
     arg_print <- arg
 
-    # ----- RULES: inter / e -----
-    if (arg %in% c("inter","e")) {
-      # never print inter
-      if (arg == "inter") return(NULL)
-      # print e only if inter != 1/"1"
-      if (!is.null(x$inter) && (x$inter == 1 || x$inter == "1")) return(NULL)
-    }
+    # ----- RULES: inter / ROPE -----
+    if (arg == "inter") return(NULL)
+    if (arg == "ROPE" && !is.null(x$inter) && (x$inter == 1 || x$inter == "1")) return(NULL)
 
-    # ----- RULES: target / FP -----
-    if (arg == "target") {
+    # ----- RULES: target / alpha -----
+    if (arg == "true_rate") {
       arg_print <- "true_rate"
       if (!is.null(x$mode_bf) && x$mode_bf != 1) return(NULL)
     }
-    if (arg == "alpha") {
+    if (arg == "false_rate") {
       arg_print <- "false_rate"
       if (!is.null(x$mode_bf) && x$mode_bf != 1) return(NULL)
     }
 
+    # ----- RULES: type_rate -----
+    if (arg == "type_rate") { if (val == "positive") return(NULL)}
 
-
-    # ----- RULES: direct > positive only if val=="h0" -----
-    if (arg == "direct") {
-      if (!is.null(val) && val == "h0") {
-        arg_print <- "type_rate"
-        val <- "negative"  # <-- no quotes!
-      } else {
-        return(NULL)  # skip h1
-      }
-    }
-
-    # ----- RULES: plotting -----
-    if (arg == "pc") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_power"
-      val <- TRUE
-    }
-    if (arg == "rela") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_rel"
-      val <- TRUE
-    }
-
-    # ----- RULES: de_an_prior -----
-    if (arg == "de_an_prior") return(NULL) # never printed
+    # ----- RULES: de_an_prior / prior_design -----
+    if (arg == "de_an_prior") return(NULL)
     if (!is.null(x$de_an_prior) && (x$de_an_prior == 1 || x$de_an_prior == "1") &&
-        arg %in% c("model_d","dff_d","rscale_d","f_m_d")) {
-      return(NULL)
-    }
+        arg %in% c("prior_design","dff_d","rscale_d","f_m_d")) return(NULL)
     if (!is.null(x$de_an_prior) && (x$de_an_prior == 0 || x$de_an_prior == "0") &&
-        !is.null(x$model_d)) {
-      if (x$model_d == "Moment" && arg %in% c("rscale_d")) return(NULL)
-      if (x$model_d == "Point" && arg %in% c("dff_d","rscale_d")) return(NULL)
+        !is.null(x$prior_design)) {
+      if (x$prior_design == "Moment" && arg %in% c("rscale_d")) return(NULL)
+      if (x$prior_design == "Point"  && arg %in% c("dff_d","rscale_d")) return(NULL)
     }
 
-    # ----- RULES: model -----
-    if (!is.null(x$model) && x$model != "effectsize" && arg == "rscale") return(NULL)
+    # ----- RULES: prior_analysis / rscale -----
+    if (!is.null(x$prior_analysis) && x$prior_analysis != "effectsize" && arg == "rscale") return(NULL)
 
     # ----- RULES: mode_bf / N -----
     if (arg == "mode_bf") return(NULL)
     if (!is.null(x$mode_bf) && x$mode_bf == 1 && arg == "N") return(NULL)
 
-
-    ## D > threshold
-    if (arg == "D") arg_print <- "threshold"
-
-    ## e > ROPE
-    if (arg == "e") arg_print <- "ROPE"
-
-
-    ## model > prior_analysis
-    if (arg == "model") arg_print <- "prior_analysis"
-
-    ## model_d > prior_design
-    if (arg == "model_d") arg_print <- "prior_design"
-
-
+    # ----- Rename arguments -----
+    if (arg == "threshold") arg_print <- "threshold"
+    if (arg == "ROPE") arg_print <- "ROPE"
+    if (arg == "prior_analysis") arg_print <- "prior_analysis"
+    if (arg == "prior_design") arg_print <- "prior_design"
 
     # Skip NULL args
     if (is.null(val)) return(NULL)
 
-
-
-
-
     # Format values
-    if (is.character(val)) {
-      val <- shQuote(val, type = "cmd")
-    } else if (is.vector(val) && length(val) > 1) {
-      val <- paste0("c(", paste(val, collapse = ", "), ")")
-    }
+    if (is.character(val)) val <- shQuote(val, type = "cmd")
+    if (is.vector(val) && length(val) > 1) val <- paste0("c(", paste(val, collapse = ", "), ")")
 
     glue::glue("  {arg_print} = {val},")
   })
@@ -433,225 +367,199 @@ show_f_code <- function(x) {
     code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
   }
 
-  # Final output
-  paste0("BFpower.f.test(\n", paste(code_lines, collapse = "\n"), "\n)")
+  # ----- Determine plot() arguments based on pc/rela -----
+  plot_args <- c()
+
+  if (isTRUE(x$pc)) {
+    plot_args <- c(plot_args, "plot_power = TRUE")
+  }
+
+  if (isTRUE(x$rela)) {
+    plot_args <- c(plot_args, "plot_rel = TRUE")
+  }
+
+  plot_args_text <- if (length(plot_args)) {
+    paste0(", ", paste(plot_args, collapse = ", "))
+  } else {
+    ""
+  }
+
+  # ----- Final code -----
+  code <- paste0(
+    "results = BFpower.f.test(\n",
+    paste(code_lines, collapse = "\n"),
+    "\n)\n",
+    "print(results)\n",
+    "plot(results",
+    plot_args_text,
+    ")"
+  )
+
+  code
 }
 
-
-
-
-
 show_bin_code <- function(x) {
-  args <- c("hypothesis","interval", "D", "target", "FP","h0","location",
-            "model","alpha", "beta", "scale",
-            "model_d","alpha_d", "beta_d", "location_d", "scale_d",
-            "de_an_prior",
-            "N", "mode_bf", "e", "direct","rela","pc")
+  args <- c("alternative", "threshold", "true_rate", "false_rate","h0",
+            "prior_analysis","alpha", "beta", "scale",
+            "prior_design","alpha_d", "beta_d","location_d","scale_d",
+            "de_an_prior", "N","mode_bf","ROPE","type_rate") # removed pc/rela/location/interval from args
 
   code_lines <- sapply(args, function(arg) {
     val <- x[[arg]]
     arg_print <- arg  # default printed name
 
-
-
-    # ----- RULES: plotting -----
-    if (arg == "pc") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_power"
-      val <- TRUE
-    }
-    if (arg == "rela") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_rel"
-      val <- TRUE
-    }
-    # ----- RULES: always skip location -----
-    if (arg == "location") return(NULL)
+    # ----- RULES: skip location/interval -----
+    if (arg %in% c("location","interval")) return(NULL)
 
     # ----- RULES: target / FP -----
-    if (arg == "target") {
+    if (arg == "true_rate") {
       arg_print <- "true_rate"
       if (!is.null(x$mode_bf) && x$mode_bf != 1) return(NULL)
     }
-    if (arg == "FP") {
+    if (arg == "false_rate") {
       arg_print <- "false_rate"
       if (!is.null(x$mode_bf) && x$mode_bf != 1) return(NULL)
     }
 
-    # ----- RULES: direct > positive only if val=="h0" -----
-    if (arg == "direct") {
-      if (!is.null(val) && val == "h0") {
-        arg_print <- "type_rate"
-        val <- "negative"  # <-- no quotes!
-      } else {
-        return(NULL)  # skip h1
-      }
-    }
-    # ----- RULES: model -----
-    if (!is.null(x$model) && x$model == "beta" && arg == "scale") val <- NULL
-    if (!is.null(x$model) && x$model != "beta" && arg %in% c("alpha","beta")) val <- NULL
+    # ----- RULES
+    if (arg == "type_rate") { if (val == "positive") return(NULL)}
 
-    # ----- RULES: de_an_prior -----
+    # ----- RULES: prior_analysis / prior_design / de_an_prior -----
+    if (!is.null(x$prior_analysis)) {
+      if (x$prior_analysis == "beta" && arg == "scale") val <- NULL
+      if (x$prior_analysis != "beta" && arg %in% c("alpha","beta")) val <- NULL
+    }
     if (!is.null(x$de_an_prior)) {
-      if (x$de_an_prior == 1 && arg %in% c("model_d","alpha_d","beta_d","location_d","scale_d")) val <- NULL
+      if (x$de_an_prior == 1 && arg %in% c("prior_design","alpha_d","beta_d","location_d","scale_d")) val <- NULL
       if (arg == "de_an_prior") val <- NULL
     }
-
-    # ----- RULES: model_d when de_an_prior = 0 -----
-    if (!is.null(x$de_an_prior) && x$de_an_prior == 0 && !is.null(x$model_d)) {
-      if (x$model_d == "beta" && arg %in% c("scale_d","location_d")) val <- val
-      else if (x$model_d == "Moment" && arg %in% c("alpha_d","beta_d")) val <- NULL
-      else if (x$model_d == "Point" && arg %in% c("alpha_d","beta_d","scale_d")) val <- NULL
+    if (!is.null(x$de_an_prior) && x$de_an_prior == 0 && !is.null(x$prior_design)) {
+      if (x$prior_design == "Moment" && arg %in% c("alpha_d","beta_d")) val <- NULL
+      if (x$prior_design == "Point" && arg %in% c("alpha_d","beta_d","scale_d")) val <- NULL
     }
 
-    # ----- RULES: mode_bf -----
+    # ----- RULES: mode_bf / N -----
     if (!is.null(x$mode_bf)) {
       if (arg == "mode_bf") val <- NULL
       if (x$mode_bf == 1 && arg == "N") val <- NULL
     }
 
-    # ----- RULES: interval / e -----
-    if (arg == "interval") return(NULL)  # interval is never printed
-    if (arg == "e" && !is.null(x$interval) && x$interval == "1") val <- NULL
+    # ----- RULES: ROPE -----
+    if (arg == "ROPE" && !is.null(x$interval) && x$interval == "1") val <- NULL
 
-
-
-    ## HYPOTHESIS > ALTERNATIVE RULE
-    if (arg == "hypothesis") {
-
-      arg_print <- "alternative"
-
-      val <- switch(val,
-                    "<"  = "less",
-                    "!=" = "two.sided",
-                    ">"  = "greater",
-                    stop("Invalid hypothesis")
-      )
-    }
-
-
-    ## D > threshold
-    if (arg == "D") arg_print <- "threshold"
-
-    ## e > ROPE
-    if (arg == "e") arg_print <- "ROPE"
-
-
-    ## model > prior_analysis
-    if (arg == "model") arg_print <- "prior_analysis"
-
-    ## model_d > prior_design
-    if (arg == "model_d") arg_print <- "prior_design"
-
-
-
+    # ----- RENAME ARGUMENTS -----
+    if (arg == "alternative") arg_print <- "alternative"
+    if (arg == "threshold") arg_print <- "threshold"
+    if (arg == "ROPE") arg_print <- "ROPE"
+    if (arg == "prior_analysis") arg_print <- "prior_analysis"
+    if (arg == "prior_design") arg_print <- "prior_design"
 
     # Skip NULL args
     if (is.null(val)) return(NULL)
 
     # Format values
-    if (is.character(val)) {
-      val <- shQuote(val, type = "cmd")  # straight quotes
-    } else if (is.vector(val) && length(val) > 1) {
-      val <- paste0("c(", paste(val, collapse = ", "), ")")
-    }
+    if (is.character(val)) val <- shQuote(val, type = "cmd")
+    if (is.vector(val) && length(val) > 1) val <- paste0("c(", paste(val, collapse = ", "), ")")
 
     glue::glue("  {arg_print} = {val},")
   })
 
+  # Clean up commas
   code_lines <- code_lines[!sapply(code_lines, is.null)]
-  if (length(code_lines) > 0) code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
-  paste0("BFpower.bin(\n", paste(code_lines, collapse = "\n"), "\n)")
-}
+  if (length(code_lines) > 0) {
+    code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
+  }
 
+  # ----- Determine plot() arguments based on pc/rela -----
+  plot_args <- c()
+
+  if (isTRUE(x$pc)) {
+    plot_args <- c(plot_args, "plot_power = TRUE")
+  }
+
+  if (isTRUE(x$rela)) {
+    plot_args <- c(plot_args, "plot_rel = TRUE")
+  }
+
+  plot_args_text <- if (length(plot_args)) {
+    paste0(", ", paste(plot_args, collapse = ", "))
+  } else {
+    ""
+  }
+
+  # ----- Final code -----
+  code <- paste0(
+    "results = BFpower.bin(\n",
+    paste(code_lines, collapse = "\n"),
+    "\n)\n",
+    "print(results)\n",
+    "plot(results",
+    plot_args_text,
+    ")"
+  )
+
+  code
+}
 
 show_props_code <- function(x) {
 
   args <- c(
-    "D", "target", "a0", "b0",
-    "model1","a1", "b1", "a2", "b2",
-    "model2", "a1d", "b1d", "dp1", "a2d", "b2d", "dp2",
-    "mode_bf", "n1", "n2", "direct","pc","rela"
+    "threshold", "true_rate", "a0", "b0",
+    "prior_design_1","a1", "b1", "a2", "b2",
+    "prior_design_2", "a1d", "b1d", "dp1", "a2d", "b2d", "dp2",
+    "mode_bf", "n1", "n2", "type_rate"   # removed pc/rela
   )
 
   code_lines <- sapply(args, function(arg) {
     val <- x[[arg]]
+    arg_print <- arg
 
-    # --- RULES: renaming ---
-    # target → true_rate
-    if (arg == "target") {
-      arg_print <- "true_rate"
-    } else {
-      arg_print <- arg
-    }
+    # ----- RENAME -----
+    if (arg == "true_rate") arg_print <- "true_rate"
 
-    # mode_bf: never printed
+    # mode_bf never printed
     if (arg == "mode_bf") return(NULL)
 
     # suppress n1/n2 if mode_bf == 1
-    if (!is.null(x$mode_bf) && x$mode_bf == 1 && arg %in% c("n1","n2")) {
+    if (!is.null(x$mode_bf) && x$mode_bf == 1 && arg %in% c("n1","n2"))
       return(NULL)
+
+    # ----- prior prior_design_1 rules -----
+    if (!is.null(x$prior_design_1)) {
+      if (x$prior_design_1 == "same" && arg %in% c("prior_design_1","a1d","b1d","dp1"))
+        return(NULL)
+      if (x$prior_design_1 == "beta" && arg == "dp1")
+        val <- NULL
+      if (x$prior_design_1 == "Point" && arg %in% c("a1d","b1d"))
+        val <- NULL
     }
 
-    # model1 rules
-    if (!is.null(x$model1)) {
-      if (x$model1 == "same" && arg %in% c("model1","a1d","b1d","dp1")) return(NULL)
-      if (x$model1 == "beta" && arg == "dp1") val <- NULL
-      if (x$model1 == "Point" && arg %in% c("a1d","b1d")) val <- NULL
+    # ----- prior prior_design_2 rules -----
+    if (!is.null(x$prior_design_2)) {
+      if (x$prior_design_2 == "same" && arg %in% c("prior_design_2","a2d","b2d","dp2"))
+        return(NULL)
+      if (x$prior_design_2 == "beta" && arg == "dp2")
+        val <- NULL
+      if (x$prior_design_2 == "Point" && arg %in% c("a2d","b2d"))
+        val <- NULL
     }
 
-    # model2 rules
-    if (!is.null(x$model2)) {
-      if (x$model2 == "same" && arg %in% c("model2","a2d","b2d","dp2")) return(NULL)
-      if (x$model2 == "beta" && arg == "dp2") val <- NULL
-      if (x$model2 == "Point" && arg %in% c("a2d","b2d")) val <- NULL
-    }
+    if (arg == "type_rate") { if (val == "positive") return(NULL)}
 
-    # ----- RULES: plotting -----
-    if (arg == "pc") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_power"
-      val <- TRUE
-    }
-    if (arg == "rela") {
-      if (!isTRUE(val)) return(NULL)
-      arg_print <- "plot_rel"
-      val <- TRUE
-    }
-
-    # ----- RULES: direct -----
-    if (arg == "direct") {
-      if (!is.null(val)) {
-        if (val == "h1") return(NULL)        # ignore
-        if (val == "h0") {                   # print type_rate = "negative"
-          arg_print <- "type_rate"
-          val <- "negative"                  # keep as plain string
-        }
-      }
-    }
-
-
-    # Skip NULL
+    # Skip NULL values
     if (is.null(val)) return(NULL)
 
     # ----- Special renaming -----
-    ## D → threshold
-    if (arg == "D") arg_print <- "threshold"
-
-    ## model1 → prior_design_1
-    if (arg == "model1") arg_print <- "prior_design_1"
-
-    ## model2 → prior_design_2
-    if (arg == "model2") arg_print <- "prior_design_2"
+    if (arg == "threshold") arg_print <- "threshold"
+    if (arg == "prior_design_1") arg_print <- "prior_design_1"
+    if (arg == "prior_design_2") arg_print <- "prior_design_2"
 
     # ----- Value formatting -----
-    # Format all character values
-    if (is.character(val)) {
-      val <- shQuote(val, type = "cmd")  # <- this will quote "negative" properly
-    } else if (is.vector(val) && length(val) > 1) {
-      val <- paste0("c(", paste(val, collapse = ", "), ")")
-    }
+    if (is.character(val))
+      val <- shQuote(val, type = "cmd")
 
+    if (is.vector(val) && length(val) > 1)
+      val <- paste0("c(", paste(val, collapse = ", "), ")")
 
     glue::glue("  {arg_print} = {val},")
   })
@@ -661,8 +569,36 @@ show_props_code <- function(x) {
 
   # Remove trailing comma
   if (length(code_lines) > 0) {
-    code_lines[length(code_lines)] <- sub(",$", "", code_lines[length(code_lines)])
+    code_lines[length(code_lines)] <-
+      sub(",$", "", code_lines[length(code_lines)])
   }
 
-  paste0("BFpower.props(\n", paste(code_lines, collapse = "\n"), "\n)")
+  # ----- Determine plot() arguments -----
+  plot_args <- c()
+
+  if (isTRUE(x$pc)) {
+    plot_args <- c(plot_args, "plot_power = TRUE")
+  }
+
+  if (isTRUE(x$rela)) {
+    plot_args <- c(plot_args, "plot_rel = TRUE")
+  }
+
+  plot_args_text <- if (length(plot_args)) {
+    paste0(", ", paste(plot_args, collapse = ", "))
+  } else {
+    ""
+  }
+
+  # ----- Final code -----
+  code <- paste0(
+    "results = BFpower.props(\n",
+    paste(code_lines, collapse = "\n"),
+    "\n)\n",
+    "print(results)\n",
+    "plot(results",
+    plot_args_text,
+    ")"
+  )
+  code
 }

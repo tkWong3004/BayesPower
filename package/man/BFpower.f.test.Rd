@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BFpower.f.test}
 \alias{BFpower.f.test}
-\title{Sample Size Determination for the Bayesian F-test}
+\title{Sample Size Determination for the Bayesian F-Test}
 \usage{
 BFpower.f.test(
   threshold,
@@ -20,9 +20,7 @@ BFpower.f.test(
   f_m_d,
   N = NULL,
   type_rate = "positive",
-  ROPE = NULL,
-  plot_power = FALSE,
-  plot_rel = FALSE
+  ROPE = NULL
 )
 }
 \arguments{
@@ -69,14 +67,9 @@ point design prior.}
 
 \item{ROPE}{Numeric vector. Numeric bounds for the interval null (only used when interval
 Bayes factors are required).}
-
-\item{plot_power}{Logical. Whether to plot power curves when
-sample size determination is requested.}
-
-\item{plot_rel}{Logical. Whether to plot the relationship between the BF and data.}
 }
 \value{
-A list of class \code{BFpower_f} containing:
+A list of class \code{BFpower} containing:
 \describe{
 \item{\code{type}}{Test type (always "Regression/ANOVA").}
 \item{\code{k}, \code{p}}{Number of predictors in the full and reduced models.}
@@ -85,8 +78,6 @@ A list of class \code{BFpower_f} containing:
 \item{\code{design_h1}}{List containing the design prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff} (or \code{NULL} if not specified).}
 \item{\code{results}}{Data frame of probabilities of compelling/misleading evidence and the required or supplied sample size.}
 \item{\code{threshold}}{Threshold of compelling evidence.}
-\item{\code{plot_power}}{Logical; whether power curves are plotted.}
-\item{\code{plot_rel}}{Logical; whether the relationship between the Bayes factor and data is plotted.}
 }
 If sample size determination fails, the function returns \code{NaN} and prints a message.
 }
@@ -132,10 +123,6 @@ The design prior under the alternative hypothesis can optionally be specified us
 \strong{interval null Hypothesis:}
 
 If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval null. Otherwise, a point-null hypothesis is assumed.
-
-\strong{Plotting:}
-
-If \code{plot_power = TRUE}, the function plots the probability of compelling evidence as a function of sample size. If \code{plot_rel = TRUE}, the relationship between the Bayes factor and Cohen's \code{f} is plotted.
 }
 \examples{
 BFpower.f.test(
@@ -149,8 +136,6 @@ BFpower.f.test(
  rscale = 0.18,
  f_m = 0.1,
  prior_design = "Point",
- f_m_d = 0.1,
- plot_power = TRUE,
- plot_rel = TRUE)
+ f_m_d = 0.1)
 
 }

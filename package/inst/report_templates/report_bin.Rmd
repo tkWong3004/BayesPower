@@ -32,10 +32,10 @@ cat(sprintf("\\(\\mathcal{H}_0: p_0 = %.2f\\) vs ", params$bin$location))
 
 # Alternative hypothesis
 alt_hypothesis <- switch(
-  params$bin$hypothesis,
-  ">"  = sprintf("\\(\\mathcal{H}_1: p_1 \\in \\{ %.2f, 1 \\}\\)\n", params$bin$location),
-  "<"  = sprintf("\\(\\mathcal{H}_1: p_1 \\in \\{ 0, %.2f \\}\\)\n", params$bin$location),
-  "!=" = "\\(\\mathcal{H}_1: p_1 \\ne p_0\\)\n"
+  params$bin$alternative,
+  "greater"  = sprintf("\\(\\mathcal{H}_1: p_1 \\in \\{ %.2f, 1 \\}\\)\n", params$bin$location),
+  "less"  = sprintf("\\(\\mathcal{H}_1: p_1 \\in \\{ 0, %.2f \\}\\)\n", params$bin$location),
+  "two.sided" = "\\(\\mathcal{H}_1: p_1 \\ne p_0\\)\n"
 )
 
 cat(alt_hypothesis)
@@ -44,24 +44,24 @@ cat(alt_hypothesis)
 
 }else if (params$bin$interval == 2) {
   # Extract epsilon values
-  hyp <- params$bin$hypothesis
+  hyp <- params$bin$alternative
   e <- params$bin$e
   location <-params$bin$location
 
 eps <- switch(hyp,
-  ">"  = list(eps_neg = 0,       eps_pos = location+e),
-  "<"  = list(eps_neg =location+ e,       eps_pos = 0),
-  "!=" = list(eps_neg = location+e[1],    eps_pos = location+e[2]),
+  "greater"  = list(eps_neg = 0,       eps_pos = location+e),
+  "less"  = list(eps_neg =location+ e,       eps_pos = 0),
+  "two.sided" = list(eps_neg = location+e[1],    eps_pos = location+e[2]),
   list(eps_neg = NA,             eps_pos = NA)  # default/fallback
 )
 
 cat(sprintf("\\(\\mathcal{H}_0: \\rho \\in \\{ %.2f, %.2f \\} \\) vs ", eps[1], eps[2]))
 
-if (hyp == ">") {
+if (hyp == "greater") {
   cat(sprintf("\\(\\mathcal{H}_1: \\rho \\in (%.2f, 1) \\)\n", eps[[2]]))
-} else if (hyp == "<") {
+} else if (hyp == "less") {
   cat(sprintf("\\(\\mathcal{H}_1: \\rho \\in (0, %.2f) \\)\n", eps[[1]]))
-} else if (hyp == "!=") {
+} else if (hyp == "two.sided") {
   cat(sprintf("\\(\\mathcal{H}_1: \\rho \\in (0, %.2f) \\cup (%.2f, 1) \\)\n", eps[[1]], eps[[2]]))
 } 
 
@@ -79,7 +79,7 @@ if (params$bin$de_an_prior == 0) {
   cat("**Analysis and design prior**  \n\n")
 }
 
-model <- params$bin$model
+model <- params$bin$prior_analysis
 
 if (model == "beta") {
   cat(sprintf("Beta ($\\alpha = %s$, $\\beta = %s$)\n\n", params$bin$alpha, params$bin$beta))
@@ -94,7 +94,7 @@ if (model == "beta") {
 if (params$bin$de_an_prior == 0) {
   cat("**Design prior**  \n")
   
-  if (params$bin$model_d == "Point") {
+  if (params$bin$prior_design == "Point") {
     cat(sprintf("Point(location = %s)  \n", params$bin$location_d))
   } else {
     

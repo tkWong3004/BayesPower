@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BF10.cor}
 \alias{BF10.cor}
-\title{Bayes factor for a Bayesian correlation test}
+\title{Bayes Factor for a Bayesian Correlation Test}
 \usage{
 BF10.cor(
   r,

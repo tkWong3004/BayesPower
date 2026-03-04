@@ -30,30 +30,30 @@ if (params$rr$interval == 1) {
   cat("\\(\\mathcal{H}_0: \\rho = 0\\) vs ")
 
   cat(switch(
-    params$rr$hypothesis,
-    ">" = "\\(\\mathcal{H}_1: \\rho > 0\\)\n",
-    "<" = "\\(\\mathcal{H}_1: \\rho < 0\\)\n",
+    params$rr$alternative,
+    "greater" = "\\(\\mathcal{H}_1: \\rho > 0\\)\n",
+    "less" = "\\(\\mathcal{H}_1: \\rho < 0\\)\n",
     "\\(\\mathcal{H}_1: \\rho \\neq 0\\)\n"
   ))
 } else if (params$rr$interval == 2) {
   # Extract epsilon values
-  hyp <- params$rr$hypothesis
-e <- params$rr$e
+  hyp <- params$rr$alternative
+e <- params$rr$ROPE
 
 eps <- switch(hyp,
-  ">"  = list(eps_neg = 0,       eps_pos = e),
-  "<"  = list(eps_neg = e,       eps_pos = 0),
-  "!=" = list(eps_neg = e[1],    eps_pos = e[2]),
+  "greater"  = list(eps_neg = 0,       eps_pos = e),
+  "less"  = list(eps_neg = e,       eps_pos = 0),
+  "two.sided" = list(eps_neg = e[1],    eps_pos = e[2]),
   list(eps_neg = NA,             eps_pos = NA)  # default/fallback
 )
 
 cat(sprintf("\\(\\mathcal{H}_0: \\rho \\in \\{ %.2f, %.2f \\} \\) vs ", eps[1], eps[2]))
 
-if (hyp == ">") {
+if (hyp == "greater") {
   cat(sprintf("\\(\\mathcal{H}_1: \\rho \\in (%.2f, 1) \\)\n", eps[[2]]))
-} else if (hyp == "<") {
+} else if (hyp == "less") {
   cat(sprintf("\\(\\mathcal{H}_1: \\rho \\in (-1, %.2f) \\)\n", eps[[1]]))
-} else if (hyp == "!=") {
+} else if (hyp == "two.sided") {
   cat(sprintf("\\(\\mathcal{H}_1: \\rho \\in (-1, %.2f) \\cup (%.2f, 1) \\)\n", eps[[1]], eps[[2]]))
 } else {
   cat("\\(\\mathcal{H}_1:\\ \\text{Undefined Hypothesis}\\)\n")
@@ -71,7 +71,7 @@ if (params$rr$de_an_prior == 0) {
 if (params$rr$de_an_prior == 1) {
   cat("**Analysis and design prior**  \n")}
 
-model <- params$rr$model
+model <- params$rr$prior_analysis
 
 if (model == "d_beta") {
   cat(sprintf("Default Stretched Beta (k = %s)\n", params$rr$k))
@@ -94,10 +94,10 @@ if (model == "d_beta") {
 if (params$rr$de_an_prior == 0) {
   cat("**Design prior**  \n")
   
-  if (params$rr$model_d == "Point") {
+  if (params$rr$prior_design == "Point") {
     cat(sprintf("Point(location = %s)  \n", params$rr$location_d))
   } else {
-    model <- params$rr$model_d
+    model <- params$rr$prior_design
 
 if (model == "d_beta") {
   cat(sprintf("Default Stretched Beta (k = %s)\n", params$rr$k_d))

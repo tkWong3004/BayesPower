@@ -43,7 +43,7 @@ or left-sided (\code{"less"}).}
 An object of class \code{"BFvalue_bin"} containing:
 \itemize{
 \item \code{bf10}: Bayes factor in favor of the alternative hypothesis.
-\item \code{type}: Test type ("one-proportion").
+\item \code{type}: Test type ("One-proportion").
 \item \code{x}: Number of successes.
 \item \code{n}: Sample size.
 \item \code{h0}: Null proportion value.

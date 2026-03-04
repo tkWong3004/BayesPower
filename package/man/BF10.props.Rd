@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BF10.props}
 \alias{BF10.props}
-\title{Bayes factor for comparing two proportions}
+\title{Bayes Factor for Comparing Two Proportions}
 \usage{
 BF10.props(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)
 }

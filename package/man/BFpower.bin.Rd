@@ -2,7 +2,7 @@
 % Please edit documentation in R/BF_users_functions.r
 \name{BFpower.bin}
 \alias{BFpower.bin}
-\title{Sample Size Determination for the Bayesian one-proportion test}
+\title{Sample Size Determination for the Bayesian One-Proportion Test}
 \usage{
 BFpower.bin(
   alternative,
@@ -21,9 +21,7 @@ BFpower.bin(
   scale_d,
   N = NULL,
   ROPE = NULL,
-  type_rate = "positive",
-  plot_power = FALSE,
-  plot_rel = FALSE
+  type_rate = "positive"
 )
 }
 \arguments{
@@ -59,19 +57,15 @@ BFpower.bin(
 
 \item{ROPE}{Numeric vector. Numeric bounds for the interval null (used when computing interval Bayes factors).
 \itemize{
-\item For \code{hypothesis = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
+\item For \code{"alterative" = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
 \item For \code{"greater"}, must be a single numeric scalar > 0.
 \item For \code{"less"}, must be a single numeric scalar < 0.
 }}
 
 \item{type_rate}{Character. Either \code{"positive"} (controls true/false positive rates) or \code{"negative"} (controls true/false negative rates).}
-
-\item{plot_power}{Logical. Whether to plot power curves when sample size determination is requested.}
-
-\item{plot_rel}{Logical. Whether to plot probability of misleading evidence.}
 }
 \value{
-A list of class \code{"BFpower_bin"} containing:
+A list of class \code{"BFpower"} containing:
 \itemize{
 \item \code{type}: Test type ("One proportion").
 \item \code{alternative}: alternative hypothesis.
@@ -84,8 +78,6 @@ A list of class \code{"BFpower_bin"} containing:
 \code{beta} (beta parameter), and \code{scale} (scale parameter).
 \item \code{results}: Data frame of probabilities of compelling/misleading evidence and the required or supplied sample size.
 \item \code{threshold}: Compelling-evidence threshold.
-\item \code{plot_power}: Logical, whether power curves are plotted.
-\item \code{plot_rel}: Logical, whether the relationship between the BF and data is plotted.
 }
 
 If sample size determination fails, the function returns \code{NaN} and prints a message.
@@ -133,10 +125,6 @@ If \code{ROPE} is provided, the function evaluates the Bayes factor for an inter
 \strong{Hypothesis:}
 
 The function supports one-sided (\code{"greater"} or \code{"less"}) and two-sided (\code{"two.sided"}) tests. Design prior and interval null bounds must be consistent with the directionality of the hypothesis.
-
-\strong{Plotting:}
-
-If \code{plot_power = TRUE}, the function plots the probability of compelling evidence as a function of sample size. If \code{plot_rel = TRUE}, the relationship between the Bayes factor and the number of successes (proportion) is plotted.
 }
 \examples{
 BFpower.bin(
@@ -147,9 +135,6 @@ BFpower.bin(
   h0 = 0.5,
   prior_analysis = "beta",
   alpha = 1,
-  beta = 1,
-  plot_rel = TRUE,
-  plot_power = TRUE)
-
+  beta = 1)
 
 }

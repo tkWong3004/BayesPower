@@ -30,15 +30,15 @@ if (params$x$interval == 1) {
   cat("\\(\\mathcal{H}_0: \\delta = 0\\) vs ")
 
   cat(switch(
-    params$x$hypothesis,
+    params$x$alternative,
     ">" = "\\(\\mathcal{H}_1: \\delta > 0\\)\n",
     "<" = "\\(\\mathcal{H}_1: \\delta < 0\\)\n",
     "\\(\\mathcal{H}_1: \\delta \\neq 0\\)\n"
   ))
 } else if (params$x$interval == 2) {
   # Extract epsilon values
-  hyp <- params$x$hypothesis
-e <- params$x$e
+  hyp <- params$x$alternative
+e <- params$x$ROPE
 
 eps <- switch(hyp,
   ">"  = list(eps_neg = 0,       eps_pos = e),
@@ -65,9 +65,9 @@ if (params$x$de_an_prior == 0) {
 if (params$x$de_an_prior == 1) {
   cat("**Analysis and design prior**  \n")}
 
-cat(paste0(params$x$model,"(location = ", params$x$location,", scale = ",params$x$scale)
+cat(paste0(params$x$prior_analysis,"(location = ", params$x$location,", scale = ",params$x$scale)
     )
-if (params$x$model == "t-distribution"){
+if (params$x$prior_analysis == "t-distribution"){
   cat(paste0(", df = ",params$x$dff),")")
 }else cat(paste0(")"))
 
@@ -78,15 +78,15 @@ if (params$x$model == "t-distribution"){
 if (params$x$de_an_prior == 0) {
   cat("**Design prior**  \n")
   
-  if (params$x$model_d == "Point") {
+  if (params$x$prior_design == "Point") {
     cat(sprintf("Point(location = %s)  \n", params$x$location_d))
   } else {
     cat(sprintf("%s(location = %s, scale = %s", 
-                params$x$model_d, 
+                params$x$prior_design, 
                 params$x$location_d, 
                 params$x$scale_d))
     
-    if (params$x$model_d == "t-distribution") {
+    if (params$x$prior_design == "t-distribution") {
       cat(sprintf(", df = %s)\n", params$x$dff_d))
     } else {
       cat(")\n")
