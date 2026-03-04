@@ -58,21 +58,23 @@ var_d <- (n1 + n2) / (n1 * n2) + (d^2) / (2 * (n1 + n2))
 round(sqrt(var_d),3)
 
 # power analysis for future study
-BFpower.ttest.TwoSample(
+results = BFpower.ttest.TwoSample(
   alternative = "two.sided",
   ROPE = c(-0.36, 0.36),
   threshold = 3,
   true_rate = 0.8,
   false_rate = 0.05,
+  type_rate = "negative",
   prior_analysis = "Normal",
   location = -0.23,
   scale = 0.2,
   dff = 1,
-  type_rate = "negative",
-  plot_power = TRUE,
-  plot_rel = TRUE,
   r = 1
 )
+print(results)
+plot(results, plot_power = TRUE, plot_rel = TRUE)
+
+
 
 #### Example 2 - Correlation
 #calculating the Bayes factor
@@ -97,7 +99,7 @@ BF10.cor(
 )
 
 # power analysis
-BFpower.cor(
+results = BFpower.cor(
   alternative = "greater",
   h0 = 0,
   threshold = 3,
@@ -106,13 +108,13 @@ BFpower.cor(
   prior_analysis = "d_beta",
   k = 1,
   prior_design = "Point",
-  location_d = 0.3,
-  plot_power = TRUE,
-  plot_rel = TRUE
+  location_d = 0.3
 )
+print(results)
+plot(results, plot_power = TRUE, plot_rel = TRUE)
 
 #### Example 3 - ANOVA
-BFpower.f.test(
+results = BFpower.f.test(
   threshold = 3,
   true_rate = 0.8,
   false_rate = 0.05,
@@ -123,10 +125,10 @@ BFpower.f.test(
   rscale = 0.18,
   f_m = 0.1,
   prior_design = "Point",
-  f_m_d = 0.1,
-  plot_power = TRUE,
-  plot_rel = TRUE
+  f_m_d = 0.1
 )
+print(results)
+plot(results, plot_power = TRUE, plot_rel = TRUE)
 
 #### Example 4 - one proportion
 #calculating Bayes factor
@@ -140,7 +142,7 @@ BF10.bin.test(
   beta = 1
 )
 # power analysis
-BFpower.bin(
+results = BFpower.bin(
   alternative = "greater",
   threshold = 3,
   true_rate = 0.8,
@@ -148,10 +150,10 @@ BFpower.bin(
   h0 = 0.5,
   prior_analysis = "beta",
   alpha = 1,
-  beta = 1,
-  plot_rel = TRUE,
-  plot_power = TRUE
+  beta = 1
 )
+print(results)
+plot(results, plot_power = TRUE, plot_rel = TRUE)
 
 #### Example 5 - two proportions
 #calculating Bayes factor
@@ -168,7 +170,7 @@ BF10.props(
   x2 = 150
 )
 # power analysis
-BFpower.props(
+results = BFpower.props(
   threshold = 3,
   true_rate = 0.8,
   a0 = 1,
@@ -176,8 +178,7 @@ BFpower.props(
   a1 = 156,
   b1 = 339,
   a2 = 151,
-  b2 = 339,
-  plot_power = TRUE,
-  plot_rel = TRUE
+  b2 = 339
 )
-
+print(results)
+plot(results, plot_power = TRUE, plot_rel = TRUE)
