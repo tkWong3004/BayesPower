@@ -540,7 +540,7 @@ plot.BFpower <- function(x, plot_power = FALSE, plot_rel = FALSE,...) {
            if (plot_rel) {
              plots$relative <- if (is.null(x$ROPE)) {suppressWarnings(
                bf10_t1(
-                 x$threshold, unlist(x$result[5]) - 1, 0,
+                 x$threshold, unlist(x$result[5]) - 1,
                  x$analysis_h1$prior, x$analysis_h1$location, x$analysis_h1$scale, x$analysis_h1$dff,
                  x$alternative
                ))
