@@ -7,7 +7,7 @@
 \method{print}{BFpower}(x, ...)
 }
 \arguments{
-\item{x}{A \code{"BFpower"} object returned by one of the BFpower functions listed above.}
+\item{x}{A \code{"BFpower"} object returned by one of the BFpower functions listed in the section Details.}
 
 \item{...}{Additional arguments (currently unused; included for method consistency).}
 }

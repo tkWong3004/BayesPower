@@ -9,7 +9,7 @@
 #' \code{\link{BFpower.f.test}}, \code{\link{BFpower.cor}},
 #' \code{\link{BFpower.bin}}, or \code{\link{BFpower.props}}.
 #'
-#' @param x A \code{"BFpower"} object returned by one of the BFpower functions listed above.
+#' @param x A \code{"BFpower"} object returned by one of the BFpower functions listed in the section Details.
 #' @param ... Additional arguments (currently unused; included for method consistency).
 #'
 #' @return Invisibly returns the input \code{"BFpower"} object.
