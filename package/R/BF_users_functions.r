@@ -938,6 +938,7 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
   type = "correlation"
   analysis_h1 <- list(
     prior = prior_analysis,
+    location = h0,
     k = k,
     alpha=alpha,
     beta=beta,
@@ -1615,6 +1616,7 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
   type = "One proportion"
   analysis_h1 <- list(
     prior = prior_analysis,
+    location = location,
     alpha=alpha,
     beta=beta,
     scale=scale
@@ -1627,7 +1629,9 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
       prior = prior_design,
       alpha=alpha_d,
       beta=beta_d,
-      scale=scale_d
+      scale=scale_d,
+      location = location_d
+
     )
 
 
@@ -1638,7 +1642,9 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
       prior = NULL,
       alpha=NULL,
       beta=NULL,
-      scale=NULL)
+      scale=NULL,
+      location = NULL
+    )
 
   }
 
@@ -2416,6 +2422,7 @@ BF10.cor <- function(r, n, k, alpha, beta, h0, alternative,  scale,  prior_analy
 
   analysis_h1 <- list(
     prior = prior_analysis,
+    location = location,
     k = k,
     alpha=alpha,
     beta=beta,
@@ -2713,6 +2720,7 @@ BF10.bin.test <- function(x, n, alpha, beta, h0, scale, prior_analysis, alternat
 
   analysis_h1 <- list(
     prior = prior_analysis,
+    location = h0,
     alpha=alpha,
     beta=beta,
     scale=scale

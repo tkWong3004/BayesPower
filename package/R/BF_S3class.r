@@ -64,12 +64,16 @@ print.BFpower <- function(x, ...) {
   cat(x$type, "\n", sep = "")
   cat(line, "Hypotheses\n", line, sep = "")
 
-  #### Hypotheses function
+  #### Hypotheses function for showing parameter space
   print_hypothesis <- function(es, rope = x$ROPE, alt = x$alternative) {
     # Determine the correct null value
     null_val <- if (es %in% c(delta, f2)) 0 else x$h0
+
+    # the parameter space for interval Bayes Factor
     shift <- function(val) if (es %in% c(rho, theta)) val + x$h0 else val
 
+
+    # f-test is a special case since the alternative hypothesis is fixed
     if (es == f2) {
       if (is.null(rope)) {
         cat("  ", H0, " (Null)         : ", es, " = 0\n", sep = "")
@@ -80,8 +84,9 @@ print.BFpower <- function(x, ...) {
       }
     } else {
       # Print null-value line for rho/theta only when no ROPE
-      #if (es %in% c(rho, theta) && is.null(rope))
+      #  if (es %in% c(rho, theta) && is.null(rope))
       #  cat("  Null value        : ", es, sub0, " = ", null_val, "\n", sep = "")
+      # it is removed for now
 
       if (is.null(rope)) {
         alt_map <- list(
@@ -145,7 +150,7 @@ print.BFpower <- function(x, ...) {
       return()
     }
 
-    # --- If prior_obj$prior is NULL (should not happen for H1 normally) ---
+    # --- If prior_obj$prior is NULL (whether design and analysis are the same) ---
     if (is.null(prior_obj$prior)) {
       loc <- if (es == f2) prior_obj$f_m else prior_obj$location
       cat("  Point prior (location = ", loc, ")\n", sep = "")
@@ -155,8 +160,8 @@ print.BFpower <- function(x, ...) {
     # --- Standard prior printing ---
     switch(prior_obj$prior,
            "Point" = cat("  Point (location = ", if (es == f2) prior_obj$f_m^2 else prior_obj$location, ")\n", sep = ""),
-           "Normal" = cat("  Normal (location = ", x$h0, ", scale = ", prior_obj$scale, ")\n", sep = ""),
-           "t-distribution" = cat("  t-distribution (location = ", x$h0, ", scale = ", prior_obj$scale, ", df = ", prior_obj$dff, ")\n", sep = ""),
+           "Normal" = cat("  Normal (location = ", prior_obj$location, ", scale = ", prior_obj$scale, ")\n", sep = ""),
+           "t-distribution" = cat("  t-distribution (location = ", prior_obj$location, ", scale = ", prior_obj$scale, ", df = ", prior_obj$dff, ")\n", sep = ""),
            "d_beta" = cat("  Default Stretched Beta (k = ", prior_obj$k, ")\n", sep = ""),
            "beta" = cat("  Stretched Beta (alpha = ", prior_obj$alpha, ", beta = ", prior_obj$beta, ")\n", sep = ""),
            "Moment" = {
@@ -356,8 +361,8 @@ print.BFvalue <- function(x, ...) {
     # --- Standard prior printing ---
     switch(prior_obj$prior,
            "Point" = cat("  Point (location = ", if (es == f2) prior_obj$f_m^2 else prior_obj$location, ")\n", sep = ""),
-           "Normal" = cat("  Normal (location = ", x$h0, ", scale = ", prior_obj$scale, ")\n", sep = ""),
-           "t-distribution" = cat("  t-distribution (location = ", x$h0, ", scale = ", prior_obj$scale, ", df = ", prior_obj$dff, ")\n", sep = ""),
+           "Normal" = cat("  Normal (location = ", prior_obj$location, ", scale = ", prior_obj$scale, ")\n", sep = ""),
+           "t-distribution" = cat("  t-distribution (location = ", prior_obj$location, ", scale = ", prior_obj$scale, ", df = ", prior_obj$dff, ")\n", sep = ""),
            "d_beta" = cat("  Default Stretched Beta (k = ", prior_obj$k, ")\n", sep = ""),
            "beta" = cat("  Stretched Beta (alpha = ", prior_obj$alpha, ", beta = ", prior_obj$beta, ")\n", sep = ""),
            "Moment" = {
@@ -379,14 +384,14 @@ print.BFvalue <- function(x, ...) {
   } else {
     # Prior under H0
     cat("Analysis prior under H", sub0, "\n", sep = "")
-    cat(" ", theta0, " ~ Beta( alpha = ", x$analysis_h0$a,
+    cat(" ", theta0, " ~ Beta(alpha = ", x$analysis_h0$a,
         ", beta = ", x$analysis_h0$b, ")\n", sep = "")
 
     # Prior under H1
     cat("Analysis prior under H", sub1, "\n", sep = "")
-    cat(" ", theta1, " ~ Beta( alpha = ", x$analysis_h1_theta_1$a,
+    cat(" ", theta1, " ~ Beta(alpha = ", x$analysis_h1_theta_1$a,
         ", beta = ", x$analysis_h1_theta_1$b, ")\n", sep = "")
-    cat(" ", theta2, " ~ Beta( alpha = ", x$analysis_h1_theta_2$a,
+    cat(" ", theta2, " ~ Beta(alpha = ", x$analysis_h1_theta_2$a,
         ", beta = ", x$analysis_h1_theta_2$b, ")\n", sep = "")
 
   }
