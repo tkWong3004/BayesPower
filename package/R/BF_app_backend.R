@@ -898,7 +898,7 @@ prior_plot_fe <- function(q, dff, rscale, f_m, prior_analysis,
       "H0 - Analysis Prior" = "dashed",
       "H1 - Design Prior"   = "solid"
     )) +
-    ggplot2::scale_size_manual(values = c(
+    ggplot2::scale_linewidth_manual(values = c(
       "H1 - Analysis Prior" = 1.2,
       "H0 - Analysis Prior" = 1.2,
       "H1 - Design Prior"   = 2
@@ -2949,7 +2949,7 @@ bin_e_prior_plot <- function(h0,
       "H0 - Analysis Prior" = "dashed",
       "H1 - Design Prior"   = "solid"
     )) +
-    ggplot2::scale_size_manual(values = c(
+    ggplot2::scale_linewidth_manual(values = c(
       "H1 - Analysis Prior" = 1.2,
       "H0 - Analysis Prior" = 1.2,
       "H1 - Design Prior"   = 2
@@ -4493,7 +4493,7 @@ re_prior_plot <- function(k, alpha, beta, h0,
       "H0 - Analysis Prior" = "dashed",
       "H1 - Design Prior"   = "solid"
     )) +
-    ggplot2::scale_size_manual(values = c(
+    ggplot2::scale_linewidth_manual(values = c(
       "H1 - Analysis Prior" = 1.2,
       "H0 - Analysis Prior" = 1.2,
       "H1 - Design Prior"   = 2
@@ -5985,17 +5985,25 @@ t1e_prior_plot <- function(prior_analysis, location, scale, dff, alternative, RO
 
   # Start ggplot with H1/H0 lines
   p <- ggplot2::ggplot() +
-    ggplot2::geom_line(data = df_lines,
-                       ggplot2::aes(x = tt, y = Density, color = Prior, linetype = Prior, size = Prior)) +
-    ggplot2::scale_color_manual(values = c("H1 - Analysis Prior" = "black",
-                                           "H0 - Analysis Prior" = "black",
-                                           "H1 - Design Prior" = "gray")) +
-    ggplot2::scale_linetype_manual(values = c("H1 - Analysis Prior" = "solid",
-                                              "H0 - Analysis Prior" = "dashed",
-                                              "H1 - Design Prior" = "solid")) +
-    ggplot2::scale_size_manual(values = c("H1 - Analysis Prior" = 1.2,
-                                          "H0 - Analysis Prior" = 1.2,
-                                          "H1 - Design Prior" = 2)) +
+    ggplot2::geom_line(
+      data = df_lines,
+      ggplot2::aes(x = tt, y = Density, color = Prior, linetype = Prior, linewidth = Prior)
+    ) +
+    ggplot2::scale_color_manual(values = c(
+      "H1 - Analysis Prior" = "black",
+      "H0 - Analysis Prior" = "black",
+      "H1 - Design Prior" = "gray"
+    )) +
+    ggplot2::scale_linetype_manual(values = c(
+      "H1 - Analysis Prior" = "solid",
+      "H0 - Analysis Prior" = "dashed",
+      "H1 - Design Prior" = "solid"
+    )) +
+    ggplot2::scale_linewidth_manual(values = c(
+      "H1 - Analysis Prior" = 1.2,
+      "H0 - Analysis Prior" = 1.2,
+      "H1 - Design Prior" = 2
+    ))+
     ggplot2::labs(
       x = expression(bold(delta)),
       y = "Density",
