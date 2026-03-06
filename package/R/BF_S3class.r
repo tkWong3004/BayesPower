@@ -16,7 +16,6 @@
 #'
 #' @export
 #' @method print BFpower
-#' @keywords internal
 #'
 #' @examples
 #' \donttest{

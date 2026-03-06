@@ -40,4 +40,3 @@ results <- BFpower.ttest.OneSample(
 print(results)
 }
 }
-\keyword{internal}
