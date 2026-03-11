@@ -28,12 +28,10 @@ BFpower.ttest.TwoSample(
 \item{alternative}{Character. The direction of the alternative hypothesis: two-sided (\code{"two.sided"}),
 right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric. Bounds for an interval null:
-\itemize{
-\item For \code{alternative = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
-\item For \code{"greater"}, must be a single numeric scalar > 0.
-\item For \code{"less"}, must be a single numeric scalar < 0.
-}}
+\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
+null hypothesis. For \code{"two.sided"} this must be a numeric vector
+of length 2 with two distinct finite values; for \code{"greater"} a
+numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 
 \item{threshold}{Numeric scalar. Threshold for compelling evidence (must be > 1).}
 
@@ -42,7 +40,7 @@ right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 \item{false_rate}{Numeric scalar. Target false positive or negative rate .}
 
 \item{prior_analysis}{Character. Analysis prior under the alternative hypothesis:
-\code{"Normal"}, \code{"Moment"}, or \code{"t-distribution"}.}
+\code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.}
 
 \item{location}{Numeric scalar. Location parameter for the analysis prior.}
 
@@ -50,8 +48,8 @@ right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
 \item{dff}{Numeric scalar. Degrees of freedom for the analysis prior (required if prior_analysis = \code{"t-distribution"}; ignored otherwise).}
 
-\item{prior_design}{Optional character. Design prior under the alternative:
-\code{"Normal"}, \code{"Moment"}, \code{"t-distribution"}, or \code{"Point"}.}
+\item{prior_design}{Optional Character. Design prior under the alternative:
+\code{"Normal"}, \code{"Moment"}(normal-moment prior), \code{"t-distribution"}, or \code{"Point"}.}
 
 \item{location_d}{Numeric scalar. Location parameter for the design prior.}
 
@@ -70,14 +68,14 @@ true/false positive or true/false negative rates .}
 }
 \value{
 An object of class \code{BFpower_t} containing:
-\describe{
-\item{type}{Character string describing the test type.}
-\item{alternative}{alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).}
-\item{ROPE}{Interval bounds under the null used, if any.}
-\item{analysis_h1}{List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
-\item{design_h1}{List with the design prior parameters: \code{prior_design}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).}
-\item{results}{Data frame with probabilities of compelling/misleading evidence.}
-\item{threshold}{Threshold of compelling evidence.}
+\itemize{
+\item \code{type}: Character string describing the test type.
+\item \code{alternative}: Alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
+\item \code{ROPE}: Interval bounds under the null used, if any.
+\item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.
+\item \code{design_h1}: List with the design prior parameters: \code{prior_design}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).
+\item \code{results}: Data frame with probabilities of compelling/misleading evidence.
+\item \code{threshold}: Threshold of compelling evidence.
 }
 }
 \description{
@@ -130,7 +128,7 @@ A design prior can be supplied to reflect uncertainty about the effect size duri
 \item \code{dff_d} - degrees of freedom for \code{"t-distribution"} design priors.
 }
 
-\strong{interval null Hypothesis:}
+\strong{Interval Null Hypothesis:}
 
 The argument \code{ROPE} specifies the bounds of an interval null hypothesis.
 If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval

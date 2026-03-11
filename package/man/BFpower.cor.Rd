@@ -27,16 +27,14 @@ BFpower.cor(
 )
 }
 \arguments{
-\item{alternative}{character. The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
+\item{alternative}{Character. The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
 \item{h0}{Numeric scalar. Null rho correlation value. Must be between -0.8 and 0.8.}
 
-\item{ROPE}{Optional numeric vector or scalar specifying bounds for an interval null; used if interval Bayes factor is calculated.
-\itemize{
-\item For \code{alternative = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
-\item For \code{alternative = "greater"}, must be a single numeric scalar > 0.
-\item For \code{alternative = "less"}, must be a single numeric scalar < 0.
-}}
+\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
+null hypothesis. For \code{"two.sided"} this must be a numeric vector
+of length 2 with two distinct finite values; for \code{"greater"} a
+numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 
 \item{threshold}{Numeric scalar. Threshold of compelling evidence (numeric scalar > 1).}
 
@@ -44,8 +42,8 @@ BFpower.cor(
 
 \item{false_rate}{Numeric scalar. Targeted false positive rate (if \code{positive = "positive"}) or false negative rate (if \code{positive = "negative"}).}
 
-\item{prior_analysis}{character. Analysis prior under the alternative hypothesis:
-default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"Moment"}).}
+\item{prior_analysis}{Character. Analysis prior under the alternative hypothesis:
+default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment prior (\code{"Moment"}).}
 
 \item{k}{Numeric scalar. Parameter for the default beta prior (\code{"d_beta"}).}
 
@@ -53,9 +51,9 @@ default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"M
 
 \item{beta}{Numeric scalar. Parameter for the beta prior (\code{"beta"}).}
 
-\item{scale}{Numeric scalar. Scale parameter for the normal moment prior (\code{"Moment"}).}
+\item{scale}{Numeric scalar. Scale parameter for the normal-moment prior (\code{"Moment"}).}
 
-\item{prior_design}{character. Design prior  under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), normal moment (\code{"Moment"}), or point (\code{"Point"}).}
+\item{prior_design}{Character. Design prior  under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), normal-moment prior (\code{"Moment"}), or point (\code{"Point"}).}
 
 \item{alpha_d}{Numeric scalar. Parameter for the design beta prior (\code{"beta"}).}
 
@@ -65,11 +63,11 @@ default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal moment (\code{"M
 
 \item{k_d}{Numeric scalar. Parameter for the design default beta prior (\code{"d_beta"}).}
 
-\item{scale_d}{Numeric scalar. Scale parameter for the design normal moment prior (\code{"Moment"}).}
+\item{scale_d}{Numeric scalar. Scale parameter for the design normal-moment prior (\code{"Moment"}).}
 
 \item{N}{Numeric integer. Sample size. Only required if the goal is not sample size determination, but rather to calculate the probability of obtaining compelling or misleading evidence for a given sample size.}
 
-\item{type_rate}{character. Character indicating which rate to control: \code{"positive"} (true/false positive rates) or \code{"negative"} (true/false negative rates).}
+\item{type_rate}{Character. Character indicating which rate to control: \code{"positive"} (true/false positive rates) or \code{"negative"} (true/false negative rates).}
 }
 \value{
 A list of class \code{BFpower_r} containing:
@@ -129,7 +127,7 @@ A design prior can be supplied to reflect uncertainty about the correlation duri
 \item \code{Point}: \code{location_d} numeric scalar.
 }
 
-\strong{interval null Hypothesis:}
+\strong{Interval Null Hypothesis:}
 
 If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval null. Otherwise, a point-null hypothesis is assumed.
 }

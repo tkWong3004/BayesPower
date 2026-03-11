@@ -36,7 +36,10 @@ BF10.cor(
 
 \item{prior_analysis}{Character. Analysis prior: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"Moment"}).}
 
-\item{ROPE}{Numeric vector. Optional numeric vector specifying bounds for an interval null hypothesis. For \code{"two.sided"}, must be two distinct finite values between -0.5 and 0.5. For \code{"greater"} or \code{"less"}, must satisfy additional bounds relative to \code{h0}.}
+\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
+null hypothesis. For \code{"two.sided"} this must be a numeric vector
+of length 2 with two distinct finite values; for \code{"greater"} a
+numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 }
 \value{
 A list with class \code{"BFvalue_r"} containing:

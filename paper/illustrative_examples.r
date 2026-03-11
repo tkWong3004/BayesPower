@@ -58,7 +58,7 @@ var_d <- (n1 + n2) / (n1 * n2) + (d^2) / (2 * (n1 + n2))
 round(sqrt(var_d),3)
 
 # power analysis for future study
-results = BFpower.ttest.TwoSample(
+results <- BFpower.ttest.TwoSample(
   alternative = "two.sided",
   ROPE = c(-0.36, 0.36),
   threshold = 3,
@@ -99,14 +99,15 @@ BF10.cor(
 )
 
 # power analysis
-results = BFpower.cor(
+results <- BFpower.cor(
   alternative = "greater",
   h0 = 0,
   threshold = 3,
   true_rate = 0.8,
   false_rate = 0.05,
-  prior_analysis = "d_beta",
-  k = 1,
+  prior_analysis = "beta",
+  alpha = 1,
+  beta = 1,
   prior_design = "Point",
   location_d = 0.3
 )
@@ -114,7 +115,7 @@ print(results)
 plot(results, plot_power = TRUE, plot_rel = TRUE)
 
 #### Example 3 - ANOVA
-results = BFpower.f.test(
+results <- BFpower.f.test(
   threshold = 3,
   true_rate = 0.8,
   false_rate = 0.05,
@@ -142,7 +143,7 @@ BF10.bin.test(
   beta = 1
 )
 # power analysis
-results = BFpower.bin(
+results <- BFpower.bin(
   alternative = "greater",
   threshold = 3,
   true_rate = 0.8,
@@ -170,7 +171,7 @@ BF10.props(
   x2 = 150
 )
 # power analysis
-results = BFpower.props(
+results <- BFpower.props(
   threshold = 3,
   true_rate = 0.8,
   a0 = 1,

@@ -25,12 +25,10 @@ BFpower.ttest.OneSample(
 \arguments{
 \item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric vector. Bounds for an interval null hypothesis.
-\itemize{
-\item For \code{alternative "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
-\item For \code{"greater"}, must be a single numeric scalar > 0.
-\item For \code{"less"}, must be a single numeric scalar < 0.
-}}
+\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
+null hypothesis. For \code{"two.sided"} this must be a numeric vector
+of length 2 with two distinct finite values; for \code{"greater"} a
+numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 
 \item{prior_analysis}{Character. The analysis prior under the alternative hypothesis:
 \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.}
@@ -41,8 +39,8 @@ BFpower.ttest.OneSample(
 
 \item{dff}{Numeric scaler. Degrees of freedom for the analysis prior under the alternative hypothesis (required if \code{prior_analysis = "t-distribution"}).}
 
-\item{prior_design}{Optional character. The design prior under the alternative hypothesis:
-\code{"Normal"}, \code{"Moment"}, \code{"t-distribution"}, or \code{"Point"}.}
+\item{prior_design}{Optional Character. The design prior under the alternative hypothesis:
+\code{"Normal"}, \code{"Moment"} (normal-moment prior), \code{"t-distribution"}, or \code{"Point"}.}
 
 \item{location_d}{Numeric scaler. Location parameter for the design prior under the alternative hypothesis.}
 
@@ -61,15 +59,15 @@ BFpower.ttest.OneSample(
 \item{threshold}{Numeric scaler. Threshold of compelling evidence (must be > 1).}
 }
 \value{
-An object of class \code{BFpower_t} (a list) containing:
-\describe{
-\item{type}{Character, always "One-sample t-test".}
-\item{alternative}{Character, the direction of the alternative hypothesis.}
-\item{ROPE}{Optional numeric vector for interval null bounds.}
-\item{analysis_h1}{List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
-\item{design_h1}{List with the design prior parameters: \code{prior_design}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).}
-\item{results}{Data frame of probabilities: compelling/misleading evidence, or \code{NaN} if calculation fails.}
-\item{threshold}{Numeric, threshold of compelling evidence.}
+An object of class \code{BFpower_t} containing:
+\itemize{
+\item \code{type}: Character, always "One-sample t-test".
+\item \code{alternative}: Character, the direction of the alternative hypothesis.
+\item \code{ROPE}: Optional numeric vector for interval null bounds.
+\item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.
+\item \code{design_h1}: List with the design prior parameters: \code{prior_design}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).
+\item \code{results}: Data frame of probabilities: compelling/misleading evidence, or \code{NaN} if calculation fails.
+\item \code{threshold}: Numeric, threshold of compelling evidence.
 }
 }
 \description{
@@ -124,7 +122,7 @@ during study planning. If provided, the following must be supplied:
 \item \code{dff_d} - degrees of freedom for \code{"t-distribution"} design priors.
 }
 
-\strong{interval null Hypothesis:}
+\strong{Interval Null Hypothesis:}
 
 The argument \code{ROPE} specifies the bounds of an interval null hypothesis.
 If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval

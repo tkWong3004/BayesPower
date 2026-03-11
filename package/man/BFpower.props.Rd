@@ -67,17 +67,17 @@ BFpower.props(
 }
 \value{
 An object of class \code{BFpower} (a list) containing:
-\describe{
-\item{\code{type}}{Character, always \code{"Two-proportions"}.}
-\item{\code{analysis_h0}}{List of analysis prior parameters under the null, containing \code{a} and \code{b}.}
-\item{\code{analysis_h1_theta_1}}{List of analysis prior parameters for group 1 under the alternative, containing \code{a} and \code{b}.}
-\item{\code{analysis_h1_theta_2}}{List of analysis prior parameters for group 2 under the alternative, containing \code{a} and \code{b}.}
-\item{\code{design_h1_theta_1}}{List of design prior parameters for group 1 under the alternative, containing \code{prior}, \code{a}, \code{b}, and \code{p}.}
-\item{\code{design_h1_theta_2}}{List of design prior parameters for group 2 under the alternative, containing \code{prior}, \code{a}, \code{b}, and \code{p}.}
-\item{\code{results}}{Data frame of probabilities of compelling and misleading evidence.}
-\item{\code{grid}}{Grid used for computation.}
-\item{\code{threshold}}{Threshold of compelling evidence.}
-\item{\code{mode_bf}}{Character string specifying the mode (sample size determination or power calculation).}
+\itemize{
+\item \code{type}: Character, always \code{"Two-proportions"}.
+\item \code{analysis_h0}: List of analysis prior parameters under the null, containing \code{a} and \code{b}.
+\item \code{analysis_h1_theta_1}: List of analysis prior parameters for group 1 under the alternative, containing \code{a} and \code{b}.
+\item \code{analysis_h1_theta_2}: List of analysis prior parameters for group 2 under the alternative, containing \code{a} and \code{b}.
+\item \code{design_h1_theta_1}: List of design prior parameters for group 1 under the alternative, containing \code{prior}, \code{a}, \code{b}, and \code{p}.
+\item \code{design_h1_theta_2}: List of design prior parameters for group 2 under the alternative, containing \code{prior}, \code{a}, \code{b}, and \code{p}.
+\item \code{results}: Data frame of probabilities of compelling and misleading evidence.
+\item \code{grid}: Grid used for computation.
+\item \code{threshold}: Threshold of compelling evidence.
+\item \code{mode_bf}: Character string specifying the mode (sample size determination or power calculation).
 }
 }
 \description{

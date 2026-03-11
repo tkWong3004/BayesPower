@@ -70,14 +70,18 @@ Bayes factors are required).}
 }
 \value{
 A list of class \code{BFpower} containing:
-\describe{
-\item{\code{type}}{Test type (always "Regression/ANOVA").}
-\item{\code{k}, \code{p}}{Number of predictors in the full and reduced models.}
-\item{\code{ROPE}}{Bounds for interval null (if used).}
-\item{\code{analysis_h1}}{List containing the analysis prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff}.}
-\item{\code{design_h1}}{List containing the design prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff} (or \code{NULL} if not specified).}
-\item{\code{results}}{Data frame of probabilities of compelling/misleading evidence and the required or supplied sample size.}
-\item{\code{threshold}}{Threshold of compelling evidence.}
+\itemize{
+\item \code{type}: Test type (always "Regression/ANOVA").
+\item \code{k}, \code{p}: Number of predictors in the full and reduced models.
+\item \code{ROPE}: Bounds for interval null (if used).
+\item \code{analysis_h1}: List containing the analysis prior specification, including
+the prior distribution, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
+\item \code{design_h1}: List containing the design prior specification, including
+the prior distribution, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}
+(or \code{NULL} if not specified).
+\item \code{results}: Data frame of probabilities of compelling/misleading evidence and
+the required or supplied sample size.
+\item \code{threshold}: Threshold of compelling evidence.
 }
 If sample size determination fails, the function returns \code{NaN} and prints a message.
 }
@@ -120,7 +124,7 @@ The design prior under the alternative hypothesis can optionally be specified us
 \item \code{"Point"}: requires \code{f_m_d} only; \code{rscale_d} and \code{dff_d} are not used.
 }
 
-\strong{interval null Hypothesis:}
+\strong{Interval Null Hypothesis:}
 
 If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval null. Otherwise, a point-null hypothesis is assumed.
 }

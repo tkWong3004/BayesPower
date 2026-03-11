@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{A \code{"BFvalue"} object returned by one of the BF10 testing functions listed in Details.}
 
-\item{...}{Additional arguments passed to or from other methods (currently unused).}
+\item{...}{Additional arguments (currently unused; included for method consistency).}
 }
 \value{
 Invisibly returns the input \code{"BFvalue"} object.
@@ -26,7 +26,6 @@ by any of the following functions:
 \code{\link{BF10.props}}.
 }
 \examples{
-\donttest{
 result <- BF10.ttest.OneSample(
  tval = 2,
  df = 50,
@@ -35,6 +34,5 @@ result <- BF10.ttest.OneSample(
  scale = 0.707,
  dff = 1,
  alternative = "two.sided")
- print(result)
-}
+print(result)
 }

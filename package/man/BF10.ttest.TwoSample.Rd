@@ -34,27 +34,26 @@ BF10.ttest.TwoSample(
 
 \item{alternative}{Character. The direction of the alternative hypothesis two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric. Bounds for an interval null:
-\itemize{
-\item For \code{"two.sided"}, must be a numeric vector of length 2 with distinct finite values.
-\item For \code{"greater"}, must be a single numeric scalar > 0.
-\item For \code{"less"}, must be a single numeric scalar < 0.
-}}
+\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
+null hypothesis. For \code{"two.sided"} this must be a numeric vector
+of length 2 with two distinct finite values; for \code{"greater"} a
+numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 }
 \value{
 A list of class \code{BFvalue_t} containing:
-\describe{
-\item{type}{Character string describing the test type.}
-\item{bf10}{Computed Bayes factor BF10.}
-\item{tval}{Observed t-value.}
-\item{df}{Degrees of freedom (currently NA / not computed).}
-\item{analysis_h1}{List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
-\item{alternative}{Hypothesis tested (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).}
-\item{ROPE}{Interval bounds used, if any.}
-\item{N1}{Sample size of group 1 .}
-\item{N2}{Sample size of group 2 .}
-\item{d}{Numeric, observed Cohen's d.}
-\item{p.value}{Numeric, p.value.}
+\itemize{
+\item \code{type}: Character string describing the test type.
+\item \code{bf10}: Computed Bayes factor BF10.
+\item \code{tval}: Observed t-value.
+\item \code{df}: Degrees of freedom.
+\item \code{analysis_h1}: List with the analysis prior parameters:
+\code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.
+\item \code{alternative}: Hypothesis tested (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
+\item \code{ROPE}: Interval bounds used, if any.
+\item \code{N1}: Sample size of group 1.
+\item \code{N2}: Sample size of group 2.
+\item \code{d}: Numeric, observed Cohen's d.
+\item \code{p.value}: Numeric, p-value.
 }
 }
 \description{

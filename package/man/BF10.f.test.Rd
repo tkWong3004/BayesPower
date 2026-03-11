@@ -22,7 +22,7 @@ the alternative hypothesis. For the Moment prior, this must be \eqn{\ge 3}.}
 \item{f_m}{Numeric scalar. Cohen's f effect-size parameter for the
 analysis prior.}
 
-\item{prior_analysis}{character. Analysis prior under the
+\item{prior_analysis}{Character. Analysis prior under the
 alternative hypothesis. Must be either \code{"effectsize"} or
 \code{"Moment"}.}
 
@@ -31,13 +31,14 @@ null hypothesis. If provided, must be > 0.}
 }
 \value{
 A list of class \code{"BFvalue_f"} containing:
-\describe{
-\item{\code{fval}}{Input F-value.}
-\item{\code{df1}, \code{df2}}{Degrees of freedom.}
-\item{\code{ROPE}}{Interval bound (if specified).}
-\item{\code{analysis_h1}}{List containing the analysis prior specification, including the prior distribution, the scale \code{rscale}, f \code{f_m}, and degrees of freedom \code{dff}.}
-\item{\code{bf10}}{The computed Bayes factor.}
-\item{\code{p.value}}{p-value.}
+\itemize{
+\item \code{fval}: Input F-value.
+\item \code{df1}, \code{df2}: Degrees of freedom.
+\item \code{ROPE}: Interval bound (if specified).
+\item \code{analysis_h1}: List containing the analysis prior specification, including
+the prior distribution, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
+\item \code{bf10}: The computed Bayes factor.
+\item \code{p.value}: p-value.
 }
 }
 \description{

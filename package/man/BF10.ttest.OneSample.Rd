@@ -20,13 +20,9 @@ BF10.ttest.OneSample(
 
 \item{df}{Numeric scalar. Degrees of freedom of the t-test (must be >= 1).}
 
-\item{prior_analysis}{Character string. Statistical model for the analysis prior under the alternative hypothesis.
-Choices are:
-\describe{
-\item{"Normal"}{Normal distribution.}
-\item{"Moment"}{Normal moment prior.}
-\item{"t-distribution"}{Scaled t-distribution.}
-}}
+\item{prior_analysis}{Character. Analysis prior under the
+alternative hypothesis. Must be either \code{"Normal"} (normal distribution),
+\code{"Moment"} (normal-moment prior), or \code{"t-distribution"} (t-distribution).}
 
 \item{location}{Numeric scalar. Location parameter for the analysis prior under the alternative hypothesis.}
 
@@ -34,32 +30,26 @@ Choices are:
 
 \item{dff}{Numeric scalar. Degrees of freedom for the t-distribution prior (only required if \code{prior_analysis = "t-distribution"}; must be > 0). Ignored otherwise.}
 
-\item{alternative}{Character string. The direction of the alternative hypothesis. One of:
-\describe{
-\item{"two.sided"}{Two-sided (difference from 0).}
-\item{"greater"}{Right-sided (greater than 0).}
-\item{"less"}{Left-sided (less than 0).}
-}}
+\item{alternative}{Character. The direction of the alternative hypothesis two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric vector. Specifies bounds for an interval null hypothesis. For:
-\describe{
-\item{Two-sided (\code{"two.sided"})}{Must be a numeric vector of length 2 with two distinct finite values.}
-\item{Right-sided (\code{"greater"})}{Must be a numeric scalar > 0.}
-\item{Left-sided (\code{"less"})}{Must be a numeric scalar < 0.}
-}}
+\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
+null hypothesis. For \code{"two.sided"} this must be a numeric vector
+of length 2 with two distinct finite values; for \code{"greater"} a
+numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 }
 \value{
-A list of class \code{BFvalue_t} containing:
-\describe{
-\item{type}{Character, indicating "One-sample t-test".}
-\item{bf10}{Numeric, the Bayes factor (BF10).}
-\item{tval}{Observed t-value.}
-\item{df}{Degrees of freedom.}
-\item{analysis_h1}{List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.}
-\item{alternative}{Character, the direction of the alternative hypothesis.}
-\item{ROPE}{Optional numeric vector of interval null bounds.}
-\item{d}{Numeric, observed Cohen's d.}
-\item{p.value}{Numeric, p.value.}
+An object of class \code{"BFvalue_t"} containing:
+\itemize{
+\item \code{type}: Character indicating "One-sample t-test".
+\item \code{bf10}: Numeric, the Bayes factor (BF10).
+\item \code{tval}: Observed t-value.
+\item \code{df}: Degrees of freedom.
+\item \code{analysis_h1}: List with the analysis prior parameters:
+\code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.
+\item \code{alternative}: Character, the direction of the alternative hypothesis.
+\item \code{ROPE}: Optional numeric vector of interval null bounds.
+\item \code{d}: Numeric, observed Cohen's d.
+\item \code{p.value}: Numeric, p-value.
 }
 }
 \description{

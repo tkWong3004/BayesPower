@@ -81,7 +81,7 @@ show_t1_code <- function(x) {
   ## Final code
   ## -----------------------------
   code <- paste0(
-    "results = BFpower.ttest.OneSample(\n",
+    "results <- BFpower.ttest.OneSample(\n",
     paste(code_lines, collapse = "\n"),
     "\n)\n",
     "print(results)\n",
@@ -184,7 +184,7 @@ show_t2_code <- function(x) {
   ## Final code
   ## -----------------------------
   code <- paste0(
-    "results = BFpower.ttest.TwoSample(\n",
+    "results <- BFpower.ttest.TwoSample(\n",
     paste(code_lines, collapse = "\n"),
     "\n)\n",
     "print(results)\n",
@@ -289,7 +289,7 @@ show_cor_code <- function(x) {
   ## Final code
   ## -----------------------------
   code <- paste0(
-    "results = BFpower.cor(\n",
+    "results <- BFpower.cor(\n",
     paste(code_lines, collapse = "\n"),
     "\n)\n",
     "print(results)\n",
@@ -386,7 +386,7 @@ show_f_code <- function(x) {
 
   # ----- Final code -----
   code <- paste0(
-    "results = BFpower.f.test(\n",
+    "results <- BFpower.f.test(\n",
     paste(code_lines, collapse = "\n"),
     "\n)\n",
     "print(results)\n",
@@ -489,7 +489,7 @@ show_bin_code <- function(x) {
 
   # ----- Final code -----
   code <- paste0(
-    "results = BFpower.bin(\n",
+    "results <- BFpower.bin(\n",
     paste(code_lines, collapse = "\n"),
     "\n)\n",
     "print(results)\n",
@@ -592,7 +592,7 @@ show_props_code <- function(x) {
 
   # ----- Final code -----
   code <- paste0(
-    "results = BFpower.props(\n",
+    "results <- BFpower.props(\n",
     paste(code_lines, collapse = "\n"),
     "\n)\n",
     "print(results)\n",

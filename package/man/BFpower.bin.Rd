@@ -35,7 +35,7 @@ BFpower.bin(
 
 \item{false_rate}{Numeric scalar. Targeted false positive rate  or false negative rate .}
 
-\item{prior_analysis}{Character. Analysis prior under the alternative hypothesis: \code{"beta"} or \code{"Moment"}.}
+\item{prior_analysis}{Character. Analysis prior under the alternative hypothesis: \code{"beta"} or \code{"Moment"} (normal-moment prior).}
 
 \item{alpha}{Numeric scalar. Parameter for the analysis beta prior (used when \code{prior_analysis = "beta"}).}
 
@@ -43,7 +43,7 @@ BFpower.bin(
 
 \item{scale}{Numeric scalar. Scale parameter for the analysis moment prior (used when \code{prior_analysis = "Moment"}).}
 
-\item{prior_design}{Character. Design prior under the alternative hypothesis: \code{"beta"}, \code{"Moment"}, or \code{"Point"}.}
+\item{prior_design}{Character. Design prior under the alternative hypothesis: \code{"beta"}, \code{"Moment"}(normal-moment prior), or \code{"Point"}.}
 
 \item{alpha_d}{Numeric scalar. Parameter for the design beta prior (used when \code{prior_design = "beta"}).}
 
@@ -55,12 +55,10 @@ BFpower.bin(
 
 \item{N}{Numeric integer. Sample size. If \code{NULL}, sample size determination is performed.}
 
-\item{ROPE}{Numeric vector. Numeric bounds for the interval null (used when computing interval Bayes factors).
-\itemize{
-\item For \code{"alterative" = "two.sided"}, must be a numeric vector of length 2 with distinct finite values.
-\item For \code{"greater"}, must be a single numeric scalar > 0.
-\item For \code{"less"}, must be a single numeric scalar < 0.
-}}
+\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
+null hypothesis. For \code{"two.sided"} this must be a numeric vector
+of length 2 with two distinct finite values; for \code{"greater"} a
+numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 
 \item{type_rate}{Character. Either \code{"positive"} (controls true/false positive rates) or \code{"negative"} (controls true/false negative rates).}
 }
@@ -118,7 +116,7 @@ The design prior under the alternative hypothesis can optionally be specified us
 }
 If \code{prior_design} is \code{NULL}, no design prior is used.
 
-\strong{interval null Hypothesis:}
+\strong{Interval Null Hypothesis:}
 
 If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval null. Otherwise, a point-null hypothesis is assumed.
 

@@ -6416,7 +6416,7 @@ p2_prior_plot <- function(a, b, ad, bd, dp, prior_analysis, nu) {
     ) +
     ggplot2::theme_minimal(base_size = 14) +
     ggplot2::theme(
-      legend.position = c(0.75, 0.95),
+      legend.position = c(0.65, 0.95),
       legend.justification = c(0, 1),
       legend.title = ggplot2::element_blank(),
       panel.grid = ggplot2::element_blank()
@@ -7853,6 +7853,20 @@ server_p2<- function(input, output, session) {
       nrow = 2,
       byrow = TRUE
     )
+
+
+    # Render priors
+    output$prior_p0 <- shiny::renderPlot({
+      p2_prior_plot(p2$a0, p2$b0, 1, 1, 0, "same", 0)
+    })
+    output$prior_p1 <- shiny::renderPlot({
+      p2_prior_plot(p2$a1, p2$b1, p2$a1d, p2$b1d, p2$dp1, p2$prior_design_1, 1)
+    })
+    output$prior_p2 <- shiny::renderPlot({
+      p2_prior_plot(p2$a2, p2$b2, p2$a2d, p2$b2d, p2$dp2, p2$prior_design_2, 2)
+    })
+
+
     results <-stats::fisher.test(tab)
     output$BFp2 <- shiny::renderUI({
       # Create the LaTeX formatted strings for the table
