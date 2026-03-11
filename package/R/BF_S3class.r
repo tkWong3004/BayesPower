@@ -460,7 +460,7 @@ print.BFvalue <- function(x, ...) {
 #' This plot method can return up to three plots based on the information
 #' from the \code{"BFpower"} object:
 #'   \itemize{
-#'     \item The first plot displays the analysis prior and the design prior.
+#'     \item The first plot displays the analysis prior and the design prior. However, for \code{\link{BFpower.props}}, three plots are returned, corresponding to the three thetas.
 #'     \item The second plot contains two panels where the left panel shows the
 #'       true and false positive rates as a function of sample size, and the
 #'       right panel shows the true and false negative rates.
@@ -760,11 +760,11 @@ plot.BFpower <- function(x, plot_power = FALSE, plot_rel = FALSE,...) {
 
          "Two-proportions" = {
            # Prior plotting
-           plots$prior1 <- p2_prior_plot(x$analysis_h0$a, x$analysis_h0$b, 1, 1, 0, "same", 0)
-           plots$prior2 <- p2_prior_plot(x$analysis_h1_theta_1$a, x$analysis_h1_theta_1$b,
+           plots$prior0 <- p2_prior_plot(x$analysis_h0$a, x$analysis_h0$b, 1, 1, 0, "same", 0)
+           plots$prior1 <- p2_prior_plot(x$analysis_h1_theta_1$a, x$analysis_h1_theta_1$b,
                                          x$design_h1_theta_1$a, x$design_h1_theta_1$b,
                                          x$design_h1_theta_1$p, x$design_h1_theta_1$prior, 1)
-           plots$prior3 <- p2_prior_plot(x$analysis_h1_theta_2$a, x$analysis_h1_theta_2$b,
+           plots$prior2 <- p2_prior_plot(x$analysis_h1_theta_2$a, x$analysis_h1_theta_2$b,
                                          x$design_h1_theta_2$a, x$design_h1_theta_2$b,
                                          x$design_h1_theta_2$p, x$design_h1_theta_2$prior, 2)
 
@@ -789,7 +789,14 @@ plot.BFpower <- function(x, plot_power = FALSE, plot_rel = FALSE,...) {
   )
 
   # Always print the first plot
-  print(plots$prior)
+  if(x$type != "Two-proportions"){
+    print(plots$prior)
+    } else{
+    print(plots$prior0)
+    print(plots$prior1)
+    print(plots$prior2)
+
+  }
 
   # Conditionally print the other plots
   if(plot_power) print(plots$power)

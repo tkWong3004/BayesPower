@@ -25,7 +25,7 @@ Visualizes a \code{"BFpower"} object.
 This plot method can return up to three plots based on the information
 from the \code{"BFpower"} object:
 \itemize{
-\item The first plot displays the analysis prior and the design prior.
+\item The first plot displays the analysis prior and the design prior. However, for \code{\link{BFpower.props}}, three plots are returned, corresponding to the three thetas.
 \item The second plot contains two panels where the left panel shows the
 true and false positive rates as a function of sample size, and the
 right panel shows the true and false negative rates.
