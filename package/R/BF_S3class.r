@@ -788,8 +788,12 @@ plot.BFpower <- function(x, plot_power = FALSE, plot_rel = FALSE,...) {
 
   )
 
-  plots$prior
-  if(plot_power) plots$power
-  if(plot_rel) plots$relative
+  # Always print the first plot
+  print(plots$prior)
+
+  # Conditionally print the other plots
+  if(plot_power) print(plots$power)
+  if(plot_rel) print(plots$relative)
+
   return(invisible(plots))
 }
