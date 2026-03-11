@@ -887,7 +887,7 @@ prior_plot_fe <- function(q, dff, rscale, f_m, prior_analysis,
                        ggplot2::aes(x = fsq, y = Density,
                                     color = Prior,
                                     linetype = Prior,
-                                    size = Prior)) +
+                                    linewidth = Prior)) +
     ggplot2::scale_color_manual(values = c(
       "H1 - Analysis Prior" = "black",
       "H0 - Analysis Prior" = "black",
@@ -933,7 +933,7 @@ prior_plot_fe <- function(q, dff, rscale, f_m, prior_analysis,
       ggplot2::aes(x = fsq, y = Density,
                    color = Prior,
                    linetype = Prior,
-                   size = Prior)
+                   linewidth = Prior)
     )
   }
 
@@ -949,7 +949,7 @@ prior_plot_fe <- function(q, dff, rscale, f_m, prior_analysis,
                          ggplot2::aes(x = fsq, y = Density,
                                       color = Prior,
                                       linetype = Prior,
-                                      size = Prior),
+                                      linewidth = Prior),
                          na.rm = TRUE) +
       ggplot2::geom_segment(
         ggplot2::aes(x = f_m_d, xend = f_m_d,
@@ -2937,7 +2937,7 @@ bin_e_prior_plot <- function(h0,
                    y = Density,
                    color = Prior,
                    linetype = Prior,
-                   size = Prior)
+                   linewidth = Prior)
     ) +
     ggplot2::scale_color_manual(values = c(
       "H1 - Analysis Prior" = "black",
@@ -2993,7 +2993,7 @@ bin_e_prior_plot <- function(h0,
                      y = Density,
                      color = Prior,
                      linetype = Prior,
-                     size = Prior)
+                     linewidth = Prior)
       )
   }
 
@@ -3016,7 +3016,7 @@ bin_e_prior_plot <- function(h0,
                      y = Density,
                      color = Prior,
                      linetype = Prior,
-                     size = Prior),
+                     linewidth = Prior),
         na.rm = TRUE,
         show.legend = TRUE
       ) +
@@ -4481,7 +4481,7 @@ re_prior_plot <- function(k, alpha, beta, h0,
                                     y = Density,
                                     color = Prior,
                                     linetype = Prior,
-                                    size = Prior)) +
+                                    linewidth = Prior)) +
     ggplot2::geom_line(na.rm = TRUE) +
     ggplot2::scale_color_manual(values = c(
       "H1 - Analysis Prior" = "black",
@@ -4532,7 +4532,7 @@ re_prior_plot <- function(k, alpha, beta, h0,
                          ggplot2::aes(x = rr, y = Density,
                                       color = Prior,
                                       linetype = Prior,
-                                      size = Prior),
+                                      linewidth = Prior),
                          na.rm = TRUE,
                          show.legend = TRUE) +
       ggplot2::annotate("segment",
@@ -6036,7 +6036,7 @@ t1e_prior_plot <- function(prior_analysis, location, scale, dff, alternative, RO
     df_dummy <- data.frame(tt = c(NA, NA), Density = c(NA, NA), Prior = "H1 - Design Prior")
     p <- p +
       ggplot2::geom_line(data = df_dummy,
-                         ggplot2::aes(x = tt, y = Density, color = Prior, linetype = Prior, size = Prior),
+                         ggplot2::aes(x = tt, y = Density, color = Prior, linetype = Prior, linewidth = Prior),
                          na.rm = TRUE, show.legend = TRUE) +
       # vertical arrow
       ggplot2::geom_segment(ggplot2::aes(x = location_d, xend = location_d, y = 0, yend = ylim_max),
@@ -7613,8 +7613,8 @@ server_p2<- function(input, output, session) {
     de_an_prior<-input$priorp2
     threshold <- input$threshold_p2
 
-    n1 <- input$n1p2
-    n2 <- input$n2p2
+    N1 <- input$n1p2
+    N2 <- input$n2p2
 
     x1 <- input$x1p2
     x2 <- input$x2p2
@@ -7643,8 +7643,8 @@ server_p2<- function(input, output, session) {
       dp1 = dp1,
       dp2 = dp2,
       threshold = threshold,
-      n1 = round(n1),
-      n2 = round(n2),
+      N1 = round(N1),
+      N2 = round(N2),
       k1 = round(x1),
       k2 = round(x2),
       true_rate = true_rate,
@@ -7668,7 +7668,7 @@ server_p2<- function(input, output, session) {
       p2$a1, p2$b1, p2$a2, p2$b2, p2$r,
       p2$prior_design_1, p2$a1d, p2$b1d, p2$dp1,
       p2$prior_design_2, p2$a2d, p2$b2d, p2$dp2,
-      p2$mode_bf, p2$n1, p2$n2, p2$type_rate
+      p2$mode_bf, p2$N1, p2$N2, p2$type_rate
     )}, error = function(e) {
       "Error"
     })
@@ -7846,10 +7846,10 @@ server_p2<- function(input, output, session) {
 
   shiny::observeEvent(input$calp2, {
     p2 = input_p2()
-    BF10 <- BF10_p2(p2$a0, p2$b0, p2$a1, p2$b1, p2$a2, p2$b2,p2$n1,p2$n2,p2$k1,p2$k2)
+    BF10 <- BF10_p2(p2$a0, p2$b0, p2$a1, p2$b1, p2$a2, p2$b2,p2$N1,p2$N2,p2$k1,p2$k2)
     tab <- matrix(
-      c(p2$k1, p2$n1 - p2$k1,
-        p2$k2, p2$n2 - p2$k2),
+      c(p2$k1, p2$N1 - p2$k1,
+        p2$k2, p2$N2 - p2$k2),
       nrow = 2,
       byrow = TRUE
     )
@@ -7871,8 +7871,8 @@ server_p2<- function(input, output, session) {
     output$BFp2 <- shiny::renderUI({
       # Create the LaTeX formatted strings for the table
       table_html <- paste0(
-        'n_1 = ', p2$n1, ', ',
-        'n_2 = ', p2$n2, ', ',
+        'n_1 = ', p2$N1, ', ',
+        'n_2 = ', p2$N2, ', ',
         'x_1 = ', p2$k1, ', ',
         'x_2 = ', p2$k2, ' \\\\ ',
         '\\textit{Odd Ratio = }',round(results$estimate,4),', \\textit{p} = ',round(results$p.value,4),' \\\\ ',
@@ -7891,8 +7891,8 @@ server_p2<- function(input, output, session) {
           b1 = p2$b1,
           a2 = p2$a2,
           b2 = p2$b2,
-          n1 = p2$n1,
-          n2 = p2$n2,
+          N1 = p2$N1,
+          N2 = p2$N2,
           x1 = p2$k1,
           x2 = p2$k2
         )

@@ -4,7 +4,7 @@
 \alias{BF10.props}
 \title{Bayes Factor for Comparing Two Proportions}
 \usage{
-BF10.props(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)
+BF10.props(a0, b0, a1, b1, a2, b2, N1, N2, x1, x2)
 }
 \arguments{
 \item{a0}{Numeric scalar. Alpha parameter of the Beta prior under the null hypothesis.}
@@ -19,9 +19,9 @@ BF10.props(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)
 
 \item{b2}{Numeric scalar. Beta parameter of the Beta prior for group 2 under the alternative hypothesis.}
 
-\item{n1}{Numeric integer. Sample size for group 1.}
+\item{N1}{Numeric integer. Sample size for group 1.}
 
-\item{n2}{Numeric integer. Sample size for group 2.}
+\item{N2}{Numeric integer. Sample size for group 2.}
 
 \item{x1}{Numeric integer. Number of successes observed in group 1.}
 
@@ -35,7 +35,7 @@ A list of class \code{BFvalue_2p} containing:
 \item \code{analysis_h1_theta_1}: list with \code{a} and \code{b} for group 1 prior under H1.
 \item \code{analysis_h1_theta_2}: list with \code{a} and \code{b} for group 2 prior under H1.
 \item \code{bf10}: the computed Bayes factor (BF10).
-\item \code{n1}, \code{x1}, \code{n2}, \code{x2}: the input sample sizes and observed successes.
+\item \code{N1}, \code{x1}, \code{N2}, \code{x2}: the input sample sizes and observed successes.
 \item \code{OddRatio}: observed odd ratio.
 \item \code{p.value}: p.value.
 }
@@ -51,8 +51,8 @@ a1 = 1,
 b1 = 1,
 a2 = 1,
 b2 = 1,
-n1 = 493,
-n2 = 488,
+N1 = 493,
+N2 = 488,
 x1 = 155,
 x2 = 150)
 }

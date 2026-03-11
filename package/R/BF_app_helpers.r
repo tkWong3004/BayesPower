@@ -507,7 +507,7 @@ show_props_code <- function(x) {
     "threshold", "true_rate", "a0", "b0",
     "prior_design_1","a1", "b1", "a2", "b2",
     "prior_design_2", "a1d", "b1d", "dp1", "a2d", "b2d", "dp2",
-    "mode_bf", "n1", "n2", "type_rate"   # removed pc/rela
+    "mode_bf", "N1", "N2", "type_rate"   # removed pc/rela
   )
 
   code_lines <- sapply(args, function(arg) {

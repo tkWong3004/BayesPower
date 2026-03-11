@@ -174,8 +174,10 @@ print.BFpower <- function(x, ...) {
   if (x$type != "Two-proportions") {
     # H0
     print_prior(x$analysis_h1, effect_size, H0, type = "analysis")
+
     # H1
     print_prior(x$analysis_h1, effect_size, H1, type = "analysis")
+
     if (is.null(x$design_h1$prior)){ print_prior(x$analysis_h1, effect_size, H1, type = "design")} else{
       print_prior(x$design_h1, effect_size, H1, type = "design")
     }
@@ -184,17 +186,31 @@ print.BFpower <- function(x, ...) {
     theta0 <- paste0(theta, sub0); theta1 <- paste0(theta, sub1); theta2 <- paste0(theta, sub2)
     cat("Analysis/design prior under H", sub0, "\n  ", theta0, " ~ Beta(alpha = ", x$analysis_h0$a, ", beta = ", x$analysis_h0$b, ")\n", sep = "")
     cat("Analysis prior under H", sub1, "\n  ", theta1, " ~ Beta(alpha = ", x$analysis_h1_theta_1$a, ", beta = ", x$analysis_h1_theta_1$b, ")\n  ", theta2, " ~ Beta(alpha = ", x$analysis_h1_theta_2$a, ", beta = ", x$analysis_h1_theta_2$b, ")\n", sep = "")
+
+
     cat("Design prior under H", sub1, "\n", sep = "")
     if (x$design_h1_theta_1$prior == "same") {
       cat("  ", theta1, " ~ Beta(alpha = ", x$analysis_h1_theta_1$a, ", beta = ", x$analysis_h1_theta_2$b, ")\n", sep = "")
+    }
+    if (x$design_h1_theta_2$prior == "same") {
       cat("  ", theta2, " ~ Beta(alpha = ", x$analysis_h1_theta_2$a, ", beta = ", x$analysis_h1_theta_2$b, ")\n", sep = "")
-    } else if (x$design_h1_theta_1$prior == "beta") {
+    }
+    if (x$design_h1_theta_1$prior == "beta") {
       cat("  ", theta1, " ~ Beta(alpha = ", x$design_h1_theta_1$a, ", beta = ", x$design_h1_theta_1$b, ")\n", sep = "")
+
+    }
+    if (x$design_h1_theta_2$prior == "beta") {
       cat("  ", theta2, " ~ Beta(alpha = ", x$design_h1_theta_2$a, ", beta = ", x$design_h1_theta_2$b, ")\n", sep = "")
-    } else if (x$design_h1_theta_1$prior == "Point") {
+
+    }
+    if (x$design_h1_theta_1$prior == "Point") {
       cat("  ", theta1, " = ", x$design_h1_theta_1$p, "\n", sep = "")
+
+    }
+    if (x$design_h1_theta_2$prior == "Point") {
       cat("  ", theta2, " = ", x$design_h1_theta_2$p, "\n", sep = "")
     }
+
   }
 
   cat(line, "Results:\n", line, sep = "")
@@ -438,8 +454,8 @@ print.BFvalue <- function(x, ...) {
   # Two-proportions special case
   if (x$type == "Two-proportions") {
     cat(
-      "  n", sub1, " = ", x$n1, ", x", sub1, " = ", x$x1,
-      ", n", sub2, " = ", x$n2, ", x", sub2, " = ", x$x2,
+      "  n", sub1, " = ", x$N1, ", x", sub1, " = ", x$x1,
+      ", n", sub2, " = ", x$N2, ", x", sub2, " = ", x$x2,
       ",\n  Odds Ratio = ", x$OddRatio,
       ", p = ", x$p.value, "\n", sep = ""
     )
@@ -725,8 +741,8 @@ plot.BFpower <- function(x, plot_power = FALSE, plot_rel = FALSE,...) {
                  x$threshold, x$h0, x$analysis_h1$alpha, x$analysis_h1$beta,
                  x$h0, x$analysis_h1$scale, x$analysis_h1$prior,
                  x$alternative,
-                 x$design_h1$alpha_d, x$design_h1$beta_d, x$design_h1$location_d,
-                 x$design_h1$scale_d, x$design_h1$prior_d, de_an_prior,
+                 x$design_h1$alpha, x$design_h1$beta, x$design_h1$location,
+                 x$design_h1$scale, x$design_h1$prior, de_an_prior,
                  unlist(x$results[1,5])
                )
              } else {
@@ -734,8 +750,8 @@ plot.BFpower <- function(x, plot_power = FALSE, plot_rel = FALSE,...) {
                  x$threshold, x$h0, x$analysis_h1$alpha, x$analysis_h1$beta,
                  x$h0, x$analysis_h1$scale, x$analysis_h1$prior,
                  x$alternative,
-                 x$design_h1$alpha_d, x$design_h1$beta_d, x$design_h1$location_d,
-                 x$design_h1$scale_d, x$design_h1$prior_d, de_an_prior,
+                 x$design_h1$alpha, x$design_h1$beta, x$design_h1$location,
+                 x$design_h1$scale, x$design_h1$prior, de_an_prior,
                  unlist(x$results[1,5]), x$ROPE
                )
              }

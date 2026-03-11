@@ -21,8 +21,8 @@ BFpower.props(
   a2d,
   b2d,
   dp2,
-  n1 = NULL,
-  n2 = NULL,
+  N1 = NULL,
+  N2 = NULL,
   type_rate = "positive"
 )
 }
@@ -59,9 +59,9 @@ BFpower.props(
 
 \item{dp2}{Numeric scalar. True proportion for group 2 in the design prior (used if \code{model2 = "Point"}).}
 
-\item{n1}{Numeric integer. Sample size for group 1.}
+\item{N1}{Numeric integer. Sample size for group 1.}
 
-\item{n2}{Numeric integer. Sample size for group 2.}
+\item{N2}{Numeric integer. Sample size for group 2.}
 
 \item{type_rate}{Character. Choose \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.}
 }
@@ -85,7 +85,7 @@ Perform sample size determination or calculate probabilities of compelling and m
 for a Bayesian comparison of two proportions.
 }
 \details{
-\strong{1. Sample size determination mode (when \code{n1 = NULL} and \code{n2 = NULL}):}
+\strong{1. Sample size determination mode (when \code{N1 = NULL} and \code{N2 = NULL}):}
 
 If no sample sizes are provided for the two groups, the function calculates the minimum sample sizes needed to achieve the desired configuration. The user must provide:
 \itemize{
@@ -96,9 +96,9 @@ If no sample sizes are provided for the two groups, the function calculates the 
 
 The function iteratively finds the smallest sample sizes for which the probability of obtaining compelling evidence meets or exceeds \code{true_rate}.
 
-\strong{2. Fixed-sample analysis mode (when \code{n1} and \code{n2} are supplied):}
+\strong{2. Fixed-sample analysis mode (when \code{N1} and \code{N2} are supplied):}
 
-If positive numeric sample sizes \code{n1} and \code{n2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for these fixed sample sizes. In this mode, \code{type_rate} and \code{true_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
+If positive numeric sample sizes \code{N1} and \code{N2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for these fixed sample sizes. In this mode, \code{type_rate} and \code{true_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
 
 \strong{Model specification:}
 

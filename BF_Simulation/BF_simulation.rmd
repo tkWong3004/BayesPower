@@ -1562,8 +1562,8 @@ results <- BFpower.props(
   a1d            =  a1d, b1d = b1d, dp1 = dp1,
   prior_design_2 = prior_design_2,
   a2d            = a2d,  b2d = b2d, dp2 = dp2,
-  n1             = 50, # setting n1 and n2 to a scalar so that it calculates power for this sample size 
-  n2             = 50 
+  N1             = 50, # setting n1 and n2 to a scalar so that it calculates power for this sample size 
+  N2             = 50 
 )
 
 ```
@@ -1649,8 +1649,8 @@ Based on the simulated theta under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prio
   a1d            = a1d, b1d = b1d, dp1 = dp1,
   prior_design_2 = prior_design_2,
   a2d            = a2d, b2d = b2d, dp2 = dp2,
-  n1             = n1,
-  n2             = n2)
+  N1             = n1,
+  N2             = n2)
  
  numeric_ones[i,] <-  c(numeric_results$results[[1]],
                         numeric_results$results[[4]],

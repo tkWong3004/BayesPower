@@ -205,7 +205,9 @@ BFpower.ttest.OneSample <- function(
     } else {
       dff_d <- 0
     }
-
+    if (prior_design == "Point") {
+      scale_d <- 0
+    }
   } else {
     de_an_prior <- 1
   }
@@ -541,6 +543,14 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
     } else {
       dff_d <- 0
     }
+
+
+    # fix scale_d to NULL for point design prior
+    if ( prior_design == "Point"){
+      scale_d <-0
+
+    }
+
 
   } else {
     de_an_prior <- 1
@@ -1691,12 +1701,12 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
 #' @param a2d Numeric scalar. Alpha parameter of the design prior for group 2 (used if \code{model2 = "beta"}).
 #' @param b2d Numeric scalar. Beta parameter of the design prior for group 2 (used if \code{model2 = "beta"}).
 #' @param dp2 Numeric scalar. True proportion for group 2 in the design prior (used if \code{model2 = "Point"}).
-#' @param n1 Numeric integer. Sample size for group 1.
-#' @param n2 Numeric integer. Sample size for group 2.
+#' @param N1 Numeric integer. Sample size for group 1.
+#' @param N2 Numeric integer. Sample size for group 2.
 #' @param type_rate Character. Choose \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.
 #' @details
 #'
-#' \strong{1. Sample size determination mode (when \code{n1 = NULL} and \code{n2 = NULL}):}
+#' \strong{1. Sample size determination mode (when \code{N1 = NULL} and \code{N2 = NULL}):}
 #'
 #' If no sample sizes are provided for the two groups, the function calculates the minimum sample sizes needed to achieve the desired configuration. The user must provide:
 #' \itemize{
@@ -1707,9 +1717,9 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
 #'
 #' The function iteratively finds the smallest sample sizes for which the probability of obtaining compelling evidence meets or exceeds \code{true_rate}.
 #'
-#' \strong{2. Fixed-sample analysis mode (when \code{n1} and \code{n2} are supplied):}
+#' \strong{2. Fixed-sample analysis mode (when \code{N1} and \code{N2} are supplied):}
 #'
-#' If positive numeric sample sizes \code{n1} and \code{n2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for these fixed sample sizes. In this mode, \code{type_rate} and \code{true_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
+#' If positive numeric sample sizes \code{N1} and \code{N2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for these fixed sample sizes. In this mode, \code{type_rate} and \code{true_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
 #'
 #' \strong{Model specification:}
 #'
@@ -1756,18 +1766,18 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
                           a2 , b2 , prior_design_1 = "same",
                           a1d , b1d , dp1 , prior_design_2 = "same",
                           a2d, b2d , dp2 ,
-                          n1 = NULL, n2 = NULL,type_rate="positive") {
+                          N1 = NULL, N2 = NULL,type_rate="positive") {
 
   # Check NULL
-  if (is.null(n1) && is.null(n2)) {
+  if (is.null(N1) && is.null(N2)) {
     mode_bf <- 1
     r       <- 1
   } else {
     mode_bf <- 0
-    r       <- n2/n1
+    r       <- N2/N1
   }
 
-  # If both n1 and n2 are NULL > mode_bf = 1
+  # If both N1 and N2 are NULL > mode_bf = 1
   # If mode_bf = 1, check target range
   if (mode_bf==1){
     if (!(type_rate %in% c("positive", "negative"))) {
@@ -1790,14 +1800,14 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
   # If not NULL, check numeric, scalar, integer
   if (mode_bf == 0) {
 
-    # Check n1
-    if (!is.numeric(n1) || length(n1) != 1 || n1 %% 1 != 0 || n1 <= 0) {
-      stop("arg [n1] sample size for group 1 must be a positive numeric scalar integer (> 0).")
+    # Check N1
+    if (!is.numeric(N1) || length(N1) != 1 || N1 %% 1 != 0 || N1 <= 0) {
+      stop("arg [N1] sample size for group 1 must be a positive numeric scalar integer (> 0).")
     }
 
-    # Check n2
-    if (!is.numeric(n2) || length(n2) != 1 || n2 %% 1 != 0 || n2 <= 0) {
-      stop("arg [n2] sample size for group 2 must be a positive numeric scalar integer (> 0).")
+    # Check N2
+    if (!is.numeric(N2) || length(N2) != 1 || N2 %% 1 != 0 || N2 <= 0) {
+      stop("arg [N2] sample size for group 2 must be a positive numeric scalar integer (> 0).")
     }
   }
 
@@ -1839,7 +1849,7 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
 
   if (prior_design_1 == "same") {
 
-    # Automatically set all to NULL
+    # Automatically set all to default values as these are irrelevant
     a1d <- 1
     b1d <- 1
     dp1 <- 0.5
@@ -1920,7 +1930,7 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
   results=tryCatch({
     suppressWarnings({
       pro_table_p2(threshold, true_rate, a0, b0, a1, b1, a2, b2, r, prior_design_1,
-                   a1d, b1d, dp1, prior_design_2, a2d, b2d, dp2, mode_bf, n1, n2, type_rate)
+                   a1d, b1d, dp1, prior_design_2, a2d, b2d, dp2, mode_bf, N1, N2, type_rate)
     })
   }, error = function(e) {
     message("Required Sample size > 5000 per group")
@@ -2738,8 +2748,8 @@ BF10.bin.test <- function(x, n, alpha, beta, h0, scale, prior_analysis, alternat
 #' @param b1 Numeric scalar. Beta parameter of the Beta prior for group 1 under the alternative hypothesis.
 #' @param a2 Numeric scalar. Alpha parameter of the Beta prior for group 2 under the alternative hypothesis.
 #' @param b2 Numeric scalar. Beta parameter of the Beta prior for group 2 under the alternative hypothesis.
-#' @param n1 Numeric integer. Sample size for group 1.
-#' @param n2 Numeric integer. Sample size for group 2.
+#' @param N1 Numeric integer. Sample size for group 1.
+#' @param N2 Numeric integer. Sample size for group 2.
 #' @param x1 Numeric integer. Number of successes observed in group 1.
 #' @param x2 Numeric integer. Number of successes observed in group 2.
 #'
@@ -2750,7 +2760,7 @@ BF10.bin.test <- function(x, n, alpha, beta, h0, scale, prior_analysis, alternat
 #'   \item \code{analysis_h1_theta_1}: list with \code{a} and \code{b} for group 1 prior under H1.
 #'   \item \code{analysis_h1_theta_2}: list with \code{a} and \code{b} for group 2 prior under H1.
 #'   \item \code{bf10}: the computed Bayes factor (BF10).
-#'   \item \code{n1}, \code{x1}, \code{n2}, \code{x2}: the input sample sizes and observed successes.
+#'   \item \code{N1}, \code{x1}, \code{N2}, \code{x2}: the input sample sizes and observed successes.
 #'    \item \code{OddRatio}: observed odd ratio.
 #'    \item \code{p.value}: p.value.
 #' }
@@ -2762,12 +2772,12 @@ BF10.bin.test <- function(x, n, alpha, beta, h0, scale, prior_analysis, alternat
 #' b1 = 1,
 #' a2 = 1,
 #' b2 = 1,
-#' n1 = 493,
-#' n2 = 488,
+#' N1 = 493,
+#' N2 = 488,
 #' x1 = 155,
 #' x2 = 150)
 #' @export
-BF10.props <- function(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2) {
+BF10.props <- function(a0, b0, a1, b1, a2, b2, N1, N2, x1, x2) {
 
 
   # null hypothesis
@@ -2804,11 +2814,11 @@ BF10.props <- function(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2) {
   }
 
   # sample sizes
-  if (!is.numeric(n1) || length(n1) != 1 || n1 %% 1 != 0 || n1 <= 0) {
-    stop("arg [n1] sample size for group 1 must be a positive numeric scalar integer (> 0).")
+  if (!is.numeric(N1) || length(N1) != 1 || N1 %% 1 != 0 || N1 <= 0) {
+    stop("arg [N1] sample size for group 1 must be a positive numeric scalar integer (> 0).")
   }
-  if (!is.numeric(n2) || length(n2) != 1 || n2 %% 1 != 0 || n2 <= 0) {
-    stop("arg [n2] sample size for group 2 must be a positive numeric scalar integer (> 0).")
+  if (!is.numeric(N2) || length(N2) != 1 || N2 %% 1 != 0 || N2 <= 0) {
+    stop("arg [N2] sample size for group 2 must be a positive numeric scalar integer (> 0).")
   }
 
   # observed successes
@@ -2819,17 +2829,17 @@ BF10.props <- function(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2) {
     stop("arg [x2] for group 2 must be a non-negative numeric scalar integer (\u2265 0).")
   }
 
-  if (x1 > n1) {
-    stop("arg [x1] number of successes in group 1 cannot exceed n1 (sample size).")
+  if (x1 > N1) {
+    stop("arg [x1] number of successes in group 1 cannot exceed N1 (sample size).")
   }
-  if (x2 > n2) {
-    stop("arg [x2] number of successes in group 2 cannot exceed n2 (sample size).")
+  if (x2 > N2) {
+    stop("arg [x2] number of successes in group 2 cannot exceed N2 (sample size).")
   }
 
-  bf10=BF10_p2(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2)
+  bf10=BF10_p2(a0, b0, a1, b1, a2, b2, N1, N2, x1, x2)
   tab <- matrix(
-    c(x1, n1 - x1,
-      x2, n2 - x2),
+    c(x1, N1 - x1,
+      x2, N2 - x2),
     nrow = 2,
     byrow = TRUE
   )
@@ -2856,9 +2866,9 @@ BF10.props <- function(a0, b0, a1, b1, a2, b2, n1, n2, x1, x2) {
     analysis_h1_theta_1= analysis_h1_theta_1,
     analysis_h1_theta_2=analysis_h1_theta_2,
     bf10=bf10,
-    n1=n1,
+    N1=N1,
     x1=x1,
-    n2=n2,
+    N2=N2,
     x2=x2,
     OddRatio = results$estimate,
     p.value=results$p.value
