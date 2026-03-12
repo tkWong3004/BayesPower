@@ -18,18 +18,24 @@ show_t1_code <- function(x) {
     if (!is.null(x$de_an_prior) && x$de_an_prior == 1 &&
         arg %in% c("prior_design","location_d","scale_d","dff_d")) return(NULL)
     if (is.null(val)) return(NULL)
+    # analysis prior model-specific rules
+    if (!is.null(x$prior_analysis)) {
+      if (x$prior_analysis == "Normal" && arg %in% c("dff")) return(NULL)
+      if (x$prior_analysis == "Moment" && arg %in% c("dff")) return(NULL)
+    }
+
+    # design prior model-specific rules
+    if (!is.null(x$de_an_prior) && x$de_an_prior == 0 && !is.null(x$prior_design)) {
+      if (x$prior_design == "Normal" && arg %in% c("dff_d")) return(NULL)
+      if (x$prior_design == "Moment" && arg %in% c("dff_d")) return(NULL)
+      if (x$prior_design == "Point"  && arg %in% c("dff_d","scale_d")) return(NULL)
+    }
+
 
     ## -----------------------------
     ## SPECIAL RENAMING
     ## -----------------------------
     arg_print <- arg
-    if (arg == "true_rate") arg_print <- "true_rate"
-    if (arg == "false_rate") arg_print <- "false_rate"
-    if (arg == "alternative") arg_print <- "alternative"
-    if (arg == "threshold") arg_print <- "threshold"
-    if (arg == "ROPE") arg_print <- "ROPE"
-    if (arg == "prior_analysis") arg_print <- "prior_analysis"
-    if (arg == "prior_design") arg_print <- "prior_design"
     if (arg == "type_rate") { if (val == "positive") return(NULL)}
 
     ## -----------------------------
@@ -115,20 +121,24 @@ show_t2_code <- function(x) {
         arg %in% c("prior_design","location_d","scale_d","dff_d")) return(NULL)
     if (x$mode_bf != 1 && arg == "r") return(NULL)
     if (arg == "type_rate") { if (val == "positive") return(NULL)}
+    if (!is.null(x$prior_analysis)) {
+      if (x$prior_analysis == "Normal" && arg %in% c("dff")) return(NULL)
+      if (x$prior_analysis == "Moment" && arg %in% c("dff")) return(NULL)
+    }
 
+    # design prior model-specific rules
+    if (!is.null(x$de_an_prior) && x$de_an_prior == 0 && !is.null(x$prior_design)) {
+      if (x$prior_design == "Normal" && arg %in% c("dff_d")) return(NULL)
+      if (x$prior_design == "Moment" && arg %in% c("dff_d")) return(NULL)
+      if (x$prior_design == "Point"  && arg %in% c("dff_d","scale_d")) return(NULL)
+    }
     if (is.null(val)) return(NULL)
 
     ## -----------------------------
     ## SPECIAL RENAMING
     ## -----------------------------
     arg_print <- arg
-    if (arg == "true_rate") arg_print <- "true_rate"
-    if (arg == "false_rate") arg_print <- "false_rate"
-    if (arg == "alternative") arg_print <- "alternative"
-    if (arg == "threshold") arg_print <- "threshold"
-    if (arg == "ROPE") arg_print <- "ROPE"
-    if (arg == "prior_analysis") arg_print <- "prior_analysis"
-    if (arg == "prior_design") arg_print <- "prior_design"
+
 
     ## -----------------------------
     ## VALUE FORMATTING

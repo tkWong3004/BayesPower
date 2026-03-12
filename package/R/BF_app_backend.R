@@ -5184,7 +5184,7 @@ t1_prior_plot <- function( prior_analysis, location, scale, dff, alternative,
       panel.grid = ggplot2::element_blank()
     ) +
     ggplot2::guides(
-      color = ggplot2::guide_legend(override.aes = list(size = 1.5))
+      color = ggplot2::guide_legend(override.aes = list(linewidth = 1.5))
     )
 
   # ---- Add vertical segment for Point prior (like t1e_prior_plot) ----
@@ -6026,7 +6026,7 @@ t1e_prior_plot <- function(prior_analysis, location, scale, dff, alternative, RO
     )
     df_design <- df_design[!is.na(df_design$Density), ]
     p <- p + ggplot2::geom_line(data = df_design,
-                                ggplot2::aes(x = tt, y = Density, color = Prior, linetype = Prior, size = Prior))
+                                ggplot2::aes(x = tt, y = Density, color = Prior, linetype = Prior, linewidth = Prior))
   }
 
   # Add vertical arrow for point prior without affecting H1/H0 lines
@@ -7099,6 +7099,33 @@ server_bin<- function(input, output, session) {
 # ---- Server_f.r ----
 
 server_f<- function(input, output, session) {
+  shiny::observeEvent(input$modelfd, {
+    if (input$modelfd == 2) {  # Moment prior
+      # If current df < 3, set it to 3
+      if (input$dffd < 3) {
+        shiny::updateSliderInput(session, "dffd", value = 3, min = 3)
+      } else {
+        shiny::updateSliderInput(session, "dffd", min = 3)
+      }
+    } else if (input$modelfd == 1) {  # Effect size prior
+      shiny::updateSliderInput(session, "dffd", min = 1)
+    }
+  })
+  shiny::observeEvent(input$modelf, {
+    if (input$modelf == 2) {  # Moment prior
+      # Update the slider to enforce df >= 3
+      if (input$dff < 3) {
+        shiny::updateSliderInput(session, "dff", value = 3, min = 3)
+      } else {
+        shiny::updateSliderInput(session, "dff", min = 3)
+      }
+    } else {  # Effect size prior
+      shiny::updateSliderInput(session, "dff", min = 1)
+    }
+  })
+
+
+
   input_f <- shiny::reactive({
     mode_bf <- switch(input$Modef,
                       "1" = 1,
@@ -8412,18 +8439,7 @@ server_r<- function(input, output, session) {
             }
           }
 
-          ## alternative > alternative
           if (arg == "alternative") {
-
-            arg_print <- "alternative"
-
-            val <- switch(val,
-                          "less"  = "less",
-                          "two.sided" = "two.sided",
-                          "greater"  = "greater",
-                          stop("Invalid alternative")
-            )
-
             val <- shQuote(val)
           } else {
             val <- fmt_val(val)
@@ -8808,55 +8824,30 @@ server_t1<- function(input, output, session) {
     )
 
     if (!is.null(x$ROPE) && x$interval != 1) {
-      args$e <- x$ROPE
+      args$ROPE <- x$ROPE
     }
 
     # Build string with each argument on a new line
     arg_strings <- sapply(names(args), function(arg) {
 
-      # fmt_val defined inside sapply, same style as before
-      fmt_val <- function(x) {
-        if (is.character(x)) {
-          # Wrap character strings in quotes
-          return(shQuote(x))
-        } else if (is.numeric(x) && length(x) > 1) {
-          # Wrap numeric vectors in c(...)
-          return(paste0("c(", paste(x, collapse = ", "), ")"))
-        } else if (is.numeric(x)) {
-          return(as.character(x))
-        } else if (is.logical(x)) {
-          return(ifelse(x, "TRUE", "FALSE"))
-        } else {
-          stop("Unsupported type in fmt_val")
-        }
-      }
-
       val <- args[[arg]]
       arg_print <- arg
 
-      ## prior_analysis > prior_analysis
-      if (arg == "prior_analysis") {
-        arg_print <- "prior_analysis"
+      # ---- Omission rules ----
+      if ((x$prior_analysis %in% c("Normal", "Moment")) && arg == "dff") {
+        return(NULL)
       }
 
-      ## e > ROPE
-      if (arg == "e") {
-        arg_print <- "ROPE"
-      }
-
-      ## alternative > alternative
+      # Handle alternative
       if (arg == "alternative") {
-        arg_print <- "alternative"
-
-        val <- switch(val,
-                      "less"  = "less",
-                      "two.sided" = "two.sided",
-                      "greater"  = "greater",
-                      stop("Invalid alternative")
-        )
-
         val <- shQuote(val)
-
+      } else if (arg == "ROPE") {
+        # Wrap vector ROPE in c(...)
+        if (length(val) > 1) {
+          val <- paste0("c(", paste(val, collapse = ", "), ")")
+        } else {
+          val <- as.character(val)
+        }
       } else {
         val <- fmt_val(val)
       }
@@ -9350,18 +9341,12 @@ server_t2<- function(input, output, session) {
 
     output$result_t2 <- shiny::renderText({
 
-
-      fmt_val <- function(val) {
-        if (is.character(val)) {
-          sprintf('"%s"', val)
-        } else if (is.numeric(val) && length(val) > 1) {
-          paste0("c(", paste(val, collapse = ","), ")")
-        } else {
-          as.character(val)
-        }
+      fmt_val <- function(x) {
+        if (is.numeric(x) && length(x) == 1) return(as.character(x))
+        if (is.numeric(x) && length(x) > 1) return(paste(x, collapse = ", "))
+        if (is.character(x)) return(shQuote(x))
+        return(as.character(x))
       }
-
-
 
       args <- list(
         tval = t2$tval,
@@ -9375,45 +9360,39 @@ server_t2<- function(input, output, session) {
       )
 
       if (t2$interval != 1) {
-        args$e <- t2$ROPE
+        args$ROPE <- t2$ROPE
       }
 
-      # Build string with each argument on a new line
+      # Build string with each argument on a new line, applying omission rules
       arg_strings <- sapply(names(args), function(arg) {
 
         val <- args[[arg]]
         arg_print <- arg
 
-        ## prior_analysis > prior_analysis
-        if (arg == "prior_analysis") {
-          arg_print <- "prior_analysis"
+        # ---- Omission rules ----
+        if ((t2$prior_analysis %in% c("Normal", "Moment")) && arg == "dff") {
+          return(NULL)
         }
 
-        ## e > ROPE
-        if (arg == "e") {
-          arg_print <- "ROPE"
-        }
-
-        ## alternative > alternative
+        # Handle alternative
         if (arg == "alternative") {
-
-          arg_print <- "alternative"
-
-          val <- switch(val,
-                        "less"  = "less",
-                        "two.sided" = "two.sided",
-                        "greater"  = "greater",
-                        stop("Invalid alternative")
-          )
-
           val <- shQuote(val)
-
+        } else if (arg == "ROPE") {
+          # Wrap vector ROPE in c(...)
+          if (length(val) > 1) {
+            val <- paste0("c(", paste(val, collapse = ", "), ")")
+          } else {
+            val <- as.character(val)
+          }
         } else {
           val <- fmt_val(val)
         }
 
         sprintf("  %s = %s", arg_print, val)
       })
+
+      # Remove NULLs from omitted arguments
+      arg_strings <- arg_strings[!sapply(arg_strings, is.null)]
 
       call_string <- paste0(
         "# Function to be used in R\n",
@@ -9424,8 +9403,6 @@ server_t2<- function(input, output, session) {
 
       call_string
     })
-
-
     d.obs <-  t2$tval / sqrt((t2$N1 * t2$N2) / (t2$N1 + t2$N2))
     ROPE <- switch(t2$interval,"1" = NULL,"2" = t2$ROPE)
     p.value <- t.pval(t2$tval, t2$N1, t2$N2, t2$alternative, ROPE = ROPE, type = "two")
