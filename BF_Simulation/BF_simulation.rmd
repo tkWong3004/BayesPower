@@ -663,9 +663,9 @@ iter <- 5000
 # specification of analysis and design priors
 # Note:
 #   Arguments 'k',  'alpha', 'beta' and 'scale' for the analysis prior and the ones for the design prior (e.g., 'k_d') are only used for the corresponding priors.
-alternative    <- "greater"; h0 <- 0;  ROPE     <- .2
-prior_analysis <- "beta";    k   <- 1; alpha   <- 1; beta   <- 1; scale   <- .5
-prior_design   <- "beta";    k_d <- 2; alpha_d <- 2; beta_d <- 2; scale_d <- .3;
+alternative    <- "greater"; h0  <- 0;  ROPE    <- .2
+prior_analysis <- "beta";    k   <- 1; alpha    <- 1; beta   <- 1; scale   <- .5
+prior_design   <- "beta";    k_d <- 2; alpha_d  <- 2; beta_d <- 2; scale_d <- .3;
 location_d     <- .3;   
 threshold      <- 3
 
@@ -1313,7 +1313,7 @@ iter <- 10000
 #   Arguments 'scale' , 'scale_d' and 'location_d' are only used when the corresponding prior is 
 #   "Moment".
 alternative    <- "two.sided"; threshold  <- 3; h0     <- .5
-prior_analysis <- "beta";      alpha      <- 1; beta   <- 1; scale <- .25
+prior_analysis <- "beta";      alpha      <- 1; beta   <- 1; scale   <- .25
 prior_design   <- "beta";      alpha_d    <- 1; beta_d <- 2; scale_d <- .1; location_d <- .3
 ROPE <- NULL
 
