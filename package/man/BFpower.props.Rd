@@ -45,25 +45,25 @@ BFpower.props(
 
 \item{prior_design_1}{Character. The design prior of group 1: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
-\item{a1d}{Numeric scalar. Alpha parameter of the design prior for group 1 (used if \code{model1 = "beta"}).}
+\item{a1d}{Numeric scalar. Alpha parameter of the design prior for group 1 (used if \code{prior_design_1 = "beta"}).}
 
-\item{b1d}{Numeric scalar. Beta parameter of the design prior for group 1 (used if \code{model1 = "beta"}).}
+\item{b1d}{Numeric scalar. Beta parameter of the design prior for group 1 (used if \code{prior_design_1 = "beta"}).}
 
-\item{dp1}{Numeric scalar. True proportion for group 1 in the design prior (used if \code{model1 = "Point"}).}
+\item{dp1}{Numeric scalar. True proportion for group 1 in the design prior (used if \code{prior_design_1 = "Point"}).}
 
 \item{prior_design_2}{Character. The design prior of group 2: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
-\item{a2d}{Numeric scalar. Alpha parameter of the design prior for group 2 (used if \code{model2 = "beta"}).}
+\item{a2d}{Numeric scalar. Alpha parameter of the design prior for group 2 (used if \code{prior_design_2 = "beta"}).}
 
-\item{b2d}{Numeric scalar. Beta parameter of the design prior for group 2 (used if \code{model2 = "beta"}).}
+\item{b2d}{Numeric scalar. Beta parameter of the design prior for group 2 (used if \code{prior_design_2 = "beta"}).}
 
-\item{dp2}{Numeric scalar. True proportion for group 2 in the design prior (used if \code{model2 = "Point"}).}
+\item{dp2}{Numeric scalar. True proportion for group 2 in the design prior (used if \code{prior_design_2 = "Point"}).}
 
 \item{N1}{Numeric integer. Sample size for group 1.}
 
 \item{N2}{Numeric integer. Sample size for group 2.}
 
-\item{type_rate}{Character. Choose \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.}
+\item{type_rate}{Character. Choose \code{"positive"} to control true positive rate or \code{"negative"} to control true negative rate.}
 }
 \value{
 An object of class \code{BFpower} (a list) containing:
@@ -81,11 +81,14 @@ An object of class \code{BFpower} (a list) containing:
 }
 }
 \description{
-Perform sample size determination or calculate probabilities of compelling and misleading evidence
-for a Bayesian comparison of two proportions.
+Perform sample size determination or power calculation of compelling and misleading evidence for a Bayesian test of two proportions.
+Under the null hypothesis, \eqn{\theta_1 = \theta_2} and it is
+assigned a shared analysis beta prior. Under the alternative hypothesis, \eqn{\theta_1} and
+\eqn{\theta_2} are treated as distinct parameters and are assigned independent beta analysis priors.
+The function supports the specification of point design prior.
 }
 \details{
-\strong{1. Sample size determination mode (when \code{N1 = NULL} and \code{N2 = NULL}):}
+\strong{1. Sample Size Determination Mode (when \code{N1 = NULL} and \code{N2 = NULL}):}
 
 If no sample sizes are provided for the two groups, the function calculates the minimum sample sizes needed to achieve the desired configuration. The user must provide:
 \itemize{
@@ -94,25 +97,40 @@ If no sample sizes are provided for the two groups, the function calculates the 
 \item \code{threshold} - the Bayes factor threshold for compelling evidence (must be > 1).
 }
 
-The function iteratively finds the smallest sample sizes for which the probability of obtaining compelling evidence meets or exceeds \code{true_rate}.
+The function iteratively finds the smallest sample sizes for which the probability of obtaining compelling evidence (i.e., true positive/negative rate) meets or exceeds \code{true_rate}.
 
-\strong{2. Fixed-sample analysis mode (when \code{N1} and \code{N2} are supplied):}
+\strong{2. Fixed-sample Analysis Mode (when \code{N1} and \code{N2} are supplied):}
 
 If positive numeric sample sizes \code{N1} and \code{N2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for these fixed sample sizes. In this mode, \code{type_rate} and \code{true_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
 
-\strong{Model specification:}
+\strong{Analysis Priors:}
 
-The user must specify the analysis priors under the null and alternative hypotheses using Beta parameters:
+The user must specify the analysis priors under the null and alternative hypotheses:
 \itemize{
-\item \code{a0}, \code{b0} - Beta parameters for the null hypothesis prior.
-\item \code{a1}, \code{b1} - Beta parameters for the analysis prior of group 1 under the alternative hypothesis.
-\item \code{a2}, \code{b2} - Beta parameters for the analysis prior of group 2 under the alternative hypothesis.
+\item Null hypothesis: Beta prior with parameters \code{a0} and \code{b0}.
+\item Alternative hypothesis:
+\itemize{
+\item Group 1: Beta prior with hyperparameters \code{a1} and \code{b1}.
+\item Group 2: Beta prior with hyperparameters \code{a2} and \code{b2}.
 }
+}
+
+\strong{Design Priors (optional):}
 
 Design priors for the alternative hypothesis can optionally be specified:
 \itemize{
-\item \code{prior_design_1}, \code{a1d}, \code{b1d}, \code{dp1} - design prior for group 1 (\code{"same"} uses the analysis prior, \code{"beta"} requires Beta parameters, \code{"Point"} uses a fixed proportion).
-\item \code{prior_design_2}, \code{a2d}, \code{b2d}, \code{dp2} - design prior for group 2.
+\item Group 1 design prior (\code{prior_design_1}):
+\itemize{
+\item \code{"same"}: uses the corresponding analysis prior (\code{a1}, \code{b1}).
+\item \code{"beta"} (beta prior): requires hyperparameters \code{a1d} and \code{b1d}.
+\item \code{"Point"} (point prior): requires fixed proportion \code{dp1}.
+}
+\item Group 2 design prior (\code{prior_design_2}):
+\itemize{
+\item \code{"same"}: uses the corresponding analysis prior (\code{a2}, \code{b2}).
+\item \code{"beta"} (beta prior): requires hyperparameters \code{a2d} and \code{b2d}.
+\item \code{"Point"} (point prior): requires fixed proportion \code{dp2}.
+}
 }
 }
 \examples{

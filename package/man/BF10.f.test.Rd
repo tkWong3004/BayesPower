@@ -38,12 +38,12 @@ A list of class \code{"BFvalue_f"} containing:
 \item \code{analysis_h1}: List containing the analysis prior specification, including
 the prior distribution, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
 \item \code{bf10}: The computed Bayes factor.
-\item \code{p.value}: p-value.
+\item \code{p.value}: Numeric, p-value.
 }
 }
 \description{
 Computes the Bayes factor (BF10) for an F-test, comparing a full model to a
-reduced model under either an effect-size prior or a Moment prior.
+reduced model under either an effect-size prior or a moment prior.
 Optionally, an interval null hypothesis can be specified.
 }
 \examples{

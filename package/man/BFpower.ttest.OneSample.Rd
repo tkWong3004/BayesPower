@@ -56,7 +56,7 @@ numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 
 \item{false_rate}{Numeric scaler. Target false positive or false negative rate (between 0.001 and 0.1).}
 
-\item{threshold}{Numeric scaler. Threshold of compelling evidence (must be > 1).}
+\item{threshold}{Numeric scaler. Threshold of compelling evidence (must be at least 1).}
 }
 \value{
 An object of class \code{BFpower_t} containing:
@@ -71,62 +71,67 @@ An object of class \code{BFpower_t} containing:
 }
 }
 \description{
-Perform sample size determination or calculate the probability of obtaining
-compelling or misleading evidence for a one-sample Bayesian t-test.
+Perform sample size determination or power calculation of compelling and misleading evidence for a one-sample Bayesian t-test.
 Can handle both point-null and interval-null hypothesis, and allows specifying
 analysis and design priors.
 }
 \details{
-\strong{1. Sample size determination mode (when \code{N = NULL}):}
+\strong{1. Sample Size Determination Mode (when \code{N = NULL}):}
 
-If no sample size is provided, the function determines the minimum sample size. In this mode, the user
-must supply the following arguments:
+If no sample size is provided, the function calculates the minimum sample size needed to achieve the desired configuration below. The user must provide:
 \itemize{
 \item \code{type_rate} - either \code{"positive"} to control true/false positive rates,
 or \code{"negative"} to control true/false negative rates.
 \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
 \item \code{false_rate} - the acceptable false positive or false negative rate (between 0.001 and 0.1).
-\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be > 1).
+\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be at least 1).
 }
 
-The function iteratively finds the smallest sample size for which the probability
-of obtaining compelling evidence meets or exceeds \code{true_rate}, while the
-probability of misleading evidence does not exceed \code{false_rate}.
+The function iteratively finds the smallest sample size for which the probability of obtaining compelling evidence (i.e., true positive/negative rate) meets or exceeds \code{true_rate}, while the probability of misleading evidence (i.e., false positive/negative rate) does not exceed \code{false_rate}.
 
-\strong{2. Fixed-sample analysis mode (when \code{N} is supplied):}
+\strong{2. Fixed-sample Analysis Mode (when \code{N} is supplied):}
 
-If a positive numeric sample size \code{N} is provided, the function computes
-the probabilities of obtaining compelling or misleading evidence for that
-fixed sample size. In this mode, the arguments \code{type_rate}, \code{true_rate},
-and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
+If a positive numeric sample size \code{N} is provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, the arguments \code{type_rate}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
+
+\strong{Direction of the Alternative Hypothesis:}
+
+The argument \code{alternative} specifies the direction of the test and can be set to \code{"two.sided"}, \code{"greater"}, or \code{"less"}.
+
+\strong{Interval Null Hypothesis:}
+
+The interval null hypothesis can be specified using the argument \code{ROPE},
+which defines an interval around the null value of 0.
+
+The required form of \code{ROPE} depends on the direction of \code{alternative}:
+\itemize{
+\item \code{"greater"} or \code{"less"}: \code{ROPE} must be a scalar.
+It should be positive for \code{"greater"} and negative for \code{"less"}.
+\item \code{"two.sided"}: \code{ROPE} must be a numeric vector of length 2,
+where the lower bound is negative and the upper bound is positive.
+}
+
+If \code{ROPE = NULL}, a point-null hypothesis is assumed.
 
 \strong{Analysis Priors:}
 
-The analysis prior specifies the prior distribution of the effect under the
-alternative hypothesis. The user must provide:
+The user must specify the analysis prior under the alternative hypothesis using \code{prior_analysis}:
 \itemize{
-\item \code{prior_analysis} - the type of prior: \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.
-\item \code{location} - the mean or location of the prior.
-\item \code{scale} - the standard deviation or scale (must be positive).
-\item \code{dff} - degrees of freedom (required if \code{prior_analysis = "t-distribution"}).
+\item \code{Normal} (normal prior): \code{location} and \code{scale} > 0.
+\item \code{Moment} (normal-moment prior): \code{scale} > 0.
+\item \code{t-distribution} (scaled t prior): \code{location}, \code{scale} > 0, and \code{dff} > 0.
 }
 
 \strong{Design Priors (optional):}
 
-A design prior can be supplied to reflect uncertainty about the effect size
-during study planning. If provided, the following must be supplied:
+The design prior under the alternative hypothesis can optionally be specified using \code{prior_design}:
 \itemize{
-\item \code{prior_design} - the type of design prior: \code{"Normal"}, \code{"Moment"}, \code{"t-distribution"}, or \code{"Point"}.
-\item \code{location_d} - the location of the design prior.
-\item \code{scale_d} - the scale parameter (positive for all models except \code{"Point"}).
-\item \code{dff_d} - degrees of freedom for \code{"t-distribution"} design priors.
+\item \code{Normal} (normal prior): \code{location_d} and \code{scale_d} > 0.
+\item \code{Moment} (normal-moment prior): \code{scale_d} > 0.
+\item \code{t-distribution} (scaled t prior): \code{location_d}, \code{scale_d} > 0, and \code{dff_d} > 0.
+\item \code{Point} (point prior): \code{location_d}.
 }
 
-\strong{Interval Null Hypothesis:}
-
-The argument \code{ROPE} specifies the bounds of an interval null hypothesis.
-If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval
-null hypothesis. For a point-null hypothesis, \code{ROPE} should be left as \code{NULL}.
+If \code{prior_design} is \code{NULL}, no design prior is used.
 }
 \examples{
 BFpower.ttest.OneSample(

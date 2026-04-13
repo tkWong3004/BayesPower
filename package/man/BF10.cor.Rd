@@ -44,7 +44,7 @@ numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 \value{
 A list with class \code{"BFvalue_r"} containing:
 \itemize{
-\item \code{type}: "correlation"
+\item \code{type}: "Correlation"
 \item \code{bf10}: Calculated Bayes factor BF10
 \item \code{h0}: Null value of the correlation
 \item \code{r}: Observed correlation coefficient
@@ -52,7 +52,7 @@ A list with class \code{"BFvalue_r"} containing:
 \item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
 \item \code{alternative}: the direction of the alternative hypothesis
 \item \code{ROPE}: Interval bounds if specified
-\item \code{p.value}: Numeric, p.value.
+\item \code{p.value}: Numeric, p-value.
 }
 }
 \description{

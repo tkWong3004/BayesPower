@@ -21,9 +21,7 @@ Displays the results of a \code{"BFvalue"} object.
 This method prints key results from a Bayesian test, including the
 Bayes factor and relevant test statistics with frequentist test result. The object can be generated
 by any of the following functions:
-\code{\link{BF10.ttest.OneSample}}, \code{\link{BF10.ttest.TwoSample}},
-\code{\link{BF10.cor}}, \code{\link{BF10.bin.test}}, or
-\code{\link{BF10.props}}.
+\code{\link{BF10.ttest.OneSample}}, \code{\link{BF10.ttest.TwoSample}}, \code{\link{BF10.cor}}, \code{\link{BFpower.f.test}} \code{\link{BF10.bin.test}}, or \code{\link{BF10.props}}.
 }
 \examples{
 result <- BF10.ttest.OneSample(

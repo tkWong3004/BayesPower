@@ -55,7 +55,7 @@ An object of class \code{"BFvalue_bin"} containing:
 \code{beta} (beta parameter), and \code{scale} (scale parameter).
 \item \code{alternative}: the direction of the alternative hypothesis.
 \item \code{ROPE}: interval null bounds (if specified).
-\item \code{p.value}: p-value.
+\item \code{p.value}: Numeric, p-value.
 }
 }
 \description{

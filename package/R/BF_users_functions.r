@@ -1,7 +1,6 @@
 #' Sample Size Determination for the One-Sample Bayesian t-Test
 #'
-#' Perform sample size determination or calculate the probability of obtaining
-#' compelling or misleading evidence for a one-sample Bayesian t-test.
+#' Perform sample size determination or power calculation of compelling and misleading evidence for a one-sample Bayesian t-test.
 #' Can handle both point-null and interval-null hypothesis, and allows specifying
 #' analysis and design priors.
 #'
@@ -24,7 +23,7 @@
 #' @param type_rate Character. Either \code{"positive"} (controls true/false positive rates) or \code{"negative"} (controls true/false negative rates).
 #' @param true_rate Numeric scaler. Target true positive or negative rate (between 0.6 and 0.999).
 #' @param false_rate Numeric scaler. Target false positive or false negative rate (between 0.001 and 0.1).
-#' @param threshold Numeric scaler. Threshold of compelling evidence (must be > 1).
+#' @param threshold Numeric scaler. Threshold of compelling evidence (must be at least 1).
 #'
 #' @return An object of class \code{BFpower_t} containing:
 #'   \itemize{
@@ -37,58 +36,63 @@
 #'     \item \code{threshold}: Numeric, threshold of compelling evidence.
 #'   }
 #' @details
-#' \strong{1. Sample size determination mode (when \code{N = NULL}):}
+#' \strong{1. Sample Size Determination Mode (when \code{N = NULL}):}
 #'
-#' If no sample size is provided, the function determines the minimum sample size. In this mode, the user
-#' must supply the following arguments:
+#' If no sample size is provided, the function calculates the minimum sample size needed to achieve the desired configuration below. The user must provide:
 #' \itemize{
 #'   \item \code{type_rate} - either \code{"positive"} to control true/false positive rates,
 #'         or \code{"negative"} to control true/false negative rates.
 #'   \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
 #'   \item \code{false_rate} - the acceptable false positive or false negative rate (between 0.001 and 0.1).
-#'   \item \code{threshold} - the Bayes factor threshold for compelling evidence (must be > 1).
+#'   \item \code{threshold} - the Bayes factor threshold for compelling evidence (must be at least 1).
 #' }
 #'
-#' The function iteratively finds the smallest sample size for which the probability
-#' of obtaining compelling evidence meets or exceeds \code{true_rate}, while the
-#' probability of misleading evidence does not exceed \code{false_rate}.
+#' The function iteratively finds the smallest sample size for which the probability of obtaining compelling evidence (i.e., true positive/negative rate) meets or exceeds \code{true_rate}, while the probability of misleading evidence (i.e., false positive/negative rate) does not exceed \code{false_rate}.
 #'
-#' \strong{2. Fixed-sample analysis mode (when \code{N} is supplied):}
+#' \strong{2. Fixed-sample Analysis Mode (when \code{N} is supplied):}
 #'
-#' If a positive numeric sample size \code{N} is provided, the function computes
-#' the probabilities of obtaining compelling or misleading evidence for that
-#' fixed sample size. In this mode, the arguments \code{type_rate}, \code{true_rate},
-#' and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
+#' If a positive numeric sample size \code{N} is provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, the arguments \code{type_rate}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
 #'
-#' \strong{Analysis Priors:}
+#' \strong{Direction of the Alternative Hypothesis:}
 #'
-#' The analysis prior specifies the prior distribution of the effect under the
-#' alternative hypothesis. The user must provide:
-#' \itemize{
-#'   \item \code{prior_analysis} - the type of prior: \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.
-#'   \item \code{location} - the mean or location of the prior.
-#'   \item \code{scale} - the standard deviation or scale (must be positive).
-#'   \item \code{dff} - degrees of freedom (required if \code{prior_analysis = "t-distribution"}).
-#' }
-#'
-#' \strong{Design Priors (optional):}
-#'
-#' A design prior can be supplied to reflect uncertainty about the effect size
-#' during study planning. If provided, the following must be supplied:
-#' \itemize{
-#'   \item \code{prior_design} - the type of design prior: \code{"Normal"}, \code{"Moment"}, \code{"t-distribution"}, or \code{"Point"}.
-#'   \item \code{location_d} - the location of the design prior.
-#'   \item \code{scale_d} - the scale parameter (positive for all models except \code{"Point"}).
-#'   \item \code{dff_d} - degrees of freedom for \code{"t-distribution"} design priors.
-#' }
+#' The argument \code{alternative} specifies the direction of the test and can be set to \code{"two.sided"}, \code{"greater"}, or \code{"less"}.
 #'
 #'
 #' \strong{Interval Null Hypothesis:}
 #'
-#' The argument \code{ROPE} specifies the bounds of an interval null hypothesis.
-#' If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval
-#' null hypothesis. For a point-null hypothesis, \code{ROPE} should be left as \code{NULL}.
+#' The interval null hypothesis can be specified using the argument \code{ROPE},
+#' which defines an interval around the null value of 0.
 #'
+#' The required form of \code{ROPE} depends on the direction of \code{alternative}:
+#' \itemize{
+#' \item \code{"greater"} or \code{"less"}: \code{ROPE} must be a scalar.
+#'   It should be positive for \code{"greater"} and negative for \code{"less"}.
+#' \item \code{"two.sided"}: \code{ROPE} must be a numeric vector of length 2,
+#'   where the lower bound is negative and the upper bound is positive.
+#' }
+#'
+#' If \code{ROPE = NULL}, a point-null hypothesis is assumed.
+#'
+#' \strong{Analysis Priors:}
+#'
+#' The user must specify the analysis prior under the alternative hypothesis using \code{prior_analysis}:
+#' \itemize{
+#' \item \code{Normal} (normal prior): \code{location} and \code{scale} > 0.
+#' \item \code{Moment} (normal-moment prior): \code{scale} > 0.
+#' \item \code{t-distribution} (scaled t prior): \code{location}, \code{scale} > 0, and \code{dff} > 0.
+#' }
+#'
+#' \strong{Design Priors (optional):}
+#'
+#' The design prior under the alternative hypothesis can optionally be specified using \code{prior_design}:
+#' \itemize{
+#' \item \code{Normal} (normal prior): \code{location_d} and \code{scale_d} > 0.
+#' \item \code{Moment} (normal-moment prior): \code{scale_d} > 0.
+#' \item \code{t-distribution} (scaled t prior): \code{location_d}, \code{scale_d} > 0, and \code{dff_d} > 0.
+#' \item \code{Point} (point prior): \code{location_d}.
+#' }
+#'
+#' If \code{prior_design} is \code{NULL}, no design prior is used.
 #' @examples
 #'BFpower.ttest.OneSample(
 #'  alternative = "two.sided",
@@ -228,8 +232,8 @@ BFpower.ttest.OneSample <- function(
       stop("Argument [false_rate] (targeted false positive or false negative rate) must be a numeric scalar strictly greater than 0.001 and smaller than 0.1")
     }
 
-    if (!is.numeric(threshold) || length(threshold) != 1 || !is.finite(threshold) || threshold <= 1) {
-      stop("Argument [threshold] threshold of compelling evidence must be a numeric scalar greater than 1")
+    if (!is.numeric(threshold) || length(threshold) != 1 || !is.finite(threshold) || threshold < 1) {
+      stop("Argument [threshold] threshold of compelling evidence must be a numeric scalar being at least 1")
     }
   } else{
     true_rate=false_rate=0
@@ -306,10 +310,10 @@ BFpower.ttest.OneSample <- function(
 }
 #' Sample Size Determination for the Two-Sample Bayesian t-Test
 #'
-#' Perform sample size determination or calculate the probabilities of obtaining
-#' compelling or misleading evidence for a two-sample Bayesian t-test.
-#' Supports point-null and interval-null hypotheses, and allows specifying
+#' Perform sample size determination or power calculation of compelling and misleading evidence for a two-sample Bayesian t-test.
+#' Can handle both point-null and interval-null hypothesis, and allows specifying
 #' analysis and design priors.
+#'
 #'
 #' @param alternative Character. The direction of the alternative hypothesis: two-sided (\code{"two.sided"}),
 #'   right-sided (\code{"greater"}), or left-sided (\code{"less"}).
@@ -317,7 +321,7 @@ BFpower.ttest.OneSample <- function(
 #'   null hypothesis. For \code{"two.sided"} this must be a numeric vector
 #'   of length 2 with two distinct finite values; for \code{"greater"} a
 #'   numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.
-#' @param threshold Numeric scalar. Threshold for compelling evidence (must be > 1).
+#' @param threshold Numeric scalar. Threshold for compelling evidence (must be at least 1).
 #' @param true_rate Numeric scalar. Target true positive or negative rate .
 #' @param false_rate Numeric scalar. Target false positive or negative rate .
 #' @param prior_analysis Character. Analysis prior under the alternative hypothesis:
@@ -339,8 +343,7 @@ BFpower.ttest.OneSample <- function(
 #' @details
 #' \strong{1. Sample size determination mode (when \code{N1 = NULL} and \code{N2 = NULL}, but \code{r} is provided):}
 #'
-#' If no sample sizes are provided, the function calculates the minimum required sample sizes for both groups. In this mode, the user
-#' must supply:
+#' If no sample size is provided, the function calculates the minimum sample size needed to achieve the desired configuration below. The user must provide:
 #' \itemize{
 #'   \item \code{type_rate} - either \code{"positive"} to control true/false positive rates,
 #'         or \code{"negative"} to control true/false negative rates.
@@ -350,41 +353,52 @@ BFpower.ttest.OneSample <- function(
 #'   \item \code{r} - the allocation ratio of group 2 to group 1 sample sizes (\code{N2/N1}).
 #' }
 #'
-#' The function iteratively finds the smallest sample sizes \code{N1} and \code{N2 = r * N1} for which the probability
-#' of obtaining compelling evidence meets or exceeds \code{true_rate}, while the probability of misleading evidence
-#' does not exceed \code{false_rate}.
+#' The function iteratively finds the smallest sample size \code{N1} and \code{N2 = r * N1} for which the probability of obtaining compelling evidence (i.e., true positive/negative rate) meets or exceeds \code{true_rate}, while the probability of misleading evidence (i.e., false positive/negative rate) does not exceed \code{false_rate}.
 #'
 #' \strong{2. Fixed-sample analysis mode (when \code{N1} and \code{N2} are supplied):}
 #'
-#' If positive numeric sample sizes \code{N1} and \code{N2} are provided, the function computes
-#' the probabilities of obtaining compelling or misleading evidence for those fixed sample sizes. In this mode,
-#' the arguments \code{type_rate}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
+#'
+#' If a positive numeric sample size \code{N1} and \code{N2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, the arguments \code{type_rate}, \code{r}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
+#'
+#' \strong{Direction of the Alternative Hypothesis:}
+#'
+#' The argument \code{alternative} specifies the direction of the test and can be set to \code{"two.sided"}, \code{"greater"}, or \code{"less"}.
+#'
+#' \strong{Interval Null Hypothesis:}
+#'
+#' The interval null hypothesis can be specified using the argument \code{ROPE},
+#' which defines an interval around the null value of 0.
+#'
+#' The required form of \code{ROPE} depends on the direction of \code{alternative}:
+#' \itemize{
+#' \item \code{"greater"} or \code{"less"}: \code{ROPE} must be a scalar.
+#'   It should be positive for \code{"greater"} and negative for \code{"less"}.
+#' \item \code{"two.sided"}: \code{ROPE} must be a numeric vector of length 2,
+#'   where the lower bound is negative and the upper bound is positive.
+#' }
+#'
+#' If \code{ROPE = NULL}, a point-null hypothesis is assumed.
 #'
 #' \strong{Analysis Priors:}
 #'
-#' The analysis prior specifies the prior distribution of the effect under the alternative hypothesis. The user must provide:
+#' The user must specify the analysis prior under the alternative hypothesis using \code{prior_analysis}:
 #' \itemize{
-#'   \item \code{prior_analysis} - the type of prior: \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.
-#'   \item \code{location} - the mean or location of the prior.
-#'   \item \code{scale} - the standard deviation or scale (must be positive).
-#'   \item \code{dff} - degrees of freedom (required if \code{prior_analysis = "t-distribution"}).
+#' \item \code{Normal} (normal prior): \code{location} and \code{scale} > 0.
+#' \item \code{Moment} (normal-moment prior): \code{scale} > 0.
+#' \item \code{t-distribution} (scaled t prior): \code{location}, \code{scale} > 0, and \code{dff} > 0.
 #' }
 #'
 #' \strong{Design Priors (optional):}
 #'
-#' A design prior can be supplied to reflect uncertainty about the effect size during study planning. If provided, the following must be supplied:
+#' The design prior under the alternative hypothesis can optionally be specified using \code{prior_design}:
 #' \itemize{
-#'   \item \code{prior_design} - the type of design prior: \code{"Normal"}, \code{"Moment"}, \code{"t-distribution"}, or \code{"Point"}.
-#'   \item \code{location_d} - the location of the design prior.
-#'   \item \code{scale_d} - the scale parameter (positive for all models except \code{"Point"}).
-#'   \item \code{dff_d} - degrees of freedom for \code{"t-distribution"} design priors.
+#' \item \code{Normal} (normal prior): \code{location_d} and \code{scale_d} > 0.
+#' \item \code{Moment} (normal-moment prior): \code{scale_d} > 0.
+#' \item \code{t-distribution} (scaled t prior): \code{location_d}, \code{scale_d} > 0, and \code{dff_d} > 0.
+#' \item \code{Point} (point prior): \code{location_d}.
 #' }
 #'
-#' \strong{Interval Null Hypothesis:}
-#'
-#' The argument \code{ROPE} specifies the bounds of an interval null hypothesis.
-#' If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval
-#' null hypothesis. For a point-null hypothesis, \code{ROPE} should be left as \code{NULL}.
+#' If \code{prior_design} is \code{NULL}, no design prior is used.
 #'
 #' @return An object of class \code{BFpower_t} containing:
 #'   \itemize{
@@ -651,7 +665,7 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
 
 #' Sample Size Determination for the Bayesian Correlation Test
 #'
-#' Perform sample size determination or the probability of obtaining compelling or misleading evidence for a Bayesian correlation test.
+#' Perform sample size determination or power calculation of compelling and misleading evidence for a Bayesian correlation test.
 #' Can handle both point-null and interval-null hypothesis, and allows specifying
 #' analysis and design priors.
 #'
@@ -661,7 +675,7 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
 #'   null hypothesis. For \code{"two.sided"} this must be a numeric vector
 #'   of length 2 with two distinct finite values; for \code{"greater"} a
 #'   numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.
-#' @param threshold Numeric scalar. Threshold of compelling evidence (numeric scalar > 1).
+#' @param threshold Numeric scalar. Threshold for compelling evidence (must be at least 1).
 #' @param true_rate Numeric scalar. Targeted true positive rate (if \code{positive = "positive"}) or true negative rate (if \code{positive = "negative"}).
 #' @param false_rate Numeric scalar. Targeted false positive rate (if \code{positive = "positive"}) or false negative rate (if \code{positive = "negative"}).
 #' @param prior_analysis Character. Analysis prior under the alternative hypothesis:
@@ -677,32 +691,47 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
 #' @param k_d Numeric scalar. Parameter for the design default beta prior (\code{"d_beta"}).
 #' @param scale_d Numeric scalar. Scale parameter for the design normal-moment prior (\code{"Moment"}).
 #' @param N Numeric integer. Sample size. Only required if the goal is not sample size determination, but rather to calculate the probability of obtaining compelling or misleading evidence for a given sample size.
-#' @param type_rate Character. Character indicating which rate to control: \code{"positive"} (true/false positive rates) or \code{"negative"} (true/false negative rates).
+#' @param type_rate Character. Character. Either `"positive"` (controls true/false positive rates) or `"negative"` (controls true/false negative rates).
 #'
 #'@details
-#' \strong{1. Sample size determination mode (when \code{N = NULL}):}
+#' \strong{1. Sample Size Determination Mode (when \code{N = NULL}):}
 #'
-#' If no sample size is provided, the function determines the minimum sample size required to meet the desired requirements. In this mode, the user must supply the following arguments:
+#' If no sample size is provided, the function calculates the minimum sample size needed to achieve the desired configuration below. The user must provide:
 #' \itemize{
 #' \item \code{type_rate} - either \code{"positive"} to control true/false positive rates, or \code{"negative"} to control true/false negative rates.
 #' \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
 #' \item \code{false_rate} - the acceptable false positive or false negative rate (between 0.001 and 0.1).
-#' \item \code{threshold} - the Bayes factor threshold for compelling evidence (must be > 1).
+#' \item \code{threshold} - the Bayes factor threshold for compelling evidence (must be at least 1).
 #' }
 #'
-#' The function iteratively finds the smallest sample size for which the probability of obtaining compelling evidence meets or exceeds \code{true_rate}, while the probability of misleading evidence does not exceed \code{false_rate}.
+#' The function iteratively finds the smallest sample size for which the probability of obtaining compelling evidence (i.e., true positive/negative rate) meets or exceeds \code{true_rate}, while the probability of misleading evidence (i.e., false positive/negative rate) does not exceed \code{false_rate}.
 #'
-#' \strong{2. Fixed-sample analysis mode (when \code{N} is supplied):}
+#' \strong{2. Fixed-sample Analysis Mode (when \code{N} is supplied):}
 #'
 #' If a positive numeric sample size \code{N} is provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, the arguments \code{type_rate}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
 #'
-#' \strong{Hypothesis specification:}
+#' \strong{Direction of the Alternative Hypothesis:}
 #'
-#' The \code{alternative} argument defines the direction of the alternative hypothesis : \code{"two.sided"} for two-sided, \code{"greater"} for right-sided, or \code{"less"} for left-sided tests. The optional \code{ROPE} argument specifies bounds for an interval null hypothesis. If \code{ROPE = NULL}, a point-null test is assumed.
+#' The argument \code{alternative} specifies the direction of the test and can be set to \code{"two.sided"}, \code{"greater"}, or \code{"less"}.
+#'
+#' \strong{Interval Null Hypothesis:}
+#'
+#' The interval null hypothesis can be specified using the argument \code{ROPE},
+#' which defines an interval around the null value of \code{h0}.
+#'
+#' The required form of \code{ROPE} depends on the direction of \code{alternative}:
+#' \itemize{
+#' \item \code{"greater"} or \code{"less"}: \code{ROPE} must be a scalar.
+#'   It should be positive for \code{"greater"} and negative for \code{"less"}.
+#' \item \code{"two.sided"}: \code{ROPE} must be a numeric vector of length 2,
+#'   where the lower bound is negative and the upper bound is positive.
+#' }
+#'
+#' If \code{ROPE = NULL}, a point-null hypothesis is assumed.
 #'
 #' \strong{Analysis Priors:}
 #'
-#' The analysis prior specifies the prior distribution of the correlation under the alternative hypothesis. Depending on \code{prior_analysis}, the user must supply:
+#' The user must specify the analysis prior under the alternative hypothesis using \code{prior_analysis}:
 #' \itemize{
 #' \item \code{d_beta} (default beta): \code{k} > 0.
 #' \item \code{beta} (stretched beta): \code{alpha} and \code{beta} > 0.
@@ -711,18 +740,16 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
 #'
 #' \strong{Design Priors (optional):}
 #'
-#' A design prior can be supplied to reflect uncertainty about the correlation during study planning. If provided, \code{prior_design} must be one of \code{"d_beta"}, \code{"beta"}, \code{"Moment"}, or \code{"Point"}, and the corresponding parameters must be supplied:
+#' The design prior under the alternative hypothesis can optionally be specified using \code{prior_design}:
 #' \itemize{
-#' \item \code{d_beta}: \code{k_d} > 0.
-#' \item \code{beta}: \code{alpha_d} and \code{beta_d} > 0.
-#' \item \code{Moment}: \code{scale_d} > 0.
-#' \item \code{Point}: \code{location_d} numeric scalar.
+#' \item \code{d_beta} (default beta): \code{k_d} > 0.
+#' \item \code{beta} (stretched beta): \code{alpha_d} and \code{beta_d} > 0.
+#' \item \code{Moment} (normal-moment prior): \code{scale_d} > 0.
+#' \item \code{Point} (point prior): \code{location_d}.
 #' }
 #'
-#' \strong{Interval Null Hypothesis:}
-#'
-#' If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval null. Otherwise, a point-null hypothesis is assumed.
-#'
+#' If \code{prior_design} is \code{NULL}, no design prior is used.
+
 #' @return A list of class \code{BFpower_r} containing:
 #' \itemize{
 #'   \item \code{type}: Test type (always "Correlation").
@@ -920,8 +947,8 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
       stop("Argument [false_rate] (targeted false positive or false negative rate) must be a numeric scalar strictly greater than 0.001 and smaller than 0.1")
     }
 
-    if (!is.numeric(threshold) || length(threshold) != 1 || !is.finite(threshold) || threshold <= 1) {
-      stop("Argument [threshold] threshold of compelling evidence must be a numeric scalar greater than 1")
+    if (!is.numeric(threshold) || length(threshold) != 1 || !is.finite(threshold) || threshold < 1) {
+      stop("Argument [threshold] threshold of compelling evidence must be a numeric scalar being at least 1")
     }
   } else{
     true_rate=false_rate=0
@@ -1000,15 +1027,13 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
 }
 #' Sample Size Determination for the Bayesian F-Test
 #'
-#' Computes required sample size or probabilities of compelling or misleading
-#' evidence for a fixed sample size.
 #'
 #' @description
-#' This function performs sample size determination (when \code{N = NULL}) or
-#' calculates the probability of compelling/misleading evidence for a fixed sample
-#' size.
+#' Perform sample size determination or power calculation of compelling and misleading evidence for a Bayesian F-test comparing a full model to a nested reduced model.
+#' Can handle both point-null and interval-null hypothesis, and allows specifying
+#' analysis and design priors.
 #'
-#' @param threshold Numeric scalar. Threshold for compelling evidence (must be > 1).
+#' @param threshold Numeric scalar. Threshold for compelling evidence (must be at least 1).
 #'
 #' @param true_rate Numeric scalar. Targeted true positive or true negative rate (used only when
 #'   sample size determination is requested; \code{N = NULL}).
@@ -1054,9 +1079,9 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
 #'
 #' @details
 #'
-#' \strong{1. Sample size determination mode (when \code{N = NULL}):}
+#' \strong{1. Sample Size Determination Mode (when \code{N = NULL}):}
 #'
-#' If no sample size is provided, the function calculates the minimum sample size to achieve the desired configuration below. The user must provide:
+#' If no sample size is provided, the function calculates the minimum sample size needed to achieve the desired configuration below. The user must provide:
 #' \itemize{
 #'   \item \code{type_rate} - either \code{"positive"} to control true/false positive rates, or \code{"negative"} to control true/false negative rates.
 #'   \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
@@ -1064,30 +1089,37 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
 #'   \item \code{threshold} - the Bayes factor threshold for compelling evidence (must be > 1).
 #' }
 #'
-#' The function iteratively finds the smallest sample size for which the probability of obtaining compelling evidence meets or exceeds \code{true_rate}, while the probability of misleading evidence does not exceed \code{false_rate}.
+#' The function iteratively finds the smallest sample size for which the probability of obtaining compelling evidence (i.e., true positive/negative rate) meets or exceeds \code{true_rate}, while the probability of misleading evidence (i.e., false positive/negative rate) does not exceed \code{false_rate}.
 #'
-#' \strong{2. Fixed-sample analysis mode (when \code{N} is supplied):}
+#' \strong{2. Fixed-sample Analysis Mode (when \code{N} is supplied):}
 #'
-#' If a positive numeric sample size \code{N} is provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, the arguments \code{type_rate}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
-#'
-#' \strong{Model specification:}
-#'
-#' The function requires the user to specify the full model (\code{k} predictors) and the reduced model (\code{p} predictors, \code{k > p}), and the analysis prior under the alternative hypothesis. Depending on the chosen \code{prior_analysis}, different arguments are required:
-#' \itemize{
-#'   \item \code{prior_analysis = "effectsize"}: requires \code{rscale} (scale parameter) and \code{f_m} (Cohen's f effect-size), and \code{dff} (degrees of freedom).
-#'   \item \code{prior_analysis = "Moment"}: requires \code{f_m} (Cohen's f effect-size) and \code{dff} (degrees of freedom, must be >= 3); \code{rscale} is not used.
-#' }
-#' The design prior under the alternative hypothesis can optionally be specified using \code{prior_design}, which can be:
-#' \itemize{
-#'   \item \code{"effectsize"}: requires \code{rscale_d}, \code{f_m_d}, and \code{dff_d}.
-#'   \item \code{"Moment"}: requires \code{f_m_d} and \code{dff_d} (>=3); \code{rscale_d} is not used.
-#'   \item \code{"Point"}: requires \code{f_m_d} only; \code{rscale_d} and \code{dff_d} are not used.
-#' }
+#' If a positive numeric sample size \code{N} is provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, \code{type_rate}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
 #'
 #' \strong{Interval Null Hypothesis:}
 #'
-#' If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval null. Otherwise, a point-null hypothesis is assumed.
+#' The interval null hypothesis can be specified using the argument \code{ROPE},
+#' which defines an interval around the null value of 0. The specified value of \code{ROPE} should be a positive numeric scaler.
+#' If \code{ROPE = NULL}, a point-null hypothesis is assumed.
 #'
+#' \strong{Analysis Priors:}
+#'
+#' The user must specify the analysis prior under the alternative hypothesis using \code{prior_analysis}:
+#' \itemize{
+#' \item \code{effectsize} (effect size prior): \code{rscale} > 0, \code{f_m} , and \code{dff}.
+#' \item \code{Moment} (normal-moment prior): \code{f_m} and \code{dff} \eqn{\ge 3}.
+#' }
+#'
+#' \strong{Design Priors (optional):}
+#'
+#' The design prior under the alternative hypothesis can optionally be specified using \code{prior_design}:
+#' \itemize{
+#' \item \code{effectsize} (effect size prior): \code{rscale_d} > 0, \code{f_m_d}, and \code{dff_d} .
+#' \item \code{Moment} (normal-moment prior): \code{f_m_d} and \code{dff_d} \eqn{\ge 3}.
+#' \item \code{Point} (point prior): \code{f_m_d}.
+#' }
+#' If \code{prior_design} is \code{NULL}, no design prior is used.
+#'
+
 #
 #' @return A list of class \code{BFpower} containing:
 #'   \itemize{
@@ -1339,11 +1371,12 @@ BFpower.f.test <- function(threshold, true_rate, false_rate , p , k ,
 }
 #' Sample Size Determination for the Bayesian One-Proportion Test
 #'
-#' Perform sample size determination or the calculation of compelling and misleading evidence
-#' for a Bayesian test of a single proportion.
+#' Perform sample size determination or power calculation of compelling and misleading evidence for a Bayesian test of a single proportion.
+#' Can handle both point-null and interval-null hypothesis, and allows specifying
+#' analysis and design priors.
 #'
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
-#' @param threshold Numeric scalar. Threshold for compelling evidence (must be > 1).
+#' @param threshold Numeric scalar. Threshold for compelling evidence (must be at least 1).
 #' @param h0 Numeric scalar. Null proportion value for the test (numeric scalar between 0.1 and 0.9).
 #' @param true_rate Numeric scalar. Targeted true positive rate  or true negative rate .
 #' @param false_rate Numeric scalar. Targeted false positive rate  or false negative rate .
@@ -1364,45 +1397,59 @@ BFpower.f.test <- function(threshold, true_rate, false_rate , p , k ,
 #' @param type_rate Character. Either `"positive"` (controls true/false positive rates) or `"negative"` (controls true/false negative rates).
 #' @details
 #'
-#' \strong{1. Sample size determination mode (when \code{N = NULL}):}
+#' \strong{1. Sample Size Determination Mode (when \code{N = NULL}):}
 #'
 #' If no sample size is provided, the function calculates the minimum sample size needed to achieve the desired configuration below. The user must provide:
 #' \itemize{
 #' \item \code{type_rate} - either \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.
 #' \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
 #' \item \code{false_rate} - the acceptable false positive or false negative rate (between 0.001 and 0.1).
-#' \item \code{threshold} - the Bayes factor threshold for compelling evidence (must be > 1).
+#' \item \code{threshold} - the Bayes factor threshold for compelling evidence (must be at least 1).
 #' }
 #'
-#' The function iteratively finds the smallest sample size for which the probability of obtaining compelling evidence meets or exceeds \code{true_rate}, while the probability of misleading evidence does not exceed \code{false_rate}.
+#' The function iteratively finds the smallest sample size for which the probability of obtaining compelling evidence (i.e., true positive/negative rate) meets or exceeds \code{true_rate}, while the probability of misleading evidence (i.e., false positive/negative rate) does not exceed \code{false_rate}.
 #'
-#' \strong{2. Fixed-sample analysis mode (when \code{N} is supplied):}
+#' \strong{2. Fixed-sample Analysis Mode (when \code{N} is supplied):}
 #'
 #' If a positive numeric sample size \code{N} is provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, \code{type_rate}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
 #'
-#' \strong{Model specification:}
+#' \strong{Direction of the Alternative Hypothesis:}
 #'
-#' The user must specify the analysis prior under the alternative hypothesis using \code{prior_analysis}:
-#' \itemize{
-#' \item \code{prior_analysis = "beta"}: requires \code{alpha} and \code{beta} parameters (shape parameters of the beta distribution).
-#' \item \code{prior_analysis = "Moment"}: requires \code{scale} parameter (scale of the moment prior).
-#' }
-#' The design prior under the alternative hypothesis can optionally be specified using \code{prior_design}:
-#' \itemize{
-#' \item \code{"beta"}: requires \code{alpha_d} and \code{beta_d}.
-#' \item \code{"Moment"}: requires \code{scale_d}.
-#' \item \code{"Point"}: requires \code{location_d}, representing the true proportion under the alternative hypothesis.
-#' }
-#' If \code{prior_design} is \code{NULL}, no design prior is used.
+#' The argument \code{alternative} specifies the direction of the test and can be set to \code{"two.sided"}, \code{"greater"}, or \code{"less"}.
 #'
 #' \strong{Interval Null Hypothesis:}
 #'
-#' If \code{ROPE} is provided, the function evaluates the Bayes factor for an interval null. Otherwise, a point-null hypothesis is assumed.
+#' The interval null hypothesis can be specified using the argument \code{ROPE},
+#' which defines an interval around the null value of \code{h0}.
 #'
-#' \strong{Hypothesis:}
+#' The required form of \code{ROPE} depends on the direction of \code{alternative}:
+#' \itemize{
+#' \item \code{"greater"} or \code{"less"}: \code{ROPE} must be a scalar.
+#'   It should be positive for \code{"greater"} and negative for \code{"less"}.
+#' \item \code{"two.sided"}: \code{ROPE} must be a numeric vector of length 2,
+#'   where the lower bound is negative and the upper bound is positive.
+#' }
 #'
-#' The function supports one-sided (\code{"greater"} or \code{"less"}) and two-sided (\code{"two.sided"}) tests. Design prior and interval null bounds must be consistent with the directionality of the hypothesis.
+#' If \code{ROPE = NULL}, a point-null hypothesis is assumed.
 #'
+#'
+#' \strong{Analysis Priors:}
+#'
+#' The user must specify the analysis prior under the alternative hypothesis using \code{prior_analysis}:
+#' \itemize{
+#' \item \code{beta} (beta prior): \code{alpha} and \code{beta} > 0.
+#' \item \code{Moment} (normal-moment prior) : \code{scale} > 0.
+#' }
+#'
+#' \strong{Design Priors (optional):}
+#'
+#' The design prior under the alternative hypothesis can optionally be specified using \code{prior_design}:
+#' \itemize{
+#' \item \code{beta} (beta prior): \code{alpha_d} and \code{beta_d} > 0.
+#' \item \code{Moment} (normal-moment prior): \code{scale_d} > 0.
+#' \item \code{Point} (point prior): \code{location_d} numeric scalar.
+#' }
+#' If \code{prior_design} is \code{NULL}, no design prior is used.
 #'
 #' @return A list of class \code{"BFpower"} containing:
 #' \itemize{
@@ -1601,8 +1648,8 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
       stop("Argument [false_rate] (targeted false positive or false negative rate) must be a numeric scalar strictly greater than 0.001 and smaller than 0.1")
     }
 
-    if (!is.numeric(threshold) || length(threshold) != 1 || !is.finite(threshold) || threshold <= 1) {
-      stop("Argument [threshold] threshold of compelling evidence must be a numeric scalar greater than 1")
+    if (!is.numeric(threshold) || length(threshold) != 1 || !is.finite(threshold) || threshold < 1) {
+      stop("Argument [threshold] threshold of compelling evidence must be a numeric scalar being at least 1")
     }
   } else{
     true_rate=false_rate=0
@@ -1682,8 +1729,12 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
 
 #' Sample Size Determination for the Bayesian Test of Two Proportions
 #'
-#' Perform sample size determination or calculate probabilities of compelling and misleading evidence
-#' for a Bayesian comparison of two proportions.
+#'
+#' Perform sample size determination or power calculation of compelling and misleading evidence for a Bayesian test of two proportions.
+#' Under the null hypothesis, \eqn{\theta_1 = \theta_2} and it is
+#' assigned a shared analysis beta prior. Under the alternative hypothesis, \eqn{\theta_1} and
+#' \eqn{\theta_2} are treated as distinct parameters and are assigned independent beta analysis priors.
+#' The function supports the specification of point design prior.
 #'
 #' @param threshold Numeric scalar. Threshold of compelling evidence.
 #' @param true_rate Numeric scalar. Targeted true positive rate (if \code{positive = "positive"}) or true negative rate (if \code{positive = "negative"}).
@@ -1694,19 +1745,19 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
 #' @param a2 Numeric scalar. Alpha parameter of the Beta analysis prior for group 2 under the alternative hypothesis.
 #' @param b2 Numeric scalar. Beta parameter of the Beta analysis prior for group 2 under the alternative hypothesis.
 #' @param prior_design_1 Character. The design prior of group 1: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).
-#' @param a1d Numeric scalar. Alpha parameter of the design prior for group 1 (used if \code{model1 = "beta"}).
-#' @param b1d Numeric scalar. Beta parameter of the design prior for group 1 (used if \code{model1 = "beta"}).
-#' @param dp1 Numeric scalar. True proportion for group 1 in the design prior (used if \code{model1 = "Point"}).
+#' @param a1d Numeric scalar. Alpha parameter of the design prior for group 1 (used if \code{prior_design_1 = "beta"}).
+#' @param b1d Numeric scalar. Beta parameter of the design prior for group 1 (used if \code{prior_design_1 = "beta"}).
+#' @param dp1 Numeric scalar. True proportion for group 1 in the design prior (used if \code{prior_design_1 = "Point"}).
 #' @param prior_design_2 Character. The design prior of group 2: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).
-#' @param a2d Numeric scalar. Alpha parameter of the design prior for group 2 (used if \code{model2 = "beta"}).
-#' @param b2d Numeric scalar. Beta parameter of the design prior for group 2 (used if \code{model2 = "beta"}).
-#' @param dp2 Numeric scalar. True proportion for group 2 in the design prior (used if \code{model2 = "Point"}).
+#' @param a2d Numeric scalar. Alpha parameter of the design prior for group 2 (used if \code{prior_design_2 = "beta"}).
+#' @param b2d Numeric scalar. Beta parameter of the design prior for group 2 (used if \code{prior_design_2 = "beta"}).
+#' @param dp2 Numeric scalar. True proportion for group 2 in the design prior (used if \code{prior_design_2 = "Point"}).
 #' @param N1 Numeric integer. Sample size for group 1.
 #' @param N2 Numeric integer. Sample size for group 2.
-#' @param type_rate Character. Choose \code{"positive"} to control true/false positive rates or \code{"negative"} to control true/false negative rates.
+#' @param type_rate Character. Choose \code{"positive"} to control true positive rate or \code{"negative"} to control true negative rate.
 #' @details
 #'
-#' \strong{1. Sample size determination mode (when \code{N1 = NULL} and \code{N2 = NULL}):}
+#' \strong{1. Sample Size Determination Mode (when \code{N1 = NULL} and \code{N2 = NULL}):}
 #'
 #' If no sample sizes are provided for the two groups, the function calculates the minimum sample sizes needed to achieve the desired configuration. The user must provide:
 #' \itemize{
@@ -1715,25 +1766,40 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
 #' \item \code{threshold} - the Bayes factor threshold for compelling evidence (must be > 1).
 #' }
 #'
-#' The function iteratively finds the smallest sample sizes for which the probability of obtaining compelling evidence meets or exceeds \code{true_rate}.
+#' The function iteratively finds the smallest sample sizes for which the probability of obtaining compelling evidence (i.e., true positive/negative rate) meets or exceeds \code{true_rate}.
 #'
-#' \strong{2. Fixed-sample analysis mode (when \code{N1} and \code{N2} are supplied):}
+#' \strong{2. Fixed-sample Analysis Mode (when \code{N1} and \code{N2} are supplied):}
 #'
 #' If positive numeric sample sizes \code{N1} and \code{N2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for these fixed sample sizes. In this mode, \code{type_rate} and \code{true_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
 #'
-#' \strong{Model specification:}
+#' \strong{Analysis Priors:}
 #'
-#' The user must specify the analysis priors under the null and alternative hypotheses using Beta parameters:
+#' The user must specify the analysis priors under the null and alternative hypotheses:
 #' \itemize{
-#' \item \code{a0}, \code{b0} - Beta parameters for the null hypothesis prior.
-#' \item \code{a1}, \code{b1} - Beta parameters for the analysis prior of group 1 under the alternative hypothesis.
-#' \item \code{a2}, \code{b2} - Beta parameters for the analysis prior of group 2 under the alternative hypothesis.
+#' \item Null hypothesis: Beta prior with parameters \code{a0} and \code{b0}.
+#' \item Alternative hypothesis:
+#'   \itemize{
+#'   \item Group 1: Beta prior with hyperparameters \code{a1} and \code{b1}.
+#'   \item Group 2: Beta prior with hyperparameters \code{a2} and \code{b2}.
+#'   }
 #' }
+#'
+#' \strong{Design Priors (optional):}
 #'
 #' Design priors for the alternative hypothesis can optionally be specified:
 #' \itemize{
-#' \item \code{prior_design_1}, \code{a1d}, \code{b1d}, \code{dp1} - design prior for group 1 (\code{"same"} uses the analysis prior, \code{"beta"} requires Beta parameters, \code{"Point"} uses a fixed proportion).
-#' \item \code{prior_design_2}, \code{a2d}, \code{b2d}, \code{dp2} - design prior for group 2.
+#' \item Group 1 design prior (\code{prior_design_1}):
+#'   \itemize{
+#'   \item \code{"same"}: uses the corresponding analysis prior (\code{a1}, \code{b1}).
+#'   \item \code{"beta"} (beta prior): requires hyperparameters \code{a1d} and \code{b1d}.
+#'   \item \code{"Point"} (point prior): requires fixed proportion \code{dp1}.
+#'   }
+#' \item Group 2 design prior (\code{prior_design_2}):
+#'   \itemize{
+#'   \item \code{"same"}: uses the corresponding analysis prior (\code{a2}, \code{b2}).
+#'   \item \code{"beta"} (beta prior): requires hyperparameters \code{a2d} and \code{b2d}.
+#'   \item \code{"Point"} (point prior): requires fixed proportion \code{dp2}.
+#'   }
 #' }
 #'
 #' @return An object of class \code{BFpower} (a list) containing:
@@ -1788,8 +1854,8 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
       stop("Argument [true_rate] (targeted true positive or true negative rate) must be a numeric scalar strictly greater than 0.6 and smaller than 0.999.")
     }
 
-    if (!is.numeric(threshold) || length(threshold) != 1 || !is.finite(threshold) || threshold <= 1) {
-      stop("Argument [threshold] threshold of compelling evidence must be a numeric scalar greater than 1")
+    if (!is.numeric(threshold) || length(threshold) != 1 || !is.finite(threshold) || threshold < 1) {
+      stop("Argument [threshold] threshold of compelling evidence must be a numeric scalar being at least 1")
     }
   } else{
     true_rate=0
@@ -1995,7 +2061,7 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
 #'   \code{"Moment"} (normal-moment prior), or \code{"t-distribution"} (t-distribution).
 #' @param location Numeric scalar. Location parameter for the analysis prior under the alternative hypothesis.
 #' @param scale Numeric scalar. Scale parameter for the analysis prior under the alternative hypothesis (must be > 0).
-#' @param dff Numeric scalar. Degrees of freedom for the t-distribution prior (only required if \code{prior_analysis = "t-distribution"}; must be > 0). Ignored otherwise.
+#' @param dff Numeric scalar. Degrees of freedom for the t-distribution prior (only required if \code{prior_analysis = "t-distribution"}; must be > 0).
 #' @param alternative Character. The direction of the alternative hypothesis two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
 #' @param ROPE Optional numeric vector. Specifies bounds for an interval
 #'   null hypothesis. For \code{"two.sided"} this must be a numeric vector
@@ -2300,7 +2366,7 @@ BF10.ttest.TwoSample <- function(tval, N1, N2, prior_analysis, location, scale, 
 #'   numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.
 #' @return A list with class \code{"BFvalue_r"} containing:
 #' \itemize{
-#'   \item \code{type}: "correlation"
+#'   \item \code{type}: "Correlation"
 #'   \item \code{bf10}: Calculated Bayes factor BF10
 #'   \item \code{h0}: Null value of the correlation
 #'   \item \code{r}: Observed correlation coefficient
@@ -2308,7 +2374,7 @@ BF10.ttest.TwoSample <- function(tval, N1, N2, prior_analysis, location, scale, 
 #'   \item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
 #'   \item \code{alternative}: the direction of the alternative hypothesis
 #'   \item \code{ROPE}: Interval bounds if specified
-#'   \item \code{p.value}: Numeric, p.value.
+#'   \item \code{p.value}: Numeric, p-value.
 #' }
 #'
 #' @examples
@@ -2444,7 +2510,7 @@ BF10.cor <- function(r, n, k, alpha, beta, h0, alternative,  scale,  prior_analy
 #' Bayes Factor for a Bayesian F-Test
 #'
 #' Computes the Bayes factor (BF10) for an F-test, comparing a full model to a
-#' reduced model under either an effect-size prior or a Moment prior.
+#' reduced model under either an effect-size prior or a moment prior.
 #' Optionally, an interval null hypothesis can be specified.
 #'
 #' @param fval Numeric scalar. Observed F statistic (must be at least 0).
@@ -2470,7 +2536,7 @@ BF10.cor <- function(r, n, k, alpha, beta, h0, alternative,  scale,  prior_analy
 #'     \item \code{analysis_h1}: List containing the analysis prior specification, including
 #'       the prior distribution, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
 #'     \item \code{bf10}: The computed Bayes factor.
-#'     \item \code{p.value}: p-value.
+#'     \item \code{p.value}: Numeric, p-value.
 #'   }
 #' @examples
 #' BF10.f.test(
@@ -2604,7 +2670,7 @@ BF10.f.test <- function(fval, df1, df2, dff, rscale, f_m, prior_analysis, ROPE =
 #'     \code{beta} (beta parameter), and \code{scale} (scale parameter).
 #'     \item \code{alternative}: the direction of the alternative hypothesis.
 #'     \item \code{ROPE}: interval null bounds (if specified).
-#'     \item \code{p.value}: p-value.
+#'     \item \code{p.value}: Numeric, p-value.
 #'   }
 #'
 #' @examples
@@ -2762,7 +2828,7 @@ BF10.bin.test <- function(x, n, alpha, beta, h0, scale, prior_analysis, alternat
 #'   \item \code{bf10}: the computed Bayes factor (BF10).
 #'   \item \code{N1}, \code{x1}, \code{N2}, \code{x2}: the input sample sizes and observed successes.
 #'    \item \code{OddRatio}: observed odd ratio.
-#'    \item \code{p.value}: p.value.
+#'    \item \code{p.value}: Numeric, p-value.
 #' }
 #' @examples
 #' BF10.props(

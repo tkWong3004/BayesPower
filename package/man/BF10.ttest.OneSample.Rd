@@ -28,7 +28,7 @@ alternative hypothesis. Must be either \code{"Normal"} (normal distribution),
 
 \item{scale}{Numeric scalar. Scale parameter for the analysis prior under the alternative hypothesis (must be > 0).}
 
-\item{dff}{Numeric scalar. Degrees of freedom for the t-distribution prior (only required if \code{prior_analysis = "t-distribution"}; must be > 0). Ignored otherwise.}
+\item{dff}{Numeric scalar. Degrees of freedom for the t-distribution prior (only required if \code{prior_analysis = "t-distribution"}; must be > 0).}
 
 \item{alternative}{Character. The direction of the alternative hypothesis two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
