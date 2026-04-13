@@ -45,13 +45,13 @@ cat(alt_hypothesis)
 }else if (params$bin$interval == 2) {
   # Extract epsilon values
   hyp <- params$bin$alternative
-  e <- params$bin$e
+  ROPE <- params$bin$ROPE
   location <-params$bin$location
 
 eps <- switch(hyp,
-  "greater"  = list(eps_neg = 0,       eps_pos = location+e),
-  "less"  = list(eps_neg =location+ e,       eps_pos = 0),
-  "two.sided" = list(eps_neg = location+e[1],    eps_pos = location+e[2]),
+  "greater"  = list(eps_neg = 0,       eps_pos = location+ROPE),
+  "less"  = list(eps_neg =location+ ROPE,       eps_pos = 0),
+  "two.sided" = list(eps_neg = location+ROPE[1],    eps_pos = location+ROPE[2]),
   list(eps_neg = NA,             eps_pos = NA)  # default/fallback
 )
 

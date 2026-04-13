@@ -320,7 +320,7 @@ prior_plot_f <- function(q, dff, rscale, f_m, prior_analysis,
   }
 
   # ---- Legend position ----
-  legend_pos <- c(0.70, 0.95)
+  legend_pos <- c(0.65, 0.95)
 
   # ---- Base ggplot ----
   p <- ggplot2::ggplot(df,
