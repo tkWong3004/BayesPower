@@ -15,7 +15,7 @@ t.pval <- function(tval, n1, n2 = NULL, alternative, ROPE = NULL, type = "One-sa
     p <- switch(alternative,
                 "less" = stats::pt(tval, df),
                 "greater" = stats::pt(tval, df, lower.tail = FALSE),
-                "two.sided" = 2 * stats::pt(abs(tval), df, lower.tail = FALSE))
+                "two.sided" = 1-(stats::pt(abs(tval), df)-stats::pt(-abs(tval), df)))
   } else {
     # ROPE specified
     if (alternative %in% c("less", "greater")) {
@@ -56,7 +56,7 @@ r.pval <- function(r, n,h0, alternative , ROPE = NULL) {
   } else {
     ROPE = h0+ROPE
 
-    Z.h1  <- r_mean(ROPE)
+    Z.h1  <- Z.h0 + r_mean(ROPE)
 
     p <- switch(alternative,
                 "less" = stats::pnorm(Z.obs, mean=Z.h1,sd=Z.sd,lower.tail = F),

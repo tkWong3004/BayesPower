@@ -31,35 +31,51 @@ BF10.bin.test(
 
 \item{scale}{Numeric scalar.  Scale parameter for the analysis prior (only used if \code{prior_analysis = "Moment"}).}
 
-\item{prior_analysis}{Character. the analysis prior under the alternative hypothesis:
+\item{prior_analysis}{Character. The analysis prior under the alternative hypothesis:
 \code{"beta"} (stretched beta) or \code{"Moment"} (normal-moment prior).}
 
 \item{alternative}{Character. Hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}),
 or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
-null hypothesis. For \code{"two.sided"} this must be a numeric vector
-of length 2 with two distinct finite values; for \code{"greater"} a
-numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
+\item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
+null hypothesis relative to \code{h0}. That is, the ROPE defines a region
+around \code{h0}, and the effective null interval is computed as
+\code{h0 + ROPE}.
+
+For \code{"two.sided"} this must be a numeric vector of length 2 with two
+distinct finite values such that the first element is negative and the second
+element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting null
+interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.
+
+For \code{"greater"} this must be a numeric scalar > 0, defining an upper
+deviation from \code{h0}, so the null region extends from \code{h0} to
+\code{h0 + ROPE}.
+
+For \code{"less"} this must be a numeric scalar < 0, defining a lower
+deviation from \code{h0}, so the null region extends from \code{h0 + ROPE}
+to \code{h0}.
+
+Example: If \code{h0 = 0.5} and \code{ROPE = c(-0.2, 0.2)}, then the effective
+null interval is \code{[0.3, 0.7]}.}
 }
 \value{
-An object of class \code{"BFvalue_bin"} containing:
+An object of class \code{BFvalue} containing:
 \itemize{
-\item \code{bf10}: Bayes factor in favor of the alternative hypothesis.
-\item \code{type}: Test type ("One-proportion").
-\item \code{x}: Number of successes.
-\item \code{n}: Sample size.
-\item \code{h0}: Null proportion value.
+\item \code{type}: Character. Test type (always "One-proportion").
+\item \code{bf10}: Numeric scalar, The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.
+\item \code{h0}: Numeric scalar, Null proportion value.
+\item \code{x}: Non-negative integer scalar,  Number of successes.
+\item \code{n}: Positive integer scalar, Sample size.
 \item \code{analysis_h1}: List describing the analysis prior, containing
 \code{prior} (prior distribution), \code{alpha} (alpha parameter),
 \code{beta} (beta parameter), and \code{scale} (scale parameter).
-\item \code{alternative}: the direction of the alternative hypothesis.
-\item \code{ROPE}: interval null bounds (if specified).
-\item \code{p.value}: Numeric, p-value.
+\item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
+\item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
+\item \code{p.value}: Numeric scalar, p-value.
 }
 }
 \description{
-Calculate the Bayes factor (BF10) for a single-proportion test, either against a point null
+Calculate the Bayes factor (BF10) for a one-proportion test, either against a point null
 or an interval null hypothesis.
 }
 \examples{

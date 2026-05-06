@@ -32,24 +32,27 @@ alternative hypothesis. Must be either \code{"Normal"} (normal distribution),
 
 \item{alternative}{Character. The direction of the alternative hypothesis two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
+\item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
 null hypothesis. For \code{"two.sided"} this must be a numeric vector
-of length 2 with two distinct finite values; for \code{"greater"} a
-numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
+of length 2 with two distinct finite values such that the first element
+is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}).
+For \code{"greater"} this must be a numeric scalar > 0; and for \code{"less"}
+a numeric scalar < 0.}
 }
 \value{
-An object of class \code{"BFvalue_t"} containing:
+A list of class \code{BFvalue} containing:
 \itemize{
-\item \code{type}: Character indicating "One-sample t-test".
-\item \code{bf10}: Numeric, the Bayes factor (BF10).
-\item \code{tval}: Observed t-value.
-\item \code{df}: Degrees of freedom.
+\item \code{type}: Character. Test type (always "One-sample t-test").
+\item \code{bf10}: Numeric scalar, The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.
+\item \code{tval}: Numeric scalar, Observed t-value.
+\item \code{df}: Numeric scalar, Degrees of freedom.
 \item \code{analysis_h1}: List with the analysis prior parameters:
-\code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.
+\code{prior} (prior distribution), \code{location}, \code{scale}, and
+optionally \code{dff}.
 \item \code{alternative}: Character, the direction of the alternative hypothesis.
-\item \code{ROPE}: Optional numeric vector of interval null bounds.
-\item \code{d}: Numeric, observed Cohen's d.
-\item \code{p.value}: Numeric, p-value.
+\item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
+\item \code{d}: Numeric scalar, observed Cohen's d.
+\item \code{p.value}: Numeric scalar, p-value.
 }
 }
 \description{

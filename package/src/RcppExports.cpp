@@ -11,12 +11,12 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // BF_grid_rcpp
-DataFrame BF_grid_rcpp(double D, double a0, double b0, double a1, double b1, int n1, double a2, double b2, int n2, std::string model1, double da1, double db1, double dp1, std::string model2, double da2, double db2, double dp2);
-RcppExport SEXP _BayesPower_BF_grid_rcpp(SEXP DSEXP, SEXP a0SEXP, SEXP b0SEXP, SEXP a1SEXP, SEXP b1SEXP, SEXP n1SEXP, SEXP a2SEXP, SEXP b2SEXP, SEXP n2SEXP, SEXP model1SEXP, SEXP da1SEXP, SEXP db1SEXP, SEXP dp1SEXP, SEXP model2SEXP, SEXP da2SEXP, SEXP db2SEXP, SEXP dp2SEXP) {
+DataFrame BF_grid_rcpp(double threshold, double a0, double b0, double a1, double b1, int n1, double a2, double b2, int n2, std::string prior_design_1, double da1, double db1, double dp1, std::string prior_design_2, double da2, double db2, double dp2);
+RcppExport SEXP _BayesPower_BF_grid_rcpp(SEXP thresholdSEXP, SEXP a0SEXP, SEXP b0SEXP, SEXP a1SEXP, SEXP b1SEXP, SEXP n1SEXP, SEXP a2SEXP, SEXP b2SEXP, SEXP n2SEXP, SEXP prior_design_1SEXP, SEXP da1SEXP, SEXP db1SEXP, SEXP dp1SEXP, SEXP prior_design_2SEXP, SEXP da2SEXP, SEXP db2SEXP, SEXP dp2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type D(DSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
     Rcpp::traits::input_parameter< double >::type a0(a0SEXP);
     Rcpp::traits::input_parameter< double >::type b0(b0SEXP);
     Rcpp::traits::input_parameter< double >::type a1(a1SEXP);
@@ -25,15 +25,15 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type a2(a2SEXP);
     Rcpp::traits::input_parameter< double >::type b2(b2SEXP);
     Rcpp::traits::input_parameter< int >::type n2(n2SEXP);
-    Rcpp::traits::input_parameter< std::string >::type model1(model1SEXP);
+    Rcpp::traits::input_parameter< std::string >::type prior_design_1(prior_design_1SEXP);
     Rcpp::traits::input_parameter< double >::type da1(da1SEXP);
     Rcpp::traits::input_parameter< double >::type db1(db1SEXP);
     Rcpp::traits::input_parameter< double >::type dp1(dp1SEXP);
-    Rcpp::traits::input_parameter< std::string >::type model2(model2SEXP);
+    Rcpp::traits::input_parameter< std::string >::type prior_design_2(prior_design_2SEXP);
     Rcpp::traits::input_parameter< double >::type da2(da2SEXP);
     Rcpp::traits::input_parameter< double >::type db2(db2SEXP);
     Rcpp::traits::input_parameter< double >::type dp2(dp2SEXP);
-    rcpp_result_gen = Rcpp::wrap(BF_grid_rcpp(D, a0, b0, a1, b1, n1, a2, b2, n2, model1, da1, db1, dp1, model2, da2, db2, dp2));
+    rcpp_result_gen = Rcpp::wrap(BF_grid_rcpp(threshold, a0, b0, a1, b1, n1, a2, b2, n2, prior_design_1, da1, db1, dp1, prior_design_2, da2, db2, dp2));
     return rcpp_result_gen;
 END_RCPP
 }

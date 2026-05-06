@@ -23,79 +23,121 @@ cat("\n```")
 
 ```
 
-**Hypothesis**
+
 
 ```{r echo=FALSE, results='asis'}
-if (params$t2$interval == 1) {
-  cat("\\(\\mathcal{H}_0: \\delta = 0\\) vs ")
+delta <- "\\delta"
+
+cat("**Hypotheses**  \n")
+
+if (is.null(params$t2$ROPE) || params$t2$interval == 1) {
+
+  cat(sprintf("\\(\\mathcal{H}_0: %s = 0\\) vs ", delta))
 
   cat(switch(
     params$t2$alternative,
-    "greater" = "\\(\\mathcal{H}_1: \\delta > 0\\)\n",
-    "less" = "\\(\\mathcal{H}_1: \\delta < 0\\)\n",
-    "\\(\\mathcal{H}_1: \\delta \\neq 0\\)\n"
+    "two.sided" = sprintf("\\(\\mathcal{H}_1: %s \\neq 0\\)  \n", delta),
+    "greater"   = sprintf("\\(\\mathcal{H}_1: %s > 0\\)  \n", delta),
+    "less"      = sprintf("\\(\\mathcal{H}_1: %s < 0\\)  \n", delta)
   ))
-} else if (params$t2$interval == 2) {
-  # Extract epsilon values
-  hyp <- params$t2$alternative
-e <- params$t2$ROPE
 
-eps <- switch(hyp,
-  "greater"  = list(eps_neg = 0,       eps_pos = e),
-  "less"  = list(eps_neg = e,       eps_pos = 0),
-  "two.sided" = list(eps_neg = e[1],    eps_pos = e[2]),
-  list(eps_neg = NA,             eps_pos = NA)  # default/fallback
-)
+} else {
 
-cat(sprintf("\\(\\mathcal{H}_0: \\delta \\in \\{ %.2f, %.2f \\} \\) vs ", eps[1], eps[2]))
+  lower <- min(params$t2$ROPE)
+  upper <- max(params$t2$ROPE)
 
-cat(sprintf("\\(\\mathcal{H}_1: \\delta \\notin \\{ %.2f, %.2f \\} \\)", eps[1], eps[2]))
+  if (params$t2$alternative == "two.sided") {
 
-  
+    cat(sprintf(
+      "\\(\\mathcal{H}_0: %.2f \\leq %s \\leq %.2f\\) vs \\(\\mathcal{H}_1: %s < %.2f \\cup %s > %.2f\\)  \n",
+      lower, delta, upper, delta, lower, delta, upper
+    ))
 
-  
-  
-}
+  } else if (params$t2$alternative == "greater") {
 
-```
+    cat(sprintf(
+      "\\(\\mathcal{H}_0: 0 \\leq %s \\leq %.2f\\) vs \\(\\mathcal{H}_1: %s > %.2f\\)  \n",
+      delta, upper, delta, upper
+    ))
 
-```{r results='asis', echo=FALSE}
-if (params$t2$de_an_prior == 0) {
-  cat("**Analysis prior**  \n")}
-if (params$t2$de_an_prior == 1) {
-  cat("**Analysis and design prior**  \n")}
+  } else if (params$t2$alternative == "less") {
 
-cat(paste0(params$t2$prior_analysis,"(location = ", params$t2$location,", scale = ",params$t2$scale)
-    )
-if (params$t2$prior_analysis == "t-distribution"){
-  cat(paste0(", df = ",params$t2$dff),")")
-}else cat(paste0(")"))
-
-```
-
-
-```{r results='asis', echo=FALSE}
-if (params$t2$de_an_prior == 0) {
-  cat("**Design prior**  \n")
-  
-  if (params$t2$prior_design == "Point") {
-    cat(sprintf("Point(location = %s)  \n", params$t2$location_d))
-  } else {
-    cat(sprintf("%s(location = %s, scale = %s", 
-                params$t2$prior_design, 
-                params$t2$location_d, 
-                params$t2$scale_d))
-    
-    if (params$t2$prior_design == "t-distribution") {
-      cat(sprintf(", df = %s)\n", params$t2$dff_d))
-    } else {
-      cat(")\n")
-    }
+    cat(sprintf(
+      "\\(\\mathcal{H}_0: %.2f \\leq %s \\leq 0\\) vs \\(\\mathcal{H}_1: %s < %.2f\\)  \n",
+      lower, delta, delta, lower
+    ))
   }
 }
 ```
 
 
+
+```{r results='asis', echo=FALSE}
+fmt <- function(z) {
+  if (is.null(z) || length(z) == 0 || any(is.na(z))) return("NA")
+  format(round(as.numeric(z), 3), nsmall = 0, trim = TRUE)
+}
+
+print_prior_rmd <- function(prior, location, scale = NULL, dff = NULL) {
+
+  if (is.null(prior) || prior == "Point") {
+    return(sprintf("Point prior (location = %s)", fmt(location)))
+  }
+
+  if (prior == "Normal") {
+    return(sprintf(
+      "Normal (location = %s, scale = %s)",
+      fmt(location), fmt(scale)
+    ))
+  }
+
+  if (prior == "Moment") {
+    return(sprintf(
+      "Normal-moment (location = %s, scale = %s)",
+      fmt(location), fmt(scale)
+    ))
+  }
+
+  if (prior == "t-distribution") {
+    return(sprintf(
+      "t-distribution (location = %s, scale = %s, df = %s)",
+      fmt(location), fmt(scale), fmt(dff)
+    ))
+  }
+
+  as.character(prior)
+}
+
+analysis_prior_text <- print_prior_rmd(
+  prior = params$t2$prior_analysis,
+  location = params$t2$location,
+  scale = params$t2$scale,
+  dff = params$t2$dff
+)
+
+cat("**Analysis/design prior**  \n")
+
+cat("Analysis/design prior under \\(\\mathcal{H}_0\\):  \n")
+cat(analysis_prior_text, "  \n\n")
+
+cat("Analysis prior under \\(\\mathcal{H}_1\\):  \n")
+cat(analysis_prior_text, "  \n\n")
+
+cat("Design prior under \\(\\mathcal{H}_1\\):  \n")
+
+if (params$t2$de_an_prior == 1) {
+  cat(analysis_prior_text)
+} else {
+  cat(print_prior_rmd(
+    prior = params$t2$prior_design,
+    location = params$t2$location_d,
+    scale = params$t2$scale_d,
+    dff = params$t2$dff_d
+  ))
+}
+
+cat("  \n")
+```
 
 **Result**
 ```{r results='asis', echo=FALSE}
@@ -123,14 +165,12 @@ cat('$$', table_latex, '$$\n\n')
 
 cat("\n CSV format \n")
 
-# Prepare a CSV output for dat (excluding params$t2$D)
-dat_csv <- params$dat[1, ]  # assuming dat is a matrix or data frame row
+dat_csv <- params$dat[1, ]  
 
-# Remove the D column if you want (assuming D is params$t2$D, not in dat)
-# Just print the dat row as CSV
-cat("```\n")  # start of code block in markdown
+
+cat("```\n")  
 write.csv(as.data.frame(t(dat_csv)), row.names = TRUE, quote = FALSE)
-cat("```\n")  # end of code block in markdown
+cat("```\n")  
 ```
 
 ```{r results='asis', echo=FALSE}

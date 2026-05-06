@@ -25,9 +25,9 @@ df <- n1 + n2 - 2
 # two-sided p-value
 p_value <- 2 * pt(abs(t_value), df = df, lower.tail = FALSE)
 
-# Bayes factor
-BF10.ttest.TwoSample(
-  tval = -1.148,
+# finding the p-value using the function for calculating Bayes factor
+results <- BF10.ttest.TwoSample(
+  tval = t_value,
   N1 = 53,
   N2 = 48,
   prior_analysis = "t-distribution",
@@ -36,10 +36,11 @@ BF10.ttest.TwoSample(
   dff = 1,
   alternative = "two.sided"
 )
+results$p.value
 
 # interval Bayes Factor and equivalence test
 
-BF10.ttest.TwoSample(
+results<-BF10.ttest.TwoSample(
   tval = -1.148,
   N1 = 53,
   N2 = 48,
@@ -50,7 +51,8 @@ BF10.ttest.TwoSample(
   alternative = "two.sided",
   ROPE = c(-0.36,0.36)
 )
-
+print(results)
+1/results$bf10
 # variance of d
 var_d <- (n1 + n2) / (n1 * n2) + (d^2) / (2 * (n1 + n2))
 
@@ -79,7 +81,7 @@ plot(results, plot_power = TRUE, plot_rel = TRUE)
 #### Example 2 - Correlation
 #calculating the Bayes factor
 
-BF10.cor(
+results <- BF10.cor(
   r = 0.393,
   n = 46,
   prior_analysis = "d_beta",
@@ -87,30 +89,33 @@ BF10.cor(
   h0 = 0,
   alternative = "two.sided"
 )
+results
+results$bf10
 
 # if r is not rounded, the bayes factors between ours and Ly et al will be the same
-BF10.cor(
-  r = 0.3930924,
+results <- BF10.cor(
+  r = 0.3930924,   # this value is extracted from Ly et al
   n = 46,
   prior_analysis = "d_beta",
   k = 1,
   h0 = 0,
   alternative = "two.sided"
 )
+results
+results$bf10
 
 # power analysis
-results <- BFpower.cor(
+results <-  BFpower.cor(
   alternative = "greater",
   h0 = 0,
   threshold = 3,
   true_rate = 0.8,
   false_rate = 0.05,
   prior_analysis = "beta",
-  alpha = 1,
-  beta = 1,
+  alpha = 1 ,
+  beta = 1 ,
   prior_design = "Point",
-  location_d = 0.3
-)
+  location_d = 0.3)
 print(results)
 plot(results, plot_power = TRUE, plot_rel = TRUE)
 
@@ -133,7 +138,7 @@ plot(results, plot_power = TRUE, plot_rel = TRUE)
 
 #### Example 4 - one proportion
 #calculating Bayes factor
-BF10.bin.test(
+results <- BF10.bin.test(
   x = 42,
   n = 52,
   h0 = 0.5,
@@ -142,6 +147,8 @@ BF10.bin.test(
   alpha = 1,
   beta = 1
 )
+print(results)
+results$bf10
 # power analysis
 results <- BFpower.bin(
   alternative = "greater",
@@ -158,7 +165,7 @@ plot(results, plot_power = TRUE, plot_rel = TRUE)
 
 #### Example 5 - two proportions
 #calculating Bayes factor
-BF10.props(
+results <- BF10.props(
   a0 = 1,
   b0 = 1,
   a1 = 1,
@@ -170,6 +177,8 @@ BF10.props(
   x1 = 155,
   x2 = 150
 )
+print(results)
+1/results$bf10
 # power analysis
 results <- BFpower.props(
   threshold = 3,

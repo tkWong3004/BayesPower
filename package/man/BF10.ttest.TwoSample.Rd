@@ -19,9 +19,9 @@ BF10.ttest.TwoSample(
 \arguments{
 \item{tval}{Numeric scalar. Observed t-value from the two-sample t-test.}
 
-\item{N1}{Numeric integer. Sample size of group 1 (must be > 2, will be rounded to nearest integer).}
+\item{N1}{Numeric integer. Sample size of group 1 (must be > 2).}
 
-\item{N2}{Numeric integer. Sample size of group 2 (must be > 2, will be rounded to nearest integer).}
+\item{N2}{Numeric integer. Sample size of group 2 (must be > 2).}
 
 \item{prior_analysis}{Character. Analysis prior under the alternative hypothesis:
 \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.}
@@ -34,30 +34,33 @@ BF10.ttest.TwoSample(
 
 \item{alternative}{Character. The direction of the alternative hypothesis two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
+\item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
 null hypothesis. For \code{"two.sided"} this must be a numeric vector
-of length 2 with two distinct finite values; for \code{"greater"} a
-numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
+of length 2 with two distinct finite values such that the first element
+is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}).
+For \code{"greater"} this must be a numeric scalar > 0; and for \code{"less"}
+a numeric scalar < 0.}
 }
 \value{
-A list of class \code{BFvalue_t} containing:
+A list of class \code{BFvalue} containing:
 \itemize{
-\item \code{type}: Character string describing the test type.
-\item \code{bf10}: Computed Bayes factor BF10.
-\item \code{tval}: Observed t-value.
-\item \code{df}: Degrees of freedom.
+\item \code{type}: Character. Test type (always  "Independent-samples t-test (equal variance)").
+\item \code{bf10}: Numeric scalar, The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.
+\item \code{tval}: Numeric scalar, Observed t-value.
+\item \code{df}: Numeric scalar, Degrees of freedom.
 \item \code{analysis_h1}: List with the analysis prior parameters:
-\code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.
-\item \code{alternative}: Hypothesis tested (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
-\item \code{ROPE}: Interval bounds used, if any.
-\item \code{N1}: Sample size of group 1.
-\item \code{N2}: Sample size of group 2.
-\item \code{d}: Numeric, observed Cohen's d.
-\item \code{p.value}: Numeric, p-value.
+\code{prior} (prior distribution), \code{location}, \code{scale}, and
+optionally \code{dff}.
+\item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
+\item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
+\item \code{N1}: Positive integer scalar, Sample size of group 1.
+\item \code{N2}: Positive integer scalar, Sample size of group 2.
+\item \code{d}: Numeric scalar, observed Cohen's d.
+\item \code{p.value}: Numeric scalar, p-value.
 }
 }
 \description{
-Compute the Bayes factor (BF10) for a two-sample independent-samples t-test. Supports both point-null and interval-null hypotheses.
+Compute the Bayes factor (BF10) for a two-sample independent t-test. Supports both point-null and interval-null hypotheses.
 }
 \examples{
 BF10.ttest.TwoSample(

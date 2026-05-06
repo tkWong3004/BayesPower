@@ -6,7 +6,7 @@ NULL
 ui <-
   shiny::navbarPage(id = "id",
                     windowTitle = "BayesPower: Bayes Factor",
-                 "\\(\\text{BayesPower}_{1.0.4}: \\text{Bayes Factor}\\)",
+                 "\\(\\text{BayesPower}_{1.0.5}: \\text{Bayes Factor}\\)",
   shiny::navbarMenu(
     "\\(\\text{Standardized Mean Difference}\\)",
 
@@ -891,7 +891,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                  ),
                  shiny::column(width = 6,
                         shiny::sliderInput("kf", "\\(k\\text{ predictor - full model :}\\)",
-                                    min = 1, max = 100, value = 1, step = 1, ticks = FALSE)
+                                    min = 2, max = 100, value = 2, step = 1, ticks = FALSE)
                  )
                )
              ),
@@ -968,7 +968,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                shiny::column(width = 6,
                       shinyWidgets::prettyRadioButtons(
                         inputId = "h0f",
-                        label = shiny::em("$$\\mathcal{H}_0:$$"),
+                        label = shiny::em("\\(\\mathcal{H}_0:\\)"),
                         choices = list(
                           "\\(\\lambda^2 = 0 \\)" = 1,
                           "\\(\\lambda^2 \\in [0, \\epsilon]\\)" = 2
@@ -1017,7 +1017,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
              shiny::fluidRow(
                shiny::column(width = 4,
                       shiny::conditionalPanel(condition = "input.modelf == 1",
-                                       shiny::sliderInput("rf", "\\(\\text{r scale:}\\)", min = 0.01, max = 3, value = 1, step = 0.01, ticks = FALSE)
+                                       shiny::sliderInput("rf", "\\(\\text{r scale:}\\)", min = 0.01, max = 1, value = .5, step = 0.01, ticks = FALSE)
                       )
                ),
                shiny::column(width = 4,
@@ -1058,7 +1058,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                  shiny::fluidRow(
                    shiny::column(width = 4,
                                  shiny::conditionalPanel(condition = "input.modelfd == 1",
-                                                         shiny::sliderInput("rfd", "\\(\\text{r scale:}\\)", min = 0.01, max = 3, value = 1, step = 0.01, ticks = FALSE)
+                                                         shiny::sliderInput("rfd", "\\(\\text{r scale:}\\)", min = 0.01, max = 1, value = .5, step = 0.01, ticks = FALSE)
                                  ),
                                  shiny::conditionalPanel(condition = "input.modelfd == 3",
                                                          shiny::sliderInput("lfd", "\\(\\lambda^2:\\)", min = 0.01, max = 0.5, value = 0.1, step = 0.01, ticks = FALSE)
@@ -1111,7 +1111,7 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                               shiny::sliderInput("threshold_f", "\\( \\text{Bound of compelling evidence:} \\)", min = 1, max = 20, value = 3, ticks = FALSE)
              ),
              shiny::conditionalPanel(condition = "input.Modef == 2",
-                              shiny::numericInput("nf", "\\( \\text{Sample Size } N: \\)", value = 50)
+                                     shiny::numericInput("nf","\\( \\text{Sample Size } N \\; (\u2265 k + 1):\\)",value = 50)
              ),
              shiny::conditionalPanel(condition = "input.Modef == 1|input.Modef == 2",
                               shiny::actionButton("runf", label = "\\( \\text{Run} \\)")
@@ -1223,7 +1223,7 @@ shiny::navbarMenu(
                ),
 
                shiny::fluidRow(
-                 shiny::column(4, shiny::sliderInput("h0prop", "\\(p_0\\)", min = .01, max = .99, value = .5, step = .01, ticks = FALSE)),
+                 shiny::column(4, shiny::sliderInput("h0prop", "\\(\\theta_0\\)", min = .01, max = .99, value = .5, step = .01, ticks = FALSE)),
 
                  shiny::column(4,
                                shiny::conditionalPanel("(input.h1bine == 2) && input.h0bin == 2", shiny::em("\\(-\\epsilon = 0\\)")),
@@ -1445,8 +1445,8 @@ shiny::sidebarLayout(shiny::sidebarPanel(
              "model_p1",
              label = "\\( \\text{Model for } \\theta_1: \\)",
              choices = list(
-               "\\( \\text{Fixed } p_1 \\)" = 1,
-               "\\( p_1 \\sim \\text{Beta}(\\alpha_{1d}, \\beta_{1d}) \\)" = 2
+               "\\( \\text{Fixed } \\theta_1 \\)" = 1,
+               "\\( \\theta_1 \\sim \\text{Beta}(\\alpha_{1d}, \\beta_{1d}) \\)" = 2
              ),
              selected = 1,
              inline = TRUE
@@ -1455,8 +1455,8 @@ shiny::sidebarLayout(shiny::sidebarPanel(
              "model_p2",
              label = "\\( \\text{Model for } \\theta_2: \\)",
              choices = list(
-               "\\( \\text{Fixed } p_1 \\)" = 1,
-               "\\( p_1 \\sim \\text{Beta}(\\alpha_{2d}, \\beta_{2d}) \\)" = 2
+               "\\( \\text{Fixed } \\theta_2 \\)" = 1,
+               "\\( \\theta_2 \\sim \\text{Beta}(\\alpha_{2d}, \\beta_{2d}) \\)" = 2
              ),
              selected = 1,
              inline = TRUE

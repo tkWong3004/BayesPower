@@ -26,19 +26,20 @@ analysis prior.}
 alternative hypothesis. Must be either \code{"effectsize"} or
 \code{"Moment"}.}
 
-\item{ROPE}{Numeric scaler. Optional numeric scalar specifying an upper bound for an interval
+\item{ROPE}{Optional numeric scalar specifying an upper bound for an interval
 null hypothesis. If provided, must be > 0.}
 }
 \value{
-A list of class \code{"BFvalue_f"} containing:
+A list of class \code{BFvalue} containing:
 \itemize{
-\item \code{fval}: Input F-value.
-\item \code{df1}, \code{df2}: Degrees of freedom.
-\item \code{ROPE}: Interval bound (if specified).
+\item \code{type}: Character. Test type (always "Regression/ANOVA").
+\item \code{bf10}: Numeric scalar, The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.
+\item \code{fval}: Numeric scalar, Input F-value.
+\item \code{df1}, \code{df2}: Numeric scalar, Degrees of freedom.
 \item \code{analysis_h1}: List containing the analysis prior specification, including
 the prior distribution, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
-\item \code{bf10}: The computed Bayes factor.
-\item \code{p.value}: Numeric, p-value.
+\item \code{ROPE}: Optional numeric scalar. Interval bounds under the null, if any.
+\item \code{p.value}: Numeric scalar, p-value.
 }
 }
 \description{

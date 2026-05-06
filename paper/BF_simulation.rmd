@@ -13,16 +13,6 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r klippy, echo=FALSE, include=TRUE}
-klippy::klippy(position = c("top", "right"))
-```
-```{css, echo=FALSE}
-.btn-klippy .octicon {
-  width: 20px !important;
-  height: 20px !important;
-}
-```
-
 This folder contains the R scripts for running simulations used to verify our method.
 
 ## General Procedure of the Simulation

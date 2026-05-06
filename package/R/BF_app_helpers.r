@@ -1,3 +1,5 @@
+# This script contains the helper functions to display the codes in the shiny app for reproducibility.
+
 show_t1_code <- function(x) {
 
   args <- c(
@@ -251,14 +253,7 @@ show_cor_code <- function(x) {
     ## RENAME ARGUMENTS
     ## -----------------------------
     arg_print <- arg
-    if (arg == "true_rate") arg_print <- "true_rate"
-    if (arg == "false_rate")     arg_print <- "false_rate"
-    if (arg == "type_rate") { if (val == "positive") return(NULL)}
-    if (arg == "alternative") arg_print <- "alternative"
-    if (arg == "threshold") arg_print <- "threshold"
-    if (arg == "ROPE") arg_print <- "ROPE"
-    if (arg == "prior_analysis") arg_print <- "prior_analysis"
-    if (arg == "prior_design") arg_print <- "prior_design"
+
 
     ## -----------------------------
     ## VALUE FORMATTING
@@ -355,11 +350,6 @@ show_f_code <- function(x) {
     if (arg == "mode_bf") return(NULL)
     if (!is.null(x$mode_bf) && x$mode_bf == 1 && arg == "N") return(NULL)
 
-    # ----- Rename arguments -----
-    if (arg == "threshold") arg_print <- "threshold"
-    if (arg == "ROPE") arg_print <- "ROPE"
-    if (arg == "prior_analysis") arg_print <- "prior_analysis"
-    if (arg == "prior_design") arg_print <- "prior_design"
 
     # Skip NULL args
     if (is.null(val)) return(NULL)
@@ -444,8 +434,9 @@ show_bin_code <- function(x) {
       if (arg == "de_an_prior") val <- NULL
     }
     if (!is.null(x$de_an_prior) && x$de_an_prior == 0 && !is.null(x$prior_design)) {
-      if (x$prior_design == "Moment" && arg %in% c("alpha_d","beta_d")) val <- NULL
-      if (x$prior_design == "Point" && arg %in% c("alpha_d","beta_d","scale_d")) val <- NULL
+      if (x$prior_design == "beta" && arg %in% c("location_d", "scale_d")) val <- NULL
+      if (x$prior_design == "Moment" && arg %in% c("alpha_d", "beta_d")) val <- NULL
+      if (x$prior_design == "Point" && arg %in% c("alpha_d", "beta_d", "scale_d")) val <- NULL
     }
 
     # ----- RULES: mode_bf / N -----
@@ -457,12 +448,7 @@ show_bin_code <- function(x) {
     # ----- RULES: ROPE -----
     if (arg == "ROPE" && !is.null(x$interval) && x$interval == "1") val <- NULL
 
-    # ----- RENAME ARGUMENTS -----
-    if (arg == "alternative") arg_print <- "alternative"
-    if (arg == "threshold") arg_print <- "threshold"
-    if (arg == "ROPE") arg_print <- "ROPE"
-    if (arg == "prior_analysis") arg_print <- "prior_analysis"
-    if (arg == "prior_design") arg_print <- "prior_design"
+
 
     # Skip NULL args
     if (is.null(val)) return(NULL)
@@ -559,10 +545,7 @@ show_props_code <- function(x) {
     # Skip NULL values
     if (is.null(val)) return(NULL)
 
-    # ----- Special renaming -----
-    if (arg == "threshold") arg_print <- "threshold"
-    if (arg == "prior_design_1") arg_print <- "prior_design_1"
-    if (arg == "prior_design_2") arg_print <- "prior_design_2"
+
 
     # ----- Value formatting -----
     if (is.character(val))

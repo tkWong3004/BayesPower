@@ -36,23 +36,40 @@ BF10.cor(
 
 \item{prior_analysis}{Character. Analysis prior: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"Moment"}).}
 
-\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
-null hypothesis. For \code{"two.sided"} this must be a numeric vector
-of length 2 with two distinct finite values; for \code{"greater"} a
-numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
+\item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
+null hypothesis relative to \code{h0}. That is, the ROPE defines a region
+around \code{h0}, and the effective null interval is computed as
+\code{h0 + ROPE}.
+
+For \code{"two.sided"} this must be a numeric vector of length 2 with two
+distinct finite values such that the first element is negative and the second
+element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting null
+interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.
+
+For \code{"greater"} this must be a numeric scalar > 0, defining an upper
+deviation from \code{h0}, so the null region extends from \code{h0} to
+\code{h0 + ROPE}.
+
+For \code{"less"} this must be a numeric scalar < 0, defining a lower
+deviation from \code{h0}, so the null region extends from \code{h0 + ROPE}
+to \code{h0}.
+
+Example: If \code{h0 = 0.1} and \code{ROPE = c(-0.2, 0.2)}, then the effective
+null interval is \code{[-0.1, 0.3]}.}
 }
 \value{
-A list with class \code{"BFvalue_r"} containing:
+A list with class \code{"BFvalue"} containing:
 \itemize{
-\item \code{type}: "Correlation"
-\item \code{bf10}: Calculated Bayes factor BF10
-\item \code{h0}: Null value of the correlation
-\item \code{r}: Observed correlation coefficient
-\item \code{n}: Sample size
-\item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
-\item \code{alternative}: the direction of the alternative hypothesis
-\item \code{ROPE}: Interval bounds if specified
-\item \code{p.value}: Numeric, p-value.
+\item \code{type}: Character. Test type (always "Correlation").
+\item \code{bf10}: Numeric scalar, The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.
+\item \code{h0}: Numeric scalar, Null value of the correlation.
+\item \code{r}: Numeric scalar, Observed correlation coefficient.
+\item \code{n}: Positive integer scalar, Sample size.
+\item \code{analysis_h1}: List with the analysis prior parameters:
+\code{prior}, \code{location}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
+\item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
+\item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
+\item \code{p.value}: Numeric scalar, Numeric, p-value.
 }
 }
 \description{

@@ -23,60 +23,86 @@ cat("\n```")
 
 ```
 
-**Hypothesis**
 
 ```{r echo=FALSE, results='asis'}
-# Null hypothesis
-cat(sprintf("\\(\\mathcal{H}_0: \\theta_0 = \\theta_1 = \\theta_2,\\quad \\theta_0 \\sim \\mathrm{beta}(\\alpha = %s, \\beta = %s)\\) vs ", params$p2$a0, params$p2$b0))
+theta0 <- "\\theta_0"
+theta1 <- "\\theta_1"
+theta2 <- "\\theta_2"
 
-cat(sprintf("\\(\\mathcal{H}_1: \\theta_1 \\neq \\theta_2\\)"))
+cat("**Hypotheses**  \n")
+
+cat(sprintf(
+  "\\(\\mathcal{H}_0: %s = %s = %s\\) vs \\(\\mathcal{H}_1: %s \\neq %s\\)  \n",
+  theta1, theta2, theta0, theta1, theta2
+))
 
 
 ```
 
 ```{r echo=FALSE, results='asis'}
-if (params$p2$de_an_prior == 1) {
-  cat("**Analysis and design prior**  \n\n")
-} else {
-  cat("**Analysis prior**  \n\n")
+cat("**Analysis/design prior**  \n")
+
+cat("Analysis/design prior under \\(\\mathcal{H}_0\\):  \n")
+cat(sprintf(
+  "\\(%s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)  \n\n",
+  "\\theta_0", params$p2$a0, params$p2$b0
+))
+
+cat("Analysis prior under \\(\\mathcal{H}_1\\):  \n")
+cat(sprintf(
+  "\\(%s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\quad %s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)  \n\n",
+  "\\theta_1", params$p2$a1, params$p2$b1,
+  "\\theta_2", params$p2$a2, params$p2$b2
+))
+
+cat("Design prior under \\(\\mathcal{H}_1\\):  \n")
+
+print_design_prior_p2 <- function(model, theta, a, b, ad, bd, dp) {
+  if (is.null(model) || length(model) == 0 || is.na(model)) model <- "same"
+
+  if (model == "same") {
+    sprintf(
+      "\\(%s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)",
+      theta, a, b
+    )
+  } else if (model == "beta") {
+    sprintf(
+      "\\(%s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)",
+      theta, ad, bd
+    )
+  } else if (model == "Point") {
+    sprintf(
+      "\\(%s = %s\\)",
+      theta, dp
+    )
+  } else {
+    sprintf("\\(%s: \\text{undefined design prior}\\)", theta)
+  }
 }
 
-
- cat(sprintf("\\(\\theta_1 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\quad \\theta_2 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)", 
-            params$p2$a1, params$p2$b1, params$p2$a2, params$p2$b2))
-
-
-if (params$p2$de_an_prior != 1) {
-  cat("\n\n **Design prior**  \n")
-  
-switch(params$p2$model1,
-  "Point" = {
-    cat(sprintf("\\(\\theta_1 \\sim \\mathrm{Point}(\\text{location} = %s),\\quad\\)", params$p2$dp1))
-  },
-  "same" = {
-    cat(sprintf("\\(\\theta_1 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\quad\\)", params$p2$a1, params$p2$b1))
-  },
-  "beta" = {
-    cat(sprintf("\\(\\theta_1 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\quad\\)", params$p2$a1d, params$p2$b1d))
-  }
+cat(
+  print_design_prior_p2(
+    model = params$p2$prior_design_1,
+    theta = "\\theta_1",
+    a = params$p2$a1,
+    b = params$p2$b1,
+    ad = params$p2$a1d,
+    bd = params$p2$b1d,
+    dp = params$p2$dp1
+  ),
+  ",\\quad ",
+  print_design_prior_p2(
+    model = params$p2$prior_design_2,
+    theta = "\\theta_2",
+    a = params$p2$a2,
+    b = params$p2$b2,
+    ad = params$p2$a2d,
+    bd = params$p2$b2d,
+    dp = params$p2$dp2
+  ),
+  "  \n",
+  sep = ""
 )
-  
-  switch(params$p2$model2,
-  "Point" = {
-    cat(sprintf("\\(\\theta_2 \\sim \\mathrm{Point}(\\text{location} = %s)\\)", params$p2$dp2))
-  },
-  "same" = {
-    cat(sprintf("\\(\\theta_2 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)", params$p2$a2, params$p2$b2))
-  },
-  "beta" = {
-    cat(sprintf("\\(\\theta_2 \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)", params$p2$a2d, params$p2$b2d))
-  }
-)
-  
-
-
-}
-
 ```
 
 

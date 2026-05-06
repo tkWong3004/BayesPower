@@ -23,90 +23,123 @@ cat("\n```")
 
 ```
 
-**Hypothesis**
 
 ```{r echo=FALSE, results='asis'}
-if (params$bin$interval == 1) {
-# Null hypothesis
-cat(sprintf("\\(\\mathcal{H}_0: p_0 = %.2f\\) vs ", params$bin$location))
+theta <- "\\theta"
 
-# Alternative hypothesis
-alt_hypothesis <- switch(
-  params$bin$alternative,
-  "greater"  = sprintf("\\(\\mathcal{H}_1: p_1 \\in \\{ %.2f, 1 \\}\\)\n", params$bin$location),
-  "less"  = sprintf("\\(\\mathcal{H}_1: p_1 \\in \\{ 0, %.2f \\}\\)\n", params$bin$location),
-  "two.sided" = "\\(\\mathcal{H}_1: p_1 \\ne p_0\\)\n"
-)
+cat("**Hypotheses**  \n")
 
-cat(alt_hypothesis)
+h0 <- params$bin$location
 
+if (is.null(params$bin$ROPE) || params$bin$interval == 1) {
 
+  cat(sprintf("\\(\\mathcal{H}_0: %s = %.2f\\) vs ", theta, h0))
 
-}else if (params$bin$interval == 2) {
-  # Extract epsilon values
-  hyp <- params$bin$alternative
-  ROPE <- params$bin$ROPE
-  location <-params$bin$location
+  cat(switch(
+    params$bin$alternative,
+    "two.sided" = sprintf("\\(\\mathcal{H}_1: %s \\neq %.2f\\)  \n", theta, h0),
+    "greater"   = sprintf("\\(\\mathcal{H}_1: %s > %.2f\\)  \n", theta, h0),
+    "less"      = sprintf("\\(\\mathcal{H}_1: %s < %.2f\\)  \n", theta, h0)
+  ))
 
-eps <- switch(hyp,
-  "greater"  = list(eps_neg = 0,       eps_pos = location+ROPE),
-  "less"  = list(eps_neg =location+ ROPE,       eps_pos = 0),
-  "two.sided" = list(eps_neg = location+ROPE[1],    eps_pos = location+ROPE[2]),
-  list(eps_neg = NA,             eps_pos = NA)  # default/fallback
-)
+} else {
 
-cat(sprintf("\\(\\mathcal{H}_0: \\rho \\in \\{ %.2f, %.2f \\} \\) vs ", eps[1], eps[2]))
+  lower <- h0 + min(params$bin$ROPE)
+  upper <- h0 + max(params$bin$ROPE)
 
-if (hyp == "greater") {
-  cat(sprintf("\\(\\mathcal{H}_1: \\rho \\in (%.2f, 1) \\)\n", eps[[2]]))
-} else if (hyp == "less") {
-  cat(sprintf("\\(\\mathcal{H}_1: \\rho \\in (0, %.2f) \\)\n", eps[[1]]))
-} else if (hyp == "two.sided") {
-  cat(sprintf("\\(\\mathcal{H}_1: \\rho \\in (0, %.2f) \\cup (%.2f, 1) \\)\n", eps[[1]], eps[[2]]))
-} 
+  if (params$bin$alternative == "two.sided") {
 
-  
-  
-}
-```
+    cat(sprintf(
+      "\\(\\mathcal{H}_0: %.2f \\leq %s \\leq %.2f\\) vs \\(\\mathcal{H}_1: %s < %.2f \\cup %s > %.2f\\)  \n",
+      lower, theta, upper, theta, lower, theta, upper
+    ))
 
+  } else if (params$bin$alternative == "greater") {
 
+    cat(sprintf(
+      "\\(\\mathcal{H}_0: %.2f \\leq %s \\leq %.2f\\) vs \\(\\mathcal{H}_1: %s > %.2f\\)  \n",
+      h0, theta, upper, theta, upper
+    ))
 
-```{r results='asis', echo=FALSE}
-if (params$bin$de_an_prior == 0) {
-  cat("**Analysis prior**  \n\n")
-} else if (params$bin$de_an_prior == 1) {
-  cat("**Analysis and design prior**  \n\n")
-}
+  } else if (params$bin$alternative == "less") {
 
-model <- params$bin$prior_analysis
-
-if (model == "beta") {
-  cat(sprintf("Beta ($\\alpha = %s$, $\\beta = %s$)\n\n", params$bin$alpha, params$bin$beta))
-} else if (model == "Moment") {
-  cat(sprintf("NLP(location = %s, scale = %s)\n\n", params$bin$location, params$bin$scale))
-}
-
-
-```
-
-```{r results='asis', echo=FALSE}
-if (params$bin$de_an_prior == 0) {
-  cat("**Design prior**  \n")
-  
-  if (params$bin$prior_design == "Point") {
-    cat(sprintf("Point(location = %s)  \n", params$bin$location_d))
-  } else {
-    
-    if (model == "beta") {
-  cat(sprintf("Beta ($\\alpha = %s$, $\\beta = %s$)\n\n", params$bin$alpha_d, params$bin$beta_d))
-} else if (model == "Moment") {
-  cat(sprintf("NLP(location = %s, scale = %s)\n\n", params$bin$location_d, params$bin$scale_d))
-}
-    
-    
+    cat(sprintf(
+      "\\(\\mathcal{H}_0: %.2f \\leq %s \\leq %.2f\\) vs \\(\\mathcal{H}_1: %s < %.2f\\)  \n",
+      lower, theta, h0, theta, lower
+    ))
   }
 }
+
+```
+
+
+
+```{r results='asis', echo=FALSE}
+fmt <- function(z) {
+  if (is.null(z) || length(z) == 0 || any(is.na(z))) return("NA")
+  format(round(as.numeric(z), 3), nsmall = 0, trim = TRUE)
+}
+
+print_bin_prior_rmd <- function(prior, alpha = NULL, beta = NULL,
+                                location = NULL, scale = NULL) {
+
+  if (is.null(prior) || prior == "Point") {
+    return(sprintf("Point prior (location = %s)", fmt(location)))
+  }
+
+  if (prior == "beta") {
+    return(sprintf(
+      "Stretched Beta (alpha = %s, beta = %s)",
+      fmt(alpha), fmt(beta)
+    ))
+  }
+
+  if (prior == "Moment") {
+    return(sprintf(
+      "Normal-moment (location = %s, scale = %s)",
+      fmt(location), fmt(scale)
+    ))
+  }
+
+  as.character(prior)
+}
+
+analysis_prior_text <- print_bin_prior_rmd(
+  prior = params$bin$prior_analysis,
+  alpha = params$bin$alpha,
+  beta = params$bin$beta,
+  location = params$bin$location,
+  scale = params$bin$scale
+)
+
+cat("**Analysis/design prior**  \n")
+
+cat("Analysis/design prior under \\(\\mathcal{H}_0\\):  \n")
+if (is.null(params$bin$ROPE) || params$bin$interval == 1) {
+  cat(sprintf("Point prior (location = %s)", fmt(params$bin$location)))
+} else {
+  cat(analysis_prior_text)
+}
+cat("  \n\n")
+
+cat("Analysis prior under \\(\\mathcal{H}_1\\):  \n")
+cat(analysis_prior_text, "  \n\n")
+
+cat("Design prior under \\(\\mathcal{H}_1\\):  \n")
+
+if (params$bin$de_an_prior == 1) {
+  cat(analysis_prior_text)
+} else {
+  cat(print_bin_prior_rmd(
+    prior = params$bin$prior_design,
+    alpha = params$bin$alpha_d,
+    beta = params$bin$beta_d,
+    location = params$bin$location_d,
+    scale = params$bin$scale_d
+  ))
+}
+
+cat("  \n")
 ```
 
 

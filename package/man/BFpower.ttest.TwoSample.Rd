@@ -28,10 +28,12 @@ BFpower.ttest.TwoSample(
 \item{alternative}{Character. The direction of the alternative hypothesis: two-sided (\code{"two.sided"}),
 right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric vector. Specifies bounds for an interval
+\item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
 null hypothesis. For \code{"two.sided"} this must be a numeric vector
-of length 2 with two distinct finite values; for \code{"greater"} a
-numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
+of length 2 with two distinct finite values such that the first element
+is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}).
+For \code{"greater"} this must be a numeric scalar > 0; and for \code{"less"}
+a numeric scalar < 0.}
 
 \item{threshold}{Numeric scalar. Threshold for compelling evidence (must be at least 1).}
 
@@ -39,7 +41,7 @@ numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 
 \item{false_rate}{Numeric scalar. Target false positive or negative rate .}
 
-\item{prior_analysis}{Character. Analysis prior under the alternative hypothesis:
+\item{prior_analysis}{Character. The analysis prior under the alternative hypothesis:
 \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.}
 
 \item{location}{Numeric scalar. Location parameter for the analysis prior.}
@@ -53,13 +55,16 @@ numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 
 \item{location_d}{Numeric scalar. Location parameter for the design prior.}
 
-\item{scale_d}{Numeric scalar > 0. Scale parameter for the design prior.}
+\item{scale_d}{Numeric scalar. Scale parameter for the design prior under the
+alternative hypothesis. Required only if \code{prior_design} is
+\code{"Normal"}, \code{"Moment"}, or \code{"t-distribution"}; must be > 0.
+Not used when \code{prior_design = "Point"}.}
 
 \item{dff_d}{Numeric scalar. Degrees of freedom for the design prior (required if \code{prior_design = "t-distribution"}; ignored otherwise).}
 
-\item{N1}{Numeric integer. Sample size for group 1 (used if \code{r = NULL}).}
+\item{N1}{Positive numeric integer. Sample size for group 1 (used if \code{r = NULL}).}
 
-\item{N2}{Numeric integer. Sample size for group 2 (used if \code{r = NULL}).}
+\item{N2}{Positive numeric integer. Sample size for group 2 (used if \code{r = NULL}).}
 
 \item{r}{Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).}
 
@@ -67,15 +72,19 @@ numeric scalar > 0; and for \code{"less"} a numeric scalar < 0.}
 true/false positive or true/false negative rates .}
 }
 \value{
-An object of class \code{BFpower_t} containing:
+An object of class \code{BFpower} containing:
 \itemize{
-\item \code{type}: Character string describing the test type.
-\item \code{alternative}: Alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
-\item \code{ROPE}: Interval bounds under the null used, if any.
-\item \code{analysis_h1}: List with the analysis prior parameters: \code{prior_analysis}, \code{location}, \code{scale}, and optionally \code{dff}.
-\item \code{design_h1}: List with the design prior parameters: \code{prior_design}, \code{location}, \code{scale}, and optionally \code{dff} (or \code{NULL} if not provided).
+\item \code{type}: Character. Test type (always "Independent-samples t-test (equal variance)").
+\item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
+\item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
+\item \code{analysis_h1}: List with the analysis prior parameters:
+\code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
+\item \code{design_h1}: List with the design prior parameters:
+\code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
 \item \code{results}: Data frame with probabilities of compelling/misleading evidence.
-\item \code{threshold}: Threshold of compelling evidence.
+\item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
+\item \code{mode_bf}: Numeric scalar. Indicates whether sample size determination (\code{1}) or power calculation (\code{0}) is performed. This output is only used internally in the print method.
+
 }
 }
 \description{
@@ -84,7 +93,7 @@ Can handle both point-null and interval-null hypothesis, and allows specifying
 analysis and design priors.
 }
 \details{
-\strong{1. Sample size determination mode (when \code{N1 = NULL} and \code{N2 = NULL}, but \code{r} is provided):}
+\strong{Sample size determination mode (when \code{N1 = NULL} and \code{N2 = NULL}, but \code{r} is provided):}
 
 If no sample size is provided, the function calculates the minimum sample size needed to achieve the desired configuration below. The user must provide:
 \itemize{
@@ -92,15 +101,15 @@ If no sample size is provided, the function calculates the minimum sample size n
 or \code{"negative"} to control true/false negative rates.
 \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
 \item \code{false_rate} - the acceptable false positive or false negative rate (between 0.001 and 0.1).
-\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be > 1).
+\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be at least 1).
 \item \code{r} - the allocation ratio of group 2 to group 1 sample sizes (\code{N2/N1}).
 }
 
 The function iteratively finds the smallest sample size \code{N1} and \code{N2 = r * N1} for which the probability of obtaining compelling evidence (i.e., true positive/negative rate) meets or exceeds \code{true_rate}, while the probability of misleading evidence (i.e., false positive/negative rate) does not exceed \code{false_rate}.
 
-\strong{2. Fixed-sample analysis mode (when \code{N1} and \code{N2} are supplied):}
+\strong{Fixed-sample analysis mode (when \code{N1} and \code{N2} are supplied):}
 
-If a positive numeric sample size \code{N1} and \code{N2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, the arguments \code{type_rate}, \code{r}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
+If positive integer sample sizes \code{N1} and \code{N2} are provided, the function computes the probabilities of obtaining compelling or misleading evidence for that fixed sample size. In this mode, the arguments \code{type_rate}, \code{r}, \code{true_rate}, and \code{false_rate} are ignored; only the Bayes factor threshold \code{threshold} is used.
 
 \strong{Direction of the Alternative Hypothesis:}
 
@@ -125,22 +134,22 @@ If \code{ROPE = NULL}, a point-null hypothesis is assumed.
 
 The user must specify the analysis prior under the alternative hypothesis using \code{prior_analysis}:
 \itemize{
-\item \code{Normal} (normal prior): \code{location} and \code{scale} > 0.
+\item \code{Normal} (normal prior): \code{location} with \code{scale} > 0.
 \item \code{Moment} (normal-moment prior): \code{scale} > 0.
-\item \code{t-distribution} (scaled t prior): \code{location}, \code{scale} > 0, and \code{dff} > 0.
+\item \code{t-distribution} (scaled t prior): \code{location} with \code{scale} > 0, and \code{dff} > 0.
 }
 
 \strong{Design Priors (optional):}
 
 The design prior under the alternative hypothesis can optionally be specified using \code{prior_design}:
 \itemize{
-\item \code{Normal} (normal prior): \code{location_d} and \code{scale_d} > 0.
-\item \code{Moment} (normal-moment prior): \code{scale_d} > 0.
-\item \code{t-distribution} (scaled t prior): \code{location_d}, \code{scale_d} > 0, and \code{dff_d} > 0.
+\item \code{Normal} (normal prior): \code{location_d} with \code{scale_d} > 0.
+\item \code{Moment} (normal-moment prior): \code{location_d} with \code{scale_d} > 0.
+\item \code{t-distribution} (scaled t prior): \code{location_d} with \code{scale_d} > 0, and \code{dff_d} > 0.
 \item \code{Point} (point prior): \code{location_d}.
 }
 
-If \code{prior_design} is \code{NULL}, no design prior is used.
+If \code{prior_design} is \code{NULL}, the analysis prior is used as the design prior.
 }
 \examples{
 BFpower.ttest.TwoSample(
