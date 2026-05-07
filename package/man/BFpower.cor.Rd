@@ -63,17 +63,17 @@ default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment prior (\c
 
 \item{k}{Numeric scalar. Parameter for the default beta prior (\code{"d_beta"}).}
 
-\item{alpha}{Numeric scalar. Parameter for the beta prior (\code{"beta"}).}
+\item{alpha}{Numeric scalar. Alpha parameter for the beta prior (\code{"beta"}).}
 
-\item{beta}{Numeric scalar. Parameter for the beta prior (\code{"beta"}).}
+\item{beta}{Numeric scalar. Beta parameter for the beta prior (\code{"beta"}).}
 
 \item{scale}{Numeric scalar. Scale parameter for the normal-moment prior (\code{"Moment"}).}
 
 \item{prior_design}{Character. Design prior  under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), normal-moment prior (\code{"Moment"}), or point (\code{"Point"}).}
 
-\item{alpha_d}{Numeric scalar. Parameter for the design beta prior (\code{"beta"}).}
+\item{alpha_d}{Numeric scalar. Alpha parameter for the design beta prior (\code{"beta"}).}
 
-\item{beta_d}{Numeric scalar. Parameter for the design beta prior (\code{"beta"}).}
+\item{beta_d}{Numeric scalar. Beta Parameter for the design beta prior (\code{"beta"}).}
 
 \item{location_d}{Numeric scalar. Location parameter for the design prior.
 Required for \code{prior_design = "Moment"} and \code{prior_design = "Point"}.

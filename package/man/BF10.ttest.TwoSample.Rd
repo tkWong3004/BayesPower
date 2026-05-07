@@ -60,7 +60,7 @@ optionally \code{dff}.
 }
 }
 \description{
-Compute the Bayes factor (BF10) for a two-sample independent t-test. Supports both point-null and interval-null hypotheses.
+Compute the Bayes factor (BF10) for a two-sample independent t-test with equal variances. Supports both point-null and interval-null hypotheses.
 }
 \examples{
 BF10.ttest.TwoSample(

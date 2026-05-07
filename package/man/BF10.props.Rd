@@ -19,13 +19,13 @@ BF10.props(a0, b0, a1, b1, a2, b2, N1, N2, x1, x2)
 
 \item{b2}{Positive numeric scalar. Beta parameter of the Beta prior for group 2 under the alternative hypothesis.}
 
-\item{N1}{Numeric integer. Sample size for group 1.}
+\item{N1}{Positive numeric integer. Sample size for group 1 (must be > 0).}
 
-\item{N2}{Numeric integer. Sample size for group 2.}
+\item{N2}{Positive numeric integer. Sample size for group 2 (must be > 0).}
 
-\item{x1}{Numeric integer. Number of successes observed in group 1.}
+\item{x1}{Non-negative numeric integer. Number of successes observed in group 1 (must be at least 0).}
 
-\item{x2}{Numeric integer. Number of successes observed in group 2.}
+\item{x2}{Non-negative numeric integer. Number of successes observed in group 2 (must be at least 0).}
 }
 \value{
 A list of class \code{BFvalue} containing:

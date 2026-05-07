@@ -95,7 +95,10 @@ A list of class \code{BFpower} containing:
 \item \code{analysis_h1}: List describing the analysis prior, containing
 \code{prior} (prior distribution), \code{alpha} (alpha parameter),
 \code{beta} (beta parameter), and \code{scale} (scale parameter).
-\item \code{design_h1}: List describing the design prior, containing
+\item \code{design_h1}: List describing the design prior. If
+\code{prior_design = NULL}, all entries in this list are returned as
+\code{NULL}, indicating that no separate design prior was specified and
+the analysis prior is used for design. Otherwise, the list contains
 \code{prior} (prior distribution), \code{location} (location parameter),
 \code{alpha} (alpha parameter), \code{beta} (beta parameter), and
 \code{scale} (scale parameter).

@@ -61,7 +61,7 @@ and at least 3 if \code{prior_design = "Moment"}.}
 point design prior.}
 
 \item{N}{Optional integer. Sample size. If \code{NULL}, sample size determination is performed.
-If supplied, fixed-sample power calculation is performed and \code{N} must be at least \code{k + 1}.}
+If \code{N} of at least \code{k + 1} is supplied, power calculation for a fixed sample size is performed.}
 
 \item{type_rate}{Character. Either \code{"positive"} (control true/false positive rates) or
 \code{"negative"} (control true/false negative rates).}
@@ -76,10 +76,12 @@ A list of class \code{BFpower} containing:
 \item \code{k}, \code{p}: Numeric integer, Number of predictors in the full and reduced models.
 \item \code{ROPE}: Optional numeric scalar. Interval bounds under the null, if any.
 \item \code{analysis_h1}: List containing the analysis prior specification, including
-the prior distribution, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
-\item \code{design_h1}: List containing the design prior specification, including
-the prior distribution, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}
-(or \code{NULL} if not specified).
+the prior distribution \code{prior}, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
+\item \code{design_h1}: List describing the design prior. If
+\code{prior_design = NULL}, all entries in this list are returned as
+\code{NULL}, indicating that no separate design prior was specified and
+the analysis prior is used for design. Otherwise, the list contains
+the prior distribution \code{prior}, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
 \item \code{results}: Data frame of probabilities of compelling/misleading evidence and
 the required or supplied sample size.
 \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.

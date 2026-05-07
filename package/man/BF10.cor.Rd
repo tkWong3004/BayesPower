@@ -24,9 +24,9 @@ BF10.cor(
 
 \item{k}{Numeric scalar. Parameter for the analysis default beta prior (\code{"d_beta"}) under the alternative hypothesis.}
 
-\item{alpha}{Numeric scalar. Parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.}
+\item{alpha}{Numeric scalar. Alpha parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.}
 
-\item{beta}{Numeric scalar. Parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.}
+\item{beta}{Numeric scalar. Beta parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.}
 
 \item{h0}{Numeric scalar. Null value of the correlation. Must be a numeric scalar between -0.8 and 0.8.}
 

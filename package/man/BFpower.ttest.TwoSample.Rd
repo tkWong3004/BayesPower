@@ -79,8 +79,13 @@ An object of class \code{BFpower} containing:
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 \item \code{analysis_h1}: List with the analysis prior parameters:
 \code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
-\item \code{design_h1}: List with the design prior parameters:
-\code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
+\item \code{design_h1}: List describing the design prior. If
+\code{prior_design = NULL}, all entries in this list are returned as
+\code{NULL}, indicating that no separate design prior was specified and
+the analysis prior is used for design. Otherwise, the list contains
+\code{prior} (prior distribution), \code{location} (location parameter),
+\code{scale} (scale parameter), and optionally \code{dff} (degrees of
+freedom).
 \item \code{results}: Data frame with probabilities of compelling/misleading evidence.
 \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 \item \code{mode_bf}: Numeric scalar. Indicates whether sample size determination (\code{1}) or power calculation (\code{0}) is performed. This output is only used internally in the print method.
@@ -88,7 +93,7 @@ An object of class \code{BFpower} containing:
 }
 }
 \description{
-Perform sample size determination or power calculation of compelling and misleading evidence for a two-sample Bayesian t-test.
+Perform sample size determination or power calculation of compelling and misleading evidence for a two-sample Bayesian t-test with equal variances.
 Can handle both point-null and interval-null hypothesis, and allows specifying
 analysis and design priors.
 }

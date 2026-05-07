@@ -96,8 +96,13 @@
 #'     \item \code{ROPE}: Optional numeric vector or scalar for interval null bounds.
 #'     \item \code{analysis_h1}: List with the analysis prior parameters:
 #'       \code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
-#'     \item \code{design_h1}: List with the design prior parameters:
-#'       \code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
+#'     \item \code{design_h1}: List describing the design prior. If
+#'       \code{prior_design = NULL}, all entries in this list are returned as
+#'       \code{NULL}, indicating that no separate design prior was specified and
+#'       the analysis prior is used for design. Otherwise, the list contains
+#'       \code{prior} (prior distribution), \code{location} (location parameter),
+#'       \code{scale} (scale parameter), and optionally \code{dff} (degrees of
+#'       freedom).
 #'     \item \code{results}: Data frame of probabilities: compelling/misleading evidence.
 #'     \item \code{threshold}: Numeric scalar. threshold of compelling evidence.
 #'      \item \code{mode_bf}: Numeric scalar. Indicates whether sample size determination (\code{1}) or power calculation (\code{0}) is performed. This output is only used internally in the print method.
@@ -272,6 +277,9 @@ BFpower.ttest.OneSample <- function(
       return(NaN)
     }
   )
+  if (is.nan(results)) {
+    return(NaN)
+  }
   type = "One-sample t-test"
   analysis_h1 <- list(
     prior = prior_analysis,
@@ -324,7 +332,7 @@ BFpower.ttest.OneSample <- function(
 }
 #' Sample Size Determination for the Two-Sample Bayesian t-Test
 #'
-#' Perform sample size determination or power calculation of compelling and misleading evidence for a two-sample Bayesian t-test.
+#' Perform sample size determination or power calculation of compelling and misleading evidence for a two-sample Bayesian t-test with equal variances.
 #' Can handle both point-null and interval-null hypothesis, and allows specifying
 #' analysis and design priors.
 #'
@@ -426,8 +434,13 @@ BFpower.ttest.OneSample <- function(
 #'     \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 #'     \item \code{analysis_h1}: List with the analysis prior parameters:
 #'       \code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
-#'     \item \code{design_h1}: List with the design prior parameters:
-#'       \code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
+#'     \item \code{design_h1}: List describing the design prior. If
+#'       \code{prior_design = NULL}, all entries in this list are returned as
+#'       \code{NULL}, indicating that no separate design prior was specified and
+#'       the analysis prior is used for design. Otherwise, the list contains
+#'       \code{prior} (prior distribution), \code{location} (location parameter),
+#'       \code{scale} (scale parameter), and optionally \code{dff} (degrees of
+#'       freedom).
 #'     \item \code{results}: Data frame with probabilities of compelling/misleading evidence.
 #'     \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 #'     \item \code{mode_bf}: Numeric scalar. Indicates whether sample size determination (\code{1}) or power calculation (\code{0}) is performed. This output is only used internally in the print method.
@@ -641,7 +654,9 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
       return(NaN)
     }
   )
-
+  if (is.nan(results)) {
+    return(NaN)
+  }
 
   type = "Independent-samples t-test (equal variance)"
   analysis_h1 <- list(
@@ -730,12 +745,12 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis:
 #'        default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment prior (\code{"Moment"}).
 #' @param k Numeric scalar. Parameter for the default beta prior (\code{"d_beta"}).
-#' @param alpha Numeric scalar. Parameter for the beta prior (\code{"beta"}).
-#' @param beta Numeric scalar. Parameter for the beta prior (\code{"beta"}).
+#' @param alpha Numeric scalar. Alpha parameter for the beta prior (\code{"beta"}).
+#' @param beta Numeric scalar. Beta parameter for the beta prior (\code{"beta"}).
 #' @param scale Numeric scalar. Scale parameter for the normal-moment prior (\code{"Moment"}).
 #' @param prior_design Character. Design prior  under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), normal-moment prior (\code{"Moment"}), or point (\code{"Point"}).
-#' @param alpha_d Numeric scalar. Parameter for the design beta prior (\code{"beta"}).
-#' @param beta_d Numeric scalar. Parameter for the design beta prior (\code{"beta"}).
+#' @param alpha_d Numeric scalar. Alpha parameter for the design beta prior (\code{"beta"}).
+#' @param beta_d Numeric scalar. Beta Parameter for the design beta prior (\code{"beta"}).
 #' @param location_d Numeric scalar. Location parameter for the design prior.
 #'   Required for \code{prior_design = "Moment"} and \code{prior_design = "Point"}.
 #'   For \code{"Moment"}, it must satisfy \code{-1 < location_d < 1}.
@@ -1110,6 +1125,9 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
       return(NaN)
     }
   )
+  if (is.nan(results)) {
+    return(NaN)
+  }
   type = "Correlation"
   analysis_h1 <- list(
     prior = prior_analysis,
@@ -1209,7 +1227,7 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
 #'   point design prior.
 #'
 #' @param N Optional integer. Sample size. If \code{NULL}, sample size determination is performed.
-#'   If supplied, fixed-sample power calculation is performed and \code{N} must be at least \code{k + 1}.
+#'   If \code{N} of at least \code{k + 1} is supplied, power calculation for a fixed sample size is performed.
 #'
 #' @param type_rate Character. Either `"positive"` (control true/false positive rates) or
 #'   `"negative"` (control true/false negative rates).
@@ -1270,10 +1288,12 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
 #'     \item \code{k}, \code{p}: Numeric integer, Number of predictors in the full and reduced models.
 #'     \item \code{ROPE}: Optional numeric scalar. Interval bounds under the null, if any.
 #'     \item \code{analysis_h1}: List containing the analysis prior specification, including
-#'       the prior distribution, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
-#'     \item \code{design_h1}: List containing the design prior specification, including
-#'       the prior distribution, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}
-#'       (or \code{NULL} if not specified).
+#'       the prior distribution \code{prior}, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
+#'     \item \code{design_h1}: List describing the design prior. If
+#'     \code{prior_design = NULL}, all entries in this list are returned as
+#'     \code{NULL}, indicating that no separate design prior was specified and
+#'     the analysis prior is used for design. Otherwise, the list contains
+#'       the prior distribution \code{prior}, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
 #'     \item \code{results}: Data frame of probabilities of compelling/misleading evidence and
 #'       the required or supplied sample size.
 #'     \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
@@ -1481,7 +1501,9 @@ BFpower.f.test <- function(threshold, true_rate, false_rate , p , k ,
     message("Error: Required sample size > 10,000")
     return(NaN)
   })
-
+  if (is.nan(results)) {
+    return(NaN)
+  }
 
   type = "Regression/ANOVA"
   analysis_h1 <- list(
@@ -1651,7 +1673,10 @@ BFpower.f.test <- function(threshold, true_rate, false_rate , p , k ,
 #'   \item \code{analysis_h1}: List describing the analysis prior, containing
 #'     \code{prior} (prior distribution), \code{alpha} (alpha parameter),
 #'     \code{beta} (beta parameter), and \code{scale} (scale parameter).
-#'   \item \code{design_h1}: List describing the design prior, containing
+#'   \item \code{design_h1}: List describing the design prior. If
+#'     \code{prior_design = NULL}, all entries in this list are returned as
+#'     \code{NULL}, indicating that no separate design prior was specified and
+#'     the analysis prior is used for design. Otherwise, the list contains
 #'     \code{prior} (prior distribution), \code{location} (location parameter),
 #'     \code{alpha} (alpha parameter), \code{beta} (beta parameter), and
 #'     \code{scale} (scale parameter).
@@ -1878,7 +1903,9 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
     message("Error: Required sample size > 10,000")
     return(NaN)
   })
-
+  if (is.nan(results)) {
+    return(NaN)
+  }
   type = "One-proportion"
   analysis_h1 <- list(
     prior = prior_analysis,
@@ -2013,8 +2040,22 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
 #'     \item \code{analysis_h0}: List of analysis prior parameters under the null, containing \code{a} and \code{b}.
 #'     \item \code{analysis_h1_theta_1}: List of analysis prior parameters for group 1 under the alternative, containing \code{a} and \code{b}.
 #'     \item \code{analysis_h1_theta_2}: List of analysis prior parameters for group 2 under the alternative, containing \code{a} and \code{b}.
-#'     \item \code{design_h1_theta_1}: List of design prior parameters for group 1 under the alternative, containing \code{prior}, \code{a}, \code{b}, and \code{p}.
-#'     \item \code{design_h1_theta_2}: List of design prior parameters for group 2 under the alternative, containing \code{prior}, \code{a}, \code{b}, and \code{p}.
+#'     \item \code{design_h1_theta_1}: List describing the design prior for
+#'       group 1 under the alternative hypothesis. If
+#'       \code{prior_design_1 = "same"}, all entries in this list are returned
+#'       as \code{NULL}, indicating that no separate design prior was specified
+#'       for group 1 and the corresponding analysis prior is used for design.
+#'       Otherwise, the list contains \code{prior} (prior distribution),
+#'       \code{a} (alpha parameter), \code{b} (beta parameter), and
+#'       \code{p} (point-prior proportion).
+#'     \item \code{design_h1_theta_2}: List describing the design prior for
+#'       group 2 under the alternative hypothesis. If
+#'       \code{prior_design_2 = "same"}, all entries in this list are returned
+#'       as \code{NULL}, indicating that no separate design prior was specified
+#'       for group 2 and the corresponding analysis prior is used for design.
+#'       Otherwise, the list contains \code{prior} (prior distribution),
+#'       \code{a} (alpha parameter), \code{b} (beta parameter), and
+#'       \code{p} (point-prior proportion).
 #'     \item \code{results}: Data frame of probabilities of compelling and misleading evidence.
 #'     \item \code{grid}: Grid used internally for the computation of the results (i.e., true/false positive and negative rates) and the plot method.
 #'     \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
@@ -2137,7 +2178,7 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
 
   if (prior_design_1 == "same") {
 
-    # Automatically set all to default values as these are irrelevant
+    # Automatically assign some value to the irrelevent parameter
     a1d <- 1
     b1d <- 1
     dp1 <- 0.5
@@ -2152,12 +2193,12 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
       stop("arg [b1d] beta for the Beta design prior on \u03b8\u2081 must be a positive numeric scalar (> 0).")
     }
 
-    # dp1 irrelevant for beta prior > set to NULL automatically
+    # Automatically assign some value to the irrelevent parameter
     dp1 <- 0.5
 
   } else if (prior_design_1 == "Point") {
 
-    # Automatically set Beta parameters to NULL
+    # Automatically assign some value to the irrelevent parameter
     a1d <- 1
     b1d <- 1
 
@@ -2177,7 +2218,7 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
 
   if (prior_design_2 == "same") {
 
-    # Automatically set all to NULL
+    # Automatically assign some value to the irrelevent parameter
     a2d <- 1
     b2d <- 1
     dp2 <- .5
@@ -2192,12 +2233,12 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
       stop("arg [b2d] beta for the Beta design prior on theta2 must be a positive numeric scalar (> 0).")
     }
 
-    # dp2 irrelevant for beta prior > set to NULL automatically
+    # Automatically assign some value to the irrelevent parameter
     dp2 <- .5
 
   } else if (prior_design_2 == "Point") {
 
-    # Automatically set Beta parameters to NULL
+    # Automatically assign some value to the irrelevent parameter
     a2d <- 1
     b2d <- 1
 
@@ -2228,6 +2269,7 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
   if (is.numeric(results) && length(results) == 1 && is.nan(results)) {
     results_out <- NaN
     grid_out <- NULL
+    return(NaN)
   } else {
     results_out <- results[[1]]
     grid_out <- results[[2]]
@@ -2247,18 +2289,38 @@ BFpower.props <- function(threshold , true_rate , a0 , b0 , a1 , b1 ,
     b = b2
   )
 
-  design_h1_theta_1 <- list(
-    prior=prior_design_1,
-    a = a1d,
-    b = b1d,
-    p = dp1
-  )
-  design_h1_theta_2 <- list(
-    prior=prior_design_2,
-    a = a2d,
-    b = b2d,
-    p = dp2
-  )
+
+  if (prior_design_1 == "same"){
+    design_h1_theta_1 <- list(
+      prior=NULL,
+      a = NULL,
+      b = NULL,
+      p = NULL
+    )
+  } else {
+    design_h1_theta_1 <- list(
+      prior=prior_design_1,
+      a = a1d,
+      b = b1d,
+      p = dp1
+    )
+  }
+  if (prior_design_2 == "same"){
+    design_h1_theta_2 <- list(
+      prior=NULL,
+      a = NULL,
+      b = NULL,
+      p = NULL
+    )
+  } else{
+    design_h1_theta_2 <- list(
+      prior=prior_design_2,
+      a = a2d,
+      b = b2d,
+      p = dp2
+    )
+  }
+
 
   object <- list(
     type = type,
@@ -2423,7 +2485,7 @@ BF10.ttest.OneSample <- function(tval, df, prior_analysis, location, scale, dff,
 
 #' Bayes Factor for a Two-Sample Bayesian t-Test
 #'
-#' Compute the Bayes factor (BF10) for a two-sample independent t-test. Supports both point-null and interval-null hypotheses.
+#' Compute the Bayes factor (BF10) for a two-sample independent t-test with equal variances. Supports both point-null and interval-null hypotheses.
 #'
 #' @param tval Numeric scalar. Observed t-value from the two-sample t-test.
 #' @param N1 Numeric integer. Sample size of group 1 (must be > 2).
@@ -2583,8 +2645,8 @@ BF10.ttest.TwoSample <- function(tval, N1, N2, prior_analysis, location, scale, 
 #' @param r Numeric scalar. Observed correlation coefficient. Must be a numeric scalar between -1 and 1.
 #' @param n Numeric integer. Sample size. Must be a numeric scalar greater than 3.
 #' @param k Numeric scalar. Parameter for the analysis default beta prior (\code{"d_beta"}) under the alternative hypothesis.
-#' @param alpha Numeric scalar. Parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.
-#' @param beta Numeric scalar. Parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.
+#' @param alpha Numeric scalar. Alpha parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.
+#' @param beta Numeric scalar. Beta parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.
 #' @param h0 Numeric scalar. Null value of the correlation. Must be a numeric scalar between -0.8 and 0.8.
 #' @param alternative Character. The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
 #' @param scale Numeric scalar. Scale parameter for the analysis normal-moment prior (\code{"Moment"}). Must be > 0.
@@ -3100,10 +3162,10 @@ BF10.bin.test <- function(x, n, alpha, beta, h0, scale, prior_analysis, alternat
 #' @param b1 Positive numeric scalar. Beta parameter of the Beta prior for group 1 under the alternative hypothesis.
 #' @param a2 Positive numeric scalar. Alpha parameter of the Beta prior for group 2 under the alternative hypothesis.
 #' @param b2 Positive numeric scalar. Beta parameter of the Beta prior for group 2 under the alternative hypothesis.
-#' @param N1 Numeric integer. Sample size for group 1.
-#' @param N2 Numeric integer. Sample size for group 2.
-#' @param x1 Numeric integer. Number of successes observed in group 1.
-#' @param x2 Numeric integer. Number of successes observed in group 2.
+#' @param N1 Positive numeric integer. Sample size for group 1 (must be > 0).
+#' @param N2 Positive numeric integer. Sample size for group 2 (must be > 0).
+#' @param x1 Non-negative numeric integer. Number of successes observed in group 1 (must be at least 0).
+#' @param x2 Non-negative numeric integer. Number of successes observed in group 2 (must be at least 0).
 #'
 #' @return A list of class \code{BFvalue} containing:
 #' \itemize{
