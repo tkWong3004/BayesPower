@@ -777,12 +777,19 @@ plot.BFpower <- function(x, plot_power = FALSE, plot_rel = FALSE,...) {
          "Two-proportions" = {
            # Prior plotting
            plots$prior0 <- p2_prior_plot(x$analysis_h0$a, x$analysis_h0$b, 1, 1, 0, "same", 0)
-           plots$prior1 <- p2_prior_plot(x$analysis_h1_theta_1$a, x$analysis_h1_theta_1$b,
-                                         x$design_h1_theta_1$a, x$design_h1_theta_1$b,
-                                         x$design_h1_theta_1$p, x$design_h1_theta_1$prior, 1)
-           plots$prior2 <- p2_prior_plot(x$analysis_h1_theta_2$a, x$analysis_h1_theta_2$b,
-                                         x$design_h1_theta_2$a, x$design_h1_theta_2$b,
-                                         x$design_h1_theta_2$p, x$design_h1_theta_2$prior, 2)
+
+           prior1 <- if (is.null(x$design_h1_theta_1$prior)) "same" else x$design_h1_theta_1$prior
+           a1d <- if (prior1 == "same") x$analysis_h1_theta_1$a else x$design_h1_theta_1$a
+           b1d <- if (prior1 == "same") x$analysis_h1_theta_1$b else x$design_h1_theta_1$b
+           dp1 <- if (prior1 == "same") 0.5 else x$design_h1_theta_1$p
+
+           prior2 <- if (is.null(x$design_h1_theta_2$prior)) "same" else x$design_h1_theta_2$prior
+           a2d <- if (prior2 == "same") x$analysis_h1_theta_2$a else x$design_h1_theta_2$a
+           b2d <- if (prior2 == "same") x$analysis_h1_theta_2$b else x$design_h1_theta_2$b
+           dp2 <- if (prior2 == "same") 0.5 else x$design_h1_theta_2$p
+
+           plots$prior1 <- p2_prior_plot(x$analysis_h1_theta_1$a, x$analysis_h1_theta_1$b, a1d, b1d, dp1, prior1, 1)
+           plots$prior2 <- p2_prior_plot(x$analysis_h1_theta_2$a, x$analysis_h1_theta_2$b, a2d, b2d, dp2, prior2, 2)
 
            if (plot_power) {
              plots$power <- Power_p2(
@@ -790,10 +797,8 @@ plot.BFpower <- function(x, plot_power = FALSE, plot_rel = FALSE,...) {
                x$analysis_h1_theta_1$a, x$analysis_h1_theta_1$b,
                x$analysis_h1_theta_2$a, x$analysis_h1_theta_2$b,
                unlist(x$results[1,6]) / unlist(x$results[1,5]),
-               x$design_h1_theta_1$prior, x$design_h1_theta_1$a, x$design_h1_theta_1$b,
-               x$design_h1_theta_1$p,
-               x$design_h1_theta_2$prior, x$design_h1_theta_2$a, x$design_h1_theta_2$b,
-               x$design_h1_theta_2$p
+               prior1, a1d, b1d, dp1,
+               prior2, a2d, b2d, dp2
              )
            }
 
