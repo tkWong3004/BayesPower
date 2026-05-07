@@ -208,14 +208,14 @@ t1_TPE <- function(t, df, prior_analysis, location, scale, dff, alternative) {
 
     return(pro)
   }
-
+ # limits of the integral, parameter space
   bound <- switch(
     alternative,
     "greater" = c(a = 0, b = Inf),
     "less" = c(a = -Inf, b = 0),
     "two.sided" = c(a = -Inf, b = Inf)
   )
-
+ # normalization of the prior under h1
   normalization <- if (alternative == "two.sided") {
     1
   } else {
@@ -237,7 +237,7 @@ t1_TPE <- function(t, df, prior_analysis, location, scale, dff, alternative) {
         stats::pt((bound[1] - location) / scale, dff, 0)
     )
   }
-
+ # integral, marginalized probability
   int <- function(delta) {
 
     ncp <- delta * constant
@@ -317,13 +317,14 @@ t1_FNE <- function(t, df, prior_analysis, location, scale, dff, alternative) {
     return(pro)
   }
 
+  # limits of the integral, parameter space under h1
   bound <- switch(
     alternative,
     "greater" = c(a = 0, b = Inf),
     "less" = c(a = -Inf, b = 0),
     "two.sided" = c(a = -Inf, b = Inf)
   )
-
+ # normalization of the prior under h1
   normalization <- if (alternative == "two.sided") {
     1
   } else {
@@ -345,7 +346,7 @@ t1_FNE <- function(t, df, prior_analysis, location, scale, dff, alternative) {
         stats::pt((bound[1] - location) / scale, dff, 0)
     )
   }
-
+ # integral, marginalized probability
   int <- function(delta) {
 
     ncp <- delta * constant

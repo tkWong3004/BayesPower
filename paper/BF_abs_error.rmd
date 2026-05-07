@@ -33,111 +33,218 @@ The functions in the backend for the calculation of power, `BayesPower:::t1_TPE`
 t1_TPE_abs_error <- function(t, df, prior_analysis, location, scale, dff, alternative ) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
+  constant <- sqrt(df + 1)
 
-  if (prior_analysis == "Point"){
-    ncp <- location * sqrt(df + 1)
+  if (prior_analysis == "Point") {
 
-    pro <- switch(alternative,
-                 "two.sided"= BayesPower:::pnct(min(t), df, ncp) + (1 - BayesPower:::pnct(max(t), df, ncp)),
-                 "greater" =1 - BayesPower:::pnct(t, df, ncp),
-                 "less" =  BayesPower:::pnct(t, df, ncp))
+    ncp <- location * constant
+
+    pro <- switch(
+      alternative,
+
+      "two.sided" = {
+        if (length(t) == 2) {
+          BayesPower:::pnct(min(t), df, ncp = ncp, lower = TRUE) +
+            BayesPower:::pnct(max(t), df, ncp = ncp, lower = FALSE)
+        } else {
+          if (t > 0) {
+            BayesPower:::pnct(t, df, ncp = ncp, lower = FALSE)
+          } else {
+            BayesPower:::pnct(t, df, ncp = ncp, lower = TRUE)
+          }
+        }
+      },
+
+      "greater" = BayesPower:::pnct(t, df, ncp = ncp, lower = FALSE),
+
+      "less" = BayesPower:::pnct(t, df, ncp = ncp, lower = TRUE)
+    )
+
     return(pro)
   }
+ # limits of the integral, parameter space
+  bound <- switch(
+    alternative,
+    "greater" = c(a = 0, b = Inf),
+    "less" = c(a = -Inf, b = 0),
+    "two.sided" = c(a = -Inf, b = Inf)
+  )
+ # normalization of the prior under h1
+  normalization <- if (alternative == "two.sided") {
+    1
+  } else {
+    switch(
+      prior_analysis,
+      "Cauchy" = stats::pcauchy(bound[2], location, scale) -
+        stats::pcauchy(bound[1], location, scale),
 
+      "Normal" = stats::pnorm(bound[2], location, scale) -
+        stats::pnorm(bound[1], location, scale),
 
-  # limits of the integral and the parameter space under h1 
-  bound  <- switch(alternative,
-                   "greater"  = c(a = 0,    b = Inf),
-                   "less"  = c(a = -Inf, b = 0),
-                   "two.sided" = c(a = -Inf, b = Inf))
- # normalization of the prior under h1 
-  normalization <- if (alternative == "two.sided") 1 else
-    switch(prior_analysis,
-           "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
-           "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "Moment"            = if (bound[2] == 0) BayesPower:::pmom(bound[2]-location, tau=scale^2) else 1-BayesPower:::pmom(bound[1]-location, tau=scale^2),
-           "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
+      "Moment" = if (bound[2] == 0) {
+        BayesPower:::pmom(bound[2] - location, tau = scale^2)
+      } else {
+        1 - BayesPower:::pmom(bound[1] - location, tau = scale^2)
+      },
 
-
+      "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) -
+        stats::pt((bound[1] - location) / scale, dff, 0)
+    )
+  }
  # integral, marginalized probability 
   int <- function(delta) {
 
-    pro <- switch(alternative,
-                  "two.sided" = {
-                    pro1 <- 1 - BayesPower:::pnct(max(t), df, delta * sqrt(df + 1))
-                    pro2 <- BayesPower:::pnct(min(t), df, delta * sqrt(df + 1))
-                    pro1 + pro2
-                  },
-                  "greater" = 1 - BayesPower:::pnct(t, df, delta * sqrt(df + 1)),
-                  "less" = BayesPower:::pnct(t, df, delta * sqrt(df + 1))
+    ncp <- delta * constant
+
+    pro <- switch(
+      alternative,
+
+      "two.sided" = {
+        if (length(t) == 2) {
+          BayesPower:::pnct(min(t), df, ncp = ncp, lower = TRUE) +
+            BayesPower:::pnct(max(t), df, ncp = ncp, lower = FALSE)
+        } else {
+          if (t > 0) {
+            BayesPower:::pnct(t, df, ncp = ncp, lower = FALSE)
+          } else {
+            BayesPower:::pnct(t, df, ncp = ncp, lower = TRUE)
+          }
+        }
+      },
+
+      "greater" = BayesPower:::pnct(t, df, ncp = ncp, lower = FALSE),
+
+      "less" = BayesPower:::pnct(t, df, ncp = ncp, lower = TRUE)
     )
 
     pro * BayesPower:::t1_prior(delta, location, scale, dff, prior_analysis) / normalization
   }
 
-  # setting error value such that error are prevented:
   error <- 1e-4
-  if (prior_analysis == "Moment" & scale <.3 ){
+
+  if (prior_analysis == "Moment" && scale < 0.3) {
     error <- 1e-14
   }
+
+  #stats::integrate(
+  #  int,
+  #  lower = bound[1],
+  #  upper = bound[2],
+  #  rel.tol = error,
+  #  stop.on.error = FALSE
+  #)$value
   stats::integrate(int, lower = bound[1], upper = bound[2], rel.tol = error, stop.on.error = FALSE)$abs.error
   
 }
 
 # Indenpedent samples t-test
 t2_TPE_abs_error <-function(t,n1,r,prior_analysis ,location ,scale,dff , alternative ){
-  n2 <- n1*r
-  df <- n1+n2-2
-  constant <- sqrt((n1*n2)/(n1+n2))
+   n2 <- n1 * r
+  df <- n1 + n2 - 2
+  constant <- sqrt((n1 * n2) / (n1 + n2))
+
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  if (prior_analysis == "Point"){
-    pro <- switch(alternative,
-                 "two.sided"= BayesPower:::pnct(min(t),df,ncp = location*constant,lower  = T)+BayesPower:::pnct(max(t),df,ncp = location*constant,lower  = F),
-                 "greater" = BayesPower:::pnct(t,df,ncp = location*constant,lower  = F),
-                 "less" = BayesPower:::pnct(t,df,ncp = location*constant,lower  = T))
+  if (prior_analysis == "Point") {
+
+    pro <- switch(
+      alternative,
+
+      "two.sided" = {
+        if (length(t) == 2) {
+          BayesPower:::pnct(min(t), df, ncp = location * constant, lower = TRUE) +
+            BayesPower:::pnct(max(t), df, ncp = location * constant, lower = FALSE)
+        } else {
+          if (t > 0 ) {
+            BayesPower:::pnct(t, df, ncp = location * constant, lower = FALSE)
+          } else {
+            BayesPower:::pnct(t, df, ncp = location * constant, lower = TRUE)
+          }
+        }
+      },
+
+      "greater" = BayesPower:::pnct(t, df, ncp = location * constant, lower = FALSE),
+
+      "less" = BayesPower:::pnct(t, df, ncp = location * constant, lower = TRUE)
+    )
+
     return(pro)
   }
-  
+
   # limits of the integral and the parameter space under h1
-  bound  <- switch(alternative,
-                   "greater" = c(a = 0, b = Inf),
-                   "less" = c(a = -Inf, b = 0),
-                   "two.sided" = c(a = -Inf, b = Inf)
+  bound <- switch(
+    alternative,
+    "greater" = c(a = 0, b = Inf),
+    "less" = c(a = -Inf, b = 0),
+    "two.sided" = c(a = -Inf, b = Inf)
   )
 
+  # normalization of prior under h1
+  normalization <- if (alternative == "two.sided") {
+    1
+  } else {
+    switch(
+      prior_analysis,
+      "Cauchy" = stats::pcauchy(bound[2], location, scale) -
+        stats::pcauchy(bound[1], location, scale),
 
-# Normalization of the prior under h1
-  x <- NULL
- 
-  normalization <- if (alternative == "two.sided") 1 else
-    switch(prior_analysis,
-           "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
-           "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "Moment"            = if (bound[2] == 0) BayesPower:::pmom(bound[2]-location, tau=scale^2) else 1-BayesPower:::pmom(bound[1]-location, tau=scale^2),
-           "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
+      "Normal" = stats::pnorm(bound[2], location, scale) -
+        stats::pnorm(bound[1], location, scale),
 
- # integral, marginalized probability
+      "Moment" = if (bound[2] == 0) {
+        BayesPower:::pmom(bound[2] - location, tau = scale^2)
+      } else {
+        1 - BayesPower:::pmom(bound[1] - location, tau = scale^2)
+      },
+
+      "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) -
+        stats::pt((bound[1] - location) / scale, dff, 0)
+    )
+  }
+
+  # integral
   int <- function(delta) {
+
     ncp <- delta * constant
 
-    pro <- switch(alternative,
-                  "two.sided" = {
-                    pro1 <- BayesPower:::pnct(max(t), df, ncp = ncp, lower = FALSE)
-                    pro2 <- BayesPower:::pnct(min(t), df, ncp = ncp, lower = TRUE)
-                    pro1 + pro2
-                  },
-                  "greater" = BayesPower:::pnct(t, df, ncp = ncp, lower = FALSE),
-                  "less" = BayesPower:::pnct(t, df, ncp = ncp, lower = TRUE)
+    pro <- switch(
+      alternative,
+
+      "two.sided" = {
+        if (length(t) == 2) {
+          BayesPower:::pnct(min(t), df, ncp = ncp, lower = TRUE) +
+            BayesPower:::pnct(max(t), df, ncp = ncp, lower = FALSE)
+        } else {
+          if (t > 0) {
+            BayesPower:::pnct(t, df, ncp = ncp, lower = FALSE)
+          } else {
+            BayesPower:::pnct(t, df, ncp = ncp, lower = TRUE)
+          }
+        }
+      },
+
+      "greater" = BayesPower:::pnct(t, df, ncp = ncp, lower = FALSE),
+
+      "less" = BayesPower:::pnct(t, df, ncp = ncp, lower = TRUE)
     )
 
     pro * BayesPower:::t1_prior(delta, location, scale, dff, prior_analysis) / normalization
   }
 
   error <- 1e-4
-  if (prior_analysis == "Moment" & scale <.3 ){
+
+  if (prior_analysis == "Moment" && scale < 0.3) {
     error <- 1e-14
   }
+
+  #x <- stats::integrate(
+  #  int,
+  #  lower = bound[1],
+  #  upper = bound[2],
+  #  rel.tol = error,
+  #  stop.on.error = FALSE
+  #)$value
+  
 x <- stats::integrate(int,lower = bound[1],upper = bound[2], rel.tol = error,stop.on.error=FALSE)$abs.error
   return(x)
 
@@ -189,48 +296,37 @@ The function in the backend for the calculation of power, `r_TPE`, is modified s
 
 r_TPE_abs_error <-function(r,n,k, alpha, beta,h0,alternative,location,scale,dff,prior_analysis){
 
-  if (any(r == "bound cannot be found") || length(r) == 0) return(0)
+    if (any(r == "bound cannot be found") || length(r) == 0) return(0)
 
-  if (prior_analysis =="Point"){
-    x = switch(alternative,
-               "two.sided" = {BayesPower:::p_cor(max(r),location,n,lower.tail = F)+ BayesPower:::p_cor(min(r),location,n,lower.tail = T)},
-               "greater"  = {BayesPower:::p_cor(r,location,n,lower.tail =F)},
-               "less"  = {BayesPower:::p_cor(r,location,n,lower.tail =T)}
-    )
+  if (prior_analysis == "Point") {
+    x <- switch(alternative,
+                "two.sided" = if (length(r) == 2) BayesPower:::p_cor(max(r), location, n, lower.tail = FALSE) + BayesPower:::p_cor(min(r), location, n, lower.tail = TRUE) else if (r > location) BayesPower:::p_cor(r, location, n, lower.tail = FALSE) else BayesPower:::p_cor(r, location, n, lower.tail = TRUE),
+                "greater" = BayesPower:::p_cor(r, location, n, lower.tail = FALSE),
+                "less" = BayesPower:::p_cor(r, location, n, lower.tail = TRUE))
     return(x)
   }
 
-  
-  # limits of the integral, the parameter space under h1
-  bound  <- switch(alternative,
-                   "greater" = c(a = h0, b = 1),
-                   "less" = c(a = -1, b = h0),
-                   "two.sided" = c(a = -1, b = 1)
-  )
-  # normalization of the prior under h1
-    normalization <- if (alternative == "two.sided") {
-    switch(prior_analysis,
-           "d_beta"   = 1,
-           "beta" = 1,
-           "Moment"   = { BayesPower:::pmom(bound[2]-location, tau=scale^2)-BayesPower:::pmom(bound[1]-location, tau=scale^2)})
+  # limits of the integral and the parameter space
+  bound <- switch(alternative, "greater" = c(a = h0, b = 1), "less" = c(a = -1, b = h0), "two.sided" = c(a = -1, b = 1))
 
-  }else{
-    switch(prior_analysis,
-           "d_beta"   = BayesPower:::p_beta(bound[2], 1/k, 1/k,-1,1)-BayesPower:::p_beta(bound[1], 1/k,1/k,-1,1) ,
-           "beta" = BayesPower:::p_beta(bound[2], alpha, beta,-1,1)-BayesPower:::p_beta(bound[1], alpha, beta,-1,1),
-           "Moment"   = {BayesPower:::pmom(bound[2]-location, tau=scale^2)-BayesPower:::pmom(bound[1]-location, tau=scale^2)})
+  # normalization of prior under h1
+  normalization <- if (alternative == "two.sided") {
+    switch(prior_analysis, "d_beta" = 1, "beta" = 1, "Moment" = BayesPower:::pmom(bound[2] - location, tau = scale^2) - BayesPower:::pmom(bound[1] - location, tau = scale^2))
+  } else {
+    switch(prior_analysis, "d_beta" = BayesPower:::p_beta(bound[2], 1 / k, 1 / k, -1, 1) - BayesPower:::p_beta(bound[1], 1 / k, 1 / k, -1, 1), "beta" = BayesPower:::p_beta(bound[2], alpha, beta, -1, 1) - BayesPower:::p_beta(bound[1], alpha, beta, -1, 1), "Moment" = BayesPower:::pmom(bound[2] - location, tau = scale^2) - BayesPower:::pmom(bound[1] - location, tau = scale^2))
   }
-    # the integral, marginalized probability 
+
+  # integral
   int <- function(rho) {
     prob <- switch(alternative,
-                   "two.sided" = BayesPower:::p_cor(max(r), rho, n, lower.tail = FALSE) +
-                     BayesPower:::p_cor(min(r), rho, n, lower.tail = TRUE),
-                   "greater"  = BayesPower:::p_cor(r, rho, n, lower.tail = FALSE),
-                   "less"  = BayesPower:::p_cor(r, rho, n, lower.tail = TRUE)
-    )
+                   "two.sided" = if (length(r) == 2) BayesPower:::p_cor(max(r), rho, n, lower.tail = FALSE) + BayesPower:::p_cor(min(r), rho, n, lower.tail = TRUE) else if (r > location) BayesPower:::p_cor(r, rho, n, lower.tail = FALSE) else BayesPower:::p_cor(r, rho, n, lower.tail = TRUE),
+                   "greater" = BayesPower:::p_cor(r, rho, n, lower.tail = FALSE),
+                   "less" = BayesPower:::p_cor(r, rho, n, lower.tail = TRUE))
 
-    prob * BayesPower:::r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta,min(bound),max(bound)) / normalization
+    prob * BayesPower:::r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta, min(bound), max(bound)) / normalization
   }
+
+  #x <- stats::integrate(int, lower = bound[1], upper = bound[2], rel.tol = 1e-4)$value
   x <- stats::integrate(int,lower = bound[1],upper = bound[2], rel.tol = 1e-4)$abs.error
   return(x)
 
