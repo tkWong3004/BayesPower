@@ -144,129 +144,280 @@ t1_BF01_bound <- function(threshold, df, prior_analysis, location, scale, dff, a
   t1_BF10_bound(1 / threshold, df, prior_analysis, location, scale, dff, alternative)
 }
 
+
 # True negative rate
-t1_TNE <- function(t, df,alternative) {
+t1_TNE <- function(t, df, alternative) {
+
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  if (alternative == "two.sided") return(stats::pt(max(t), df) - stats::pt(min(t), df))
+  pro <- switch(
+    alternative,
 
-  return(if (alternative=="greater") stats::pt(t, df,0) else 1 - stats::pt(t, df))
+    "two.sided" = {
+      if (length(t) == 2) {
+        stats::pt(max(t), df = df, lower = TRUE) -
+          stats::pt(min(t), df = df, lower = TRUE)
+      } else {
+        if (t > 0) {
+          stats::pt(t, df = df, lower = TRUE)
+        } else {
+          stats::pt(t, df = df, lower = FALSE)
+        }
+      }
+    },
+
+    "greater" = stats::pt(t, df = df, lower = TRUE),
+
+    "less" = stats::pt(t, df = df, lower = FALSE)
+  )
+
+  return(pro)
 }
 
 # True positive rate
-t1_TPE <- function(t, df, prior_analysis, location, scale, dff, alternative ) {
+t1_TPE <- function(t, df, prior_analysis, location, scale, dff, alternative) {
+
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
+  constant <- sqrt(df + 1)
 
+  if (prior_analysis == "Point") {
 
-  if (prior_analysis == "Point"){
-    ncp <- location * sqrt(df + 1)
+    ncp <- location * constant
 
-    pro <- switch(alternative,
-                  "two.sided"= pnct(min(t), df, ncp) + (1 - pnct(max(t), df, ncp)),
-                  "greater" =1 - pnct(t, df, ncp),
-                  "less" =  pnct(t, df, ncp))
+    pro <- switch(
+      alternative,
+
+      "two.sided" = {
+        if (length(t) == 2) {
+          pnct(min(t), df, ncp = ncp, lower = TRUE) +
+            pnct(max(t), df, ncp = ncp, lower = FALSE)
+        } else {
+          if (t > 0) {
+            pnct(t, df, ncp = ncp, lower = FALSE)
+          } else {
+            pnct(t, df, ncp = ncp, lower = TRUE)
+          }
+        }
+      },
+
+      "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
+
+      "less" = pnct(t, df, ncp = ncp, lower = TRUE)
+    )
+
     return(pro)
   }
 
+  bound <- switch(
+    alternative,
+    "greater" = c(a = 0, b = Inf),
+    "less" = c(a = -Inf, b = 0),
+    "two.sided" = c(a = -Inf, b = Inf)
+  )
 
-  # limits of integration
+  normalization <- if (alternative == "two.sided") {
+    1
+  } else {
+    switch(
+      prior_analysis,
+      "Cauchy" = stats::pcauchy(bound[2], location, scale) -
+        stats::pcauchy(bound[1], location, scale),
 
-  bound  <- switch(alternative,
-                   "greater"  = c(a = 0,    b = Inf),
-                   "less"  = c(a = -Inf, b = 0),
-                   "two.sided" = c(a = -Inf, b = Inf))
+      "Normal" = stats::pnorm(bound[2], location, scale) -
+        stats::pnorm(bound[1], location, scale),
 
-  # Normalize the prior
-  normalization <- if (alternative == "two.sided") 1 else
-    switch(prior_analysis,
-           "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
-           "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
-           "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
+      "Moment" = if (bound[2] == 0) {
+        pmom(bound[2] - location, tau = scale^2)
+      } else {
+        1 - pmom(bound[1] - location, tau = scale^2)
+      },
 
+      "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) -
+        stats::pt((bound[1] - location) / scale, dff, 0)
+    )
+  }
 
-  # Integral
   int <- function(delta) {
 
-    pro <- switch(alternative,
-                  "two.sided" = {
-                    pro1 <- 1 - pnct(max(t), df, delta * sqrt(df + 1))
-                    pro2 <- pnct(min(t), df, delta * sqrt(df + 1))
-                    pro1 + pro2
-                  },
-                  "greater" = 1 - pnct(t, df, delta * sqrt(df + 1)),
-                  "less" = pnct(t, df, delta * sqrt(df + 1))
+    ncp <- delta * constant
+
+    pro <- switch(
+      alternative,
+
+      "two.sided" = {
+        if (length(t) == 2) {
+          pnct(min(t), df, ncp = ncp, lower = TRUE) +
+            pnct(max(t), df, ncp = ncp, lower = FALSE)
+        } else {
+          if (t > 0) {
+            pnct(t, df, ncp = ncp, lower = FALSE)
+          } else {
+            pnct(t, df, ncp = ncp, lower = TRUE)
+          }
+        }
+      },
+
+      "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
+
+      "less" = pnct(t, df, ncp = ncp, lower = TRUE)
     )
 
     pro * t1_prior(delta, location, scale, dff, prior_analysis) / normalization
   }
 
-  # setting error value such that error are prevented:
-  error = 1e-4
-  if (prior_analysis == "Moment" & scale <.3 ){
-    error = 1e-14
+  error <- 1e-4
+
+  if (prior_analysis == "Moment" && scale < 0.3) {
+    error <- 1e-14
   }
-  stats::integrate(int, lower = bound[1], upper = bound[2], rel.tol = error, stop.on.error = FALSE)$value
+
+  stats::integrate(
+    int,
+    lower = bound[1],
+    upper = bound[2],
+    rel.tol = error,
+    stop.on.error = FALSE
+  )$value
 }
+
 
 # False negative rate
-t1_FNE <- function(t, df, prior_analysis, location, scale, dff,alternative){
+t1_FNE <- function(t, df, prior_analysis, location, scale, dff, alternative) {
 
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
+
+  constant <- sqrt(df + 1)
 
   if (prior_analysis == "Point") {
-    ncp <- location * sqrt(df + 1)
-    if (length(t) == 2) return(pnct(max(t), df, ncp) - pnct(min(t), df, ncp))
-    # Length 1:
-    return(if (alternative=="greater") pnct(t, df, ncp) else 1 - pnct(t, df, ncp))
+
+    ncp <- location * constant
+
+    pro <- switch(
+      alternative,
+
+      "two.sided" = {
+        if (length(t) == 2) {
+          pnct(max(t), df, ncp = ncp, lower = TRUE) -
+            pnct(min(t), df, ncp = ncp, lower = TRUE)
+        } else {
+          if (t > 0) {
+            pnct(t, df, ncp = ncp, lower = TRUE)
+          } else {
+            pnct(t, df, ncp = ncp, lower = FALSE)
+          }
+        }
+      },
+
+      "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
+
+      "less" = pnct(t, df, ncp = ncp, lower = FALSE)
+    )
+
+    return(pro)
   }
 
-  # limits of integration
+  bound <- switch(
+    alternative,
+    "greater" = c(a = 0, b = Inf),
+    "less" = c(a = -Inf, b = 0),
+    "two.sided" = c(a = -Inf, b = Inf)
+  )
 
-  bound  <- switch(alternative,
-                   "greater"  = c(a = 0,    b = Inf),
-                   "less"  = c(a = -Inf, b = 0),
-                   "two.sided" = c(a = -Inf, b = Inf))
+  normalization <- if (alternative == "two.sided") {
+    1
+  } else {
+    switch(
+      prior_analysis,
+      "Cauchy" = stats::pcauchy(bound[2], location, scale) -
+        stats::pcauchy(bound[1], location, scale),
 
+      "Normal" = stats::pnorm(bound[2], location, scale) -
+        stats::pnorm(bound[1], location, scale),
 
-  # Normalize the prior
-  normalization <- if (alternative == "two.sided") 1 else
-    switch(prior_analysis,
-           "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
-           "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
-           "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
+      "Moment" = if (bound[2] == 0) {
+        pmom(bound[2] - location, tau = scale^2)
+      } else {
+        1 - pmom(bound[1] - location, tau = scale^2)
+      },
 
-  # integral
-  int <- if (length(t) == 2) { # two-sided test
-    function(delta) {
-      pro1 <- pnct(max(t), df, delta * sqrt(df + 1))
-      pro2 <- pnct(min(t), df, delta * sqrt(df + 1))
-      (pro1 - pro2) * t1_prior(delta, location, scale, dff, prior_analysis) / normalization
-    }
-  } else if (alternative =="greater") { # one-sided test with delta > 0
-    function(delta) pnct(t, df, delta * sqrt(df + 1)) * t1_prior(delta, location, scale, dff, prior_analysis) / normalization
-  } else if (alternative =="less"){             # one-sided test with delta < 0
-    function(delta) (1 - pnct(t, df, delta * sqrt(df + 1))) * t1_prior(delta, location, scale, dff, prior_analysis) / normalization
+      "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) -
+        stats::pt((bound[1] - location) / scale, dff, 0)
+    )
   }
 
-  # setting error value such that error are prevented:
-  error <- if (prior_analysis == "Moment" && scale < 0.3) 1e-14 else if (scale > 0.3) .Machine$double.eps^0.25 else 1e-8
-  error = 1e-4
-  stats::integrate(int, lower = bound[1], upper = bound[2], rel.tol = error, stop.on.error = FALSE)$value
+  int <- function(delta) {
+
+    ncp <- delta * constant
+
+    pro <- switch(
+      alternative,
+
+      "two.sided" = {
+        if (length(t) == 2) {
+          pnct(max(t), df, ncp = ncp, lower = TRUE) -
+            pnct(min(t), df, ncp = ncp, lower = TRUE)
+        } else {
+          if (t > 0) {
+            pnct(t, df, ncp = ncp, lower = TRUE)
+          } else {
+            pnct(t, df, ncp = ncp, lower = FALSE)
+          }
+        }
+      },
+
+      "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
+
+      "less" = pnct(t, df, ncp = ncp, lower = FALSE)
+    )
+
+    pro * t1_prior(delta, location, scale, dff, prior_analysis) / normalization
+  }
+
+  error <- 1e-4
+
+  if (prior_analysis == "Moment" && scale < 0.3) {
+    error <- 1e-14
+  }
+
+  stats::integrate(
+    int,
+    lower = bound[1],
+    upper = bound[2],
+    rel.tol = error,
+    stop.on.error = FALSE
+  )$value
 }
 
-# False Positive rate
-t1_FPE <- function(t, df,alternative) {
+
+# False positive rate
+t1_FPE <- function(t, df, alternative) {
+
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
+  pro <- switch(
+    alternative,
 
-  if (alternative == "two.sided") return(stats::pt(min(t), df) + (1 - stats::pt(max(t), df)))
+    "two.sided" = {
+      if (length(t) == 2) {
+        stats::pt(min(t), df = df, lower = TRUE) +
+          stats::pt(max(t), df = df, lower = FALSE)
+      } else {
+        if (t > 0) {
+          stats::pt(t, df = df, lower = FALSE)
+        } else {
+          stats::pt(t, df = df, lower = TRUE)
+        }
+      }
+    },
 
-  return(if (alternative=="greater") 1 - stats::pt(t, df) else stats::pt(t, df))
+    "greater" = stats::pt(t, df = df, lower = FALSE),
+
+    "less" = stats::pt(t, df = df, lower = TRUE)
+  )
+
+  return(pro)
 }
-
 
 
 
@@ -957,167 +1108,124 @@ t1e_BF01_bound <-function(threshold, df,prior_analysis,location,scale,dff , alte
 
 
 # True positive rate
-t1e_TPE <-function(t,df,prior_analysis ,location,scale,dff , alternative ,ROPE){
+t1e_TPE <- function(t, df, prior_analysis, location, scale, dff, alternative, ROPE) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
+  constant <- sqrt(df + 1)
+
   if (prior_analysis == "Point") {
-    ncp <- location * sqrt(df + 1)
-    if (length(t) == 2) return(pnct(min(t), df, ncp) + (1 - pnct(max(t), df, ncp)))
-    # Length 1:
-    return(if (t >= 0) 1 - pnct(t, df, ncp) else pnct(t, df, ncp))
+    ncp <- location * constant
+    pro <- switch(alternative,
+                  "two.sided" = if (length(t) == 2) pnct(min(t), df, ncp = ncp, lower = TRUE) + pnct(max(t), df, ncp = ncp, lower = FALSE) else pnct(t, df, ncp = ncp, lower = t < 0),
+                  "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
+                  "less" = pnct(t, df, ncp = ncp, lower = TRUE))
+    return(pro)
   }
-
-  # limits of integration
-  bound_h1  <- switch(alternative,
-                      "greater" = c(a = ROPE, b = Inf),
-                      "less" = c(a = -Inf, b = ROPE),
-                      "two.sided" = c(a = ROPE[1], b = ROPE[2])
-  )
-
-  # normalization of the prior
+  # limits of the integral and the normalization of the prior under h1
+  bound_h1 <- switch(alternative, "greater" = c(a = ROPE, b = Inf), "less" = c(a = -Inf, b = ROPE), "two.sided" = c(a = ROPE[1], b = ROPE[2]))
   normalizationh1 <- norm_h1(alternative, prior_analysis, bound_h1, location, scale, dff)
 
-
-  x <- NULL
-
-  # integral
+  # integral, marginalized probability
   int <- function(delta) {
-    ncp <- delta * sqrt(df + 1)
-
+    ncp <- delta * constant
     pro <- switch(alternative,
-                  "two.sided" = pnct(max(t), df, ncp = ncp, lower  = FALSE) +
-                    pnct(min(t), df, ncp = ncp, lower  = TRUE),
-                  "greater"  = pnct(t, df, ncp = ncp, lower  = FALSE),
-                  "less"  = pnct(t, df, ncp = ncp, lower  = TRUE)
-    )
-
-    pro * te_prior(delta, location,scale, dff, prior_analysis) / normalizationh1
+                  "two.sided" = if (length(t) == 2) pnct(min(t), df, ncp = ncp, lower = TRUE) + pnct(max(t), df, ncp = ncp, lower = FALSE) else pnct(t, df, ncp = ncp, lower = t < 0),
+                  "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
+                  "less" = pnct(t, df, ncp = ncp, lower = TRUE))
+    pro * te_prior(delta, location, scale, dff, prior_analysis) / normalizationh1
   }
 
-  error = 1e-4
-
+  error <- 1e-4
   x <- switch(alternative,
-              "two.sided" = stats::integrate(int, -Inf, bound_h1[1], rel.tol = error)$value +
-                stats::integrate(int, bound_h1[2], Inf, rel.tol = error)$value,
-              "less"  = ,
-              "greater"  = stats::integrate(int, bound_h1[1], bound_h1[2], rel.tol = error)$value
+              "two.sided" = stats::integrate(int, lower = -Inf, upper = bound_h1[1], rel.tol = error, stop.on.error = FALSE)$value + stats::integrate(int, lower = bound_h1[2], upper = Inf, rel.tol = error, stop.on.error = FALSE)$value,
+              "less" = stats::integrate(int, lower = bound_h1[1], upper = bound_h1[2], rel.tol = error, stop.on.error = FALSE)$value,
+              "greater" = stats::integrate(int, lower = bound_h1[1], upper = bound_h1[2], rel.tol = error, stop.on.error = FALSE)$value)
 
-  )
   return(x)
-
 }
 
 # False negative rate
-t1e_FNE <-function(t,df,prior_analysis ,location,scale,dff , alternative ,ROPE){
-
+t1e_FNE <- function(t, df, prior_analysis, location, scale, dff, alternative, ROPE) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
+
+  constant <- sqrt(df + 1)
 
   if (prior_analysis == "Point") {
-    ncp <- location * sqrt(df + 1)
-    if (length(t) == 2) return(pnct(max(t), df, ncp) - pnct(min(t), df, ncp))
-    # Length 1:
-    return(if (t >= 0) pnct(t, df, ncp) else 1 - pnct(t, df, ncp))
+    ncp <- location * constant
+    pro <- switch(alternative,
+                  "two.sided" = if (length(t) == 2) pnct(max(t), df, ncp = ncp, lower = TRUE) - pnct(min(t), df, ncp = ncp, lower = TRUE) else pnct(t, df, ncp = ncp, lower = t > 0),
+                  "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
+                  "less" = pnct(t, df, ncp = ncp, lower = FALSE))
+    return(pro)
   }
-  # limits of integration
-  bound_h1  <- switch(alternative,
-                      "greater" = c(a = ROPE, b = Inf),
-                      "less" = c(a = -Inf, b = ROPE),
-                      "two.sided" = c(a = ROPE[1], b = ROPE[2])
-  )
-  # normalization of the prior
+  # limits of the integral and the normalization of the prior under h1
+  bound_h1 <- switch(alternative, "greater" = c(a = ROPE, b = Inf), "less" = c(a = -Inf, b = ROPE), "two.sided" = c(a = ROPE[1], b = ROPE[2]))
   normalizationh1 <- norm_h1(alternative, prior_analysis, bound_h1, location, scale, dff)
 
-  x <- NULL
-
+  # integral, marginalized probability
   int <- function(delta) {
-    ncp <- delta * sqrt(df + 1)
-
+    ncp <- delta * constant
     pro <- switch(alternative,
-                  "two.sided" = pnct(max(t), df, ncp = ncp, lower  = TRUE) -
-                    pnct(min(t), df, ncp = ncp, lower  = TRUE),
-                  "greater"  = pnct(t, df, ncp = ncp, lower  = TRUE),
-                  "less"  = pnct(t,df, ncp = ncp, lower  = FALSE)
-    )
-
-    pro * te_prior(delta,location, scale, dff, prior_analysis) / normalizationh1
+                  "two.sided" = if (length(t) == 2) pnct(max(t), df, ncp = ncp, lower = TRUE) - pnct(min(t), df, ncp = ncp, lower = TRUE) else pnct(t, df, ncp = ncp, lower = t > 0),
+                  "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
+                  "less" = pnct(t, df, ncp = ncp, lower = FALSE))
+    pro * te_prior(delta, location, scale, dff, prior_analysis) / normalizationh1
   }
 
-  error = 1e-4
-
+  error <- 1e-4
   x <- switch(alternative,
-              "two.sided" = stats::integrate(int,lower = -Inf,upper = bound_h1[1], rel.tol=error,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = Inf, rel.tol=error,stop.on.error = F)$value ,
-              "less"  = ,
-              "greater"  = stats::integrate(int, bound_h1[1], bound_h1[2], rel.tol = error)$value)
-  return(x)
+              "two.sided" = stats::integrate(int, lower = -Inf, upper = bound_h1[1], rel.tol = error, stop.on.error = FALSE)$value + stats::integrate(int, lower = bound_h1[2], upper = Inf, rel.tol = error, stop.on.error = FALSE)$value,
+              "less" = stats::integrate(int, lower = bound_h1[1], upper = bound_h1[2], rel.tol = error, stop.on.error = FALSE)$value,
+              "greater" = stats::integrate(int, lower = bound_h1[1], upper = bound_h1[2], rel.tol = error, stop.on.error = FALSE)$value)
 
+  return(x)
 }
 
-t1e_TNE <-function(t,df,prior_analysis ,location,scale,dff , alternative ,ROPE){
 
+# True negative rate
+t1e_TNE <- function(t, df, prior_analysis, location, scale, dff, alternative, ROPE) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
- # limits of the integral under h0
-  bound_h0  <- switch(alternative,
-                      "greater" = c(a = 0, b = ROPE),
-                      "less" = c(a = ROPE, b = 0),
-                      "two.sided" = c(a = ROPE[1], b = ROPE[2])
-  )
-  # normalization of prior under h0
+
+  constant <- sqrt(df + 1)
+  # limits of the integral and the normalization of the prior under h0
+  bound_h0 <- switch(alternative, "greater" = c(a = 0, b = ROPE), "less" = c(a = ROPE, b = 0), "two.sided" = c(a = ROPE[1], b = ROPE[2]))
   normalizationh0 <- norm_h0(prior_analysis, bound_h0, location, scale, dff)
-
-  x <- NULL
- # integral
+  # integral, marginalized probability
   int <- function(delta) {
-    ncp <- delta * sqrt(df + 1)
+    ncp <- delta * constant
     pro <- switch(alternative,
-                  "two.sided" = pnct(max(t), df, ncp, lower  = TRUE) -
-                    pnct(min(t), df, ncp, lower  = TRUE),
-                  "greater"  = pnct(t, df, ncp, lower  = TRUE),
-                  "less"  = pnct(t, df, ncp, lower  = FALSE),
-                  stop("Unsupported alternative")
-    )
-
-    pro * te_prior(delta,location, scale, dff, prior_analysis) / normalizationh0
+                  "two.sided" = if (length(t) == 2) pnct(max(t), df, ncp = ncp, lower = TRUE) - pnct(min(t), df, ncp = ncp, lower = TRUE) else pnct(t, df, ncp = ncp, lower = t > 0),
+                  "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
+                  "less" = pnct(t, df, ncp = ncp, lower = FALSE))
+    pro * te_prior(delta, location, scale, dff, prior_analysis) / normalizationh0
   }
 
-  error = 1e-4
-
-  x = stats::integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=error)$value
-
+  x <- stats::integrate(int, lower = bound_h0[1], upper = bound_h0[2], rel.tol = 1e-4, stop.on.error = FALSE)$value
   return(x)
-
 }
 # False positive rate
-t1e_FPE <-function(t,df,prior_analysis ,location,scale,dff , alternative ,ROPE){
+t1e_FPE <- function(t, df, prior_analysis, location, scale, dff, alternative, ROPE) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
-  # limits of the integral
-  bound_h0  <- switch(alternative,
-                      "greater" = c(a = 0, b = ROPE),
-                      "less" = c(a = ROPE, b = 0),
-                      "two.sided" = c(a = ROPE[1], b = ROPE[2])
-  )
- # normalization of the prior under h0
+
+  constant <- sqrt(df + 1)
+  # limits of the integral and the normalization of the prior under h0
+  bound_h0 <- switch(alternative, "greater" = c(a = 0, b = ROPE), "less" = c(a = ROPE, b = 0), "two.sided" = c(a = ROPE[1], b = ROPE[2]))
   normalizationh0 <- norm_h0(prior_analysis, bound_h0, location, scale, dff)
-  x = NULL
+  # integral, marginalized probability
   int <- function(delta) {
-    ncp <- delta * sqrt(df + 1)
-
+    ncp <- delta * constant
     pro <- switch(alternative,
-                  "two.sided" = pnct(max(t), df, ncp, lower  = FALSE) + pnct(min(t), df, ncp, lower  = TRUE),
-                  "greater"  = pnct(t, df, ncp, lower  = FALSE),
-                  "less"  = pnct(t, df, ncp, lower  = TRUE),
-                  stop("Unsupported alternative")
-    )
-
-    pro * te_prior(delta,location, scale, dff, prior_analysis) / normalizationh0
+                  "two.sided" = if (length(t) == 2) pnct(min(t), df, ncp = ncp, lower = TRUE) + pnct(max(t), df, ncp = ncp, lower = FALSE) else pnct(t, df, ncp = ncp, lower = t < 0),
+                  "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
+                  "less" = pnct(t, df, ncp = ncp, lower = TRUE))
+    pro * te_prior(delta, location, scale, dff, prior_analysis) / normalizationh0
   }
 
-  error = 1e-4
-
-  x = stats::integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=error,stop.on.error = F)$value
-
+  x <- stats::integrate(int, lower = bound_h0[1], upper = bound_h0[2], rel.tol = 1e-4, stop.on.error = FALSE)$value
   return(x)
-
 }
+
+
 # finding the df such that the targeted true/false positive rates is reached
 t1e_N_finder<-function(threshold,true_rate,prior_analysis,location,scale,dff, alternative,ROPE ,
                        prior_design,scale_d,dff_d, de_an_prior,location_d  ,false_rate){
@@ -1693,7 +1801,7 @@ t2_BF10 <-function(t,n1,r,prior_analysis ,location,scale,dff , alternative ){
            "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
            "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
 
-  error = 1e-10
+  error = 1e-4
   # intergral
   x <- sapply(t, function(ti) {
     int <- function(delta) {
@@ -1707,16 +1815,14 @@ t2_BF10 <-function(t,n1,r,prior_analysis ,location,scale,dff , alternative ){
   return(x)
 }
 
-
-
 # finding the t-values that correspond to BF10 = threshold
 t2_BF10_bound <-function(threshold, n1,r,prior_analysis ,location ,scale,dff , alternative){
   y <- numeric(0)
   Bound_finding <-function(t){
     t2_BF10(t,n1,r,prior_analysis=prior_analysis,location=location,scale=scale,dff=dff, alternative =alternative )- threshold
   }
-  x <- tryCatch(stats::uniroot(Bound_finding, lower = -6, upper = 0)$root, error = function(e) NA)
-  y <- tryCatch(stats::uniroot(Bound_finding, lower =  0, upper = 6)$root, error = function(e) NA)
+  x <- tryCatch(stats::uniroot(Bound_finding, lower = -6, upper = location)$root, error = function(e) NA)
+  y <- tryCatch(stats::uniroot(Bound_finding, lower =  location, upper = 6)$root, error = function(e) NA)
   results <- c(x, y)
 
   results <- results[!is.na(results)]
@@ -1744,7 +1850,18 @@ t2_TNE <- function(t , n1,r,alternative){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
   pro <- switch(alternative,
-                "two.sided" = stats::pt(max(t), df) - stats::pt(min(t), df),
+                "two.sided" ={
+                  if (length(t) == 2) {
+                    pnct(max(t), df, ncp = 0, lower = TRUE) -
+                      pnct(min(t), df, ncp = 0, lower = TRUE)
+                  } else {
+                    if (t > 0 ) {
+                      pnct(t, df, ncp = 0, lower = TRUE)
+                    } else {
+                      pnct(t, df, ncp = 0, lower = FALSE)
+                    }
+                  }
+                },
                 "greater"  = stats::pt(t, df),
                 "less"  = 1 - stats::pt(t, df)
   )
@@ -1754,62 +1871,115 @@ t2_TNE <- function(t , n1,r,alternative){
 }
 
 # true positive rate
-t2_TPE <-function(t,n1,r,prior_analysis ,location ,scale,dff , alternative ){
-  n2 = n1*r
-  df = n1+n2-2
-  constant = sqrt((n1*n2)/(n1+n2))
+t2_TPE <- function(t, n1, r, prior_analysis, location, scale, dff, alternative) {
+
+  n2 <- n1 * r
+  df <- n1 + n2 - 2
+  constant <- sqrt((n1 * n2) / (n1 + n2))
+
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  if (prior_analysis == "Point"){
-    pro = switch(alternative,
-                 "two.sided"= pnct(min(t),df,ncp = location*constant,lower  = T)+pnct(max(t),df,ncp = location*constant,lower  = F),
-                 "greater" = pnct(t,df,ncp = location*constant,lower  = F),
-                 "less" = pnct(t,df,ncp = location*constant,lower  = T))
+  if (prior_analysis == "Point") {
+
+    pro <- switch(
+      alternative,
+
+      "two.sided" = {
+        if (length(t) == 2) {
+          pnct(min(t), df, ncp = location * constant, lower = TRUE) +
+            pnct(max(t), df, ncp = location * constant, lower = FALSE)
+        } else {
+          if (t > 0 ) {
+            pnct(t, df, ncp = location * constant, lower = FALSE)
+          } else {
+            pnct(t, df, ncp = location * constant, lower = TRUE)
+          }
+        }
+      },
+
+      "greater" = pnct(t, df, ncp = location * constant, lower = FALSE),
+
+      "less" = pnct(t, df, ncp = location * constant, lower = TRUE)
+    )
+
     return(pro)
   }
- # limits of the integral and the parameter space under h1
-  bound  <- switch(alternative,
-                   "greater" = c(a = 0, b = Inf),
-                   "less" = c(a = -Inf, b = 0),
-                   "two.sided" = c(a = -Inf, b = Inf)
+
+  # limits of the integral and the parameter space under h1
+  bound <- switch(
+    alternative,
+    "greater" = c(a = 0, b = Inf),
+    "less" = c(a = -Inf, b = 0),
+    "two.sided" = c(a = -Inf, b = Inf)
   )
 
-
-
-  x <- NULL
   # normalization of prior under h1
-  normalization <- if (alternative == "two.sided") 1 else
-    switch(prior_analysis,
-           "Cauchy"         = stats::pcauchy(bound[2], location, scale)     - stats::pcauchy(bound[1], location, scale),
-           "Normal"         = stats::pnorm (bound[2], location, scale)      - stats::pnorm (bound[1], location, scale),
-           "Moment"            = if (bound[2] == 0) pmom(bound[2]-location, tau=scale^2) else 1-pmom(bound[1]-location, tau=scale^2),
-           "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) - stats::pt((bound[1] - location) / scale, dff, 0))
+  normalization <- if (alternative == "two.sided") {
+    1
+  } else {
+    switch(
+      prior_analysis,
+      "Cauchy" = stats::pcauchy(bound[2], location, scale) -
+        stats::pcauchy(bound[1], location, scale),
 
- # integral
+      "Normal" = stats::pnorm(bound[2], location, scale) -
+        stats::pnorm(bound[1], location, scale),
+
+      "Moment" = if (bound[2] == 0) {
+        pmom(bound[2] - location, tau = scale^2)
+      } else {
+        1 - pmom(bound[1] - location, tau = scale^2)
+      },
+
+      "t-distribution" = stats::pt((bound[2] - location) / scale, dff, 0) -
+        stats::pt((bound[1] - location) / scale, dff, 0)
+    )
+  }
+
+  # integral
   int <- function(delta) {
+
     ncp <- delta * constant
 
-    pro <- switch(alternative,
-                  "two.sided" = {
-                    pro1 <- pnct(max(t), df, ncp = ncp, lower = FALSE)
-                    pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
-                    pro1 + pro2
-                  },
-                  "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
-                  "less" = pnct(t, df, ncp = ncp, lower = TRUE)
+    pro <- switch(
+      alternative,
+
+      "two.sided" = {
+        if (length(t) == 2) {
+          pnct(min(t), df, ncp = ncp, lower = TRUE) +
+            pnct(max(t), df, ncp = ncp, lower = FALSE)
+        } else {
+          if (t > 0) {
+            pnct(t, df, ncp = ncp, lower = FALSE)
+          } else {
+            pnct(t, df, ncp = ncp, lower = TRUE)
+          }
+        }
+      },
+
+      "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
+
+      "less" = pnct(t, df, ncp = ncp, lower = TRUE)
     )
 
     pro * t1_prior(delta, location, scale, dff, prior_analysis) / normalization
   }
 
-  error = 1e-4
-  if (prior_analysis == "Moment" & scale <.3 ){
-    error = 1e-14
+  error <- 1e-4
+
+  if (prior_analysis == "Moment" && scale < 0.3) {
+    error <- 1e-14
   }
-  x <- stats::integrate(int,lower = bound[1],upper = bound[2], rel.tol = error,stop.on.error=FALSE)$value
+
+  x <- stats::integrate(
+    int,
+    lower = bound[1],
+    upper = bound[2],
+    rel.tol = error,
+    stop.on.error = FALSE
+  )$value
 
   return(x)
-
 }
 
 
@@ -1822,7 +1992,18 @@ t2_FNE<-function(t,n1,r,prior_analysis ,location ,scale,dff , alternative ){
 
   if (prior_analysis == "Point"){
     pro = switch(alternative,
-                 "two.sided"=  pnct(max(t),df,ncp = location*constant,lower  = T) - pnct(min(t),df,ncp = location*constant,lower  = T),
+                 "two.sided"=  {
+                   if (length(t) == 2) {
+                     pnct(max(t), df, ncp = location * constant, lower = TRUE) -
+                       pnct(min(t), df, ncp = location * constant, lower = TRUE)
+                   } else {
+                     if (t > 0 ) {
+                       pnct(t, df, ncp = location * constant, lower = TRUE)
+                     } else {
+                       pnct(t, df, ncp = location * constant, lower = FALSE)
+                     }
+                   }
+                 },
                  "greater" = pnct(t,df,ncp = location*constant,lower  = T),
                  "less" = pnct(t,df,ncp = location*constant,lower  = F))
     return(pro)
@@ -1849,9 +2030,16 @@ t2_FNE<-function(t,n1,r,prior_analysis ,location ,scale,dff , alternative ){
 
     pro <- switch(alternative,
                   "two.sided" = {
-                    pro1 <- pnct(max(t), df, ncp = ncp, lower = TRUE)
-                    pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
-                    pro1 - pro2
+                    if (length(t) == 2) {
+                      pnct(max(t), df, ncp = ncp, lower = TRUE) -
+                        pnct(min(t), df, ncp = ncp, lower = TRUE)
+                    } else {
+                      if (t > 0) {
+                        pnct(t, df, ncp = ncp, lower = TRUE)
+                      } else {
+                        pnct(t, df, ncp = ncp, lower = FALSE)
+                      }
+                    }
                   },
                   "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
                   "less" = pnct(t, df, ncp = ncp, lower = FALSE)
@@ -1875,10 +2063,20 @@ t2_FPE <- function(t,n1,r, alternative){
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
   pro <- switch(alternative,
-                "two.sided" = stats::pt(max(t), df = df, lower.tail = FALSE) +
-                  stats::pt(min(t), df = df, lower.tail = TRUE),
-                "greater"  = stats::pt(t, df = df, lower.tail = FALSE),
-                "less"  = stats::pt(t, df = df, lower.tail = TRUE)
+                "two.sided" = {
+                  if (length(t) == 2) {
+                    pnct(min(t), df, ncp = 0, lower = TRUE) +
+                      pnct(max(t), df, ncp = 0, lower = FALSE)
+                  } else {
+                    if (t > 0 ) {
+                      pnct(t, df, ncp = 0, lower = FALSE)
+                    } else {
+                      pnct(t, df, ncp =0, lower = TRUE)
+                    }
+                  }
+                },
+                "greater"  = stats::pt(t, df = df, lower = FALSE),
+                "less"  = stats::pt(t, df = df, lower = TRUE)
   )
   return(pro)
 
@@ -1889,8 +2087,8 @@ t2_FPE <- function(t,n1,r, alternative){
 
 t2_N_finder<-function(threshold,r,true_rate,prior_analysis,location,scale,dff, alternative ,
                       prior_design,location_d,scale_d,dff_d,de_an_prior ,false_rate){
-  # checking if the sample size of 2 as a lower bound reaches the targeted true/false positive rates
-  lower <- 2
+  # checking if the sample size of 10 as a lower bound reaches the targeted true/false positive rates
+  lower <- 10
   upper <- 10000
   t2 <- t2_BF10_bound(threshold, lower,r,prior_analysis ,location ,scale,dff , alternative)
   FPE_lo <-t2_FPE(t2,lower,r, alternative)
@@ -1938,9 +2136,9 @@ t2_N_finder<-function(threshold,r,true_rate,prior_analysis,location,scale,dff, a
 
 t2_N_01_finder<-function(threshold,r,true_rate,prior_analysis,location,scale,dff, alternative ,
                          prior_design,location_d,scale_d,dff_d,de_an_prior ,false_rate){
-  # checking if the sample size of 2 as a lower bound reaches the targeted true/false negative rates
+  # checking if the sample size of 10 as a lower bound reaches the targeted true/false negative rates
 
-  lower <- 2
+  lower <- 10
   upper <- 10000
   t2 <- t2_BF01_bound(threshold, lower,r,prior_analysis ,location ,scale,dff , alternative)
   TNE_lo <- t2_TNE(t2,lower,r,alternative)
@@ -2378,192 +2576,128 @@ t2e_BF01_bound <-function(threshold, n1,r,prior_analysis,location,scale,dff , al
 }
 
 # True positive rate
-t2e_TPE <-function(t,n1,r,prior_analysis ,location,scale,dff , alternative ,ROPE){
+t2e_TPE <- function(t, n1, r, prior_analysis, location, scale, dff, alternative, ROPE) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  n2 = n1*r
-  df = n1+n2-2
-  constant = sqrt((n1*n2)/(n1+n2))
+  n2 <- n1 * r
+  df <- n1 + n2 - 2
+  constant <- sqrt((n1 * n2) / (n1 + n2))
 
-  if (prior_analysis =="Point"){
-    x = switch(alternative,
-               "two.sided" = {pnct(min(t),df,ncp= location*constant,lower = T)+ pnct(max(t),df,ncp=location*constant,lower = F)},
-               "less"  = {pnct(t,df,ncp = location *constant,lower  = T)},
-               "greater"  = {pnct(t,df,ncp = location *constant,lower  = F)}
-    )
+  if (prior_analysis == "Point") {
+    ncp <- location * constant
+    x <- switch(alternative,
+                "two.sided" = if (length(t) == 2) pnct(min(t), df, ncp = ncp, lower = TRUE) + pnct(max(t), df, ncp = ncp, lower = FALSE) else pnct(t, df, ncp = ncp, lower = t < 0),
+                "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
+                "less" = pnct(t, df, ncp = ncp, lower = TRUE))
     return(x)
   }
 
-  # limits of the integral and the parameter space under h1
-  bound_h1  <- switch(alternative,
-                      "greater" = c(a = ROPE, b = Inf),
-                      "less" = c(a = -Inf, b = ROPE),
-                      "two.sided" = c(a = ROPE[1], b = ROPE[2])
-  )
-
-  # normalization of the prior under h1
+  bound_h1 <- switch(alternative, "greater" = c(a = ROPE, b = Inf), "less" = c(a = -Inf, b = ROPE), "two.sided" = c(a = ROPE[1], b = ROPE[2]))
   normalizationh1 <- norm_h1(alternative, prior_analysis, bound_h1, location, scale, dff)
 
-
- # integral
   int <- function(delta) {
     ncp <- delta * constant
-
     pro <- switch(alternative,
-                  "two.sided" = {
-                    pro1 <- pnct(max(t), df, ncp = ncp, lower = FALSE)
-                    pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
-                    pro1 + pro2
-                  },
+                  "two.sided" = if (length(t) == 2) pnct(min(t), df, ncp = ncp, lower = TRUE) + pnct(max(t), df, ncp = ncp, lower = FALSE) else pnct(t, df, ncp = ncp, lower = t < 0),
                   "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
-                  "less" = pnct(t, df, ncp = ncp, lower = TRUE)
-    )
-
-    pro * te_prior(delta,location, scale, dff, prior_analysis) / normalizationh1
+                  "less" = pnct(t, df, ncp = ncp, lower = TRUE))
+    pro * te_prior(delta, location, scale, dff, prior_analysis) / normalizationh1
   }
 
+  error <- 1e-4
+  x <- switch(alternative,
+              "two.sided" = stats::integrate(int, lower = -Inf, upper = bound_h1[1], rel.tol = error, stop.on.error = FALSE)$value + stats::integrate(int, lower = bound_h1[2], upper = Inf, rel.tol = error, stop.on.error = FALSE)$value,
+              "less" = stats::integrate(int, lower = bound_h1[1], upper = bound_h1[2], rel.tol = error, stop.on.error = FALSE)$value,
+              "greater" = stats::integrate(int, lower = bound_h1[1], upper = bound_h1[2], rel.tol = error, stop.on.error = FALSE)$value)
 
-  error = 1e-4
-
-  if (alternative == "two.sided"){
-    x = stats::integrate(int,lower = -Inf,upper = bound_h1[1], rel.tol=error,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = Inf, rel.tol=error,stop.on.error = F)$value
-  }else{
-    x = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=error,stop.on.error = F)$value
-
-  }
   return(x)
-
 }
 # False negative rate
-t2e_FNE <-function(t,n1,r,prior_analysis ,location,scale,dff , alternative ,ROPE){
-
+t2e_FNE <- function(t, n1, r, prior_analysis, location, scale, dff, alternative, ROPE) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  n2 = n1*r
-  df = n1+n2-2
-  constant = sqrt((n1*n2)/(n1+n2))
+  n2 <- n1 * r
+  df <- n1 + n2 - 2
+  constant <- sqrt((n1 * n2) / (n1 + n2))
 
-  if (prior_analysis =="Point"){
-    x = switch(alternative,
-               "two.sided" = {pnct(max(t),df,ncp= location*constant,lower = T)- pnct(min(t),df,ncp=location*constant,lower = T)},
-               "less"  = {pnct(t,df,ncp = location *constant,lower  = F)},
-               "greater"  = {pnct(t,df,ncp = location *constant,lower  = T)}
-    )
+  if (prior_analysis == "Point") {
+    ncp <- location * constant
+    x <- switch(alternative,
+                "two.sided" = if (length(t) == 2) pnct(max(t), df, ncp = ncp, lower = TRUE) - pnct(min(t), df, ncp = ncp, lower = TRUE) else pnct(t, df, ncp = ncp, lower = t > 0),
+                "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
+                "less" = pnct(t, df, ncp = ncp, lower = FALSE))
     return(x)
   }
-  # limits of the integral and the parameter space under h1
-  bound_h1  <- switch(alternative,
-                      "greater" = c(a = ROPE, b = Inf),
-                      "less" = c(a = -Inf, b = ROPE),
-                      "two.sided" = c(a = ROPE[1], b = ROPE[2])
-  )
-  # normalization of the prior under h1
+
+  bound_h1 <- switch(alternative, "greater" = c(a = ROPE, b = Inf), "less" = c(a = -Inf, b = ROPE), "two.sided" = c(a = ROPE[1], b = ROPE[2]))
   normalizationh1 <- norm_h1(alternative, prior_analysis, bound_h1, location, scale, dff)
 
-  # integral
   int <- function(delta) {
     ncp <- delta * constant
-
     pro <- switch(alternative,
-                  "two.sided" = {
-                    pro1 <- pnct(max(t), df, ncp = ncp, lower = TRUE)
-                    pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
-                    pro1 - pro2
-                  },
+                  "two.sided" = if (length(t) == 2) pnct(max(t), df, ncp = ncp, lower = TRUE) - pnct(min(t), df, ncp = ncp, lower = TRUE) else pnct(t, df, ncp = ncp, lower = t > 0),
                   "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
-                  "less" = pnct(t, df, ncp = ncp, lower = FALSE)
-    )
-
-    pro * te_prior(delta, location,scale, dff, prior_analysis) / normalizationh1
+                  "less" = pnct(t, df, ncp = ncp, lower = FALSE))
+    pro * te_prior(delta, location, scale, dff, prior_analysis) / normalizationh1
   }
 
-  error = 1e-4
-  if (alternative == "two.sided"){
-    x = stats::integrate(int,lower = -Inf,upper = bound_h1[1], rel.tol=error,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = Inf, rel.tol=error,stop.on.error = F)$value
-  }else{
-    x = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=error,stop.on.error = F)$value
+  error <- 1e-4
+  x <- switch(alternative,
+              "two.sided" = stats::integrate(int, lower = -Inf, upper = bound_h1[1], rel.tol = error, stop.on.error = FALSE)$value + stats::integrate(int, lower = bound_h1[2], upper = Inf, rel.tol = error, stop.on.error = FALSE)$value,
+              "less" = stats::integrate(int, lower = bound_h1[1], upper = bound_h1[2], rel.tol = error, stop.on.error = FALSE)$value,
+              "greater" = stats::integrate(int, lower = bound_h1[1], upper = bound_h1[2], rel.tol = error, stop.on.error = FALSE)$value)
 
-  }
   return(x)
-
 }
 
 # true negative rate
-t2e_TNE <-function(t,n1,r,prior_analysis ,location,scale,dff , alternative ,ROPE){
+# True negative rate
+t2e_TNE <- function(t, n1, r, prior_analysis, location, scale, dff, alternative, ROPE) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  n2 = n1*r
-  df = n1+n2-2
-  constant = sqrt((n1*n2)/(n1+n2))
+  n2 <- n1 * r
+  df <- n1 + n2 - 2
+  constant <- sqrt((n1 * n2) / (n1 + n2))
 
-  # limits of the integral and the parameter space under h0
-  bound_h0  <- switch(alternative,
-                      "greater" = c(a = 0, b = ROPE),
-                      "less" = c(a = ROPE, b = 0),
-                      "two.sided" = c(a = ROPE[1], b = ROPE[2])
-  )
-  # normalization of the prior under h0
+  bound_h0 <- switch(alternative, "greater" = c(a = 0, b = ROPE), "less" = c(a = ROPE, b = 0), "two.sided" = c(a = ROPE[1], b = ROPE[2]))
   normalizationh0 <- norm_h0(prior_analysis, bound_h0, location, scale, dff)
 
-  # integral
   int <- function(delta) {
     ncp <- delta * constant
-
     pro <- switch(alternative,
-                  "two.sided" = {
-                    pro1 <- pnct(max(t), df, ncp = ncp, lower = TRUE)
-                    pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
-                    pro1 - pro2
-                  },
+                  "two.sided" = if (length(t) == 2) pnct(max(t), df, ncp = ncp, lower = TRUE) - pnct(min(t), df, ncp = ncp, lower = TRUE) else pnct(t, df, ncp = ncp, lower = t > 0),
                   "greater" = pnct(t, df, ncp = ncp, lower = TRUE),
-                  "less" = pnct(t, df, ncp = ncp, lower = FALSE)
-    )
-
-    pro * te_prior(delta,location, scale, dff, prior_analysis) / normalizationh0
+                  "less" = pnct(t, df, ncp = ncp, lower = FALSE))
+    pro * te_prior(delta, location, scale, dff, prior_analysis) / normalizationh0
   }
-  error = 1e-4
-  x = stats::integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=error,stop.on.error = F)$value
-  return(x)
 
+  x <- stats::integrate(int, lower = bound_h0[1], upper = bound_h0[2], rel.tol = 1e-4, stop.on.error = FALSE)$value
+  return(x)
 }
 
 # False positive rate
-t2e_FPE <-function(t,n1,r,prior_analysis ,location,scale,dff , alternative ,ROPE){
+# False positive rate
+t2e_FPE <- function(t, n1, r, prior_analysis, location, scale, dff, alternative, ROPE) {
   if (any(t == "bound cannot be found") || length(t) == 0) return(0)
 
-  n2 = n1*r
-  df = n1+n2-2
-  constant = sqrt((n1*n2)/(n1+n2))
-  # limits of the integral and the paramter space under h0
-  bound_h0  <- switch(alternative,
-                      "greater" = c(a = 0, b = ROPE),
-                      "less" = c(a = ROPE, b = 0),
-                      "two.sided" = c(a = ROPE[1], b = ROPE[2])
-  )
- # normalization of the prior under h0
+  n2 <- n1 * r
+  df <- n1 + n2 - 2
+  constant <- sqrt((n1 * n2) / (n1 + n2))
+
+  bound_h0 <- switch(alternative, "greater" = c(a = 0, b = ROPE), "less" = c(a = ROPE, b = 0), "two.sided" = c(a = ROPE[1], b = ROPE[2]))
   normalizationh0 <- norm_h0(prior_analysis, bound_h0, location, scale, dff)
 
- # integral
   int <- function(delta) {
     ncp <- delta * constant
-
     pro <- switch(alternative,
-                  "two.sided" = {
-                    pro1 <- pnct(max(t), df, ncp = ncp, lower = FALSE)
-                    pro2 <- pnct(min(t), df, ncp = ncp, lower = TRUE)
-                    pro1 + pro2
-                  },
+                  "two.sided" = if (length(t) == 2) pnct(min(t), df, ncp = ncp, lower = TRUE) + pnct(max(t), df, ncp = ncp, lower = FALSE) else pnct(t, df, ncp = ncp, lower = t < 0),
                   "greater" = pnct(t, df, ncp = ncp, lower = FALSE),
-                  "less" = pnct(t, df, ncp = ncp, lower = TRUE)
-    )
-
-    pro * te_prior(delta,location, scale, dff, prior_analysis) / normalizationh0
+                  "less" = pnct(t, df, ncp = ncp, lower = TRUE))
+    pro * te_prior(delta, location, scale, dff, prior_analysis) / normalizationh0
   }
-  error = 1e-4
-  x = stats::integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=error,stop.on.error = F)$value
 
+  x <- stats::integrate(int, lower = bound_h0[1], upper = bound_h0[2], rel.tol = 1e-4, stop.on.error = FALSE)$value
   return(x)
-
 }
 
 # finding the sample size for ensuring that the true/false positive rates are reached
@@ -3144,141 +3278,103 @@ p_cor<-function(limit,rho,n,lower.tail){
 }
 
 # True positive rate
-r_TPE <-function(r,n,k, alpha, beta,h0,alternative,location,scale,dff,prior_analysis){
+r_TPE <- function(r, n, k, alpha, beta, h0, alternative, location, scale, dff, prior_analysis) {
 
   if (any(r == "bound cannot be found") || length(r) == 0) return(0)
 
-  if (prior_analysis =="Point"){
-    x = switch(alternative,
-               "two.sided" = {p_cor(max(r),location,n,lower.tail = F)+ p_cor(min(r),location,n,lower.tail = T)},
-               "greater"  = {p_cor(r,location,n,lower.tail =F)},
-               "less"  = {p_cor(r,location,n,lower.tail =T)}
-    )
+  if (prior_analysis == "Point") {
+    x <- switch(alternative,
+                "two.sided" = if (length(r) == 2) p_cor(max(r), location, n, lower.tail = FALSE) + p_cor(min(r), location, n, lower.tail = TRUE) else if (r > location) p_cor(r, location, n, lower.tail = FALSE) else p_cor(r, location, n, lower.tail = TRUE),
+                "greater" = p_cor(r, location, n, lower.tail = FALSE),
+                "less" = p_cor(r, location, n, lower.tail = TRUE))
     return(x)
   }
-  # limits of the integral and the parameter space
-  bound  <- switch(alternative,
-                   "greater" = c(a = h0, b = 1),
-                   "less" = c(a = -1, b = h0),
-                   "two.sided" = c(a = -1, b = 1)
-  )
-  # normalization of prior under h1
-  normalization <-   normalization <- if (alternative == "two.sided") {
-    switch(prior_analysis,
-           "d_beta"   = 1,
-           "beta" = 1,
-           "Moment"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
 
-  }else{
-    switch(prior_analysis,
-           "d_beta"   = p_beta(bound[2], 1/k, 1/k,-1,1)-p_beta(bound[1], 1/k,1/k,-1,1) ,
-           "beta" = p_beta(bound[2], alpha, beta,-1,1)-p_beta(bound[1], alpha, beta,-1,1),
-           "Moment"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+  # limits of the integral and the parameter space
+  bound <- switch(alternative, "greater" = c(a = h0, b = 1), "less" = c(a = -1, b = h0), "two.sided" = c(a = -1, b = 1))
+
+  # normalization of prior under h1
+  normalization <- if (alternative == "two.sided") {
+    switch(prior_analysis, "d_beta" = 1, "beta" = 1, "Moment" = pmom(bound[2] - location, tau = scale^2) - pmom(bound[1] - location, tau = scale^2))
+  } else {
+    switch(prior_analysis, "d_beta" = p_beta(bound[2], 1 / k, 1 / k, -1, 1) - p_beta(bound[1], 1 / k, 1 / k, -1, 1), "beta" = p_beta(bound[2], alpha, beta, -1, 1) - p_beta(bound[1], alpha, beta, -1, 1), "Moment" = pmom(bound[2] - location, tau = scale^2) - pmom(bound[1] - location, tau = scale^2))
   }
+
   # integral
   int <- function(rho) {
     prob <- switch(alternative,
-                   "two.sided" = p_cor(max(r), rho, n, lower.tail = FALSE) +
-                     p_cor(min(r), rho, n, lower.tail = TRUE),
-                   "greater"  = p_cor(r, rho, n, lower.tail = FALSE),
-                   "less"  = p_cor(r, rho, n, lower.tail = TRUE)
-    )
+                   "two.sided" = if (length(r) == 2) p_cor(max(r), rho, n, lower.tail = FALSE) + p_cor(min(r), rho, n, lower.tail = TRUE) else if (r > location) p_cor(r, rho, n, lower.tail = FALSE) else p_cor(r, rho, n, lower.tail = TRUE),
+                   "greater" = p_cor(r, rho, n, lower.tail = FALSE),
+                   "less" = p_cor(r, rho, n, lower.tail = TRUE))
 
-    prob * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta,min(bound),max(bound)) / normalization
+    prob * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta, min(bound), max(bound)) / normalization
   }
-  x = stats::integrate(int,lower = bound[1],upper = bound[2], rel.tol = 1e-4)$value
-  return(x)
 
+  x <- stats::integrate(int, lower = bound[1], upper = bound[2], rel.tol = 1e-4)$value
+  return(x)
 }
 
 # False negative rate
-r_FNE <-function(r,n,k, alpha, beta,h0,alternative,location,scale,dff,prior_analysis){
+r_FNE <- function(r, n, k, alpha, beta, h0, alternative, location, scale, dff, prior_analysis) {
 
   if (any(r == "bound cannot be found") || length(r) == 0) return(0)
 
-
-  if (prior_analysis =="Point"){
-    x = switch(alternative,
-               "two.sided" = {p_cor(max(r),location,n,lower.tail = T)- p_cor(min(r),location,n,lower.tail = T)},
-               "greater"  = {p_cor(r,location,n,lower.tail =T)},
-               "less"  = {p_cor(r,location,n,lower.tail =F)}
-    )
+  if (prior_analysis == "Point") {
+    x <- switch(alternative,
+                "two.sided" = if (length(r) == 2) p_cor(max(r), location, n, lower.tail = TRUE) - p_cor(min(r), location, n, lower.tail = TRUE) else if (r > location) p_cor(r, location, n, lower.tail = TRUE) else p_cor(r, location, n, lower.tail = FALSE),
+                "greater" = p_cor(r, location, n, lower.tail = TRUE),
+                "less" = p_cor(r, location, n, lower.tail = FALSE))
     return(x)
   }
 
- # limits of the integral and the parameter space
-  bound  <- switch(alternative,
-                   "greater" = c(a = h0, b = 1),
-                   "less" = c(a = -1, b = h0),
-                   "two.sided" = c(a = -1, b = 1)
-  )
+  # limits of the integral and the parameter space
+  bound <- switch(alternative, "greater" = c(a = h0, b = 1), "less" = c(a = -1, b = h0), "two.sided" = c(a = -1, b = 1))
 
   # normalization of the prior under h1
-  normalization <-  normalization <- if (alternative == "two.sided") {
-    switch(prior_analysis,
-           "d_beta"   = 1,
-           "beta" = 1,
-           "Moment"   = { pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
-
-  }else{
-    switch(prior_analysis,
-           "d_beta"   = p_beta(bound[2], 1/k, 1/k,-1,1)-p_beta(bound[1], 1/k,1/k,-1,1) ,
-           "beta" = p_beta(bound[2], alpha, beta,-1,1)-p_beta(bound[1], alpha, beta,-1,1),
-           "Moment"   = {pmom(bound[2]-location, tau=scale^2)-pmom(bound[1]-location, tau=scale^2)})
+  normalization <- if (alternative == "two.sided") {
+    switch(prior_analysis, "d_beta" = 1, "beta" = 1, "Moment" = pmom(bound[2] - location, tau = scale^2) - pmom(bound[1] - location, tau = scale^2))
+  } else {
+    switch(prior_analysis, "d_beta" = p_beta(bound[2], 1 / k, 1 / k, -1, 1) - p_beta(bound[1], 1 / k, 1 / k, -1, 1), "beta" = p_beta(bound[2], alpha, beta, -1, 1) - p_beta(bound[1], alpha, beta, -1, 1), "Moment" = pmom(bound[2] - location, tau = scale^2) - pmom(bound[1] - location, tau = scale^2))
   }
+
   # integral
   int <- function(rho) {
     prob <- switch(alternative,
-                   "two.sided" = p_cor(max(r), rho, n, lower.tail = TRUE) -
-                     p_cor(min(r), rho, n, lower.tail = TRUE),
-                   "greater"  = p_cor(r, rho, n, lower.tail = TRUE),
-                   "less"  = p_cor(r, rho, n, lower.tail = FALSE)
-    )
+                   "two.sided" = if (length(r) == 2) p_cor(max(r), rho, n, lower.tail = TRUE) - p_cor(min(r), rho, n, lower.tail = TRUE) else if (r > location) p_cor(r, rho, n, lower.tail = TRUE) else p_cor(r, rho, n, lower.tail = FALSE),
+                   "greater" = p_cor(r, rho, n, lower.tail = TRUE),
+                   "less" = p_cor(r, rho, n, lower.tail = FALSE))
 
-    prob * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta,min(bound),max(bound)) / normalization
+    prob * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta, min(bound), max(bound)) / normalization
   }
 
-
-  x = stats::integrate(int,lower = bound[1],upper = bound[2], rel.tol = 1e-8, subdivisions=10000000)$value
+  x <- stats::integrate(int, lower = bound[1], upper = bound[2], rel.tol = 1e-8, subdivisions = 10000000)$value
   return(x)
-
 }
 
 # False positive rate
-r_FPE <-function(r,n,h0,alternative){
+r_FPE <- function(r, n, h0, alternative) {
 
   if (any(r == "bound cannot be found") || length(r) == 0) return(0)
 
   x <- switch(alternative,
-              "two.sided" = p_cor(max(r), h0, n, lower.tail = FALSE) +
-                p_cor(min(r), h0, n, lower.tail = TRUE),
-              "greater"  = p_cor(r, h0, n, lower.tail = FALSE),
-              "less"  = p_cor(r, h0, n, lower.tail = TRUE)
-  )
-  return(x)
+              "two.sided" = if (length(r) == 2) p_cor(max(r), h0, n, lower.tail = FALSE) + p_cor(min(r), h0, n, lower.tail = TRUE) else if (r > h0) p_cor(r, h0, n, lower.tail = FALSE) else p_cor(r, h0, n, lower.tail = TRUE),
+              "greater" = p_cor(r, h0, n, lower.tail = FALSE),
+              "less" = p_cor(r, h0, n, lower.tail = TRUE))
 
+  return(x)
 }
 
 # True negative rate
-r_TNE <-function(r,n,h0,alternative){
+r_TNE <- function(r, n, h0, alternative) {
 
   if (any(r == "bound cannot be found") || length(r) == 0) return(0)
 
-  bound  <- switch(alternative,
-                   "greater" = c(a = h0, b = 1),
-                   "less" = c(a = -1, b = h0),
-                   "two.sided" = c(a = -1, b = 1)
-  )
-
   x <- switch(alternative,
-              "two.sided" = p_cor(max(r), h0, n, lower.tail = TRUE) -
-                p_cor(min(r), h0, n, lower.tail = TRUE),
-              "greater"  = p_cor(r, h0, n, lower.tail = TRUE),
-              "less"  = p_cor(r, h0, n, lower.tail = FALSE)
-  )
+              "two.sided" = if (length(r) == 2) p_cor(max(r), h0, n, lower.tail = TRUE) - p_cor(min(r), h0, n, lower.tail = TRUE) else if (r > h0) p_cor(r, h0, n, lower.tail = TRUE) else p_cor(r, h0, n, lower.tail = FALSE),
+              "greater" = p_cor(r, h0, n, lower.tail = TRUE),
+              "less" = p_cor(r, h0, n, lower.tail = FALSE))
 
   return(x)
-
 }
 
 
@@ -3961,221 +4057,167 @@ re_BF_bound_01 <-function(threshold,n,k,alpha, beta,h0,alternative,location,scal
 }
 
 # True positive rate
-re_TPE <-function(r,n,k, alpha, beta,h0,alternative,location,scale,dff,prior_analysis,ROPE){
+re_TPE <- function(r, n, k, alpha, beta, h0, alternative, location, scale, dff, prior_analysis, ROPE) {
 
-  if (any(r =="bound cannot be found" | length(r)==0)){
-    r=0
+  if (any(r == "bound cannot be found" | length(r) == 0)) {
+    r <- 0
     return(r)
   }
 
-  if (prior_analysis =="Point"){
-    x = switch(alternative,
-               "two.sided" = {p_cor(max(r),location,n,lower.tail = F)+ p_cor(min(r),location,n,lower.tail = T)},
-               "greater"  = {p_cor(r,location,n,lower.tail =F)},
-               "less"  = {p_cor(r,location,n,lower.tail =T)}
-    )
+  if (prior_analysis == "Point") {
+    x <- switch(alternative,
+                "two.sided" = if (length(r) == 2) p_cor(max(r), location, n, lower.tail = FALSE) + p_cor(min(r), location, n, lower.tail = TRUE) else if (r > location) p_cor(r, location, n, lower.tail = FALSE) else p_cor(r, location, n, lower.tail = TRUE),
+                "greater" = p_cor(r, location, n, lower.tail = FALSE),
+                "less" = p_cor(r, location, n, lower.tail = TRUE))
     return(x)
   }
+
   # limits of the integral and the parameter space under h1
-  bound_h1  <- switch(alternative,
-                      "greater" = c(a = h0+ROPE, b = 1),
-                      "less" = c(a = -1, b = h0+ROPE),
-                      "two.sided" = c(a = h0+ROPE[1], b = h0+ROPE[2])
-  )
+  bound_h1 <- switch(alternative, "greater" = c(a = h0 + ROPE, b = 1), "less" = c(a = -1, b = h0 + ROPE), "two.sided" = c(a = h0 + ROPE[1], b = h0 + ROPE[2]))
+
   # normalization of the prior under h1
   normalizationh1 <- switch(alternative,
                             "two.sided" = switch(prior_analysis,
-                                                 "d_beta"       = 1-(p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
-                                                 "beta"         = 1-(p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                                 "Moment"          = {
-                                                   (pmom(1-location, tau = scale^2)-pmom(bound_h1[2]-location, tau = scale^2))+
-                                                     (pmom(bound_h1[1]-location, tau = scale^2)-pmom(-1-location, tau = scale^2))
-                                                 }),
-
-                            "less"  = switch(prior_analysis,
-                                             "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
-                                             "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                             "Moment"          = {
-                                               (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
-                                             }),
-                            "greater"  = switch(prior_analysis,
-                                                "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
-                                                "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                                "Moment"          = {
-                                                  (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
-                                                })
-  )
+                                                 "d_beta" = 1 - (p_beta(bound_h1[2], 1 / k, 1 / k, -1, 1) - p_beta(bound_h1[1], 1 / k, 1 / k, -1, 1)),
+                                                 "beta" = 1 - (p_beta(bound_h1[2], alpha, beta, -1, 1) - p_beta(bound_h1[1], alpha, beta, -1, 1)),
+                                                 "Moment" = (pmom(1 - location, tau = scale^2) - pmom(bound_h1[2] - location, tau = scale^2)) + (pmom(bound_h1[1] - location, tau = scale^2) - pmom(-1 - location, tau = scale^2))),
+                            "less" = switch(prior_analysis, "
+                                            d_beta" = p_beta(bound_h1[2], 1 / k, 1 / k, -1, 1) - p_beta(bound_h1[1], 1 / k, 1 / k, -1, 1),
+                                            "beta" = p_beta(bound_h1[2], alpha, beta, -1, 1) - p_beta(bound_h1[1], alpha, beta, -1, 1),
+                                            "Moment" = pmom(bound_h1[2] - location, tau = scale^2) - pmom(bound_h1[1] - location, tau = scale^2)),
+                            "greater" = switch(prior_analysis,
+                                               "d_beta" = p_beta(bound_h1[2], 1 / k, 1 / k, -1, 1) - p_beta(bound_h1[1], 1 / k, 1 / k, -1, 1),
+                                               "beta" = p_beta(bound_h1[2], alpha, beta, -1, 1) - p_beta(bound_h1[1], alpha, beta, -1, 1),
+                                               "Moment" = pmom(bound_h1[2] - location, tau = scale^2) - pmom(bound_h1[1] - location, tau = scale^2)))
 
   # marginalized probability under h1
   int <- function(rho) {
     pro <- switch(alternative,
-                  "two.sided" = p_cor(max(r), rho, n, lower.tail = FALSE) +
-                    p_cor(min(r), rho, n, lower.tail = TRUE),
-                  "greater"  = p_cor(r, rho, n, lower.tail = FALSE),
-                  "less"  = p_cor(r, rho, n, lower.tail = TRUE)
-    )
-
-    pro * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta,-1,1) / normalizationh1
+                  "two.sided" = if (length(r) == 2) p_cor(max(r), rho, n, lower.tail = FALSE) + p_cor(min(r), rho, n, lower.tail = TRUE) else if (r > location) p_cor(r, rho, n, lower.tail = FALSE) else p_cor(r, rho, n, lower.tail = TRUE),
+                  "greater" = p_cor(r, rho, n, lower.tail = FALSE),
+                  "less" = p_cor(r, rho, n, lower.tail = TRUE))
+    pro * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta, -1, 1) / normalizationh1
   }
 
-
-
-  if (alternative == "two.sided"){
-    x = stats::integrate(int,lower = -1,upper = bound_h1[1], rel.tol=1e-5,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = 1, rel.tol=1e-5,stop.on.error = F)$value
-  }else{
-    x = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=1e-5,stop.on.error = F)$value
-
+  if (alternative == "two.sided") {
+    x <- stats::integrate(int, lower = -1, upper = bound_h1[1], rel.tol = 1e-5, stop.on.error = FALSE)$value + stats::integrate(int, lower = bound_h1[2], upper = 1, rel.tol = 1e-5, stop.on.error = FALSE)$value
+  } else {
+    x <- stats::integrate(int, lower = bound_h1[1], upper = bound_h1[2], rel.tol = 1e-5, stop.on.error = FALSE)$value
   }
+
   return(x)
-
 }
 
-re_FNE <-function(r,n,k, alpha, beta,h0,alternative,location,scale,dff,prior_analysis,ROPE){
+re_FNE <- function(r, n, k, alpha, beta, h0, alternative, location, scale, dff, prior_analysis, ROPE) {
 
-  if (any(r =="bound cannot be found" | length(r)==0)){
-    r=0
+  if (any(r == "bound cannot be found" | length(r) == 0)) {
+    r <- 0
     return(r)
   }
-  if (prior_analysis =="Point"){
-    x = switch(alternative,
-               "two.sided" = {p_cor(max(r),location,n,lower.tail = T)- p_cor(min(r),location,n,lower.tail = T)},
-               "greater"  = {p_cor(r,location,n,lower.tail =T)},
-               "less"  = {p_cor(r,location,n,lower.tail =F)}
-    )
+
+  if (prior_analysis == "Point") {
+    x <- switch(alternative,
+                "two.sided" = if (length(r) == 2) p_cor(max(r), location, n, lower.tail = TRUE) - p_cor(min(r), location, n, lower.tail = TRUE) else if (r > location) p_cor(r, location, n, lower.tail = TRUE) else p_cor(r, location, n, lower.tail = FALSE),
+                "greater" = p_cor(r, location, n, lower.tail = TRUE),
+                "less" = p_cor(r, location, n, lower.tail = FALSE))
     return(x)
   }
+
   # limits of the integral and the parameter space under h1
-  bound_h1  <- switch(alternative,
-                      "greater" = c(a = h0+ROPE, b = 1),
-                      "less" = c(a = -1, b = h0+ROPE),
-                      "two.sided" = c(a = h0+ROPE[1], b = h0+ROPE[2])
-  )
- # normalization of the prior under h1
+  bound_h1 <- switch(alternative, "greater" = c(a = h0 + ROPE, b = 1), "less" = c(a = -1, b = h0 + ROPE), "two.sided" = c(a = h0 + ROPE[1], b = h0 + ROPE[2]))
+
+  # normalization of the prior under h1
   normalizationh1 <- switch(alternative,
                             "two.sided" = switch(prior_analysis,
-                                                 "d_beta"       = 1-(p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
-                                                 "beta"         = 1-(p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                                 "Moment"          = {
-                                                   (pmom(1-location, tau = scale^2)-pmom(bound_h1[2]-location, tau = scale^2))+
-                                                     (pmom(bound_h1[1]-location, tau = scale^2)-pmom(-1-location, tau = scale^2))
-                                                 }),
+                                                 "d_beta" = 1 - (p_beta(bound_h1[2], 1 / k, 1 / k, -1, 1) - p_beta(bound_h1[1], 1 / k, 1 / k, -1, 1)),
+                                                 "beta" = 1 - (p_beta(bound_h1[2], alpha, beta, -1, 1) - p_beta(bound_h1[1], alpha, beta, -1, 1)),
+                                                 "Moment" = (pmom(1 - location, tau = scale^2) - pmom(bound_h1[2] - location, tau = scale^2)) + (pmom(bound_h1[1] - location, tau = scale^2) - pmom(-1 - location, tau = scale^2))),
+                            "less" = switch(prior_analysis, "
+                                            d_beta" = p_beta(bound_h1[2], 1 / k, 1 / k, -1, 1) - p_beta(bound_h1[1], 1 / k, 1 / k, -1, 1),
+                                            "beta" = p_beta(bound_h1[2], alpha, beta, -1, 1) - p_beta(bound_h1[1], alpha, beta, -1, 1),
+                                            "Moment" = pmom(bound_h1[2] - location, tau = scale^2) - pmom(bound_h1[1] - location, tau = scale^2)),
+                            "greater" = switch(prior_analysis,
+                                               "d_beta" = p_beta(bound_h1[2], 1 / k, 1 / k, -1, 1) - p_beta(bound_h1[1], 1 / k, 1 / k, -1, 1),
+                                               "beta" = p_beta(bound_h1[2], alpha, beta, -1, 1) - p_beta(bound_h1[1], alpha, beta, -1, 1),
+                                               "Moment" = pmom(bound_h1[2] - location, tau = scale^2) - pmom(bound_h1[1] - location, tau = scale^2)))
 
-                            "less"  = switch(prior_analysis,
-                                             "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
-                                             "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                             "Moment"          = {
-                                               (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
-                                             }),
-                            "greater"  = switch(prior_analysis,
-                                                "d_beta"       = (p_beta(bound_h1[2], 1/k, 1/k,-1,1) - p_beta(bound_h1[1], 1/k, 1/k,-1,1)),
-                                                "beta"         = (p_beta(bound_h1[2], alpha, beta,-1,1) - p_beta(bound_h1[1], alpha, beta,-1,1)),
-                                                "Moment"          = {
-                                                  (pmom(bound_h1[2]-location, tau = scale^2)-pmom(bound_h1[1]-location, tau = scale^2))
-                                                })
-  )
   # marginalized probability under h1
-
   int <- function(rho) {
     pro <- switch(alternative,
-                  "two.sided" = p_cor(max(r), rho, n, lower.tail = T) -
-                    p_cor(min(r), rho, n, lower.tail = TRUE),
-                  "greater"  = p_cor(r, rho, n, lower.tail = T),
-                  "less"  = p_cor(r, rho, n, lower.tail = F)
-    )
-
-    pro * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta,-1,1) / normalizationh1
+                  "two.sided" = if (length(r) == 2) p_cor(max(r), rho, n, lower.tail = TRUE) - p_cor(min(r), rho, n, lower.tail = TRUE) else if (r > location) p_cor(r, rho, n, lower.tail = TRUE) else p_cor(r, rho, n, lower.tail = FALSE),
+                  "greater" = p_cor(r, rho, n, lower.tail = TRUE),
+                  "less" = p_cor(r, rho, n, lower.tail = FALSE))
+    pro * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta, -1, 1) / normalizationh1
   }
 
-
-  if (alternative == "two.sided"){
-    x = stats::integrate(int,lower = -1,upper = bound_h1[1], rel.tol=1e-10,stop.on.error = F)$value+stats::integrate(int,lower =  bound_h1[2],upper = 1, rel.tol=1e-10,stop.on.error = F)$value
-  }else{
-    x = stats::integrate(int,lower = bound_h1[1],upper = bound_h1[2], rel.tol=1e-10,stop.on.error = F)$value
-
+  if (alternative == "two.sided") {
+    x <- stats::integrate(int, lower = -1, upper = bound_h1[1], rel.tol = 1e-10, stop.on.error = FALSE)$value + stats::integrate(int, lower = bound_h1[2], upper = 1, rel.tol = 1e-10, stop.on.error = FALSE)$value
+  } else {
+    x <- stats::integrate(int, lower = bound_h1[1], upper = bound_h1[2], rel.tol = 1e-10, stop.on.error = FALSE)$value
   }
 
   return(x)
-
 }
 
-re_FPE <-function(r,n,k, alpha, beta,h0,alternative,location,scale,dff,prior_analysis,ROPE){
+re_FPE <- function(r, n, k, alpha, beta, h0, alternative, location, scale, dff, prior_analysis, ROPE) {
 
-  if (any(r =="bound cannot be found" | length(r)==0)){
-    r=0
+  if (any(r == "bound cannot be found" | length(r) == 0)) {
+    r <- 0
     return(r)
   }
-  #limits of the integral and the parameter under h0
-  bound_h0  <- switch(alternative,
-                      "greater" = c(a = h0, b = h0+ROPE),
-                      "less" = c(a = h0+ROPE, b = h0),
-                      "two.sided" = c(a = h0+ROPE[1], b = h0+ROPE[2])
-  )
+
+  # limits of the integral and the parameter under h0
+  bound_h0 <- switch(alternative, "greater" = c(a = h0, b = h0 + ROPE), "less" = c(a = h0 + ROPE, b = h0), "two.sided" = c(a = h0 + ROPE[1], b = h0 + ROPE[2]))
+
   # normalization of the prior under h0
   normalizationh0 <- switch(prior_analysis,
-                            "d_beta" = p_beta(bound_h0[2], 1/k, 1/k, -1, 1) - p_beta(bound_h0[1], 1/k, 1/k, -1, 1),
-                            "beta"   = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
-                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
-                            }
-  )
+                            "d_beta" = p_beta(bound_h0[2], 1 / k, 1 / k, -1, 1) - p_beta(bound_h0[1], 1 / k, 1 / k, -1, 1),
+                            "beta" = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
+                            "Moment" = pmom(bound_h0[2] - location, tau = scale^2) - pmom(bound_h0[1] - location, tau = scale^2))
 
   # marginalized probability under h0
   int <- function(rho) {
     pro <- switch(alternative,
-                  "two.sided" = p_cor(max(r), rho, n, lower.tail = FALSE) +
-                    p_cor(min(r), rho, n, lower.tail = TRUE),
-                  "greater"  = p_cor(r, rho, n, lower.tail = FALSE),
-                  "less"  = p_cor(r, rho, n, lower.tail = TRUE)
-    )
-
-    pro * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta,-1,1) / normalizationh0
+                  "two.sided" = if (length(r) == 2) p_cor(max(r), rho, n, lower.tail = FALSE) + p_cor(min(r), rho, n, lower.tail = TRUE) else if (r > h0) p_cor(r, rho, n, lower.tail = FALSE) else p_cor(r, rho, n, lower.tail = TRUE),
+                  "greater" = p_cor(r, rho, n, lower.tail = FALSE),
+                  "less" = p_cor(r, rho, n, lower.tail = TRUE))
+    pro * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta, -1, 1) / normalizationh0
   }
 
-  x = stats::integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=1e-5,stop.on.error = F)$value
-
+  x <- stats::integrate(int, lower = bound_h0[1], upper = bound_h0[2], rel.tol = 1e-5, stop.on.error = FALSE)$value
 
   return(x)
-
 }
 
-re_TNE <-function(r,n,k, alpha, beta,h0,alternative,location,scale,dff,prior_analysis,ROPE){
+re_TNE <- function(r, n, k, alpha, beta, h0, alternative, location, scale, dff, prior_analysis, ROPE) {
 
-  if (any(r =="bound cannot be found" | length(r)==0)){
-    r=0
+  if (any(r == "bound cannot be found" | length(r) == 0)) {
+    r <- 0
     return(r)
   }
-  #limits of the integral and the parameter under h0
-  bound_h0  <- switch(alternative,
-                      "greater" = c(a = h0, b = h0+ROPE),
-                      "less" = c(a = h0+ROPE, b = h0),
-                      "two.sided" = c(a = h0+ROPE[1], b = h0+ROPE[2])
-  )
+
+  # limits of the integral and the parameter under h0
+  bound_h0 <- switch(alternative, "greater" = c(a = h0, b = h0 + ROPE), "less" = c(a = h0 + ROPE, b = h0), "two.sided" = c(a = h0 + ROPE[1], b = h0 + ROPE[2]))
 
   # normalization of the prior under h0
   normalizationh0 <- switch(prior_analysis,
-                            "d_beta" = p_beta(bound_h0[2], 1/k, 1/k, -1, 1) - p_beta(bound_h0[1], 1/k, 1/k, -1, 1),
-                            "beta"   = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
-                            "Moment"    = {pmom(bound_h0[2]-location, tau = scale^2) - pmom(bound_h0[1]-location, tau = scale^2)
-                            }
-  )
+                            "d_beta" = p_beta(bound_h0[2], 1 / k, 1 / k, -1, 1) - p_beta(bound_h0[1], 1 / k, 1 / k, -1, 1),
+                            "beta" = p_beta(bound_h0[2], alpha, beta, -1, 1) - p_beta(bound_h0[1], alpha, beta, -1, 1),
+                            "Moment" = pmom(bound_h0[2] - location, tau = scale^2) - pmom(bound_h0[1] - location, tau = scale^2))
+
   # marginalized probability under h0
   int <- function(rho) {
     pro <- switch(alternative,
-                  "two.sided" = p_cor(max(r), rho, n, lower.tail = TRUE) -
-                    p_cor(min(r), rho, n, lower.tail = TRUE),
-                  "greater"  = p_cor(r, rho, n, lower.tail = TRUE),
-                  "less"  = p_cor(r, rho, n, lower.tail = FALSE)
-    )
-
-    pro * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta,-1,1) / normalizationh0
+                  "two.sided" = if (length(r) == 2) p_cor(max(r), rho, n, lower.tail = TRUE) - p_cor(min(r), rho, n, lower.tail = TRUE) else if (r > h0) p_cor(r, rho, n, lower.tail = TRUE) else p_cor(r, rho, n, lower.tail = FALSE),
+                  "greater" = p_cor(r, rho, n, lower.tail = TRUE),
+                  "less" = p_cor(r, rho, n, lower.tail = FALSE))
+    pro * r_prior(rho, k, location, scale, dff, prior_analysis, alpha, beta, -1, 1) / normalizationh0
   }
 
-  x = stats::integrate(int,lower = bound_h0[1],upper = bound_h0[2], rel.tol=1e-5,stop.on.error = F)$value
-
+  x <- stats::integrate(int, lower = bound_h0[1], upper = bound_h0[2], rel.tol = 1e-5, stop.on.error = FALSE)$value
 
   return(x)
-
 }
-
 
 
 # finding sample size such that targeted true/false positive rates are reached
@@ -6193,10 +6235,6 @@ bin_BF_bound_01 <-function(threshold,n,alpha,beta,location,scale,prior_analysis,
 bin_TPE<-function(x,n,h0,alpha,beta,location,scale,prior_analysis,alternative){
   if (length(x) == 0 || any(x == "bound cannot be found")) return(0)
 
-
-  # The calculation of the probability differ slightly from other types of test since
-  # the length of critical number of success might be 1 for two-sided test.
-  # Thus, depending on the length and the null value, the probability calculate differently.
   if (prior_analysis =="Point"){
     TPE = switch(alternative,
                  "two.sided" = {
@@ -6265,9 +6303,6 @@ bin_TPE<-function(x,n,h0,alpha,beta,location,scale,prior_analysis,alternative){
 bin_FNE<-function(x,n,h0,alpha,beta,location,scale,prior_analysis,alternative){
   if (length(x) == 0 || any(x == "bound cannot be found")) return(0)
 
-  # The calculation of the probability differ slightly from other types of test since
-  # the length of critical number of success might be 1 for two-sided test.
-  # Thus, depending on the length and the null value, the probability calculate differently.
 
   if (prior_analysis == "Point") {
     FNE <- switch(alternative,

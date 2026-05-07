@@ -62,9 +62,9 @@ Not used when \code{prior_design = "Point"}.}
 
 \item{dff_d}{Numeric scalar. Degrees of freedom for the design prior (required if \code{prior_design = "t-distribution"}; ignored otherwise).}
 
-\item{N1}{Positive numeric integer. Sample size for group 1 (used if \code{r = NULL}).}
+\item{N1}{Positive numeric integer. Sample size for group 1, used if \code{r = NULL} (must be at least 2).}
 
-\item{N2}{Positive numeric integer. Sample size for group 2 (used if \code{r = NULL}).}
+\item{N2}{Positive numeric integer. Sample size for group 2, used if \code{r = NULL} (must be at least 2).}
 
 \item{r}{Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).}
 

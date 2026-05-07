@@ -191,25 +191,24 @@ print.BFpower <- function(x, ...) {
 
 
     cat("Design prior under H", sub1, "\n", sep = "")
-    if (x$design_h1_theta_1$prior == "same") {
+    if (is.null(x$design_h1_theta_1$prior)) {
       cat("  ", theta1, " ~ Beta(alpha = ", x$analysis_h1_theta_1$a, ", beta = ", x$analysis_h1_theta_2$b, ")\n", sep = "")
-    }
-    if (x$design_h1_theta_2$prior == "same") {
-      cat("  ", theta2, " ~ Beta(alpha = ", x$analysis_h1_theta_2$a, ", beta = ", x$analysis_h1_theta_2$b, ")\n", sep = "")
-    }
-    if (x$design_h1_theta_1$prior == "beta") {
+    }else  if (x$design_h1_theta_1$prior == "beta") {
       cat("  ", theta1, " ~ Beta(alpha = ", x$design_h1_theta_1$a, ", beta = ", x$design_h1_theta_1$b, ")\n", sep = "")
 
-    }
-    if (x$design_h1_theta_2$prior == "beta") {
-      cat("  ", theta2, " ~ Beta(alpha = ", x$design_h1_theta_2$a, ", beta = ", x$design_h1_theta_2$b, ")\n", sep = "")
-
-    }
-    if (x$design_h1_theta_1$prior == "Point") {
+    } else  if (x$design_h1_theta_1$prior == "Point") {
       cat("  ", theta1, " = ", x$design_h1_theta_1$p, "\n", sep = "")
 
     }
-    if (x$design_h1_theta_2$prior == "Point") {
+
+
+
+    if (is.null(x$design_h1_theta_2$prior)) {
+      cat("  ", theta2, " ~ Beta(alpha = ", x$analysis_h1_theta_2$a, ", beta = ", x$analysis_h1_theta_2$b, ")\n", sep = "")
+    } else if (x$design_h1_theta_2$prior == "beta") {
+      cat("  ", theta2, " ~ Beta(alpha = ", x$design_h1_theta_2$a, ", beta = ", x$design_h1_theta_2$b, ")\n", sep = "")
+
+    } else if (x$design_h1_theta_2$prior == "Point") {
       cat("  ", theta2, " = ", x$design_h1_theta_2$p, "\n", sep = "")
     }
 

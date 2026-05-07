@@ -277,7 +277,7 @@ BFpower.ttest.OneSample <- function(
       return(NaN)
     }
   )
-  if (is.nan(results)) {
+  if (is.numeric(results) && length(results) == 1 && is.nan(results)) {
     return(NaN)
   }
   type = "One-sample t-test"
@@ -361,8 +361,8 @@ BFpower.ttest.OneSample <- function(
 #'   \code{"Normal"}, \code{"Moment"}, or \code{"t-distribution"}; must be > 0.
 #'   Not used when \code{prior_design = "Point"}.
 #' @param dff_d Numeric scalar. Degrees of freedom for the design prior (required if \code{prior_design = "t-distribution"}; ignored otherwise).
-#' @param N1 Positive numeric integer. Sample size for group 1 (used if \code{r = NULL}).
-#' @param N2 Positive numeric integer. Sample size for group 2 (used if \code{r = NULL}).
+#' @param N1 Positive numeric integer. Sample size for group 1, used if \code{r = NULL} (must be at least 2).
+#' @param N2 Positive numeric integer. Sample size for group 2, used if \code{r = NULL} (must be at least 2).
 #' @param r Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).
 #' @param type_rate Character, either \code{"positive"} or \code{"negative"}; determines whether to control
 #'   true/false positive or true/false negative rates .
@@ -499,11 +499,11 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
       stop("If 'r' is NULL, both N1 and N2 must be provided")
     }
 
-    if (!is.numeric(N1) || length(N1) != 1 || !is.finite(N1) || N1 <= 0 || N1 != floor(N1)) {
-      stop("Argument [N1] sample size for group 1 must be a positive integer")
+    if (!is.numeric(N1) || length(N1) != 1 || !is.finite(N1) || N1 < 2 || N1 != floor(N1)) {
+      stop("Argument [N1] sample size for group 1 must be a positive integer being at least 2")
     }
-    if (!is.numeric(N2) || length(N2) != 1 || !is.finite(N2) || N2 <= 0 || N2 != floor(N2)) {
-      stop("Argument [N2] sample size for group 2 must be a positive integer")
+    if (!is.numeric(N2) || length(N2) != 1 || !is.finite(N2) || N2 < 2 || N2 != floor(N2)) {
+      stop("Argument [N2] sample size for group 2 must be a positive integer being at least 2")
     }
   }
 
@@ -654,9 +654,10 @@ BFpower.ttest.TwoSample <- function(alternative , ROPE = NULL,
       return(NaN)
     }
   )
-  if (is.nan(results)) {
+  if (is.numeric(results) && length(results) == 1 && is.nan(results)) {
     return(NaN)
   }
+
 
   type = "Independent-samples t-test (equal variance)"
   analysis_h1 <- list(
@@ -1125,7 +1126,7 @@ BFpower.cor<- function(alternative , h0, ROPE = NULL,
       return(NaN)
     }
   )
-  if (is.nan(results)) {
+  if (is.numeric(results) && length(results) == 1 && is.nan(results)) {
     return(NaN)
   }
   type = "Correlation"
@@ -1501,7 +1502,7 @@ BFpower.f.test <- function(threshold, true_rate, false_rate , p , k ,
     message("Error: Required sample size > 10,000")
     return(NaN)
   })
-  if (is.nan(results)) {
+  if (is.numeric(results) && length(results) == 1 && is.nan(results)) {
     return(NaN)
   }
 
@@ -1903,7 +1904,7 @@ BFpower.bin <- function(alternative ,threshold , h0 ,
     message("Error: Required sample size > 10,000")
     return(NaN)
   })
-  if (is.nan(results)) {
+  if (is.numeric(results) && length(results) == 1 && is.nan(results)) {
     return(NaN)
   }
   type = "One-proportion"

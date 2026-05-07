@@ -3,7 +3,7 @@ title: "Simulation"
 author: 
   - Tsz Keung Wong
   - Jorge Tendeiro 
-date: "2026-03-10"
+date: "2026-05-07"
 output: 
   html_document:
     toc: true
@@ -252,34 +252,54 @@ for (i in 1:length(sample_size)) {
   )
   
   # operational characteristics
-  TPR <- switch(
-    alternative,
-    "two.sided" = mean(tval_h1 > max(t.cri.h1) | tval_h1 < min(t.cri.h1)),
-    "greater"   = mean(tval_h1 > max(t.cri.h1)),
-    "less"      = mean(tval_h1 < max(t.cri.h1)))
-  FPR <- switch(
-    alternative,
-    "two.sided" = mean(tval_h0 > max(t.cri.h1) | tval_h0 < min(t.cri.h1)),
-    "greater"   = mean(tval_h0 > max(t.cri.h1)),
-    "less"      = mean(tval_h0 < max(t.cri.h1)))
-  
-  if (any(t.cri.h0 == "bound cannot be found")) {
-    TNR <- 0
-    FNR <- 0
+TPR <- switch(
+  alternative,
+  "two.sided" = if (length(t.cri.h1) == 2) {
+    mean(tval_h1 > max(t.cri.h1) | tval_h1 < min(t.cri.h1))
   } else {
-    TNR <- switch(
-      alternative,
-      "two.sided" = mean(tval_h0 < max(t.cri.h0) & tval_h0 > min(t.cri.h0)),
-      "greater"   = mean(tval_h0 < max(t.cri.h0)),
-      "less"      = mean(tval_h0 > min(t.cri.h0))
-    )
-    FNR <- switch(
-      alternative,
-      "two.sided" = mean(tval_h1 < max(t.cri.h0) & tval_h1 > min(t.cri.h0)),
-      "greater"   = mean(tval_h1 < max(t.cri.h0)),
-      "less"      = mean(tval_h1 > min(t.cri.h0))
-    )
-  }
+    mean(if (t.cri.h1 > 0) tval_h1 > t.cri.h1 else tval_h1 < t.cri.h1)
+  },
+  "greater" = mean(tval_h1 > max(t.cri.h1)),
+  "less" = mean(tval_h1 < max(t.cri.h1))
+)
+
+FPR <- switch(
+  alternative,
+  "two.sided" = if (length(t.cri.h1) == 2) {
+    mean(tval_h0 > max(t.cri.h1) | tval_h0 < min(t.cri.h1))
+  } else {
+    mean(if (t.cri.h1 > 0) tval_h0 > t.cri.h1 else tval_h0 < t.cri.h1)
+  },
+  "greater" = mean(tval_h0 > max(t.cri.h1)),
+  "less" = mean(tval_h0 < max(t.cri.h1))
+)
+
+if (any(t.cri.h0 == "bound cannot be found")) {
+  TNR <- 0
+  FNR <- 0
+} else {
+  TNR <- switch(
+    alternative,
+    "two.sided" = if (length(t.cri.h0) == 2) {
+      mean(tval_h0 < max(t.cri.h0) & tval_h0 > min(t.cri.h0))
+    } else {
+      mean(if (t.cri.h0 > 0) tval_h0 < t.cri.h0 else tval_h0 > t.cri.h0)
+    },
+    "greater" = mean(tval_h0 < max(t.cri.h0)),
+    "less" = mean(tval_h0 > min(t.cri.h0))
+  )
+
+  FNR <- switch(
+    alternative,
+    "two.sided" = if (length(t.cri.h0) == 2) {
+      mean(tval_h1 < max(t.cri.h0) & tval_h1 > min(t.cri.h0))
+    } else {
+      mean(if (t.cri.h0 > 0) tval_h1 < t.cri.h0 else tval_h1 > t.cri.h0)
+    },
+    "greater" = mean(tval_h1 < max(t.cri.h0)),
+    "less" = mean(tval_h1 > min(t.cri.h0))
+  )
+}
   
   simulated[i,] <- c(TPR, FPR, TNR, FNR)
   
@@ -322,9 +342,9 @@ for (i in 1:length(sample_size)) {
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[10]~">"~.(threshold))))
-  lines(sample_size, simulated[,1],    col = "gray",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,1],    col = "gray",  lwd = 3, lty = 3)
   lines(sample_size, numeric_ones[,2], col = "black", lwd = 3)
-  lines(sample_size, simulated[,2],    col = "grey",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,2],    col = "grey",  lwd = 3, lty = 3)
 
   plot(sample_size, numeric_ones[,3], 
        type       = "l",
@@ -334,9 +354,9 @@ for (i in 1:length(sample_size)) {
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[0][1]~">"~.(threshold))))
-  lines(sample_size, simulated[,3],    col = "gray",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,3],    col = "gray",  lwd = 3, lty = 3)
   lines(sample_size, numeric_ones[,4], col = "black", lwd = 3)
-  lines(sample_size, simulated[,4],    col = "grey",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,4],    col = "grey",  lwd = 3, lty = 3)
 ```
 
 
@@ -547,36 +567,57 @@ Based on the simulated delta under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prio
   }
   )
   # operational characteristics
-  TPR <- switch(alternative,
-                   "two.sided" = mean(tval_h1 > max(t.cri.h1) | tval_h1 < min(t.cri.h1)),
-                   "greater"   = mean(tval_h1 > max(t.cri.h1)),
-                   "less"      = mean(tval_h1 < max(t.cri.h1)))
-  FPR <- switch(alternative,
-                   "two.sided" = mean(tval_h0 > max(t.cri.h1) | tval_h0 < min(t.cri.h1)),
-                   "greater"   = mean(tval_h0 > max(t.cri.h1)),
-                   "less"      = mean(tval_h0 < max(t.cri.h1)))
+TPR <- switch(
+  alternative,
+  "two.sided" = if (length(t.cri.h1) == 2) {
+    mean(tval_h1 > max(t.cri.h1) | tval_h1 < min(t.cri.h1))
+  } else {
+    mean(if (t.cri.h1 > 0) tval_h1 > t.cri.h1 else tval_h1 < t.cri.h1)
+  },
+  "greater" = mean(tval_h1 > max(t.cri.h1)),
+  "less" = mean(tval_h1 < max(t.cri.h1))
+)
 
- if (any(t.cri.h0 == "bound cannot be found")) {
-  
+FPR <- switch(
+  alternative,
+  "two.sided" = if (length(t.cri.h1) == 2) {
+    mean(tval_h0 > max(t.cri.h1) | tval_h0 < min(t.cri.h1))
+  } else {
+    mean(if (t.cri.h1 > 0) tval_h0 > t.cri.h1 else tval_h0 < t.cri.h1)
+  },
+  "greater" = mean(tval_h0 > max(t.cri.h1)),
+  "less" = mean(tval_h0 < max(t.cri.h1))
+)
+
+if (any(t.cri.h0 == "bound cannot be found")) {
+
   TNR <- 0
   FNR <- 0
-  
+
 } else {
-  
-  TNR <- switch(alternative,
-    "two.sided" = mean(tval_h0 < max(t.cri.h0) & tval_h0 > min(t.cri.h0)),
-    "greater"   = mean(tval_h0 < max(t.cri.h0)),
-    "less"      = mean(tval_h0 > min(t.cri.h0))
+
+  TNR <- switch(
+    alternative,
+    "two.sided" = if (length(t.cri.h0) == 2) {
+      mean(tval_h0 < max(t.cri.h0) & tval_h0 > min(t.cri.h0))
+    } else {
+      mean(if (t.cri.h0 > 0) tval_h0 < t.cri.h0 else tval_h0 > t.cri.h0)
+    },
+    "greater" = mean(tval_h0 < max(t.cri.h0)),
+    "less" = mean(tval_h0 > min(t.cri.h0))
   )
-  
-  FNR <- switch(alternative,
-    "two.sided" = mean(tval_h1 < max(t.cri.h0) & tval_h1 > min(t.cri.h0)),
-    "greater"   = mean(tval_h1 < max(t.cri.h0)),
-    "less"      = mean(tval_h1 > min(t.cri.h0))
+
+  FNR <- switch(
+    alternative,
+    "two.sided" = if (length(t.cri.h0) == 2) {
+      mean(tval_h1 < max(t.cri.h0) & tval_h1 > min(t.cri.h0))
+    } else {
+      mean(if (t.cri.h0 > 0) tval_h1 < t.cri.h0 else tval_h1 > t.cri.h0)
+    },
+    "greater" = mean(tval_h1 < max(t.cri.h0)),
+    "less" = mean(tval_h1 > min(t.cri.h0))
   )
 }
- 
- 
  simulated[i,] <- c(TPR,FPR,TNR,FNR)
  
  numeric_results<- BFpower.ttest.TwoSample(
@@ -621,9 +662,9 @@ Based on the simulated delta under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prio
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[10]~">"~.(threshold))))
-  lines(sample_size, simulated[,1],    col = "gray",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,1],    col = "gray",  lwd = 3, lty = 3)
   lines(sample_size, numeric_ones[,2], col = "black", lwd = 3)
-  lines(sample_size, simulated[,2],    col = "grey",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,2],    col = "grey",  lwd = 3, lty = 3)
 
   plot(sample_size, numeric_ones[,3], 
        type       = "l",
@@ -633,9 +674,9 @@ Based on the simulated delta under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prio
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[0][1]~">"~.(threshold))))
-  lines(sample_size, simulated[,3],    col = "gray",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,3],    col = "gray",  lwd = 3, lty = 3)
   lines(sample_size, numeric_ones[,4], col = "black", lwd = 3)
-  lines(sample_size, simulated[,4],    col = "grey",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,4],    col = "grey",  lwd = 3, lty = 3)
 ```
 
 
@@ -922,27 +963,53 @@ Based on the simulated rho under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prior 
 
 
   # --- operational characteristics ---
-   TPR <- switch(alternative,
-                   "two.sided" = mean(rval_h1 > max(r.cri.h1) | rval_h1 < min(r.cri.h1)),
-                   "greater"   = mean(rval_h1 > max(r.cri.h1)),
-                   "less"      = mean(rval_h1 < max(r.cri.h1)))
-   FPR <- switch(alternative,
-                   "two.sided" = mean(rval_h0 > max(r.cri.h1) | rval_h0 < min(r.cri.h1)),
-                   "greater"   = mean(rval_h0 > max(r.cri.h1)),
-                   "less"      = mean(rval_h0 < max(r.cri.h1)))
-
-   if (any(r.cri.h0 == "bound cannot be found")){
-    TNR <- FNR <- 0
+  TPR <- switch(
+  alternative,
+  "two.sided" = if (length(r.cri.h1) == 2) {
+    mean(rval_h1 > max(r.cri.h1) | rval_h1 < min(r.cri.h1))
   } else {
-  TNR <- switch(alternative,
-                "two.sided" = mean(rval_h0 < max(r.cri.h0) & rval_h0 > min(r.cri.h0)),
-                "greater"   = mean(rval_h0 < max(r.cri.h0)),
-                "less"      = mean(rval_h0 > max(r.cri.h0)))
-  FNR <- switch(alternative,
-                "two.sided" = mean(rval_h1 < max(r.cri.h0) & rval_h1 > min(r.cri.h0)),
-                "greater"   = mean(rval_h1 < max(r.cri.h0)),
-                "less"      = mean(rval_h1 > max(r.cri.h0)))
-  }
+    mean(if (r.cri.h1 > h0) rval_h1 > r.cri.h1 else rval_h1 < r.cri.h1)
+  },
+  "greater" = mean(rval_h1 > max(r.cri.h1)),
+  "less" = mean(rval_h1 < max(r.cri.h1))
+)
+
+  FPR <- switch(
+  alternative,
+  "two.sided" = if (length(r.cri.h1) == 2) {
+    mean(rval_h0 > max(r.cri.h1) | rval_h0 < min(r.cri.h1))
+  } else {
+    mean(if (r.cri.h1 > h0) rval_h0 > r.cri.h1 else rval_h0 < r.cri.h1)
+  },
+  "greater" = mean(rval_h0 > max(r.cri.h1)),
+  "less" = mean(rval_h0 < max(r.cri.h1))
+)
+
+if (any(r.cri.h0 == "bound cannot be found")) {
+  TNR <- FNR <- 0
+} else {
+  TNR <- switch(
+    alternative,
+    "two.sided" = if (length(r.cri.h0) == 2) {
+      mean(rval_h0 < max(r.cri.h0) & rval_h0 > min(r.cri.h0))
+    } else {
+      mean(if (r.cri.h0 > h0) rval_h0 < r.cri.h0 else rval_h0 > r.cri.h0)
+    },
+    "greater" = mean(rval_h0 < max(r.cri.h0)),
+    "less" = mean(rval_h0 > max(r.cri.h0))
+  )
+
+  FNR <- switch(
+    alternative,
+    "two.sided" = if (length(r.cri.h0) == 2) {
+      mean(rval_h1 < max(r.cri.h0) & rval_h1 > min(r.cri.h0))
+    } else {
+      mean(if (r.cri.h0 > h0) rval_h1 < r.cri.h0 else rval_h1 > r.cri.h0)
+    },
+    "greater" = mean(rval_h1 < max(r.cri.h0)),
+    "less" = mean(rval_h1 > max(r.cri.h0))
+  )
+}
  simulated[i,] <- c(TPR,FPR,TNR,FNR)
  
  numeric_results<- BFpower.cor(
@@ -984,9 +1051,9 @@ Based on the simulated rho under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prior 
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[10]~">"~.(threshold))))
-  lines(sample_size, simulated[,1],    col = "gray",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,1],    col = "gray",  lwd = 3, lty = 3)
   lines(sample_size, numeric_ones[,2], col = "black", lwd = 3)
-  lines(sample_size, simulated[,2],    col = "grey",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,2],    col = "grey",  lwd = 3, lty = 3)
 
 
   plot(sample_size, numeric_ones[,3], 
@@ -997,9 +1064,9 @@ Based on the simulated rho under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prior 
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[0][1]~">"~.(threshold))))
-  lines(sample_size, simulated[,3],    col = "gray",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,3],    col = "gray",  lwd = 3, lty = 3)
   lines(sample_size, numeric_ones[,4], col = "black", lwd = 3)
-  lines(sample_size, simulated[,4],    col = "grey",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,4],    col = "grey",  lwd = 3, lty = 3)
 ```
 
 
@@ -1012,7 +1079,7 @@ Users can specify the parameters below for the simulation and call the function 
 ```{r results='hide'}
   
 # number of iterations
-iter <- 1000
+iter <- 5000
   
 # specification of analysis and design prior
 # Note:
@@ -1267,9 +1334,9 @@ Based on the simulated squared $f$ under $\mathcal{H}_0$ and $\mathcal{H}_1$, th
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[10]~">"~.(threshold))))
-  lines(sample_size, simulated[,1],    col = "gray",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,1],    col = "gray",  lwd = 3, lty = 3)
   lines(sample_size, numeric_ones[,2], col = "black", lwd = 3)
-  lines(sample_size, simulated[,2],    col = "grey",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,2],    col = "grey",  lwd = 3, lty = 3)
 
 
   plot(sample_size, numeric_ones[,3], 
@@ -1280,9 +1347,9 @@ Based on the simulated squared $f$ under $\mathcal{H}_0$ and $\mathcal{H}_1$, th
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[0][1]~">"~.(threshold))))
-  lines(sample_size, simulated[,3],    col = "gray",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,3],    col = "gray",  lwd = 3, lty = 3)
   lines(sample_size, numeric_ones[,4], col = "black", lwd = 3)
-  lines(sample_size, simulated[,4],    col = "grey",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,4],    col = "grey",  lwd = 3, lty = 3)
 ```
 
 
@@ -1503,9 +1570,9 @@ Based on the simulated theta under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prio
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[10]~">"~.(threshold))))
-  lines(sample_size, simulated[,1],    col = "gray",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,1],    col = "gray",  lwd = 3, lty = 3)
   lines(sample_size, numeric_ones[,2], col = "black", lwd = 3)
-  lines(sample_size, simulated[,2],    col = "grey",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,2],    col = "grey",  lwd = 3, lty = 3)
 
   plot(sample_size, numeric_ones[,3], 
        type       = "l",
@@ -1515,9 +1582,9 @@ Based on the simulated theta under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prio
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[0][1]~">"~.(threshold))))
-  lines(sample_size, simulated[,3],    col = "gray",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,3],    col = "gray",  lwd = 3, lty = 3)
   lines(sample_size, numeric_ones[,4], col = "black", lwd = 3)
-  lines(sample_size, simulated[,4],    col = "grey",  lwd = 2, lty = 3)
+  lines(sample_size, simulated[,4],    col = "grey",  lwd = 3, lty = 3)
 ```
 
 ### Two proportions
@@ -1674,9 +1741,9 @@ Based on the simulated theta under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prio
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[10]~">"~.(threshold))))
-  lines(total, simulated[,1],    col = "gray",  lwd = 2, lty = 3)
+  lines(total, simulated[,1],    col = "gray",  lwd = 3, lty = 3)
   lines(total, numeric_ones[,2], col = "black", lwd = 3)
-  lines(total, simulated[,2],    col = "grey",  lwd = 2, lty = 3)
+  lines(total, simulated[,2],    col = "grey",  lwd = 3, lty = 3)
 
   plot(total, numeric_ones[,3], 
        type       = "l",
@@ -1686,7 +1753,7 @@ Based on the simulated theta under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prio
        frame.plot = FALSE,
        lwd        = 3,
        main       = bquote(bold("Power curve for BF"[0][1]~">"~.(threshold))))
-  lines(total, simulated[,3],    col = "gray",  lwd = 2, lty = 3)
+  lines(total, simulated[,3],    col = "gray",  lwd = 3, lty = 3)
   lines(total, numeric_ones[,4], col = "black", lwd = 3)
-  lines(total, simulated[,4],    col = "grey",  lwd = 2, lty = 3)
+  lines(total, simulated[,4],    col = "grey",  lwd = 3, lty = 3)
 ```
