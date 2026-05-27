@@ -68,7 +68,7 @@ Not used when \code{prior_design = "Point"}.}
 
 \item{r}{Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).}
 
-\item{type_rate}{Character, either \code{"positive"} or \code{"negative"}; determines whether to control
+\item{type_rate}{Character. either \code{"positive"} or \code{"negative"}; determines whether to control
 true/false positive or true/false negative rates .}
 }
 \value{
@@ -79,16 +79,14 @@ An object of class \code{BFpower} containing:
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 \item \code{analysis_h1}: List with the analysis prior parameters:
 \code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
-\item \code{design_h1}: List describing the design prior. If
-\code{prior_design = NULL}, all entries in this list are returned as
-\code{NULL}, indicating that no separate design prior was specified and
-the analysis prior is used for design. Otherwise, the list contains
-\code{prior} (prior distribution), \code{location} (location parameter),
-\code{scale} (scale parameter), and optionally \code{dff} (degrees of
-freedom).
+\item \code{design_h1}:  List with the design prior parameters:
+\code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
 \item \code{results}: Data frame with probabilities of compelling/misleading evidence.
 \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
-\item \code{mode_bf}: Numeric scalar. Indicates whether sample size determination (\code{1}) or power calculation (\code{0}) is performed. This output is only used internally in the print method.
+\item \code{setting}: List containing \code{mode_bf}, indicating whether
+sample size determination (\code{1}) or power calculation (\code{0}) is
+performed, and \code{same.priors}, indicating whether the design and
+analysis priors are the same (\code{1}) or not the same (\code{0}).
 
 }
 }

@@ -97,15 +97,18 @@ A list of class \code{BFpower} containing:
 \itemize{
 \item \code{type}: Character. Test type (always "Correlation").
 \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
-\item \code{h0}: Numeric scalar, the value of correlation under the null hypothesis.
+\item \code{h0}: Numeric scalar. the value of correlation under the null hypothesis.
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 \item \code{analysis_h1}: List with the analysis prior parameters:
-\code{prior}, \code{location}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
+\code{prior}, \code{location} (being the same as \code{h0} for the moment-normal prior, otherwise it is \code{NULL}), \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
 \item \code{design_h1}: List with the design prior parameters:
 \code{prior}, \code{location}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
 \item \code{results}: Data frame with the probabilities of compelling/misleading evidence, and with the required sample size.
 \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
-\item \code{mode_bf}: Numeric scalar. Indicates whether sample size determination (\code{1}) or power calculation (\code{0}) is performed. This output is only used internally in the print method.
+\item \code{setting}: List containing \code{mode_bf}, indicating whether
+sample size determination (\code{1}) or power calculation (\code{0}) is
+performed, and \code{same.priors}, indicating whether the design and
+analysis priors are the same (\code{1}) or not the same (\code{0}).
 }
 }
 \description{

@@ -73,7 +73,7 @@ null hypothesis. If provided, must be > 0.}
 A list of class \code{BFpower} containing:
 \itemize{
 \item \code{type}: Character. Test type (always "Regression/ANOVA").
-\item \code{k}, \code{p}: Numeric integer, Number of predictors in the full and reduced models.
+\item \code{k}, \code{p}: Numeric integer. Number of predictors in the full and reduced models.
 \item \code{ROPE}: Optional numeric scalar. Interval bounds under the null, if any.
 \item \code{analysis_h1}: List containing the analysis prior specification, including
 the prior distribution \code{prior}, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
@@ -85,7 +85,10 @@ the prior distribution \code{prior}, the scale \code{rscale}, \code{f_m}, and de
 \item \code{results}: Data frame of probabilities of compelling/misleading evidence and
 the required or supplied sample size.
 \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
-\item \code{mode_bf}: Numeric scalar. Indicates whether sample size determination (\code{1}) or power calculation (\code{0}) is performed. This output is only used internally in the print method.
+\item \code{setting}: List containing \code{mode_bf}, indicating whether
+sample size determination (\code{1}) or power calculation (\code{0}) is
+performed, and \code{same.priors}, indicating whether the design and
+analysis priors are the same (\code{1}) or not the same (\code{0}).
 }
 If sample size determination fails, the function returns \code{NaN} and prints a message.
 }

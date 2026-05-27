@@ -61,15 +61,15 @@ null interval is \code{[-0.1, 0.3]}.}
 A list with class \code{"BFvalue"} containing:
 \itemize{
 \item \code{type}: Character. Test type (always "Correlation").
-\item \code{bf10}: Numeric scalar, The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.
-\item \code{h0}: Numeric scalar, Null value of the correlation.
-\item \code{r}: Numeric scalar, Observed correlation coefficient.
-\item \code{n}: Positive integer scalar, Sample size.
+\item \code{bf10}: Numeric scalar. The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.
+\item \code{h0}: Numeric scalar. Null value of the correlation.
+\item \code{r}: Numeric scalar. Observed correlation coefficient.
+\item \code{n}: Positive integer scalar. Sample size.
 \item \code{analysis_h1}: List with the analysis prior parameters:
 \code{prior}, \code{location}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
 \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
-\item \code{p.value}: Numeric scalar, Numeric, p-value.
+\item \code{p.value}: Numeric scalar. Numeric, p-value.
 }
 }
 \description{

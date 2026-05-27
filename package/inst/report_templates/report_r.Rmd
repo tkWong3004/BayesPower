@@ -97,11 +97,17 @@ print_cor_prior_rmd <- function(prior, k = NULL, alpha = NULL, beta = NULL,
                                 location = NULL, scale = NULL) {
 
   if (is.null(prior) || prior == "Point") {
-    return(sprintf("Point prior (location = %s)", fmt(location)))
+    return(sprintf(
+      "Point prior (location = %s)",
+      fmt(location)
+    ))
   }
 
   if (prior == "d_beta") {
-    return(sprintf("Default Stretched Beta (k = %s)", fmt(k)))
+    return(sprintf(
+      "Default Stretched Beta (k = %s)",
+      fmt(k)
+    ))
   }
 
   if (prior == "beta") {
@@ -114,6 +120,20 @@ print_cor_prior_rmd <- function(prior, k = NULL, alpha = NULL, beta = NULL,
   if (prior == "Moment") {
     return(sprintf(
       "Normal-moment (location = %s, scale = %s)",
+      fmt(location), fmt(scale)
+    ))
+  }
+
+  if (prior == "Normal") {
+    return(sprintf(
+      "Normal (location = %s, scale = %s)",
+      fmt(location), fmt(scale)
+    ))
+  }
+
+  if (prior == "t-distribution") {
+    return(sprintf(
+      "t-distribution (location = %s, scale = %s)",
       fmt(location), fmt(scale)
     ))
   }
@@ -141,47 +161,26 @@ cat(analysis_prior_text, "  \n\n")
 cat("Design prior under \\(\\mathcal{H}_1\\):  \n")
 
 if (params$rr$de_an_prior == 1) {
+
   cat(analysis_prior_text)
+
 } else {
-  cat(print_cor_prior_rmd(
+
+  design_prior_text <- print_cor_prior_rmd(
     prior = params$rr$prior_design,
     k = params$rr$k_d,
     alpha = params$rr$alpha_d,
     beta = params$rr$beta_d,
     location = params$rr$location_d,
     scale = params$rr$scale_d
-  ))
+  )
+
+  cat(design_prior_text)
 }
 
 cat("  \n")
 ```
 
-
-```{r results='asis', echo=FALSE}
-if (params$rr$de_an_prior == 0) {
-  cat("**Design prior**  \n")
-  
-  if (params$rr$prior_design == "Point") {
-    cat(sprintf("Point(location = %s)  \n", params$rr$location_d))
-  } else {
-    model <- params$rr$prior_design
-
-if (model == "d_beta") {
-  cat(sprintf("Default Stretched Beta (k = %s)\n", params$rr$k_d))
-
-} else if (model == "beta") {
-  cat(sprintf("Beta (alpha = %s, beta = %s)\n", params$rr$alpha, params$rr$beta))
-
-} else if (model == "nlp") {
-  cat(sprintf("NLP(location = %s, scale = %s)\n", params$rr$location, params$rr$scale_d))
-
-} else {
-  cat(sprintf("%s(location = %s, scale = %s)\n", 
-              model, params$rr$location, params$rr$scale))
-}
-  }
-}
-```
 
 
 

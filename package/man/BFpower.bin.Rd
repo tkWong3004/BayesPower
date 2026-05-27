@@ -93,18 +93,18 @@ A list of class \code{BFpower} containing:
 \item \code{h0}: The proportion under the null hypothesis.
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 \item \code{analysis_h1}: List describing the analysis prior, containing
-\code{prior} (prior distribution), \code{alpha} (alpha parameter),
+\code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0} for the moment-normal prior), \code{alpha} (alpha parameter),
 \code{beta} (beta parameter), and \code{scale} (scale parameter).
-\item \code{design_h1}: List describing the design prior. If
-\code{prior_design = NULL}, all entries in this list are returned as
-\code{NULL}, indicating that no separate design prior was specified and
-the analysis prior is used for design. Otherwise, the list contains
+\item \code{design_h1}: List describing the design prior, containing, the list contains
 \code{prior} (prior distribution), \code{location} (location parameter),
 \code{alpha} (alpha parameter), \code{beta} (beta parameter), and
 \code{scale} (scale parameter).
 \item \code{results}: Data frame of probabilities of compelling/misleading evidence and the required or supplied sample size.
 \item \code{threshold}: Numeric scalar. Compelling-evidence threshold.
-\item \code{mode_bf}: Numeric scalar. Indicates whether sample size determination (\code{1}) or power calculation (\code{0}) is performed. This output is only used internally in the print method.
+\item \code{setting}: List containing \code{mode_bf}, indicating whether
+sample size determination (\code{1}) or power calculation (\code{0}) is
+performed, and \code{same.priors}, indicating whether the design and
+analysis priors are the same (\code{1}) or not the same (\code{0}).
 }
 
 If sample size determination fails, the function returns \code{NaN} and prints a message.

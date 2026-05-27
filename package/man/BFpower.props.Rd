@@ -73,19 +73,11 @@ A list of class \code{BFpower} containing:
 \item \code{analysis_h1_theta_1}: List of analysis prior parameters for group 1 under the alternative, containing \code{a} and \code{b}.
 \item \code{analysis_h1_theta_2}: List of analysis prior parameters for group 2 under the alternative, containing \code{a} and \code{b}.
 \item \code{design_h1_theta_1}: List describing the design prior for
-group 1 under the alternative hypothesis. If
-\code{prior_design_1 = "same"}, all entries in this list are returned
-as \code{NULL}, indicating that no separate design prior was specified
-for group 1 and the corresponding analysis prior is used for design.
-Otherwise, the list contains \code{prior} (prior distribution),
+group 1 under the alternative hypothesis. The list contains \code{prior} (prior distribution),
 \code{a} (alpha parameter), \code{b} (beta parameter), and
 \code{p} (point-prior proportion).
 \item \code{design_h1_theta_2}: List describing the design prior for
-group 2 under the alternative hypothesis. If
-\code{prior_design_2 = "same"}, all entries in this list are returned
-as \code{NULL}, indicating that no separate design prior was specified
-for group 2 and the corresponding analysis prior is used for design.
-Otherwise, the list contains \code{prior} (prior distribution),
+group 2 under the alternative hypothesis. The list contains \code{prior} (prior distribution),
 \code{a} (alpha parameter), \code{b} (beta parameter), and
 \code{p} (point-prior proportion).
 \item \code{results}: Data frame of probabilities of compelling and misleading evidence.

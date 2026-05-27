@@ -51,7 +51,7 @@ print.BFpower <- function(x, ...) {
                         "Two-proportions" = 0)
 
   # Centered header
-  header_text <- ifelse(x$mode_bf == 1, "SAMPLE SIZE CALCULATION", "POWER CALCULATION")
+  header_text <- ifelse(x$setting$mode_bf == 1, "SAMPLE SIZE CALCULATION", "POWER CALCULATION")
   pad_total <- 50 - nchar(header_text)
   pad_left <- floor(pad_total / 2); pad_right <- ceiling(pad_total / 2)
   cat(UL, HR, UR, "\n", VL, strrep(" ", pad_left), header_text, strrep(" ", pad_right), VL, "\n", LL, HR, LR, "\n", sep = "")
@@ -177,12 +177,11 @@ print.BFpower <- function(x, ...) {
     # H0
     print_prior(x$analysis_h1, effect_size, H0, type = "analysis")
 
-    # H1
+    # H1 analysis prior
     print_prior(x$analysis_h1, effect_size, H1, type = "analysis")
+    # H1 design prior
+    print_prior(x$design_h1, effect_size, H1, type = "design")
 
-    if (is.null(x$design_h1$prior)){ print_prior(x$analysis_h1, effect_size, H1, type = "design")} else{
-      print_prior(x$design_h1, effect_size, H1, type = "design")
-    }
   } else {
     # Two-proportion priors
     theta0 <- paste0(theta, sub0); theta1 <- paste0(theta, sub1); theta2 <- paste0(theta, sub2)
@@ -191,8 +190,8 @@ print.BFpower <- function(x, ...) {
 
 
     cat("Design prior under H", sub1, "\n", sep = "")
-    if (is.null(x$design_h1_theta_1$prior)) {
-      cat("  ", theta1, " ~ Beta(alpha = ", x$analysis_h1_theta_1$a, ", beta = ", x$analysis_h1_theta_2$b, ")\n", sep = "")
+    if (x$design_h1_theta_1$prior == "same") {
+      cat("  ", theta1, " ~ Beta(alpha = ", x$design_h1_theta_1$a, ", beta = ", x$design_h1_theta_1$b, ")\n", sep = "")
     }else  if (x$design_h1_theta_1$prior == "beta") {
       cat("  ", theta1, " ~ Beta(alpha = ", x$design_h1_theta_1$a, ", beta = ", x$design_h1_theta_1$b, ")\n", sep = "")
 
@@ -203,8 +202,8 @@ print.BFpower <- function(x, ...) {
 
 
 
-    if (is.null(x$design_h1_theta_2$prior)) {
-      cat("  ", theta2, " ~ Beta(alpha = ", x$analysis_h1_theta_2$a, ", beta = ", x$analysis_h1_theta_2$b, ")\n", sep = "")
+    if (x$design_h1_theta_2$prior == "same") {
+      cat("  ", theta2, " ~ Beta(alpha = ", x$design_h1_theta_2$a, ", beta = ", x$design_h1_theta_2$b, ")\n", sep = "")
     } else if (x$design_h1_theta_2$prior == "beta") {
       cat("  ", theta2, " ~ Beta(alpha = ", x$design_h1_theta_2$a, ", beta = ", x$design_h1_theta_2$b, ")\n", sep = "")
 
@@ -514,8 +513,9 @@ print.BFvalue <- function(x, ...) {
 #' plot(results, plot_power = TRUE, plot_rel = TRUE)
 plot.BFpower <- function(x, plot_power = FALSE, plot_rel = FALSE,...) {
 
-  de_an_prior <- if (is.null(x$design_h1$prior)) 1 else 0
-
+  if (x$type != "Two-proportions"){
+  de_an_prior <- x$setting$same.priors
+}
   # Initialize list to store plots
   plots <- list()
 
@@ -776,27 +776,88 @@ plot.BFpower <- function(x, plot_power = FALSE, plot_rel = FALSE,...) {
 
          "Two-proportions" = {
            # Prior plotting
-           plots$prior0 <- p2_prior_plot(x$analysis_h0$a, x$analysis_h0$b, 1, 1, 0, "same", 0)
+           plots$prior0 <- p2_prior_plot(
+             x$analysis_h0$a,
+             x$analysis_h0$b,
+             1,
+             1,
+             0,
+             "same",
+             0
+           )
 
-           prior1 <- if (is.null(x$design_h1_theta_1$prior)) "same" else x$design_h1_theta_1$prior
-           a1d <- if (prior1 == "same") x$analysis_h1_theta_1$a else x$design_h1_theta_1$a
-           b1d <- if (prior1 == "same") x$analysis_h1_theta_1$b else x$design_h1_theta_1$b
-           dp1 <- if (prior1 == "same") 0.5 else x$design_h1_theta_1$p
+           # ----- Design prior for theta_1 -----
 
-           prior2 <- if (is.null(x$design_h1_theta_2$prior)) "same" else x$design_h1_theta_2$prior
-           a2d <- if (prior2 == "same") x$analysis_h1_theta_2$a else x$design_h1_theta_2$a
-           b2d <- if (prior2 == "same") x$analysis_h1_theta_2$b else x$design_h1_theta_2$b
-           dp2 <- if (prior2 == "same") 0.5 else x$design_h1_theta_2$p
+           prior1 <- x$design_h1_theta_1$prior
 
-           plots$prior1 <- p2_prior_plot(x$analysis_h1_theta_1$a, x$analysis_h1_theta_1$b, a1d, b1d, dp1, prior1, 1)
-           plots$prior2 <- p2_prior_plot(x$analysis_h1_theta_2$a, x$analysis_h1_theta_2$b, a2d, b2d, dp2, prior2, 2)
+
+           if (prior1 == "same") {
+             a1d <- x$analysis_h1_theta_1$a
+             b1d <- x$analysis_h1_theta_1$b
+             dp1 <- 0.5
+           } else if (prior1 == "beta") {
+             a1d <- x$design_h1_theta_1$a
+             b1d <- x$design_h1_theta_1$b
+             dp1 <- 0.5
+           } else if (prior1 == "Point") {
+             a1d <- 1
+             b1d <- 1
+             dp1 <- x$design_h1_theta_1$p
+           } else {
+             stop("Unknown design prior for theta_1.")
+           }
+
+           # ----- Design prior for theta_2 -----
+
+           prior2 <- x$design_h1_theta_2$prior
+
+
+           if (prior2 == "same") {
+             a2d <- x$analysis_h1_theta_2$a
+             b2d <- x$analysis_h1_theta_2$b
+             dp2 <- 0.5
+           } else if (prior2 == "beta") {
+             a2d <- x$design_h1_theta_2$a
+             b2d <- x$design_h1_theta_2$b
+             dp2 <- 0.5
+           } else if (prior2 == "Point") {
+             a2d <- 1
+             b2d <- 1
+             dp2 <- x$design_h1_theta_2$p
+           } else {
+             stop("Unknown design prior for theta_2.")
+           }
+
+           plots$prior1 <- p2_prior_plot(
+             x$analysis_h1_theta_1$a,
+             x$analysis_h1_theta_1$b,
+             a1d,
+             b1d,
+             dp1,
+             prior1,
+             1
+           )
+
+           plots$prior2 <- p2_prior_plot(
+             x$analysis_h1_theta_2$a,
+             x$analysis_h1_theta_2$b,
+             a2d,
+             b2d,
+             dp2,
+             prior2,
+             2
+           )
+
+           # Power plot
 
            if (plot_power) {
              plots$power <- Power_p2(
-               x$threshold, unlist(x$results[1,5]), x$analysis_h0$a, x$analysis_h0$b,
+               x$threshold,
+               unlist(x$results[1, 5]),
+               x$analysis_h0$a, x$analysis_h0$b,
                x$analysis_h1_theta_1$a, x$analysis_h1_theta_1$b,
                x$analysis_h1_theta_2$a, x$analysis_h1_theta_2$b,
-               unlist(x$results[1,6]) / unlist(x$results[1,5]),
+               unlist(x$results[1, 6]) / unlist(x$results[1, 5]),
                prior1, a1d, b1d, dp1,
                prior2, a2d, b2d, dp2
              )
@@ -804,8 +865,7 @@ plot.BFpower <- function(x, plot_power = FALSE, plot_rel = FALSE,...) {
 
            if (plot_rel) {
              plots$relative <- heatmap_p2(x$grid, x$threshold)
-           }
-         },
+           }},
 
   )
 

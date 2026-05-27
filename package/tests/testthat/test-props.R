@@ -371,9 +371,9 @@ test_that("BFpower.props returns the expected object structure", {
     N1 = 493,
     N2 = 488,
     prior_design_1 = "Point",
-    dp1 = 0.35,
+    dp1 = 0.2,
     prior_design_2 = "Point",
-    dp2 = 0.25
+    dp2 = 0.1
   )
 
   expect_s3_class(bfpower_props_obj, "BFpower")
@@ -757,7 +757,4 @@ run_test(
 ## End
 ############################################################
 
-cat("\n============================================================\n")
-cat("All BF10.props and BFpower.props tests finished.\n")
-cat("============================================================\n")
 

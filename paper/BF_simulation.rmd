@@ -689,7 +689,7 @@ Users can specify the parameters below for the simulation and call the function 
 ```{r, results='hide'}
   
 # number of iterations
-iter <- 5000
+iter <- 10000
   
 # specification of analysis and design priors
 # Note:

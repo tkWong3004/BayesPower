@@ -626,7 +626,7 @@ test_that("BFpower.bin returns the expected object structure", {
   expect_true("design_h1" %in% names(bfpower_obj))
   expect_true("results" %in% names(bfpower_obj))
   expect_true("threshold" %in% names(bfpower_obj))
-  expect_true("mode_bf" %in% names(bfpower_obj))
+  expect_true("setting" %in% names(bfpower_obj))
 })
 
 
@@ -828,7 +828,4 @@ run_test(
 ## End
 ############################################################
 
-cat("\n============================================================\n")
-cat("All BF10.bin.test and BFpower.bin tests finished.\n")
-cat("============================================================\n")
 

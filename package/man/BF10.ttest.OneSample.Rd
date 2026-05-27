@@ -43,16 +43,16 @@ a numeric scalar < 0.}
 A list of class \code{BFvalue} containing:
 \itemize{
 \item \code{type}: Character. Test type (always "One-sample t-test").
-\item \code{bf10}: Numeric scalar, The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.
-\item \code{tval}: Numeric scalar, Observed t-value.
-\item \code{df}: Numeric scalar, Degrees of freedom.
+\item \code{bf10}: Numeric scalar. The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.
+\item \code{tval}: Numeric scalar. Observed t-value.
+\item \code{df}: Numeric scalar. Degrees of freedom.
 \item \code{analysis_h1}: List with the analysis prior parameters:
 \code{prior} (prior distribution), \code{location}, \code{scale}, and
 optionally \code{dff}.
-\item \code{alternative}: Character, the direction of the alternative hypothesis.
+\item \code{alternative}: Character. the direction of the alternative hypothesis.
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
-\item \code{d}: Numeric scalar, observed Cohen's d.
-\item \code{p.value}: Numeric scalar, p-value.
+\item \code{d}: Numeric scalar. Observed Cohen's d.
+\item \code{p.value}: Numeric scalar. p-value.
 }
 }
 \description{

@@ -40,6 +40,7 @@ cat(sprintf(
 ```
 
 ```{r echo=FALSE, results='asis'}
+```{r echo=FALSE, results='asis'}
 cat("**Analysis/design prior**  \n")
 
 cat("Analysis/design prior under \\(\\mathcal{H}_0\\):  \n")
@@ -50,7 +51,7 @@ cat(sprintf(
 
 cat("Analysis prior under \\(\\mathcal{H}_1\\):  \n")
 cat(sprintf(
-  "\\(%s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\quad %s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)  \n\n",
+  "\\(%s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s),\\; %s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)  \n\n",
   "\\theta_1", params$p2$a1, params$p2$b1,
   "\\theta_2", params$p2$a2, params$p2$b2
 ))
@@ -62,25 +63,26 @@ print_design_prior_p2 <- function(model, theta, a, b, ad, bd, dp) {
 
   if (model == "same") {
     sprintf(
-      "\\(%s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)",
+      "%s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)",
       theta, a, b
     )
   } else if (model == "beta") {
     sprintf(
-      "\\(%s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)\\)",
+      "%s \\sim \\mathrm{Beta}(\\alpha = %s, \\beta = %s)",
       theta, ad, bd
     )
   } else if (model == "Point") {
     sprintf(
-      "\\(%s = %s\\)",
+      "%s = %s",
       theta, dp
     )
   } else {
-    sprintf("\\(%s: \\text{undefined design prior}\\)", theta)
+    sprintf("%s: \\text{undefined design prior}", theta)
   }
 }
 
 cat(
+  "\\(",
   print_design_prior_p2(
     model = params$p2$prior_design_1,
     theta = "\\theta_1",
@@ -90,7 +92,7 @@ cat(
     bd = params$p2$b1d,
     dp = params$p2$dp1
   ),
-  ",\\quad ",
+  ",\\; ",
   print_design_prior_p2(
     model = params$p2$prior_design_2,
     theta = "\\theta_2",
@@ -100,7 +102,7 @@ cat(
     bd = params$p2$b2d,
     dp = params$p2$dp2
   ),
-  "  \n",
+  "\\)  \n",
   sep = ""
 )
 ```

@@ -1110,7 +1110,7 @@ test_that("BFpower.cor returns the expected object structure", {
   expect_true("design_h1" %in% names(bfpower_cor_obj))
   expect_true("results" %in% names(bfpower_cor_obj))
   expect_true("threshold" %in% names(bfpower_cor_obj))
-  expect_true("mode_bf" %in% names(bfpower_cor_obj))
+  expect_true("setting" %in% names(bfpower_cor_obj))
 })
 
 
@@ -1587,8 +1587,4 @@ run_test(
 ############################################################
 ## End
 ############################################################
-
-cat("\n============================================================\n")
-cat("All BF10.cor and BFpower.cor tests finished.\n")
-cat("============================================================\n")
 

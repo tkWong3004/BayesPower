@@ -1856,13 +1856,11 @@ test_that("BFpower.ttest.OneSample returns the expected object structure", {
   expect_true("analysis_h1" %in% names(obj))
   expect_true("results" %in% names(obj))
   expect_true("threshold" %in% names(obj))
-  expect_true("mode_bf" %in% names(obj))
+  expect_true("setting" %in% names(obj))
 })
 
 
 ############################################################
 ## End of test script
 ############################################################
-
-cat("\nAll test calls finished.\n")
 
