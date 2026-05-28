@@ -227,6 +227,7 @@ show_cor_code <- function(x) {
     if (!is.null(x$interval) && x$interval == 1 && arg == "ROPE") return(NULL)
     if (arg == "N" && x$mode_bf != 0) return(NULL)
     if (x$mode_bf == 0 && arg %in% c("true_rate","false_rate")) return(NULL)
+    if (arg == "type_rate" && !is.null(val) && identical(val, "positive")) return(NULL)
     if (!is.null(x$de_an_prior) && x$de_an_prior == 1 &&
         arg %in% c("prior_design","alpha_d","beta_d","location_d","k_d","scale_d","dff_d"))
       return(NULL)
