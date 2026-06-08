@@ -4,5 +4,6 @@
 .httr-oauth
 .DS_Store
 .quarto
-src/*.o
-src/*.so
+*.o
+*.so
+*.dll
