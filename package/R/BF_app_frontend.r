@@ -1593,6 +1593,11 @@ server <- function(input, output, session) {
   server_bin(input, output, session)
   server_p2(input, output, session)
 
+  # This kills the Shiny app service whenever the browser is closed:
+  session$onSessionEnded(function() {
+    stopApp()
+  })
+
 }
 
 #' Launch the BayesPower Shiny Application
