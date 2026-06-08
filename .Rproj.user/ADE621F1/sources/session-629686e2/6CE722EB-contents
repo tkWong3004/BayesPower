@@ -25,9 +25,7 @@ Imports:
     shinyWidgets,
     grDevices,
     tidyr,
-    scales, 
-    callr, 
-    rstudioapi
+    scales
 LinkingTo:
     Rcpp,
     BH

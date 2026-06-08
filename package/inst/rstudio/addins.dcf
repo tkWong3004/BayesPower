@@ -1,0 +1,4 @@
+Name: BayesPower Shiny App
+Description: Launch the BayesPower Shiny App
+Binding: launch_app_addin
+Interactive: false
