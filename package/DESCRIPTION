@@ -26,9 +26,8 @@ Imports:
     grDevices,
     tidyr,
     scales, 
-    callr, 
-    rstudioapi, 
-    httpuv
+    httpuv,
+    utils
 LinkingTo:
     Rcpp,
     BH

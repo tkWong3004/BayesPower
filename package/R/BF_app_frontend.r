@@ -223,7 +223,14 @@ ui <-
 
           # Run button + error message
           shiny::conditionalPanel("input.Modet1 == 1 || input.Modet1 == 2",
-                           shiny::actionButton("runt1", label = "\\(\\text{Run}\\)")
+                                  shiny::tags$div(
+                                    style = "margin-bottom: 12px;",
+                                    shiny::actionButton(
+                                      "runt1",
+                                      label = "\\(\\text{Run}\\)",
+                                      class = "btn-success"
+                                    )
+                                  )
           ),
 
           # BF calculator mode
@@ -232,7 +239,14 @@ ui <-
                              shiny::column(6, shiny::numericInput("t1df", "\\(\\text{Degree of freedom:}\\)", value = 50)),
                              shiny::column(6, shiny::numericInput("t1tval", "\\(\\text{t-value:}\\)", value = 2))
                            ),
-                           shiny::actionButton("cal1", label = "\\(\\text{Calculate}\\)"),
+                           shiny::tags$div(
+                             style = "margin-bottom: 12px;",
+                             shiny::actionButton(
+                               "cal1",
+                               label = "\\(\\text{Calculate}\\)",
+                               class = "btn-success"
+                             )
+                           ),
                            shiny::htmlOutput("BFt1"),
                            shiny::em("\\(t\\text{-value calculator}\\)"),
 
@@ -512,7 +526,14 @@ ui <-
                                                      shiny::column(4, shiny::numericInput("t2tval", "\\(\\text{t-value:}\\)", value = 2)))
                              ),
                            shiny::conditionalPanel("input.Modet2 == 3",
-                                                   shiny::actionButton("cal2", label = "\\(\\text{Calculate}\\)"),
+                                                   shiny::tags$div(
+                                                     style = "margin-bottom: 12px;",
+                                                     shiny::actionButton(
+                                                       "cal2",
+                                                       label = "\\(\\text{Calculate}\\)",
+                                                       class = "btn-success"
+                                                     )
+                                                   ),
                                                    shiny::htmlOutput("BFt2"),
                                                    shiny::em("\\(t\\text{-value calculator}\\)"),
 
@@ -536,8 +557,14 @@ ui <-
 
           # Action buttons
           shiny::conditionalPanel("input.Modet2 == 1 || input.Modet2 == 2",
-                           shiny::actionButton("runt2", label = "\\(\\text{Run}\\)")
-
+                                  shiny::tags$div(
+                                    style = "margin-bottom: 12px;",
+                                    shiny::actionButton(
+                                      "runt2",
+                                      label = "\\(\\text{Run}\\)",
+                                      class = "btn-success"
+                                    )
+                                  )
           ),
           shiny::conditionalPanel(
             condition = "input.Modet2 == 1||input.Modet2 == 2",
@@ -799,8 +826,15 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
              ),
 
              shiny::conditionalPanel("input.Moder == 1 | input.Moder == 2",
-                              shiny::actionButton("runr", label = "\\( \\text{Run} \\)")
-             ),
+                                     shiny::tags$div(
+                                       style = "margin-bottom: 12px;",
+                                       shiny::actionButton(
+                                         "runr",
+                                         label = "\\(\\text{Run}\\)",
+                                         class = "btn-success"
+                                       )
+                                     )
+                                     ),
 
              # BF calculator
              shiny::conditionalPanel("input.Moder == 3",
@@ -812,7 +846,14 @@ shiny::tabPanel("\\(\\text{Correlation}\\)", shiny::withMathJax(),
                                        shiny::numericInput("rval", "\\(\\text{Pearson's:} \\)", value = 0)
                                 )
                               ),
-                              shiny::actionButton("calr", label = "\\( \\text{Calculate} \\)"),
+                              shiny::tags$div(
+                                style = "margin-bottom: 12px;",
+                                shiny::actionButton(
+                                  "calr",
+                                  label = "\\(\\text{Calculate}\\)",
+                                  class = "btn-success"
+                                )
+                              ),
                               shiny::htmlOutput("BFrv")
              ),
              shiny::conditionalPanel(
@@ -1114,8 +1155,15 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                                      shiny::numericInput("nf","\\( \\text{Sample Size } N \\; (\u2265 k + 1):\\)",value = 50)
              ),
              shiny::conditionalPanel(condition = "input.Modef == 1|input.Modef == 2",
-                              shiny::actionButton("runf", label = "\\( \\text{Run} \\)")
-             ),
+                                     shiny::tags$div(
+                                       style = "margin-bottom: 12px;",
+                                       shiny::actionButton(
+                                         "runf",
+                                         label = "\\(\\text{Run}\\)",
+                                         class = "btn-success"
+                                       )
+                                     )
+                                     ),
 
              # BF calculator mode
              shiny::conditionalPanel(condition = "input.Modef == 3",
@@ -1124,7 +1172,14 @@ shiny::tabPanel(shiny::em("\\(\\text{Regression}\\)"), shiny::withMathJax(),
                                 shiny::column(width = 4, shiny::numericInput("df2f", label = "\\( \\mathcal{df}_2: \\)", value = 30)),
                                 shiny::column(width = 4, shiny::numericInput("fval", label = "\\( f\\text{-value:} \\)", value = 1))
                               ),
-                              shiny::actionButton("calf", label = "\\( \\text{Calculate} \\)"),
+                              shiny::tags$div(
+                                style = "margin-bottom: 12px;",
+                                shiny::actionButton(
+                                  "calf",
+                                  label = "\\(\\text{Calculate}\\)",
+                                  class = "btn-success"
+                                )
+                              ),
                               shiny::htmlOutput("BFcalf")
              ),
 
@@ -1342,11 +1397,25 @@ shiny::navbarMenu(
                ),
 
                shiny::conditionalPanel("input.Modebin == 1 || input.Modebin == 2",
-                                shiny::actionButton("runbin", label = "\\(\\text{Run}\\)")
-               ),
+                                       shiny::tags$div(
+                                         style = "margin-bottom: 12px;",
+                                         shiny::actionButton(
+                                           "runbin",
+                                           label = "\\(\\text{Run}\\)",
+                                           class = "btn-success"
+                                         )
+                                       )
+                                       ),
 
                shiny::conditionalPanel("input.Modebin == 3",
-                                shiny::actionButton("calbin", label = "\\(\\text{Calculate}\\)"),
+                                       shiny::tags$div(
+                                         style = "margin-bottom: 12px;",
+                                         shiny::actionButton(
+                                           "calbin",
+                                           label = "\\(\\text{Calculate}\\)",
+                                           class = "btn-success"
+                                         )
+                                       ),
                                 shiny::htmlOutput("BFbin")),
                shiny::conditionalPanel(
                  condition = "input.Modebin == 1||input.Modebin == 2",
@@ -1535,10 +1604,24 @@ shiny::sidebarLayout(shiny::sidebarPanel(
                    )) ,
 
   shiny::conditionalPanel("input.Modep2 == 1 || input.Modep2 == 2",
-                   shiny::actionButton("runp2", label = "\\(\\text{Run}\\)")
-  ),
+                          shiny::tags$div(
+                            style = "margin-bottom: 12px;",
+                            shiny::actionButton(
+                              "runp2",
+                              label = "\\(\\text{Run}\\)",
+                              class = "btn-success"
+                            )
+                          )
+                          ),
   shiny::conditionalPanel("input.Modep2 == 3",
-                   shiny::actionButton("calp2", label = "\\(\\text{Calculate}\\)"),
+                          shiny::tags$div(
+                            style = "margin-bottom: 12px;",
+                            shiny::actionButton(
+                              "calp2",
+                              label = "\\(\\text{Calculate}\\)",
+                              class = "btn-success"
+                            )
+                          ),
                    shiny::htmlOutput("BFp2")
   ),
 
@@ -1595,7 +1678,7 @@ server <- function(input, output, session) {
 
   # This kills the Shiny app service whenever the browser is closed:
   session$onSessionEnded(function() {
-    stopApp()
+    shiny::stopApp()
   })
 
 }
