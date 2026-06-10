@@ -25,7 +25,10 @@ Imports:
     shinyWidgets,
     grDevices,
     tidyr,
-    scales
+    scales, 
+    callr, 
+    rstudioapi, 
+    httpuv
 LinkingTo:
     Rcpp,
     BH
