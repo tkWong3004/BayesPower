@@ -4,9 +4,17 @@
 \alias{BF10.props}
 \title{Bayes Factor for Comparing Two Proportions}
 \usage{
-BF10.props(a0, b0, a1, b1, a2, b2, N1, N2, x1, x2)
+BF10.props(N1, x1, N2, x2, a0, b0, a1, b1, a2, b2)
 }
 \arguments{
+\item{N1}{Positive numeric integer. Sample size for group 1 (must be > 0).}
+
+\item{x1}{Non-negative numeric integer. Number of successes observed in group 1 (must be \eqn{\ge 0} and \eqn{\le N_1} ).}
+
+\item{N2}{Positive numeric integer. Sample size for group 2 (must be > 0).}
+
+\item{x2}{Non-negative numeric integer. Number of successes observed in group 2 (must be \eqn{\ge 0} and \eqn{\le N_2}).}
+
 \item{a0}{Positive numeric scalar. Alpha parameter of the Beta prior under the null hypothesis.}
 
 \item{b0}{Positive numeric scalar. Beta parameter of the Beta prior under the null hypothesis.}
@@ -18,21 +26,16 @@ BF10.props(a0, b0, a1, b1, a2, b2, N1, N2, x1, x2)
 \item{a2}{Positive numeric scalar. Alpha parameter of the Beta prior for group 2 under the alternative hypothesis.}
 
 \item{b2}{Positive numeric scalar. Beta parameter of the Beta prior for group 2 under the alternative hypothesis.}
-
-\item{N1}{Positive numeric integer. Sample size for group 1 (must be > 0).}
-
-\item{N2}{Positive numeric integer. Sample size for group 2 (must be > 0).}
-
-\item{x1}{Non-negative numeric integer. Number of successes observed in group 1 (must be at least 0).}
-
-\item{x2}{Non-negative numeric integer. Number of successes observed in group 2 (must be at least 0).}
 }
 \value{
 A list of class \code{BFvalue} containing:
 \itemize{
 \item \code{type}: Character. Test type (always "Two-proportions").
 \item \code{bf10}: Numeric scalar. The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.
-\item \code{N1}, \code{x1}, \code{N2}, \code{x2}: Positive integer scalar and non-negative integer scalar. The input sample sizes and observed successes.
+\item \code{N1}: Positive integer scalar. Sample size for group 1.
+\item \code{x1}: Non-negative integer scalar. Observed successes for group 1.
+\item \code{N2}: Positive integer scalar. Sample size for group 2.
+\item \code{x2}: Non-negative integer scalar. Observed successes for group 2.
 \item \code{analysis_h0}: list with \code{a} (alpha parameter) and \code{b} (beta parameter) for the null prior.
 \item \code{analysis_h1_theta_1}: list with \code{a} (alpha parameter) and \code{b} (beta parameter) for group 1 prior under H1.
 \item \code{analysis_h1_theta_2}: list with \code{a} (alpha parameter) and \code{b} (beta parameter) for group 2 prior under H1.
@@ -45,14 +48,14 @@ Compute the Bayes factor (BF10) for a Bayesian test of two proportions.
 }
 \examples{
 BF10.props(
+N1 = 493,
+x1 = 155,
+N2 = 488,
+x2 = 150,
 a0 = 1,
 b0 = 1,
 a1 = 1,
 b1 = 1,
 a2 = 1,
-b2 = 1,
-N1 = 493,
-N2 = 488,
-x1 = 155,
-x2 = 150)
+b2 = 1)
 }

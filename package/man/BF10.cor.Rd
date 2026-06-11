@@ -7,14 +7,14 @@
 BF10.cor(
   r,
   n,
+  h0,
+  alternative,
+  ROPE = NULL,
+  prior_analysis,
   k,
   alpha,
   beta,
-  h0,
-  alternative,
-  scale,
-  prior_analysis,
-  ROPE = NULL
+  scale
 )
 }
 \arguments{
@@ -22,40 +22,42 @@ BF10.cor(
 
 \item{n}{Numeric integer. Sample size. Must be a numeric scalar greater than 3.}
 
-\item{k}{Numeric scalar. Parameter for the analysis default beta prior (\code{"d_beta"}) under the alternative hypothesis.}
-
-\item{alpha}{Numeric scalar. Alpha parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.}
-
-\item{beta}{Numeric scalar. Beta parameter for the analysis beta prior (\code{"beta"}) under the alternative hypothesis.}
-
 \item{h0}{Numeric scalar. Null value of the correlation. Must be a numeric scalar between -0.8 and 0.8.}
 
-\item{alternative}{Character. The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
-
-\item{scale}{Numeric scalar. Scale parameter for the analysis normal-moment prior (\code{"Moment"}). Must be > 0.}
-
-\item{prior_analysis}{Character. Analysis prior: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"Moment"}).}
+\item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
 \item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
 null hypothesis relative to \code{h0}. That is, the ROPE defines a region
 around \code{h0}, and the effective null interval is computed as
 \code{h0 + ROPE}.
 
-For \code{"two.sided"} this must be a numeric vector of length 2 with two
+For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two
 distinct finite values such that the first element is negative and the second
 element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting null
-interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.
+interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)}, then the effective
+null interval is \code{[-0.1, 0.3]}.
 
-For \code{"greater"} this must be a numeric scalar > 0, defining an upper
+For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
 deviation from \code{h0}, so the null region extends from \code{h0} to
-\code{h0 + ROPE}.
+\code{h0 + ROPE}. Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2}, then the effective
+null interval is \code{[0.1, 0.3]}.
 
-For \code{"less"} this must be a numeric scalar < 0, defining a lower
+For \code{alternative "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
 deviation from \code{h0}, so the null region extends from \code{h0 + ROPE}
-to \code{h0}.
+to \code{h0}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2}, then the effective
+null interval is \code{[-0.1, 0.1]}.}
 
-Example: If \code{h0 = 0.1} and \code{ROPE = c(-0.2, 0.2)}, then the effective
-null interval is \code{[-0.1, 0.3]}.}
+\item{prior_analysis}{Character. The analysis prior under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"Moment"}).}
+
+\item{k}{Numeric scalar. Shape parameter for the analysis default beta prior under the alternative hypothesis given  \eqn{\alpha = \beta = \frac{1}{\kappa}}{alpha = beta = 1/kappa} (required if \code{prior_analysis = "d_beta"}).}
+
+\item{alpha}{Numeric scalar.  Alpha parameter of the analysis beta prior under the alternative hypothesis
+(required if \code{prior_analysis = "beta"}).}
+
+\item{beta}{Numeric scalar.  Beta parameter of the analysis beta prior under the alternative hypothesis
+(required if \code{prior_analysis = "beta"}).}
+
+\item{scale}{Numeric scalar.  Scale parameter for the analysis prior (required if \code{prior_analysis = "Moment"}).}
 }
 \value{
 A list with class \code{"BFvalue"} containing:
@@ -69,7 +71,7 @@ A list with class \code{"BFvalue"} containing:
 \code{prior}, \code{location}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
 \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
-\item \code{p.value}: Numeric scalar. Numeric, p-value.
+\item \code{p.value}: Numeric scalar. p-value.
 }
 }
 \description{
@@ -79,10 +81,10 @@ and normal-moment (\code{"Moment"}) priors for the alternative hypothesis.
 }
 \examples{
 BF10.cor(
-  r = 0.3930924,
+  r = 0.393,
   n = 46,
-  prior_analysis = "d_beta",
-  k = 1,
   h0 = 0,
-  alternative = "two.sided")
+  alternative = "two.sided",
+  prior_analysis = "d_beta",
+  k = 1)
 }

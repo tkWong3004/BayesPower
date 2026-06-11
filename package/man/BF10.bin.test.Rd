@@ -5,58 +5,57 @@
 \title{Bayes Factor for a Bayesian One-Proportion Test}
 \usage{
 BF10.bin.test(
-  x,
   n,
+  x,
+  h0,
+  alternative,
+  ROPE = NULL,
+  prior_analysis,
   alpha,
   beta,
-  h0,
-  scale,
-  prior_analysis,
-  alternative,
-  ROPE = NULL
+  scale
 )
 }
 \arguments{
-\item{x}{Numeric integer. Observed number of successes (non-negative integer scalar, must be \eqn{\le n}).}
-
 \item{n}{Numeric integer. Sample size (positive integer scalar).}
 
-\item{alpha}{Numeric scalar.  Shape parameter of the analysis beta prior under the alternative hypothesis
-(required if \code{prior_analysis = "beta"}).}
-
-\item{beta}{Numeric scalar.  Shape parameter of the analysis beta prior under the alternative hypothesis
-(required if \code{prior_analysis = "beta"}).}
+\item{x}{Numeric integer. Observed number of successes (non-negative integer scalar, must be \eqn{\ge 0} and \eqn{\le n} ).}
 
 \item{h0}{Numeric scalar.  Null proportion value (numeric scalar between 0.1 and 0.9).}
 
-\item{scale}{Numeric scalar.  Scale parameter for the analysis prior (only used if \code{prior_analysis = "Moment"}).}
-
-\item{prior_analysis}{Character. The analysis prior under the alternative hypothesis:
-\code{"beta"} (stretched beta) or \code{"Moment"} (normal-moment prior).}
-
-\item{alternative}{Character. Hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}),
-or left-sided (\code{"less"}).}
+\item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
 \item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
 null hypothesis relative to \code{h0}. That is, the ROPE defines a region
 around \code{h0}, and the effective null interval is computed as
 \code{h0 + ROPE}.
 
-For \code{"two.sided"} this must be a numeric vector of length 2 with two
+For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two
 distinct finite values such that the first element is negative and the second
 element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting null
-interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.
+interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)}, then the effective
+null interval is \code{[0.3, 0.7]}.
 
-For \code{"greater"} this must be a numeric scalar > 0, defining an upper
+For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
 deviation from \code{h0}, so the null region extends from \code{h0} to
-\code{h0 + ROPE}.
+\code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2}, then the effective
+null interval is \code{[0.5, 0.7]}.
 
-For \code{"less"} this must be a numeric scalar < 0, defining a lower
+For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
 deviation from \code{h0}, so the null region extends from \code{h0 + ROPE}
-to \code{h0}.
+to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2}, then the effective
+null interval is \code{[0.3, 0.5]}.}
 
-Example: If \code{h0 = 0.5} and \code{ROPE = c(-0.2, 0.2)}, then the effective
-null interval is \code{[0.3, 0.7]}.}
+\item{prior_analysis}{Character. The analysis prior under the alternative hypothesis:
+\code{"beta"} or \code{"Moment"} (normal-moment prior).}
+
+\item{alpha}{Numeric scalar.  Alpha parameter of the analysis beta prior under the alternative hypothesis
+(required if \code{prior_analysis = "beta"}).}
+
+\item{beta}{Numeric scalar.  Beta parameter of the analysis beta prior under the alternative hypothesis
+(required if \code{prior_analysis = "beta"}).}
+
+\item{scale}{Numeric scalar.  Scale parameter for the analysis prior (required if \code{prior_analysis = "Moment"}).}
 }
 \value{
 An object of class \code{BFvalue} containing:
@@ -67,7 +66,7 @@ An object of class \code{BFvalue} containing:
 \item \code{x}: Non-negative integer scalar.  Number of successes.
 \item \code{n}: Positive integer scalar. Sample size.
 \item \code{analysis_h1}: List describing the analysis prior, containing
-\code{prior} (prior distribution), \code{alpha} (alpha parameter),
+\code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0}),\code{alpha} (alpha parameter),
 \code{beta} (beta parameter), and \code{scale} (scale parameter).
 \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
@@ -80,11 +79,11 @@ or an interval null hypothesis.
 }
 \examples{
 BF10.bin.test(
- x = 42,
  n = 52,
+ x = 42,
  h0 = 0.5,
- prior_analysis = "beta",
  alternative = "greater",
+ prior_analysis = "beta",
  alpha = 1,
  beta = 1)
 

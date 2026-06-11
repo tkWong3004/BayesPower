@@ -5,11 +5,15 @@
 \title{Sample Size Determination for the Two-Sample Bayesian t-Test}
 \usage{
 BFpower.ttest.TwoSample(
-  alternative,
-  ROPE = NULL,
   threshold,
+  type_rate = "positive",
   true_rate,
   false_rate,
+  N1 = NULL,
+  N2 = NULL,
+  r = NULL,
+  alternative,
+  ROPE = NULL,
   prior_analysis,
   location,
   scale,
@@ -17,59 +21,60 @@ BFpower.ttest.TwoSample(
   prior_design = NULL,
   location_d,
   scale_d,
-  dff_d,
-  N1 = NULL,
-  N2 = NULL,
-  r = NULL,
-  type_rate = "positive"
+  dff_d
 )
 }
 \arguments{
-\item{alternative}{Character. The direction of the alternative hypothesis: two-sided (\code{"two.sided"}),
-right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
+\item{threshold}{Numeric scalar. Threshold for compelling evidence (must be \eqn{\ge 1}).}
 
-\item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
-null hypothesis. For \code{"two.sided"} this must be a numeric vector
-of length 2 with two distinct finite values such that the first element
-is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}).
-For \code{"greater"} this must be a numeric scalar > 0; and for \code{"less"}
-a numeric scalar < 0.}
-
-\item{threshold}{Numeric scalar. Threshold for compelling evidence (must be at least 1).}
+\item{type_rate}{Character. either \code{"positive"} or \code{"negative"}; determines whether to control
+true/false positive or true/false negative rates .}
 
 \item{true_rate}{Numeric scalar. Target true positive or negative rate .}
 
 \item{false_rate}{Numeric scalar. Target false positive or negative rate .}
 
+\item{N1}{Positive numeric integer. Sample size for group 1, used if \code{r = NULL} (must be \eqn{\ge 2}).}
+
+\item{N2}{Positive numeric integer. Sample size for group 2, used if \code{r = NULL} (must be \eqn{\ge 2}).}
+
+\item{r}{Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).}
+
+\item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
+
+\item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
+null hypothesis.
+
+For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
+is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)}, then the effective
+null interval is \code{[-0.2, 0.2]}.
+
+For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2}, then the effective
+null interval is \code{[0, 0.2]}.
+
+For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2}, then the effective
+null interval is \code{[-0.2, 0]}.}
+
 \item{prior_analysis}{Character. The analysis prior under the alternative hypothesis:
 \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.}
 
-\item{location}{Numeric scalar. Location parameter for the analysis prior.}
+\item{location}{Numeric scalar. Location parameter for the analysis prior under the alternative hypothesis.}
 
-\item{scale}{Numeric scalar > 0. Scale parameter for the analysis prior.}
+\item{scale}{Numeric scalar > 0. Scale parameter for the analysis prior under the alternative hypothesis.}
 
 \item{dff}{Numeric scalar. Degrees of freedom for the analysis prior (required if prior_analysis = \code{"t-distribution"}; ignored otherwise).}
 
 \item{prior_design}{Optional Character. Design prior under the alternative:
 \code{"Normal"}, \code{"Moment"}(normal-moment prior), \code{"t-distribution"}, or \code{"Point"}.}
 
-\item{location_d}{Numeric scalar. Location parameter for the design prior.}
+\item{location_d}{Numeric scalar. Location parameter for the design prior under the alternative hypothesis.}
 
 \item{scale_d}{Numeric scalar. Scale parameter for the design prior under the
 alternative hypothesis. Required only if \code{prior_design} is
 \code{"Normal"}, \code{"Moment"}, or \code{"t-distribution"}; must be > 0.
 Not used when \code{prior_design = "Point"}.}
 
-\item{dff_d}{Numeric scalar. Degrees of freedom for the design prior (required if \code{prior_design = "t-distribution"}; ignored otherwise).}
-
-\item{N1}{Positive numeric integer. Sample size for group 1, used if \code{r = NULL} (must be at least 2).}
-
-\item{N2}{Positive numeric integer. Sample size for group 2, used if \code{r = NULL} (must be at least 2).}
-
-\item{r}{Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).}
-
-\item{type_rate}{Character. either \code{"positive"} or \code{"negative"}; determines whether to control
-true/false positive or true/false negative rates .}
+\item{dff_d}{Numeric scalar. Degrees of freedom for the design prior under the alternative hypothesis (required if \code{prior_design = "t-distribution"}; ignored otherwise).}
 }
 \value{
 An object of class \code{BFpower} containing:
@@ -100,11 +105,11 @@ analysis and design priors.
 
 If no sample size is provided, the function calculates the minimum sample size needed to achieve the desired configuration below. The user must provide:
 \itemize{
+\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be at least 1).
 \item \code{type_rate} - either \code{"positive"} to control true/false positive rates,
 or \code{"negative"} to control true/false negative rates.
 \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
 \item \code{false_rate} - the acceptable false positive or false negative rate (between 0.001 and 0.1).
-\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be at least 1).
 \item \code{r} - the allocation ratio of group 2 to group 1 sample sizes (\code{N2/N1}).
 }
 
@@ -125,10 +130,17 @@ which defines an interval around the null value of 0.
 
 The required form of \code{ROPE} depends on the direction of \code{alternative}:
 \itemize{
-\item \code{"greater"} or \code{"less"}: \code{ROPE} must be a scalar.
-It should be positive for \code{"greater"} and negative for \code{"less"}.
-\item \code{"two.sided"}: \code{ROPE} must be a numeric vector of length 2,
-where the lower bound is negative and the upper bound is positive.
+
+For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
+is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)}, then the effective
+null interval is \code{[-0.2, 0.2]}.
+
+For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2}, then the effective
+null interval is \code{[0, 0.2]}.
+
+For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2}, then the effective
+null interval is \code{[-0.2, 0]}.
+
 }
 
 If \code{ROPE = NULL}, a point-null hypothesis is assumed.
@@ -156,15 +168,15 @@ If \code{prior_design} is \code{NULL}, the analysis prior is used as the design 
 }
 \examples{
 BFpower.ttest.TwoSample(
- alternative = "two.sided",
- ROPE = c(-0.36, 0.36),
  threshold = 3,
+ type_rate = "negative",
  true_rate = 0.8,
  false_rate = 0.05,
+ r = 1,
+ alternative = "two.sided",
+ ROPE = c(-0.36, 0.36),
  prior_analysis = "Normal",
  location = -0.23,
  scale = 0.2,
- dff = 1,
- type_rate = "negative",
- r = 1)
+ dff = 1)
 }

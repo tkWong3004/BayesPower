@@ -7,37 +7,42 @@
 BF10.ttest.OneSample(
   tval,
   df,
+  alternative,
+  ROPE = NULL,
   prior_analysis,
   location,
   scale,
-  dff,
-  alternative,
-  ROPE = NULL
+  dff
 )
 }
 \arguments{
 \item{tval}{Numeric scalar. Observed t-value from the one-sample t-test.}
 
-\item{df}{Numeric scalar. Degrees of freedom of the t-test (must be >= 1).}
+\item{df}{Numeric scalar. Degrees of freedom of the t-test (must be \eqn{\ge 1}).}
 
-\item{prior_analysis}{Character. Analysis prior under the
-alternative hypothesis. Must be either \code{"Normal"} (normal distribution),
+\item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
+
+\item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
+null hypothesis.
+
+For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
+is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)}, then the effective
+null interval is \code{[-0.2, 0.2]}.
+
+For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2}, then the effective
+null interval is \code{[0, 0.2]}.
+
+For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2}, then the effective
+null interval is \code{[-0.2, 0]}.}
+
+\item{prior_analysis}{Character. The analysis prior under the alternative hypothesis: \code{"Normal"} (normal distribution),
 \code{"Moment"} (normal-moment prior), or \code{"t-distribution"} (t-distribution).}
 
 \item{location}{Numeric scalar. Location parameter for the analysis prior under the alternative hypothesis.}
 
 \item{scale}{Numeric scalar. Scale parameter for the analysis prior under the alternative hypothesis (must be > 0).}
 
-\item{dff}{Numeric scalar. Degrees of freedom for the t-distribution prior (only required if \code{prior_analysis = "t-distribution"}; must be > 0).}
-
-\item{alternative}{Character. The direction of the alternative hypothesis two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
-
-\item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
-null hypothesis. For \code{"two.sided"} this must be a numeric vector
-of length 2 with two distinct finite values such that the first element
-is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}).
-For \code{"greater"} this must be a numeric scalar > 0; and for \code{"less"}
-a numeric scalar < 0.}
+\item{dff}{Numeric scalar. Degrees of freedom for the t-distribution prior under the alternative hypothesis (required if \code{prior_analysis = "t-distribution"}; must be > 0).}
 }
 \value{
 A list of class \code{BFvalue} containing:
@@ -56,18 +61,18 @@ optionally \code{dff}.
 }
 }
 \description{
-Computes the Bayes factor (BF10) for a one-sample t-test, comparing an observed t-value
+Calculate the Bayes factor (BF10) for a one-sample t-test, comparing an observed t-value
 against either a point null hypothesis or an interval null hypothesis.
 }
 \examples{
 BF10.ttest.OneSample(
 tval = 2,
 df = 50,
+alternative = "two.sided",
 prior_analysis = "t-distribution",
 location = 0,
 scale = 0.707,
-dff = 1,
-alternative = "two.sided")
+dff = 1)
 
 
 }

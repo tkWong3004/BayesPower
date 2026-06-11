@@ -6,7 +6,10 @@
 \usage{
 BFpower.props(
   threshold,
+  type_rate = "positive",
   true_rate,
+  N1 = NULL,
+  N2 = NULL,
   a0,
   b0,
   a1,
@@ -20,16 +23,19 @@ BFpower.props(
   prior_design_2 = "same",
   a2d,
   b2d,
-  dp2,
-  N1 = NULL,
-  N2 = NULL,
-  type_rate = "positive"
+  dp2
 )
 }
 \arguments{
-\item{threshold}{Numeric scalar. Threshold of compelling evidence (must be at least 1).}
+\item{threshold}{Numeric scalar. Threshold of compelling evidence (must be \eqn{\ge 1}).}
+
+\item{type_rate}{Character. Choose \code{"positive"} to control true positive rate or \code{"negative"} to control true negative rate.}
 
 \item{true_rate}{Numeric scalar. Targeted true positive rate (if \code{type_rate = "positive"}) or true negative rate (if \code{type_rate = "negative"}).}
+
+\item{N1}{Optional positive integer. Sample size for group 1. Must be supplied together with \code{N2}; if both are \code{NULL}, sample size determination is performed.}
+
+\item{N2}{Optional positive integer. Sample size for group 2. Must be supplied together with \code{N1}; if both are \code{NULL}, sample size determination is performed.}
 
 \item{a0}{Positive numeric scalar. Alpha parameter of the Beta prior under the null hypothesis.}
 
@@ -58,12 +64,6 @@ BFpower.props(
 \item{b2d}{Positive numeric scalar. Beta parameter of the design prior for group 2 (used if \code{prior_design_2 = "beta"}).}
 
 \item{dp2}{Numeric scalar. True proportion for group 2 in the design prior (used if \code{prior_design_2 = "Point"}).}
-
-\item{N1}{Optional positive integer. Sample size for group 1. Must be supplied together with \code{N2}; if both are \code{NULL}, sample size determination is performed.}
-
-\item{N2}{Optional positive integer. Sample size for group 2. Must be supplied together with \code{N1}; if both are \code{NULL}, sample size determination is performed.}
-
-\item{type_rate}{Character. Choose \code{"positive"} to control true positive rate or \code{"negative"} to control true negative rate.}
 }
 \value{
 A list of class \code{BFpower} containing:
@@ -98,9 +98,9 @@ The function supports the specification of beta and point design priors.
 
 If no sample sizes are provided for the two groups, the function calculates the minimum sample sizes needed to achieve the desired configuration. The user must provide:
 \itemize{
+\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be \eqn{\ge 1}).
 \item \code{type_rate} - either \code{"positive"} to control true positive rates or \code{"negative"} to control true negative rates.
 \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
-\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be at least 1).
 }
 
 The function iteratively finds the smallest sample sizes for which the probability of obtaining compelling evidence (i.e., true positive/negative rate) meets or exceeds \code{true_rate}.

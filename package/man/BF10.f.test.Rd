@@ -4,30 +4,27 @@
 \alias{BF10.f.test}
 \title{Bayes Factor for a Bayesian F-Test}
 \usage{
-BF10.f.test(fval, df1, df2, dff, rscale, f_m, prior_analysis, ROPE = NULL)
+BF10.f.test(fval, df1, df2, ROPE = NULL, prior_analysis, rscale, f_m, dff)
 }
 \arguments{
-\item{fval}{Numeric scalar. Observed F statistic (must be at least 0).}
+\item{fval}{Numeric scalar. Observed F statistic (must be \eqn{\ge 0}).}
 
 \item{df1}{Numeric scalar. Numerator degrees of freedom (must be > 0).}
 
 \item{df2}{Numeric scalar. Denominator degrees of freedom (must be > 0).}
 
+\item{ROPE}{Optional numeric scalar specifying an upper bound for an interval
+null hypothesis. If provided, must be > 0.
+Example: If \code{ROPE =  0.2}, then the effective null interval is \code{[0, 0.2]}.}
+
+\item{prior_analysis}{Character. The analysis prior under the alternative hypothesis: \code{"effectsize"} or \code{"Moment"}.}
+
+\item{rscale}{Numeric scalar. Scale parameter for the effect-size analysis prior under the alternative hypothesis (required if \code{prior_analysis = "effectsize"}).}
+
+\item{f_m}{Numeric scalar. Cohen's f location parameter for the analysis prior under the alternative hypothesis.}
+
 \item{dff}{Numeric scalar. Degrees of freedom for the analysis prior under
 the alternative hypothesis. For the Moment prior, this must be \eqn{\ge 3}.}
-
-\item{rscale}{Numeric scalar. Scale parameter for the effect-size prior
-(only used when \code{prior_analysis = "effectsize"}).}
-
-\item{f_m}{Numeric scalar. Cohen's f effect-size parameter for the
-analysis prior.}
-
-\item{prior_analysis}{Character. Analysis prior under the
-alternative hypothesis. Must be either \code{"effectsize"} or
-\code{"Moment"}.}
-
-\item{ROPE}{Optional numeric scalar specifying an upper bound for an interval
-null hypothesis. If provided, must be > 0.}
 }
 \value{
 A list of class \code{BFvalue} containing:
@@ -43,7 +40,7 @@ the prior distribution, the scale \code{rscale}, \code{f_m}, and degrees of free
 }
 }
 \description{
-Computes the Bayes factor (BF10) for an F-test, comparing a full model to a
+Calculate the Bayes factor (BF10) for an F-test, comparing a full model to a
 reduced model under either an effect-size prior or a moment prior.
 Optionally, an interval null hypothesis can be specified.
 }
@@ -53,9 +50,8 @@ BF10.f.test(
   df1 = 2,
   df2 = 12,
   dff = 12,
+  prior_analysis = "effectsize",
   rscale = 0.707,
-  f_m = 0.1,
-  prior_analysis = "effectsize"
-)
+  f_m = 0.1)
 
 }

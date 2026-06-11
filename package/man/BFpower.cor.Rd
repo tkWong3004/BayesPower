@@ -5,77 +5,85 @@
 \title{Sample Size Determination for the Bayesian Correlation Test}
 \usage{
 BFpower.cor(
-  alternative,
-  h0,
-  ROPE = NULL,
   threshold,
+  type_rate = "positive",
   true_rate,
   false_rate,
+  N = NULL,
+  h0,
+  alternative,
+  ROPE = NULL,
   prior_analysis,
   k,
   alpha,
   beta,
   scale,
   prior_design = NULL,
+  k_d,
   alpha_d,
   beta_d,
   location_d,
-  k_d,
-  scale_d,
-  N = NULL,
-  type_rate = "positive"
+  scale_d
 )
 }
 \arguments{
-\item{alternative}{Character. The direction of the alternative hypothesis being tested: two-sided (\code{"two.sided"}), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
+\item{threshold}{Numeric scalar. Threshold for compelling evidence (must be \eqn{\ge 1}).}
+
+\item{type_rate}{Character. Either \code{"positive"} (controls true/false positive rates) or \code{"negative"} (controls true/false negative rates).}
+
+\item{true_rate}{Numeric scalar. Targeted true positive rate (if \code{type_rate = "positive"}) or true negative rate (if \code{type_rate = "negative"}).}
+
+\item{false_rate}{Numeric scalar. Targeted false positive rate (if \code{type_rate  = "positive"}) or false negative rate (if \code{type_rate = "negative"}).}
+
+\item{N}{Numeric integer. Sample size. Only required if the goal is not sample size determination, but rather to calculate the probability of obtaining compelling or misleading evidence for a given sample size.}
 
 \item{h0}{Numeric scalar. Null rho correlation value. Must be between -0.8 and 0.8.}
+
+\item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
 \item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
 null hypothesis relative to \code{h0}. That is, the ROPE defines a region
 around \code{h0}, and the effective null interval is computed as
 \code{h0 + ROPE}.
 
-For \code{"two.sided"} this must be a numeric vector of length 2 with two
+For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two
 distinct finite values such that the first element is negative and the second
 element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting null
-interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.
+interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)}, then the effective
+null interval is \code{[-0.1, 0.3]}.
 
-For \code{"greater"} this must be a numeric scalar > 0, defining an upper
+For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
 deviation from \code{h0}, so the null region extends from \code{h0} to
-\code{h0 + ROPE}.
+\code{h0 + ROPE}. Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2}, then the effective
+null interval is \code{[0.1, 0.3]}.
 
-For \code{"less"} this must be a numeric scalar < 0, defining a lower
+For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
 deviation from \code{h0}, so the null region extends from \code{h0 + ROPE}
-to \code{h0}.
-
-Example: If \code{h0 = 0.1} and \code{ROPE = c(-0.2, 0.2)}, then the effective
-null interval is \code{[-0.1, 0.3]}.}
-
-\item{threshold}{Numeric scalar. Threshold for compelling evidence (must be at least 1).}
-
-\item{true_rate}{Numeric scalar. Targeted true positive rate (if \code{type_rate = "positive"}) or true negative rate (if \code{type_rate = "negative"}).}
-
-\item{false_rate}{Numeric scalar. Targeted false positive rate (if \code{type_rate  = "positive"}) or false negative rate (if \code{type_rate = "negative"}).}
+to \code{h0}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2}, then the effective
+null interval is \code{[-0.1, 0.1]}.}
 
 \item{prior_analysis}{Character. The analysis prior under the alternative hypothesis:
 default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment prior (\code{"Moment"}).}
 
-\item{k}{Numeric scalar. Parameter for the default beta prior (\code{"d_beta"}).}
+\item{k}{Numeric scalar. Shape parameter of the analysis default beta prior under the alternative hypothesis given  \eqn{\alpha = \beta = \frac{1}{\kappa}}{alpha = beta = 1/kappa} (required if \code{prior_analysis = "d_beta"}).}
 
-\item{alpha}{Numeric scalar. Alpha parameter for the beta prior (\code{"beta"}).}
+\item{alpha}{Numeric scalar.  Alpha parameter of the analysis beta prior under the alternative hypothesis
+(required if \code{prior_analysis = "beta"}).}
 
-\item{beta}{Numeric scalar. Beta parameter for the beta prior (\code{"beta"}).}
+\item{beta}{Numeric scalar.  Beta parameter of the analysis beta prior under the alternative hypothesis
+(required if \code{prior_analysis = "beta"}).}
 
-\item{scale}{Numeric scalar. Scale parameter for the normal-moment prior (\code{"Moment"}).}
+\item{scale}{Numeric scalar.  Scale parameter of the analysis prior under the alternative hypothesis (required if \code{prior_analysis = "Moment"}).}
 
 \item{prior_design}{Character. Design prior  under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), normal-moment prior (\code{"Moment"}), or point (\code{"Point"}).}
 
-\item{alpha_d}{Numeric scalar. Alpha parameter for the design beta prior (\code{"beta"}).}
+\item{k_d}{Numeric scalar. Shape parameter of the design default beta prior under the alternative hypothesis given  \eqn{\alpha = \beta = \frac{1}{\kappa}}{alpha = beta = 1/kappa} (required if \code{prior_design = "d_beta"}).}
 
-\item{beta_d}{Numeric scalar. Beta Parameter for the design beta prior (\code{"beta"}).}
+\item{alpha_d}{Numeric scalar. Alpha parameter of the design beta prior under the alternative hypothesis(\code{"beta"}).}
 
-\item{location_d}{Numeric scalar. Location parameter for the design prior.
+\item{beta_d}{Numeric scalar. Beta Parameter of the design beta prior under the alternative hypothesis(\code{"beta"}).}
+
+\item{location_d}{Numeric scalar. Location parameter of the design prior under the alternative hypothesis.
 Required for \code{prior_design = "Moment"} and \code{prior_design = "Point"}.
 For \code{"Moment"}, it must satisfy \code{-1 < location_d < 1}.
 For \code{"Point"}, it represents the true correlation and must satisfy
@@ -84,13 +92,7 @@ direction-specific constraints: for \code{alternative = "greater"},
 \code{-1 < location_d < h0}; and for \code{alternative = "two.sided"},
 \code{-1 < location_d < 1} and \code{location_d != h0}.}
 
-\item{k_d}{Numeric scalar. Parameter for the design default beta prior (\code{"d_beta"}).}
-
-\item{scale_d}{Numeric scalar. Scale parameter for the design normal-moment prior (\code{"Moment"}).}
-
-\item{N}{Numeric integer. Sample size. Only required if the goal is not sample size determination, but rather to calculate the probability of obtaining compelling or misleading evidence for a given sample size.}
-
-\item{type_rate}{Character. Either \code{"positive"} (controls true/false positive rates) or \code{"negative"} (controls true/false negative rates).}
+\item{scale_d}{Numeric scalar. Scale parameter of the design normal-moment prior (\code{"Moment"}) under the alternative hypothesis.}
 }
 \value{
 A list of class \code{BFpower} containing:
@@ -121,10 +123,10 @@ analysis and design priors.
 
 If no sample size is provided, the function calculates the minimum sample size needed to achieve the desired configuration below. The user must provide:
 \itemize{
+\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be \eqn{\ge 1}).
 \item \code{type_rate} - either \code{"positive"} to control true/false positive rates, or \code{"negative"} to control true/false negative rates.
 \item \code{true_rate} - the targeted true positive or true negative rate (between 0.6 and 0.999).
 \item \code{false_rate} - the acceptable false positive or false negative rate (between 0.001 and 0.1).
-\item \code{threshold} - the Bayes factor threshold for compelling evidence (must be at least 1).
 }
 
 The function iteratively finds the smallest sample size for which the probability of obtaining compelling evidence (i.e., true positive/negative rate) meets or exceeds \code{true_rate}, while the probability of misleading evidence (i.e., false positive/negative rate) does not exceed \code{false_rate}.
@@ -145,19 +147,21 @@ interval is obtained by adding \code{ROPE} to \code{h0}.
 
 The required form of \code{ROPE} depends on the direction of \code{alternative}:
 \itemize{
-\item \code{"greater"}: \code{ROPE} must be a numeric scalar > 0. The null
-region is \code{[h0, h0 + ROPE]}.
 
-\item \code{"less"}: \code{ROPE} must be a numeric scalar < 0. The null
-region is \code{[h0 + ROPE, h0]}.
-
-\item \code{"two.sided"}: \code{ROPE} must be a numeric vector of length 2
+\item For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2
 with two distinct finite values such that \code{ROPE[1] < 0 < ROPE[2]}.
-The null region is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.
-}
-
-Example: If \code{h0 = 0.1} and \code{ROPE = c(-0.2, 0.2)}, then the effective
+The null region is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)}, then the effective
 null interval is \code{[-0.1, 0.3]}.
+
+\item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. The null
+region is \code{[h0, h0 + ROPE]}.Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2}, then the effective
+null interval is \code{[0.1, 0.3]}.
+
+\item For\code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0. The null
+region is \code{[h0 + ROPE, h0]}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2}, then the effective
+null interval is \code{[-0.1, 0.1]}.
+
+}
 
 If \code{ROPE = NULL}, a point-null hypothesis is assumed.
 
@@ -189,15 +193,14 @@ If \code{prior_design} is \code{NULL}, the analysis prior is used as the design 
 }
 \examples{
 BFpower.cor(
- alternative = "greater",
-   h0 = 0,
    threshold = 3,
    true_rate = 0.8,
    false_rate = 0.05,
+   h0 = 0,
+   alternative = "greater",
    prior_analysis = "d_beta",
    k = 1,
    prior_design = "Point",
-   location_d = 0.3
- )
+   location_d = 0.3)
 
 }
