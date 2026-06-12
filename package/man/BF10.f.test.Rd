@@ -13,9 +13,13 @@ BF10.f.test(fval, df1, df2, ROPE = NULL, prior_analysis, rscale, f_m, dff)
 
 \item{df2}{Numeric scalar. Denominator degrees of freedom (must be > 0).}
 
-\item{ROPE}{Optional numeric scalar specifying an upper bound for an interval
-null hypothesis. If provided, must be > 0.
-Example: If \code{ROPE =  0.2}, then the effective null interval is \code{[0, 0.2]}.}
+\item{ROPE}{Optional numeric scalar. Specifies the upper bound of the region
+of practical equivalence, whose lower bound is fixed at zero. Thus,
+\code{ROPE} defines the interval of values considered practically
+equivalent to the null value. If provided, it must be positive.
+
+For example, if \code{ROPE = 0.2}, then the region of practical equivalence
+is \code{[0, 0.2]}.}
 
 \item{prior_analysis}{Character. The analysis prior under the alternative hypothesis: \code{"effectsize"} or \code{"Moment"}.}
 

@@ -51,7 +51,8 @@ print.BFpower <- function(x, ...) {
                         "Two-proportions" = 0)
 
   # Centered header
-  header_text <- ifelse(x$setting$mode_bf == 1, "SAMPLE SIZE CALCULATION", "POWER CALCULATION")
+  mode_bf <- if (effect_size!=0) x$setting$mode_bf else x$mode_bf
+  header_text <- ifelse(mode_bf == 1, "SAMPLE SIZE CALCULATION", "POWER CALCULATION")
   pad_total <- 50 - nchar(header_text)
   pad_left <- floor(pad_total / 2); pad_right <- ceiling(pad_total / 2)
   cat(UL, HR, UR, "\n", VL, strrep(" ", pad_left), header_text, strrep(" ", pad_right), VL, "\n", LL, HR, LR, "\n", sep = "")

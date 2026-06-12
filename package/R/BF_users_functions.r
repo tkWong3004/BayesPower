@@ -11,18 +11,20 @@
 #' @param false_rate Numeric scalar. Target false positive or false negative rate (between 0.001 and 0.1).
 #' @param N Numeric integer. Sample size.
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
-#' @param ROPE Optional numeric vector or scalar. Specifies bounds for an interval
-#'   null hypothesis.
+#' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
+#'   equivalence relative to the point null value of zero.
+#'   Thus, \code{ROPE} defines the interval of values considered
+#'   practically equivalent to the null value.
 #'
 #'   For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
-#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[-0.2, 0.2]}.
+#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[-0.2, 0.2]}.
 #'
-#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0, 0.2]}.
+#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0, 0.2]}.
 #'
-#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[-0.2, 0]}.
+#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[-0.2, 0]}.
 #'
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis:
 #'   \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.
@@ -63,20 +65,20 @@
 #' \strong{Interval Null Hypothesis:}
 #'
 #' The interval null hypothesis can be specified using the argument \code{ROPE},
-#' which defines an interval around the null value of 0.
+#' which defines a region of practical equivalence around the null value of 0.
 #'
 #' The required form of \code{ROPE} depends on the direction of \code{alternative}:
 #' \itemize{
 #'
-#'   For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
-#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[-0.2, 0.2]}.
+#'   \item For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
+#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[-0.2, 0.2]}.
 #'
-#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0, 0.2]}.
+#'   \item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0, 0.2]}.
 #'
-#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[-0.2, 0]}.
+#'   \item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[-0.2, 0]}.
 #'
 #' }
 #'
@@ -350,18 +352,20 @@ BFpower.ttest.OneSample <- function(
 #' @param N2 Positive numeric integer. Sample size for group 2, used if \code{r = NULL} (must be \eqn{\ge 2}).
 #' @param r Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
-#' @param ROPE Optional numeric vector or scalar. Specifies bounds for an interval
-#'   null hypothesis.
+#' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
+#'   equivalence relative to the point null value of zero.
+#'   Thus, \code{ROPE} defines the interval of values considered
+#'   practically equivalent to the null value.
 #'
 #'   For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
-#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[-0.2, 0.2]}.
+#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[-0.2, 0.2]}.
 #'
-#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0, 0.2]}.
+#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0, 0.2]}.
 #'
-#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[-0.2, 0]}.
+#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[-0.2, 0]}.
 #'
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis:
 #'   \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.
@@ -400,23 +404,24 @@ BFpower.ttest.OneSample <- function(
 #'
 #' The argument \code{alternative} specifies the direction of the test and can be set to \code{"two.sided"}, \code{"greater"}, or \code{"less"}.
 #'
+
 #' \strong{Interval Null Hypothesis:}
 #'
 #' The interval null hypothesis can be specified using the argument \code{ROPE},
-#' which defines an interval around the null value of 0.
+#' which defines a region of practical equivalence around the null value of 0.
 #'
 #' The required form of \code{ROPE} depends on the direction of \code{alternative}:
 #' \itemize{
 #'
-#'   For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
-#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[-0.2, 0.2]}.
+#'   \item For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
+#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[-0.2, 0.2]}.
 #'
-#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0, 0.2]}.
+#'   \item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0, 0.2]}.
 #'
-#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[-0.2, 0]}.
+#'   \item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[-0.2, 0]}.
 #'
 #' }
 #'
@@ -738,26 +743,26 @@ BFpower.ttest.TwoSample <- function(threshold ,type_rate = "positive", true_rate
 #' @param N Numeric integer. Sample size. Only required if the goal is not sample size determination, but rather to calculate the probability of obtaining compelling or misleading evidence for a given sample size.
 #' @param h0 Numeric scalar. Null rho correlation value. Must be between -0.8 and 0.8.
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
-#' @param ROPE Optional numeric vector or scalar. Specifies bounds for an interval
-#'   null hypothesis relative to \code{h0}. That is, the ROPE defines a region
-#'   around \code{h0}, and the effective null interval is computed as
-#'   \code{h0 + ROPE}.
+#' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
+#'   equivalence relative to the point null value of \code{h0}.
+#'   Thus, \code{ROPE} defines the interval of values considered
+#'   practically equivalent to the null value by \code{h0 + ROPE}.
 #'
 #'   For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two
 #'   distinct finite values such that the first element is negative and the second
-#'   element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting null
-#'   interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[-0.1, 0.3]}.
+#'   element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting region of practical equivalence
+#'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[-0.1, 0.3]}.
 #'
 #'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-#'   deviation from \code{h0}, so the null region extends from \code{h0} to
-#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0.1, 0.3]}.
+#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
+#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0.1, 0.3]}.
 #'
 #'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-#'   deviation from \code{h0}, so the null region extends from \code{h0 + ROPE}
-#'   to \code{h0}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[-0.1, 0.1]}.
+#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
+#'   to \code{h0}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[-0.1, 0.1]}.
 #'
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis:
 #'        default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment prior (\code{"Moment"}).
@@ -807,24 +812,29 @@ BFpower.ttest.TwoSample <- function(threshold ,type_rate = "positive", true_rate
 #' \strong{Interval Null Hypothesis:}
 #'
 #' The interval null hypothesis can be specified using the argument \code{ROPE},
-#' which defines a region around the null value \code{h0}. The effective null
-#' interval is obtained by adding \code{ROPE} to \code{h0}.
+#' which defines a region of practical equivalence around the null value of \code{h0}.
+#' Thus, \code{ROPE} defines the interval of values considered
+#' practically equivalent to the null value by \code{h0 + ROPE}.
+#'
 #'
 #' The required form of \code{ROPE} depends on the direction of \code{alternative}:
 #' \itemize{
 #'
-#' \item For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2
-#'   with two distinct finite values such that \code{ROPE[1] < 0 < ROPE[2]}.
-#'   The null region is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[-0.1, 0.3]}.
+#'   \item For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two
+#'   distinct finite values such that the first element is negative and the second
+#'   element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting region of practical equivalence
+#'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[-0.1, 0.3]}.
 #'
-#' \item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. The null
-#'   region is \code{[h0, h0 + ROPE]}.Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0.1, 0.3]}.
+#'   \item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
+#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
+#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0.1, 0.3]}.
 #'
-#' \item For\code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0. The null
-#'   region is \code{[h0 + ROPE, h0]}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[-0.1, 0.1]}.
+#'   \item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
+#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
+#'   to \code{h0}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[-0.1, 0.1]}.
 #'
 #' }
 #'
@@ -1212,8 +1222,13 @@ BFpower.cor<- function(threshold , type_rate="positive",true_rate, false_rate ,N
 #'   If \code{N} of at least \code{k + 1} is supplied, power calculation for a fixed sample size is performed.
 #' @param p Numeric integer. Number of predictors in the reduced model.
 #' @param k Numeric integer. Number of predictors in the full model (must satisfy \code{k > p}).
-#' @param ROPE Optional numeric scalar specifying an upper bound for an interval
-#'   null hypothesis. If provided, must be > 0.
+#' @param ROPE Optional numeric scalar. Specifies the upper bound of the region
+#'   of practical equivalence, whose lower bound is fixed at zero. Thus,
+#'   \code{ROPE} defines the interval of values considered practically
+#'   equivalent to the null value. If provided, it must be positive.
+#'
+#'   For example, if \code{ROPE = 0.2}, then the region of practical equivalence
+#'   is \code{[0, 0.2]}.
 #'   Example: If \code{ROPE =  0.2}, then the effective null interval is \code{[0, 0.2]}.
 #' @param prior_analysis Character. The analysis prior model under the alternative hypothesis:
 #'   \code{"effectsize"} or \code{"Moment"}.
@@ -1253,10 +1268,15 @@ BFpower.cor<- function(threshold , type_rate="positive",true_rate, false_rate ,N
 #' \strong{Interval Null Hypothesis:}
 #'
 #' The interval null hypothesis can be specified using the argument \code{ROPE},
-#' which defines an interval around the null value of 0.
-#' The specified value of \code{ROPE} should be a positive numeric scalar.
+#' which defines  the upper bound of the region
+#' of practical equivalence, whose lower bound is fixed at zero. Thus,
+#' \code{ROPE} defines the interval of values considered practically
+#' equivalent to the null value. If provided, it must be positive.
+#'
 #' Example: If \code{ROPE =  0.2}, then the effective null interval is \code{[0, 0.2]}.
+#'
 #' If \code{ROPE = NULL}, a point-null hypothesis is assumed.
+
 #'
 #' \strong{Analysis Priors:}
 #'
@@ -1553,27 +1573,26 @@ BFpower.f.test <- function(threshold, type_rate="positive",true_rate, false_rate
 #' @param N Numeric integer. Sample size. If \code{NULL}, sample size determination is performed.
 #' @param h0 Numeric scalar. Null proportion value for the test (numeric scalar between 0.1 and 0.9).
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
-#' @param ROPE Optional numeric vector or scalar. Specifies bounds for an interval
-#'   null hypothesis relative to \code{h0}. That is, the ROPE defines a region
-#'   around \code{h0}, and the effective null interval is computed as
-#'   \code{h0 + ROPE}.
+#' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
+#'   equivalence relative to the point null value of \code{h0}.
+#'   Thus, \code{ROPE} defines the interval of values considered
+#'   practically equivalent to the null value by \code{h0 + ROPE}.
 #'
 #'   For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two
 #'   distinct finite values such that the first element is negative and the second
-#'   element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting null
-#'   interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[0.3, 0.7]}.
+#'   element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting region of practical equivalence
+#'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[0.3, 0.7]}.
 #'
 #'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-#'   deviation from \code{h0}, so the null region extends from \code{h0} to
-#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0.5, 0.7]}.
+#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
+#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0.5, 0.7]}.
 #'
 #'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-#'   deviation from \code{h0}, so the null region extends from \code{h0 + ROPE}
-#'   to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[0.3, 0.5]}.
-#'
+#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
+#'   to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[0.3, 0.5]}.
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis: \code{"beta"} or \code{"Moment"} (normal-moment prior).
 #' @param alpha Numeric scalar.  Alpha parameter of the analysis beta prior under the alternative hypothesis
 #'   (required if \code{prior_analysis = "beta"}).
@@ -1617,28 +1636,31 @@ BFpower.f.test <- function(threshold, type_rate="positive",true_rate, false_rate
 #' \strong{Interval Null Hypothesis:}
 #'
 #' The interval null hypothesis can be specified using the argument \code{ROPE},
-#' which defines a region around the null value \code{h0}. The effective null
-#' interval is obtained by adding \code{ROPE} to \code{h0}.
+#' which defines a region of practical equivalence around the null value of \code{h0}.
+#' Thus, \code{ROPE} defines the interval of values considered
+#' practically equivalent to the null value by \code{h0 + ROPE}.
 #'
 #' The required form of \code{ROPE} depends on the direction of \code{alternative}:
 #' \itemize{
-#' \item For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2
-#'   with two distinct finite values such that \code{ROPE[1] < 0 < ROPE[2]}.
-#'   The null region is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[0.3, 0.7]}.
+#'   \item For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two
+#'   distinct finite values such that the first element is negative and the second
+#'   element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting region of practical equivalence
+#'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[0.3, 0.7]}.
 #'
-#' \item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. The null
-#'   region is \code{[h0, h0 + ROPE]}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}z, \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0.5, 0.7]}.
+#'   \item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
+#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
+#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0.5, 0.7]}.
 #'
-#' \item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0. The null
-#'   region is \code{[h0 + ROPE, h0]}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[0.3, 0.5]}.
+#'   \item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
+#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
+#'   to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[0.3, 0.5]}.
 #'
 #' }
 #'
 #' If \code{ROPE = NULL}, a point-null hypothesis is assumed.
-#'
 #'
 #' \strong{Analysis Priors:}
 #'
@@ -2336,18 +2358,20 @@ BFpower.props <- function(threshold ,type_rate="positive", true_rate ,
 #' @param tval Numeric scalar. Observed t-value from the one-sample t-test.
 #' @param df Numeric scalar. Degrees of freedom of the t-test (must be \eqn{\ge 1}).
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
-#' @param ROPE Optional numeric vector or scalar. Specifies bounds for an interval
-#'   null hypothesis.
+#' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
+#'   equivalence relative to the point null value of zero.
+#'   Thus, \code{ROPE} defines the interval of values considered
+#'   practically equivalent to the null value.
 #'
 #'   For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
-#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[-0.2, 0.2]}.
+#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[-0.2, 0.2]}.
 #'
-#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0, 0.2]}.
+#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0, 0.2]}.
 #'
-#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[-0.2, 0]}.
+#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[-0.2, 0]}.
 #'
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis: \code{"Normal"} (normal distribution),
 #'   \code{"Moment"} (normal-moment prior), or \code{"t-distribution"} (t-distribution).
@@ -2485,18 +2509,21 @@ BF10.ttest.OneSample <- function(tval, df, alternative, ROPE = NULL, prior_analy
 #' @param N1 Numeric integer. Sample size of group 1 (must be > 2).
 #' @param N2 Numeric integer. Sample size of group 2 (must be > 2).
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
-#' @param ROPE Optional numeric vector or scalar. Specifies bounds for an interval
-#'   null hypothesis.
+#' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
+#'   equivalence relative to the point null value of zero.
+#'   Thus, \code{ROPE} defines the interval of values considered
+#'   practically equivalent to the null value.
 #'
 #'   For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
-#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[-0.2, 0.2]}.
+#'   is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[-0.2, 0.2]}.
 #'
-#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0, 0.2]}.
+#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0, 0.2]}.
 #'
-#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[-0.2, 0]}.
+#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[-0.2, 0]}.
+#'
 #'
 #' @param prior_analysis Character. Analysis prior under the alternative hypothesis:
 #'   \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.
@@ -2647,26 +2674,26 @@ BF10.ttest.TwoSample <- function(tval, N1, N2,alternative, ROPE = NULL, prior_an
 #' @param n Numeric integer. Sample size. Must be a numeric scalar greater than 3.
 #' @param h0 Numeric scalar. Null value of the correlation. Must be a numeric scalar between -0.8 and 0.8.
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
-#' @param ROPE Optional numeric vector or scalar. Specifies bounds for an interval
-#'   null hypothesis relative to \code{h0}. That is, the ROPE defines a region
-#'   around \code{h0}, and the effective null interval is computed as
-#'   \code{h0 + ROPE}.
+#' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
+#'   equivalence relative to the point null value of \code{h0}.
+#'   Thus, \code{ROPE} defines the interval of values considered
+#'   practically equivalent to the null value by \code{h0 + ROPE}.
 #'
 #'   For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two
 #'   distinct finite values such that the first element is negative and the second
-#'   element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting null
-#'   interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}.Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[-0.1, 0.3]}.
+#'   element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting region of practical equivalence
+#'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[-0.1, 0.3]}.
 #'
 #'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-#'   deviation from \code{h0}, so the null region extends from \code{h0} to
-#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0.1, 0.3]}.
+#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
+#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0.1, 0.3]}.
 #'
-#'   For \code{alternative "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-#'   deviation from \code{h0}, so the null region extends from \code{h0 + ROPE}
-#'   to \code{h0}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[-0.1, 0.1]}.
+#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
+#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
+#'   to \code{h0}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[-0.1, 0.1]}.
 #'
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"Moment"}).
 #' @param k Numeric scalar. Shape parameter for the analysis default beta prior under the alternative hypothesis given  \eqn{\alpha = \beta = \frac{1}{\kappa}}{alpha = beta = 1/kappa} (required if \code{prior_analysis = "d_beta"}).
@@ -2838,9 +2865,13 @@ BF10.cor <- function(r, n, h0, alternative, ROPE = NULL,  prior_analysis, k, alp
 #' @param fval Numeric scalar. Observed F statistic (must be \eqn{\ge 0}).
 #' @param df1 Numeric scalar. Numerator degrees of freedom (must be > 0).
 #' @param df2 Numeric scalar. Denominator degrees of freedom (must be > 0).
-#' @param ROPE Optional numeric scalar specifying an upper bound for an interval
-#'   null hypothesis. If provided, must be > 0.
-#'   Example: If \code{ROPE =  0.2}, then the effective null interval is \code{[0, 0.2]}.
+#' @param ROPE Optional numeric scalar. Specifies the upper bound of the region
+#'   of practical equivalence, whose lower bound is fixed at zero. Thus,
+#'   \code{ROPE} defines the interval of values considered practically
+#'   equivalent to the null value. If provided, it must be positive.
+#'
+#'   For example, if \code{ROPE = 0.2}, then the region of practical equivalence
+#'   is \code{[0, 0.2]}.
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis: \code{"effectsize"} or \code{"Moment"}.
 #' @param rscale Numeric scalar. Scale parameter for the effect-size analysis prior under the alternative hypothesis (required if \code{prior_analysis = "effectsize"}).
 #' @param f_m Numeric scalar. Cohen's f location parameter for the analysis prior under the alternative hypothesis.
@@ -2965,26 +2996,26 @@ BF10.f.test <- function(fval, df1, df2, ROPE = NULL, prior_analysis, rscale, f_m
 #' @param x Numeric integer. Observed number of successes (non-negative integer scalar, must be \eqn{\ge 0} and \eqn{\le n} ).
 #' @param h0 Numeric scalar.  Null proportion value (numeric scalar between 0.1 and 0.9).
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
-#' @param ROPE Optional numeric vector or scalar. Specifies bounds for an interval
-#'   null hypothesis relative to \code{h0}. That is, the ROPE defines a region
-#'   around \code{h0}, and the effective null interval is computed as
-#'   \code{h0 + ROPE}.
+#' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
+#'   equivalence relative to the point null value of \code{h0}.
+#'   Thus, \code{ROPE} defines the interval of values considered
+#'   practically equivalent to the null value by \code{h0 + ROPE}.
 #'
 #'   For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two
 #'   distinct finite values such that the first element is negative and the second
-#'   element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting null
-#'   interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)}, then the effective
-#'   null interval is \code{[0.3, 0.7]}.
+#'   element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting region of practical equivalence
+#'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
+#'   then the region of practical equivalence is \code{[0.3, 0.7]}.
 #'
 #'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-#'   deviation from \code{h0}, so the null region extends from \code{h0} to
-#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2}, then the effective
-#'   null interval is \code{[0.5, 0.7]}.
+#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
+#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   then the region of practical equivalence is \code{[0.5, 0.7]}.
 #'
 #'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-#'   deviation from \code{h0}, so the null region extends from \code{h0 + ROPE}
-#'   to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2}, then the effective
-#'   null interval is \code{[0.3, 0.5]}.
+#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
+#'   to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   then the region of practical equivalence is \code{[0.3, 0.5]}.
 #'
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis:
 #'   \code{"beta"} or \code{"Moment"} (normal-moment prior).
@@ -3001,9 +3032,7 @@ BF10.f.test <- function(fval, df1, df2, ROPE = NULL, prior_analysis, rscale, f_m
 #'     \item \code{h0}: Numeric scalar. Null proportion value.
 #'     \item \code{x}: Non-negative integer scalar.  Number of successes.
 #'     \item \code{n}: Positive integer scalar. Sample size.
-#'   \item \code{analysis_h1}: List describing the analysis prior, containing
-#'     \code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0}),\code{alpha} (alpha parameter),
-#'     \code{beta} (beta parameter), and \code{scale} (scale parameter).
+#'     \item \code{analysis_h1}: List describing the analysis prior, containing \code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0}),\code{alpha} (alpha parameter), \code{beta} (beta parameter), and \code{scale} (scale parameter).
 #'     \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 #'     \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 #'     \item \code{p.value}: Numeric scalar. p-value.

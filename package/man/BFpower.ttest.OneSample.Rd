@@ -35,18 +35,20 @@ BFpower.ttest.OneSample(
 
 \item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
-null hypothesis.
+\item{ROPE}{Optional numeric vector or scalar. Specifies the region of practical
+equivalence relative to the point null value of zero.
+Thus, \code{ROPE} defines the interval of values considered
+practically equivalent to the null value.
 
 For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
-is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)}, then the effective
-null interval is \code{[-0.2, 0.2]}.
+is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)},
+then the region of practical equivalence is \code{[-0.2, 0.2]}.
 
-For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2}, then the effective
-null interval is \code{[0, 0.2]}.
+For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2},
+then the region of practical equivalence is \code{[0, 0.2]}.
 
-For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2}, then the effective
-null interval is \code{[-0.2, 0]}.}
+For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2},
+then the region of practical equivalence is \code{[-0.2, 0]}.}
 
 \item{prior_analysis}{Character. The analysis prior under the alternative hypothesis:
 \code{"Normal"}, \code{"Moment"} (normal-moment prior), or \code{"t-distribution"}.}
@@ -117,20 +119,20 @@ The argument \code{alternative} specifies the direction of the test and can be s
 \strong{Interval Null Hypothesis:}
 
 The interval null hypothesis can be specified using the argument \code{ROPE},
-which defines an interval around the null value of 0.
+which defines a region of practical equivalence around the null value of 0.
 
 The required form of \code{ROPE} depends on the direction of \code{alternative}:
 \itemize{
 
-For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
-is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)}, then the effective
-null interval is \code{[-0.2, 0.2]}.
+\item For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two distinct finite values such that the first element
+is negative and the second element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). Example: If \code{alternative = "two.sided"} and \code{ROPE = c(-0.2, 0.2)},
+then the region of practical equivalence is \code{[-0.2, 0.2]}.
 
-For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2}, then the effective
-null interval is \code{[0, 0.2]}.
+\item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0. Example: If \code{alternative = "greater"} and \code{ROPE = 0.2},
+then the region of practical equivalence is \code{[0, 0.2]}.
 
-For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2}, then the effective
-null interval is \code{[-0.2, 0]}.
+\item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0.Example: If \code{alternative = "less"} and \code{ROPE = -0.2},
+then the region of practical equivalence is \code{[-0.2, 0]}.
 
 }
 

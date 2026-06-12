@@ -8739,115 +8739,79 @@ server_t1<- function(input, output, session) {
   })
 
   shiny::observeEvent(input$cal1, {
-    x = input_t1()
+
+    x <- input_t1()
 
     output$result_t1 <- shiny::renderText({
+
       args <- list(
-      tval = x$tval,
-      df = x$N,
-      prior_analysis = x$prior_analysis,
-      location = x$location,
-      scale = x$scale,
-      dff = x$dff,
-      alternative = x$alternative
-    )
-
-    if (!is.null(x$ROPE) && x$interval != 1) {
-      args$ROPE <- x$ROPE
-    }
-
-    # Build string with each argument on a new line
-    arg_strings <- lapply(names(args), function(arg) {
-
-      val <- args[[arg]]
-      arg_print <- arg
-
-      # ---- Omission rules ----
-      if ((x$prior_analysis %in% c("Normal", "Moment")) && arg == "dff") {
-        return(NULL)
-      }
-
-      if (arg == "alternative") {
-        val <- shQuote(val)
-      } else if (arg == "ROPE") {
-        if (length(val) > 1) {
-          val <- paste0("c(", paste(val, collapse = ", "), ")")
-        } else {
-          val <- as.character(val)
-        }
-      } else {
-        val <- fmt_val(val)
-      }
-
-      sprintf("  %s = %s", arg_print, val)
-    })
-
-    arg_strings <- Filter(Negate(is.null), arg_strings)
-
-    call_string <- paste0(
-      "# Function to be used in R\n",
-      "BF10.ttest.OneSample(\n",
-      paste(arg_strings, collapse = ",\n"),
-      "\n)"
-    )
-
-    call_string
-    })
-
-
-
-
-
-    output$priort1 <- shiny::renderPlot({
-      suppressWarnings(switch(x$interval,
-                              "1"= t1_prior_plot(       # Access 'target' explicitly
-                                prior_analysis = x$prior_analysis,          # Access 'prior_analysis' explicitly
-                                location = x$location,    # Access 'location' explicitly
-                                scale = x$scale,          # Access 'scale' explicitly
-                                dff = x$dff,              # Access 'dff' explicitly
-                                alternative = x$alternative,  # Access 'alternative' explicitly
-                                prior_design = x$prior_design,        # Access 'prior_design' explicitly
-                                location_d = x$location_d,  # Access 'location_d' explicitly
-                                scale_d = x$scale_d,        # Access 'scale_d' explicitly
-                                dff_d = x$dff_d,            # Access 'dff_d' explicitly
-                                de_an_prior = 1   # Access 'de_an_prior' explicitly
-                              ),
-                              "2" = t1e_prior_plot(x$prior_analysis,
-                                                   x$location,
-                                                   x$scale,
-                                                   x$dff ,
-                                                   x$alternative,
-                                                   x$ROPE,
-                                                   1,
-                                                   x$prior_design,
-                                                   x$scale_d,
-                                                   x$dff_d,
-                                                   x$location_d )
-
-      ))
-
-    })
-    BF10 <- suppressWarnings(switch(x$interval,
-                                    "1" = t1_BF10(x$tval,x$N,x$prior_analysis ,x$location,x$scale,x$dff , x$alternative ),
-                                    "2" = t1e_BF10(x$tval,x$N,x$prior_analysis,x$location,x$scale,x$dff , x$alternative,x$ROPE )))
-    d.obs <- x$tval/sqrt(x$N)
-    ROPE <- switch(x$interval,"1" = NULL,"2" = x$ROPE)
-    p.value <- t.pval(x$tval, x$N+1, n2 = NULL, x$alternative, ROPE = ROPE, type = "One-sample t-test")
-    output$BFt1 <- shiny::renderUI({
-      # Create the LaTeX formatted strings for the table
-      table_html <- paste0('
-    \\textit{t}(', x$N , ') = ',x$tval,', \\textit{p} = ',round(p.value,4),', \\textit{d} = ',round(d.obs,4),',\\\\ \\textit{BF}_{10} = ', round(BF10, 4),", \\textit{BF}_{01} = ",round(1/BF10, 4), '
-')
-
-
-      # Render the table using MathJax
-      shiny::tagList(
-        # Render the table using MathJax
-        shiny::withMathJax(
-          shiny::em('$$', table_html, '$$')
-        )
+        tval = x$tval,
+        df = x$N,
+        alternative = x$alternative,
+        ROPE = x$ROPE,
+        prior_analysis = x$prior_analysis,
+        location = x$location,
+        scale = x$scale,
+        dff = x$dff
       )
+
+      arg_strings <- lapply(names(args), function(arg) {
+
+        val <- args[[arg]]
+
+        ## -----------------------------
+        ## Omission rules
+        ## -----------------------------
+
+        if (arg == "ROPE") {
+          if (is.null(x$ROPE) || x$interval == 1) {
+            return(NULL)
+          }
+        }
+
+        if ((x$prior_analysis %in% c("Normal", "Moment")) && arg == "dff") {
+          return(NULL)
+        }
+
+        if (is.null(val)) {
+          return(NULL)
+        }
+
+        ## -----------------------------
+        ## Value formatting
+        ## -----------------------------
+
+        if (arg %in% c("alternative", "prior_analysis")) {
+          val <- shQuote(val)
+
+        } else if (arg == "ROPE") {
+          if (length(val) > 1) {
+            val <- paste0("c(", paste(val, collapse = ", "), ")")
+          } else {
+            val <- as.character(val)
+          }
+
+        } else {
+          val <- fmt_val(val)
+        }
+
+        sprintf("  %s = %s", arg, val)
+      })
+
+      arg_strings <- Filter(Negate(is.null), arg_strings)
+
+      call_string <- paste0(
+        "# Function to be used in R\n",
+        "BF10.ttest.OneSample(\n",
+        paste(arg_strings, collapse = ",\n"),
+        "\n)"
+      )
+
+      call_string
     })
+
+
+
 
   })
 
@@ -9316,16 +9280,13 @@ server_t2<- function(input, output, session) {
         tval = t2$tval,
         N1 = t2$N1,
         N2 = t2$N2,
+        alternative = t2$alternative,
+        ROPE = t2$ROPE,
         prior_analysis = t2$prior_analysis,
         location = t2$location,
         scale = t2$scale,
-        dff = t2$dff,
-        alternative = t2$alternative
+        dff = t2$dff
       )
-
-      if (t2$interval != 1) {
-        args$ROPE <- t2$ROPE
-      }
 
       # Build string with each argument on a new line, applying omission rules
       arg_strings <- sapply(names(args), function(arg) {
@@ -9334,20 +9295,29 @@ server_t2<- function(input, output, session) {
         arg_print <- arg
 
         # ---- Omission rules ----
+        if (arg == "ROPE" && t2$interval == 1) {
+          return(NULL)
+        }
+
         if ((t2$prior_analysis %in% c("Normal", "Moment")) && arg == "dff") {
           return(NULL)
         }
 
-        # Handle alternative
+        if (is.null(val)) {
+          return(NULL)
+        }
+
+        # ---- Value formatting ----
         if (arg == "alternative") {
           val <- shQuote(val)
+
         } else if (arg == "ROPE") {
-          # Wrap vector ROPE in c(...)
           if (length(val) > 1) {
             val <- paste0("c(", paste(val, collapse = ", "), ")")
           } else {
             val <- as.character(val)
           }
+
         } else {
           val <- fmt_val(val)
         }
@@ -9367,6 +9337,10 @@ server_t2<- function(input, output, session) {
 
       call_string
     })
+
+
+
+
     d.obs <-  t2$tval / sqrt((t2$N1 * t2$N2) / (t2$N1 + t2$N2))
     ROPE <- switch(t2$interval,"1" = NULL,"2" = t2$ROPE)
     p.value <- t.pval(t2$tval, t2$N1, t2$N2, t2$alternative, ROPE = ROPE, type = "two")
@@ -9897,61 +9871,70 @@ server_r<- function(input, output, session) {
         args <- list(
           r = rr$rval,
           n = rr$N,
-          prior_analysis = rr$prior_analysis
+          h0 = rr$h0,
+          alternative = rr$alternative,
+          ROPE = rr$ROPE,
+          prior_analysis = rr$prior_analysis,
+          k = rr$k,
+          alpha = rr$alpha,
+          beta = rr$beta,
+          scale = rr$scale
         )
 
-        # Add prior_analysis-specific arguments
-        if (!is.null(rr$prior_analysis)) {
-          if (rr$prior_analysis == "d_beta") {
-            args$k <- rr$k
-          } else if (rr$prior_analysis == "beta") {
-            args$alpha <- rr$alpha
-            args$beta  <- rr$beta
-          } else if (rr$prior_analysis == "Moment") {
-            args$scale <- rr$scale
-          }
-        }
-
-        # Common arguments
-        args$h0 <- rr$h0
-        args$alternative <- rr$alternative
-
-        # Optional ROPE (only if interval != 1)
-        if (!is.null(rr$interval) && rr$interval != 1) {
-          args$e <- rr$ROPE
-        }
-
-        # Build string with renaming & mapping rules
         arg_strings <- sapply(names(args), function(arg) {
 
           val <- args[[arg]]
           arg_print <- arg
 
-          ## prior_analysis > prior_analysis
-          if (arg == "prior_analysis") {
-            arg_print <- "prior_analysis"
+          ## -----------------------------
+          ## Omission rules
+          ## -----------------------------
+
+          if (arg == "ROPE" && (!is.null(rr$interval) && rr$interval == 1)) {
+            return(NULL)
           }
 
-          ## e > ROPE
-          if (arg == "e") {
-            arg_print <- "ROPE"
-            if (length(val) > 1) {
-              return(sprintf(
-                "  %s = c(%s)",
-                arg_print,
-                paste(fmt_val(val), collapse = ", ")
-              ))
+          if (is.null(val)) {
+            return(NULL)
+          }
+
+          # prior_analysis-specific argument rules
+          if (!is.null(rr$prior_analysis)) {
+            if (rr$prior_analysis == "d_beta" && arg %in% c("alpha", "beta", "scale")) {
+              return(NULL)
+            }
+
+            if (rr$prior_analysis == "beta" && arg %in% c("k", "scale")) {
+              return(NULL)
+            }
+
+            if (rr$prior_analysis == "Moment" && arg %in% c("k", "alpha", "beta")) {
+              return(NULL)
             }
           }
 
-          if (arg == "alternative") {
+          ## -----------------------------
+          ## Value formatting
+          ## -----------------------------
+
+          if (arg %in% c("alternative", "prior_analysis")) {
             val <- shQuote(val)
+
+          } else if (arg == "ROPE") {
+            if (length(val) > 1) {
+              val <- paste0("c(", paste(val, collapse = ", "), ")")
+            } else {
+              val <- as.character(val)
+            }
+
           } else {
             val <- fmt_val(val)
           }
 
           sprintf("  %s = %s", arg_print, val)
         })
+
+        arg_strings <- arg_strings[!sapply(arg_strings, is.null)]
 
         paste0(
           "# Function to be used in R\n",
@@ -9961,11 +9944,8 @@ server_r<- function(input, output, session) {
         )
       }
 
-
-
       build_BF10_call(rr)
     })
-
 
 
 
@@ -10530,15 +10510,12 @@ server_f<- function(input, output, session) {
         fval = ff$fval,
         df1 = ff$df1,
         df2 = ff$df2,
-        dff = ff$dff,
+        ROPE = ff$ROPE,
+        prior_analysis = ff$prior_analysis,
         rscale = ff$rscale,
         f_m = ff$f_m,
-        prior_analysis = ff$prior_analysis
+        dff = ff$dff
       )
-
-      if (ff$inter!=1) {
-        args$e <- ff$ROPE
-      }
 
       # Build string with each argument on a new line
       arg_strings <- sapply(names(args), function(arg) {
@@ -10546,19 +10523,24 @@ server_f<- function(input, output, session) {
         val <- args[[arg]]
         arg_print <- arg
 
-        ## prior_analysis > prior_analysis
-        if (arg == "prior_analysis") {
-          arg_print <- "prior_analysis"
+        ## -----------------------------
+        ## Omission rules
+        ## -----------------------------
+        if (arg == "ROPE" && ff$inter == 1) {
+          return(NULL)
         }
 
-        ## e > ROPE
-        if (arg == "e") {
-          arg_print <- "ROPE"
+        if (is.null(val)) {
+          return(NULL)
         }
 
+        ## -----------------------------
+        ## Value formatting
+        ## -----------------------------
         sprintf("  %s = %s", arg_print, fmt_val(val))
       })
 
+      arg_strings <- arg_strings[!sapply(arg_strings, is.null)]
 
       call_string <- paste0(
         "# Function to be used in R\n",
@@ -10569,7 +10551,6 @@ server_f<- function(input, output, session) {
 
       call_string
     })
-
 
     output$BFcalf <- shiny::renderUI({
       ROPE <- switch(ff$inter,"1" = NULL,"2" = ff$ROPE)
@@ -10995,26 +10976,18 @@ server_bin<- function(input, output, session) {
 ')
 
       output$result_bin <- shiny::renderText({
+
         args <- list(
-          x = bin$Suc,
           n = bin$N,
+          x = bin$Suc,
           h0 = bin$location,
+          alternative = bin$alternative,
+          ROPE = bin$ROPE,
           prior_analysis = bin$prior_analysis,
-          alternative = bin$alternative
+          alpha = bin$alpha,
+          beta = bin$beta,
+          scale = bin$scale
         )
-
-        # Add prior_analysis-specific parameters
-        if (bin$prior_analysis == "beta") {
-          args$alpha <- bin$alpha
-          args$beta  <- bin$beta
-        } else if (bin$prior_analysis == "Moment") {
-          args$scale <- bin$scale
-        }
-
-        # Include e only if interval != 1
-        if (!is.null(bin$interval) && bin$interval != 1) {
-          args$ROPE <-  bin$ROPE
-        }
 
         fmt_val <- function(x) {
           if (is.numeric(x) && length(x) == 1) return(as.character(x))
@@ -11027,34 +11000,54 @@ server_bin<- function(input, output, session) {
         arg_strings <- sapply(names(args), function(arg) {
 
           val <- args[[arg]]
-          arg_print <- arg  # default printed name
+          arg_print <- arg
 
-          ## prior_analysis → prior_analysis
-          if (arg == "prior_analysis") arg_print <- "prior_analysis"
+          ## -----------------------------
+          ## Omission rules
+          ## -----------------------------
 
-          ## e → ROPE
-          if (arg == "e") arg_print <- "ROPE"
+          # Include ROPE only if interval != 1
+          if (arg == "ROPE" && !is.null(bin$interval) && bin$interval == 1) {
+            return(NULL)
+          }
 
-          ## alternative → alternative
+          # prior_analysis-specific parameters
+          if (!is.null(bin$prior_analysis)) {
+            if (bin$prior_analysis == "beta" && arg == "scale") {
+              return(NULL)
+            }
+
+            if (bin$prior_analysis == "Moment" && arg %in% c("alpha", "beta")) {
+              return(NULL)
+            }
+          }
+
+          if (is.null(val)) {
+            return(NULL)
+          }
+
+          ## -----------------------------
+          ## Value formatting
+          ## -----------------------------
+
           if (arg == "alternative") {
-
-            arg_print <- "alternative"
-
-            val <- switch(val,
-                          "less"  = "less",
-                          "two.sided" = "two.sided",
-                          "greater"  = "greater",
-                          stop("Invalid alternative")
+            val <- switch(
+              val,
+              "less" = "less",
+              "two.sided" = "two.sided",
+              "greater" = "greater",
+              stop("Invalid alternative")
             )
           }
 
-          # Format e as c(...) if vector
-          if (arg == "e" && length(val) > 1) {
-            sprintf("  %s = c(%s)", arg_print, paste(fmt_val(val), collapse = ", "))
+          if (arg == "ROPE" && length(val) > 1) {
+            sprintf("  %s = c(%s)", arg_print, paste(val, collapse = ", "))
           } else {
             sprintf("  %s = %s", arg_print, fmt_val(val))
           }
         })
+
+        arg_strings <- arg_strings[!sapply(arg_strings, is.null)]
 
         call_string <- paste0(
           "# Function to be used in R\n",
@@ -11064,9 +11057,7 @@ server_bin<- function(input, output, session) {
         )
 
         call_string
-
       })
-
 
 
 
@@ -11510,25 +11501,26 @@ server_p2<- function(input, output, session) {
 
       output$result_p2 <- shiny::renderText({
 
-
         args <- list(
+          N1 = p2$N1,
+          x1 = p2$k1,
+          N2 = p2$N2,
+          x2 = p2$k2,
           a0 = p2$a0,
           b0 = p2$b0,
           a1 = p2$a1,
           b1 = p2$b1,
           a2 = p2$a2,
-          b2 = p2$b2,
-          N1 = p2$N1,
-          N2 = p2$N2,
-          x1 = p2$k1,
-          x2 = p2$k2
+          b2 = p2$b2
         )
+
         fmt_val <- function(x) {
           if (is.numeric(x) && length(x) == 1) return(as.character(x))
           if (is.numeric(x) && length(x) > 1) return(paste(x, collapse = ", "))
           if (is.character(x)) return(shQuote(x))
           return(as.character(x))
         }
+
         # Build string with each argument on a new line
         arg_strings <- sapply(names(args), function(nm) {
           sprintf("  %s = %s", nm, fmt_val(args[[nm]]))
@@ -11543,7 +11535,6 @@ server_p2<- function(input, output, session) {
 
         call_string
       })
-
 
 
 

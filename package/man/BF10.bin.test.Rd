@@ -25,26 +25,26 @@ BF10.bin.test(
 
 \item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
-\item{ROPE}{Optional numeric vector or scalar. Specifies bounds for an interval
-null hypothesis relative to \code{h0}. That is, the ROPE defines a region
-around \code{h0}, and the effective null interval is computed as
-\code{h0 + ROPE}.
+\item{ROPE}{Optional numeric vector or scalar. Specifies the region of practical
+equivalence relative to the point null value of \code{h0}.
+Thus, \code{ROPE} defines the interval of values considered
+practically equivalent to the null value by \code{h0 + ROPE}.
 
 For \code{alternative = "two.sided"}, argument \code{ROPE} must be a numeric vector of length 2 with two
 distinct finite values such that the first element is negative and the second
-element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting null
-interval is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)}, then the effective
-null interval is \code{[0.3, 0.7]}.
+element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting region of practical equivalence
+is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
+then the region of practical equivalence is \code{[0.3, 0.7]}.
 
 For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-deviation from \code{h0}, so the null region extends from \code{h0} to
-\code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2}, then the effective
-null interval is \code{[0.5, 0.7]}.
+deviation from \code{h0}, so the interval null extends from \code{h0} to
+\code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+then the region of practical equivalence is \code{[0.5, 0.7]}.
 
 For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-deviation from \code{h0}, so the null region extends from \code{h0 + ROPE}
-to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2}, then the effective
-null interval is \code{[0.3, 0.5]}.}
+deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
+to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
+then the region of practical equivalence is \code{[0.3, 0.5]}.}
 
 \item{prior_analysis}{Character. The analysis prior under the alternative hypothesis:
 \code{"beta"} or \code{"Moment"} (normal-moment prior).}
@@ -65,9 +65,7 @@ An object of class \code{BFvalue} containing:
 \item \code{h0}: Numeric scalar. Null proportion value.
 \item \code{x}: Non-negative integer scalar.  Number of successes.
 \item \code{n}: Positive integer scalar. Sample size.
-\item \code{analysis_h1}: List describing the analysis prior, containing
-\code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0}),\code{alpha} (alpha parameter),
-\code{beta} (beta parameter), and \code{scale} (scale parameter).
+\item \code{analysis_h1}: List describing the analysis prior, containing \code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0}),\code{alpha} (alpha parameter), \code{beta} (beta parameter), and \code{scale} (scale parameter).
 \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 \item \code{p.value}: Numeric scalar. p-value.

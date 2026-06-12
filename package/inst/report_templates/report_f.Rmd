@@ -52,19 +52,19 @@ fmt <- function(z) {
 print_ff_prior_rmd <- function(prior, rscale = NULL, f_m = NULL, dff = NULL) {
 
   if (is.null(prior) || prior == "Point") {
-    return(sprintf("Point (\\(\\lambda^2 = %s\\))", fmt(f_m^2)))
+    return(sprintf("Point (\\(f^2 = %s\\))", fmt(f_m^2)))
   }
 
   if (prior %in% c("tdis", "effectsize")) {
     return(sprintf(
-      "Effect size prior (scale = %s, \\(\\lambda^2 = %s\\), df = %s)",
+      "Effect size prior (scale = %s, \\(f^2 = %s\\), df = %s)",
       fmt(rscale), fmt(f_m^2), fmt(dff)
     ))
   }
 
   if (prior == "Moment") {
     return(sprintf(
-      "Moment prior (\\(\\lambda^2 = %s\\), df = %s)",
+      "Moment prior (\\(f^2 = %s\\), df = %s)",
       fmt(f_m^2), fmt(dff)
     ))
   }

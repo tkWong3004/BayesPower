@@ -42,8 +42,13 @@ If \code{N} of at least \code{k + 1} is supplied, power calculation for a fixed 
 
 \item{k}{Numeric integer. Number of predictors in the full model (must satisfy \code{k > p}).}
 
-\item{ROPE}{Optional numeric scalar specifying an upper bound for an interval
-null hypothesis. If provided, must be > 0.
+\item{ROPE}{Optional numeric scalar. Specifies the upper bound of the region
+of practical equivalence, whose lower bound is fixed at zero. Thus,
+\code{ROPE} defines the interval of values considered practically
+equivalent to the null value. If provided, it must be positive.
+
+For example, if \code{ROPE = 0.2}, then the region of practical equivalence
+is \code{[0, 0.2]}.
 Example: If \code{ROPE =  0.2}, then the effective null interval is \code{[0, 0.2]}.}
 
 \item{prior_analysis}{Character. The analysis prior model under the alternative hypothesis:
@@ -119,9 +124,13 @@ threshold \code{threshold} is used. The supplied \code{N} must satisfy
 \strong{Interval Null Hypothesis:}
 
 The interval null hypothesis can be specified using the argument \code{ROPE},
-which defines an interval around the null value of 0.
-The specified value of \code{ROPE} should be a positive numeric scalar.
+which defines  the upper bound of the region
+of practical equivalence, whose lower bound is fixed at zero. Thus,
+\code{ROPE} defines the interval of values considered practically
+equivalent to the null value. If provided, it must be positive.
+
 Example: If \code{ROPE =  0.2}, then the effective null interval is \code{[0, 0.2]}.
+
 If \code{ROPE = NULL}, a point-null hypothesis is assumed.
 
 \strong{Analysis Priors:}
