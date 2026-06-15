@@ -29,13 +29,13 @@ BFpower.bin(
 
 \item{type_rate}{Character. Either \code{"positive"} (controls true/false positive rates) or \code{"negative"} (controls true/false negative rates).}
 
-\item{true_rate}{Numeric scalar. Targeted true positive rate  or true negative rate .}
+\item{true_rate}{Numeric scalar. Target true positive or negative rate (between 0.6 and 0.999) for sample size determination.}
 
-\item{false_rate}{Numeric scalar. Targeted false positive rate  or false negative rate .}
+\item{false_rate}{Numeric scalar. Target false positive or false negative rate (between 0.001 and 0.1) for sample size determination.}
 
-\item{N}{Numeric integer. Sample size. If \code{NULL}, sample size determination is performed.}
+\item{N}{Numeric integer. Sample size for power calculation. If \code{NULL}, sample size determination is performed.}
 
-\item{h0}{Numeric scalar. Null proportion value for the test (numeric scalar between 0.1 and 0.9).}
+\item{h0}{Numeric scalar. Null proportion value (numeric scalar between 0.1 and 0.9).}
 
 \item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
@@ -50,14 +50,14 @@ element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting region o
 is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
 then the region of practical equivalence is \code{[0.3, 0.7]}.
 
-For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-deviation from \code{h0}, so the interval null extends from \code{h0} to
-\code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0,
+the interval null extends from \code{h0} to \code{h0 + ROPE}.
+Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
 then the region of practical equivalence is \code{[0.5, 0.7]}.
 
-For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
-to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
+For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0,
+the interval null extends from \code{h0 + ROPE} to \code{h0}.
+Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
 then the region of practical equivalence is \code{[0.3, 0.5]}.}
 
 \item{prior_analysis}{Character. The analysis prior under the alternative hypothesis: \code{"beta"} or \code{"Moment"} (normal-moment prior).}
@@ -72,9 +72,9 @@ then the region of practical equivalence is \code{[0.3, 0.5]}.}
 
 \item{prior_design}{Character. Design prior under the alternative hypothesis: \code{"beta"}, \code{"Moment"}(normal-moment prior), or \code{"Point"}.}
 
-\item{alpha_d}{Numeric scalar. Alpha parameter of the design beta prior under the alternative hypothesis(\code{"beta"}).}
+\item{alpha_d}{Numeric scalar. Alpha parameter of the design beta prior under the alternative hypothesis (required if \code{prior_design = "beta"}).}
 
-\item{beta_d}{Numeric scalar. Beta Parameter of the design beta prior under the alternative hypothesis(\code{"beta"}).}
+\item{beta_d}{Numeric scalar. Beta Parameter of the design beta prior under the alternative hypothesis (required if \code{prior_design = "beta"}).}
 
 \item{location_d}{Numeric scalar. Location parameter for the design prior under the alternative hypothesis.
 Required for \code{prior_design = "Moment"} and \code{prior_design = "Point"}.
@@ -91,8 +91,9 @@ for \code{alternative = "less"}, \code{0 < location_d < h0}; and for
 A list of class \code{BFpower} containing:
 \itemize{
 \item \code{type}: Character. Test type (always "One-proportion").
+\item \code{threshold}: Numeric scalar. Compelling-evidence threshold.
+\item \code{h0}: Numeric scalar. Null proportion value.
 \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
-\item \code{h0}: The proportion under the null hypothesis.
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 \item \code{analysis_h1}: List describing the analysis prior, containing
 \code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0} for the moment-normal prior), \code{alpha} (alpha parameter),
@@ -102,7 +103,6 @@ A list of class \code{BFpower} containing:
 \code{alpha} (alpha parameter), \code{beta} (beta parameter), and
 \code{scale} (scale parameter).
 \item \code{results}: Data frame of probabilities of compelling/misleading evidence and the required or supplied sample size.
-\item \code{threshold}: Numeric scalar. Compelling-evidence threshold.
 \item \code{setting}: List containing \code{mode_bf}, indicating whether
 sample size determination (\code{1}) or power calculation (\code{0}) is
 performed, and \code{same.priors}, indicating whether the design and
@@ -152,14 +152,14 @@ element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting region o
 is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
 then the region of practical equivalence is \code{[0.3, 0.7]}.
 
-\item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-deviation from \code{h0}, so the interval null extends from \code{h0} to
-\code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+\item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0,
+the interval null extends from \code{h0} to \code{h0 + ROPE}.
+Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
 then the region of practical equivalence is \code{[0.5, 0.7]}.
 
-\item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
-to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
+\item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0,
+the interval null extends from \code{h0 + ROPE} to \code{h0}.
+Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
 then the region of practical equivalence is \code{[0.3, 0.5]}.
 
 }

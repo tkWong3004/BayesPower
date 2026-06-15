@@ -7,9 +7,9 @@
 #'
 #' @param threshold Numeric scalar. Threshold of compelling evidence (must be \eqn{\ge 1}).
 #' @param type_rate Character. Either \code{"positive"} (controls true/false positive rates) or \code{"negative"} (controls true/false negative rates).
-#' @param true_rate Numeric scalar. Target true positive or negative rate (between 0.6 and 0.999).
-#' @param false_rate Numeric scalar. Target false positive or false negative rate (between 0.001 and 0.1).
-#' @param N Numeric integer. Sample size.
+#' @param true_rate Numeric scalar. Target true positive or negative rate (between 0.6 and 0.999) for sample size determination.
+#' @param false_rate Numeric scalar. Target false positive or false negative rate (between 0.001 and 0.1) for sample size determination.
+#' @param N Numeric integer. Sample size for power calculation. If \code{NULL}, sample size determination is performed.
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
 #' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
 #'   equivalence relative to the point null value of zero.
@@ -108,6 +108,7 @@
 #' @return An object of class \code{BFpower} containing:
 #'   \itemize{
 #'     \item \code{type}: Character. Test type (always "One-sample t-test").
+#'     \item \code{threshold}: Numeric scalar. threshold of compelling evidence.
 #'     \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 #'     \item \code{ROPE}: Optional numeric vector or scalar for interval null bounds.
 #'     \item \code{analysis_h1}: List with the analysis prior parameters:
@@ -115,7 +116,6 @@
 #'     \item \code{design_h1}: List with the design prior parameters:
 #'       \code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
 #'     \item \code{results}: Data frame of probabilities: compelling/misleading evidence.
-#'     \item \code{threshold}: Numeric scalar. threshold of compelling evidence.
 #'     \item \code{setting}: List containing \code{mode_bf}, indicating whether
 #'       sample size determination (\code{1}) or power calculation (\code{0}) is
 #'       performed, and \code{same.priors}, indicating whether the design and
@@ -325,12 +325,12 @@ BFpower.ttest.OneSample <- function(
 
   object <- list(
     type = type,
+    threshold = threshold,
     alternative = alternative,
     ROPE = ROPE,
     analysis_h1 = analysis_h1,
     design_h1 = design_h1,
     results = results,
-    threshold = threshold,
     setting = setting
   )
   class(object) <- "BFpower"
@@ -347,10 +347,10 @@ BFpower.ttest.OneSample <- function(
 #' @param type_rate Character. either \code{"positive"} or \code{"negative"}; determines whether to control
 #'   true/false positive or true/false negative rates .
 #' @param true_rate Numeric scalar. Target true positive or negative rate .
-#' @param false_rate Numeric scalar. Target false positive or negative rate .
-#' @param N1 Positive numeric integer. Sample size for group 1, used if \code{r = NULL} (must be \eqn{\ge 2}).
-#' @param N2 Positive numeric integer. Sample size for group 2, used if \code{r = NULL} (must be \eqn{\ge 2}).
-#' @param r Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).
+#' @param false_rate Numeric scalar. Target false positive or false negative rate (between 0.001 and 0.1) for sample size determination.
+#' @param N1 Positive numeric integer. Sample size for group 1 for power calculation, used if \code{r = NULL} (must be \eqn{\ge 2}).
+#' @param N2 Positive numeric integer. Sample size for group 2 for power calculation, used if \code{r = NULL} (must be \eqn{\ge 2}).
+#' @param r Optional numeric scalar. Ratio of sample size \code{N2 / N1} for sample size determination (used if \code{N1} and \code{N2} are NULL).
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
 #' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
 #'   equivalence relative to the point null value of zero.
@@ -451,6 +451,7 @@ BFpower.ttest.OneSample <- function(
 #' @return An object of class \code{BFpower} containing:
 #'   \itemize{
 #'     \item \code{type}: Character. Test type (always "Independent-samples t-test (equal variance)").
+#'     \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 #'     \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 #'     \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 #'     \item \code{analysis_h1}: List with the analysis prior parameters:
@@ -458,7 +459,6 @@ BFpower.ttest.OneSample <- function(
 #'     \item \code{design_h1}:  List with the design prior parameters:
 #'       \code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
 #'     \item \code{results}: Data frame with probabilities of compelling/misleading evidence.
-#'     \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 #'     \item \code{setting}: List containing \code{mode_bf}, indicating whether
 #'       sample size determination (\code{1}) or power calculation (\code{0}) is
 #'       performed, and \code{same.priors}, indicating whether the design and
@@ -715,12 +715,12 @@ BFpower.ttest.TwoSample <- function(threshold ,type_rate = "positive", true_rate
 
   object <- list(
     type = type,
+    threshold = threshold,
     alternative = alternative,
     ROPE = ROPE,
     analysis_h1 = analysis_h1,
     design_h1 = design_h1,
     results = results,
-    threshold = threshold,
     setting = setting
   )
   class(object) <- "BFpower"
@@ -738,10 +738,10 @@ BFpower.ttest.TwoSample <- function(threshold ,type_rate = "positive", true_rate
 #'
 #' @param threshold Numeric scalar. Threshold for compelling evidence (must be \eqn{\ge 1}).
 #' @param type_rate Character. Either `"positive"` (controls true/false positive rates) or `"negative"` (controls true/false negative rates).
-#' @param true_rate Numeric scalar. Targeted true positive rate (if \code{type_rate = "positive"}) or true negative rate (if \code{type_rate = "negative"}).
-#' @param false_rate Numeric scalar. Targeted false positive rate (if \code{type_rate  = "positive"}) or false negative rate (if \code{type_rate = "negative"}).
-#' @param N Numeric integer. Sample size. Only required if the goal is not sample size determination, but rather to calculate the probability of obtaining compelling or misleading evidence for a given sample size.
-#' @param h0 Numeric scalar. Null rho correlation value. Must be between -0.8 and 0.8.
+#' @param true_rate Numeric scalar. Target true positive or negative rate (between 0.6 and 0.999) for sample size determination.
+#' @param false_rate Numeric scalar. Target false positive or false negative rate (between 0.001 and 0.1) for sample size determination.
+#' @param N Numeric integer. Sample size for power calculation. If \code{NULL}, sample size determination is performed.
+#' @param h0 Numeric scalar. Null value of the correlation. Must be a numeric scalar between -0.8 and 0.8.
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
 #' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
 #'   equivalence relative to the point null value of \code{h0}.
@@ -754,14 +754,14 @@ BFpower.ttest.TwoSample <- function(threshold ,type_rate = "positive", true_rate
 #'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
 #'   then the region of practical equivalence is \code{[-0.1, 0.3]}.
 #'
-#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
-#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0,
+#'   the interval null extends from \code{h0} to \code{h0 + ROPE}.
+#'   Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2},
 #'   then the region of practical equivalence is \code{[0.1, 0.3]}.
 #'
-#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
-#'   to \code{h0}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0,
+#'   the interval null extends from \code{h0 + ROPE} to \code{h0}.
+#'   Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2},
 #'   then the region of practical equivalence is \code{[-0.1, 0.1]}.
 #'
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis:
@@ -826,14 +826,14 @@ BFpower.ttest.TwoSample <- function(threshold ,type_rate = "positive", true_rate
 #'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
 #'   then the region of practical equivalence is \code{[-0.1, 0.3]}.
 #'
-#'   \item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
-#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   \item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0,
+#'   the interval null extends from \code{h0} to \code{h0 + ROPE}.
+#'   Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2},
 #'   then the region of practical equivalence is \code{[0.1, 0.3]}.
 #'
-#'   \item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
-#'   to \code{h0}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   \item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0,
+#'   the interval null extends from \code{h0 + ROPE} to \code{h0}.
+#'   Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2},
 #'   then the region of practical equivalence is \code{[-0.1, 0.1]}.
 #'
 #' }
@@ -871,15 +871,15 @@ BFpower.ttest.TwoSample <- function(threshold ,type_rate = "positive", true_rate
 #' @return A list of class \code{BFpower} containing:
 #' \itemize{
 #'   \item \code{type}: Character. Test type (always "Correlation").
-#'   \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
+#'   \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 #'   \item \code{h0}: Numeric scalar. the value of correlation under the null hypothesis.
+#'   \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 #'   \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 #'   \item \code{analysis_h1}: List with the analysis prior parameters:
-#'   \code{prior}, \code{location} (being the same as \code{h0} for the moment-normal prior, otherwise it is \code{NULL}), \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
+#'   \code{prior}, \code{k}, \code{alpha}, \code{beta},\code{location} (being the same as \code{h0} for the moment-normal prior, otherwise it is \code{NULL}), and \code{scale}.
 #'   \item \code{design_h1}: List with the design prior parameters:
-#'   \code{prior}, \code{location}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
+#'   \code{prior}, \code{k}, \code{alpha}, \code{beta}, \code{location}, and \code{scale}.
 #'   \item \code{results}: Data frame with the probabilities of compelling/misleading evidence, and with the required sample size.
-#'   \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 #'     \item \code{setting}: List containing \code{mode_bf}, indicating whether
 #'       sample size determination (\code{1}) or power calculation (\code{0}) is
 #'       performed, and \code{same.priors}, indicating whether the design and
@@ -1160,10 +1160,10 @@ BFpower.cor<- function(threshold , type_rate="positive",true_rate, false_rate ,N
   )
   analysis_h1 <- list(
     prior = prior_analysis,
-    location = if(prior_analysis=="Moment") h0 else NULL,
     k = k,
     alpha=alpha,
     beta=beta,
+    location = if(prior_analysis=="Moment") h0 else NULL,
     scale=scale
   )
 
@@ -1172,10 +1172,10 @@ BFpower.cor<- function(threshold , type_rate="positive",true_rate, false_rate ,N
     # Base fields always included
     design_h1 <-  list(
       prior = prior_design,
-      location=location_d,
       k = k_d,
       alpha=alpha_d,
       beta=beta_d,
+      location=location_d,
       scale=scale_d
     )
 
@@ -1188,13 +1188,13 @@ BFpower.cor<- function(threshold , type_rate="positive",true_rate, false_rate ,N
   }
   object <- list(
     type =  type,
-    alternative = alternative,
+    threshold = threshold,
     h0=h0,
+    alternative = alternative,
     ROPE = ROPE,
     analysis_h1 = analysis_h1,
     design_h1 = design_h1,
     results = results,
-    threshold = threshold,
     setting = setting
   )
   class(object) <- "BFpower"
@@ -1214,11 +1214,9 @@ BFpower.cor<- function(threshold , type_rate="positive",true_rate, false_rate ,N
 #' @param threshold Numeric scalar. Threshold for compelling evidence (must be \eqn{\ge 1}).
 #' @param type_rate Character. Either `"positive"` (control true/false positive rates) or
 #'   `"negative"` (control true/false negative rates).
-#' @param true_rate Numeric scalar. Targeted true positive or true negative rate (used only when
-#'   sample size determination is requested; \code{N = NULL}).
-#' @param false_rate Numeric scalar. Targeted false positive or false negative rate (used only when
-#'   sample size determination is requested; \code{N = NULL}).
-#' @param N Optional integer. Sample size. If \code{NULL}, sample size determination is performed.
+#' @param true_rate Numeric scalar. Target true positive or negative rate (between 0.6 and 0.999) for sample size determination.
+#' @param false_rate Numeric scalar. Target false positive or false negative rate (between 0.001 and 0.1) for sample size determination.
+#' @param N Optional integer. Sample size for power calculation. If \code{NULL}, sample size determination is performed.
 #'   If \code{N} of at least \code{k + 1} is supplied, power calculation for a fixed sample size is performed.
 #' @param p Numeric integer. Number of predictors in the reduced model.
 #' @param k Numeric integer. Number of predictors in the full model (must satisfy \code{k > p}).
@@ -1300,19 +1298,16 @@ BFpower.cor<- function(threshold , type_rate="positive",true_rate, false_rate ,N
 #' @return A list of class \code{BFpower} containing:
 #'   \itemize{
 #'     \item \code{type}: Character. Test type (always "Regression/ANOVA").
+#'     \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 #'     \item \code{p}: Numeric integer. Number of predictors in the reduced model.
 #'     \item \code{k}: Numeric integer. Number of predictors in the full model (must satisfy \code{k > p}).
 #'     \item \code{ROPE}: Optional numeric scalar. Interval bounds under the null, if any.
 #'     \item \code{analysis_h1}: List containing the analysis prior specification, including
 #'       the prior distribution \code{prior}, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
-#'     \item \code{design_h1}: List describing the design prior. If
-#'     \code{prior_design = NULL}, all entries in this list are returned as
-#'     \code{NULL}, indicating that no separate design prior was specified and
-#'     the analysis prior is used for design. Otherwise, the list contains
+#'     \item \code{design_h1}: List containing the design prior specification, including
 #'       the prior distribution \code{prior}, the scale \code{rscale}, \code{f_m}, and degrees of freedom \code{dff}.
 #'     \item \code{results}: Data frame of probabilities of compelling/misleading evidence and
 #'       the required or supplied sample size.
-#'     \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 #'     \item \code{setting}: List containing \code{mode_bf}, indicating whether
 #'       sample size determination (\code{1}) or power calculation (\code{0}) is
 #'       performed, and \code{same.priors}, indicating whether the design and
@@ -1544,13 +1539,13 @@ BFpower.f.test <- function(threshold, type_rate="positive",true_rate, false_rate
 
   object <- list(
     type = type,
+    threshold = threshold,
     k=k,
     p=p,
     ROPE = ROPE,
     analysis_h1 = analysis_h1,
     design_h1 = design_h1,
     results = results,
-    threshold = threshold,
     setting = setting
   )
   class(object) <- "BFpower"
@@ -1568,10 +1563,10 @@ BFpower.f.test <- function(threshold, type_rate="positive",true_rate, false_rate
 #'
 #' @param threshold Numeric scalar. Threshold for compelling evidence (must be \eqn{\ge 1}).
 #' @param type_rate Character. Either `"positive"` (controls true/false positive rates) or `"negative"` (controls true/false negative rates).
-#' @param true_rate Numeric scalar. Targeted true positive rate  or true negative rate .
-#' @param false_rate Numeric scalar. Targeted false positive rate  or false negative rate .
-#' @param N Numeric integer. Sample size. If \code{NULL}, sample size determination is performed.
-#' @param h0 Numeric scalar. Null proportion value for the test (numeric scalar between 0.1 and 0.9).
+#' @param true_rate Numeric scalar. Target true positive or negative rate (between 0.6 and 0.999) for sample size determination.
+#' @param false_rate Numeric scalar. Target false positive or false negative rate (between 0.001 and 0.1) for sample size determination.
+#' @param N Numeric integer. Sample size for power calculation. If \code{NULL}, sample size determination is performed.
+#' @param h0 Numeric scalar. Null proportion value (numeric scalar between 0.1 and 0.9).
 #' @param alternative Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).
 #' @param ROPE Optional numeric vector or scalar. Specifies the region of practical
 #'   equivalence relative to the point null value of \code{h0}.
@@ -1584,14 +1579,14 @@ BFpower.f.test <- function(threshold, type_rate="positive",true_rate, false_rate
 #'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
 #'   then the region of practical equivalence is \code{[0.3, 0.7]}.
 #'
-#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
-#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0,
+#'   the interval null extends from \code{h0} to \code{h0 + ROPE}.
+#'   Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
 #'   then the region of practical equivalence is \code{[0.5, 0.7]}.
 #'
-#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
-#'   to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0,
+#'   the interval null extends from \code{h0 + ROPE} to \code{h0}.
+#'   Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
 #'   then the region of practical equivalence is \code{[0.3, 0.5]}.
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis: \code{"beta"} or \code{"Moment"} (normal-moment prior).
 #' @param alpha Numeric scalar.  Alpha parameter of the analysis beta prior under the alternative hypothesis
@@ -1600,8 +1595,8 @@ BFpower.f.test <- function(threshold, type_rate="positive",true_rate, false_rate
 #'   (required if \code{prior_analysis = "beta"}).
 #' @param scale Numeric scalar.  Scale parameter of the analysis prior under the alternative hypothesis (required if \code{prior_analysis = "Moment"}).
 #' @param prior_design Character. Design prior under the alternative hypothesis: \code{"beta"}, \code{"Moment"}(normal-moment prior), or \code{"Point"}.
-#' @param alpha_d Numeric scalar. Alpha parameter of the design beta prior under the alternative hypothesis(\code{"beta"}).
-#' @param beta_d Numeric scalar. Beta Parameter of the design beta prior under the alternative hypothesis(\code{"beta"}).
+#' @param alpha_d Numeric scalar. Alpha parameter of the design beta prior under the alternative hypothesis (required if \code{prior_design = "beta"}).
+#' @param beta_d Numeric scalar. Beta Parameter of the design beta prior under the alternative hypothesis (required if \code{prior_design = "beta"}).
 #' @param location_d Numeric scalar. Location parameter for the design prior under the alternative hypothesis.
 #'   Required for \code{prior_design = "Moment"} and \code{prior_design = "Point"}.
 #'   For \code{"Moment"}, it must satisfy \code{0 < location_d < 1}.
@@ -1648,14 +1643,14 @@ BFpower.f.test <- function(threshold, type_rate="positive",true_rate, false_rate
 #'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
 #'   then the region of practical equivalence is \code{[0.3, 0.7]}.
 #'
-#'   \item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
-#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   \item For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0,
+#'   the interval null extends from \code{h0} to \code{h0 + ROPE}.
+#'   Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
 #'   then the region of practical equivalence is \code{[0.5, 0.7]}.
 #'
-#'   \item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
-#'   to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   \item For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0,
+#'   the interval null extends from \code{h0 + ROPE} to \code{h0}.
+#'   Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
 #'   then the region of practical equivalence is \code{[0.3, 0.5]}.
 #'
 #' }
@@ -1683,8 +1678,9 @@ BFpower.f.test <- function(threshold, type_rate="positive",true_rate, false_rate
 #' @return A list of class \code{BFpower} containing:
 #' \itemize{
 #'   \item \code{type}: Character. Test type (always "One-proportion").
+#'   \item \code{threshold}: Numeric scalar. Compelling-evidence threshold.
+#'   \item \code{h0}: Numeric scalar. Null proportion value.
 #'   \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
-#'   \item \code{h0}: The proportion under the null hypothesis.
 #'   \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 #'   \item \code{analysis_h1}: List describing the analysis prior, containing
 #'     \code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0} for the moment-normal prior), \code{alpha} (alpha parameter),
@@ -1694,7 +1690,6 @@ BFpower.f.test <- function(threshold, type_rate="positive",true_rate, false_rate
 #'     \code{alpha} (alpha parameter), \code{beta} (beta parameter), and
 #'     \code{scale} (scale parameter).
 #'   \item \code{results}: Data frame of probabilities of compelling/misleading evidence and the required or supplied sample size.
-#'   \item \code{threshold}: Numeric scalar. Compelling-evidence threshold.
 #'     \item \code{setting}: List containing \code{mode_bf}, indicating whether
 #'       sample size determination (\code{1}) or power calculation (\code{0}) is
 #'       performed, and \code{same.priors}, indicating whether the design and
@@ -1950,13 +1945,13 @@ BFpower.bin <- function(threshold, type_rate="positive"  ,true_rate , false_rate
 
   object <- list(
     type = type,
-    alternative = alternative,
+    threshold = threshold,
     h0=h0,
+    alternative = alternative,
     ROPE = ROPE,
     analysis_h1 = analysis_h1,
     design_h1 = design_h1,
     results = results,
-    threshold = threshold,
     setting = setting
   )
   class(object) <- "BFpower"
@@ -1977,23 +1972,23 @@ BFpower.bin <- function(threshold, type_rate="positive"  ,true_rate , false_rate
 #'
 #' @param threshold Numeric scalar. Threshold of compelling evidence (must be \eqn{\ge 1}).
 #' @param type_rate Character. Choose \code{"positive"} to control true positive rate or \code{"negative"} to control true negative rate.
-#' @param true_rate Numeric scalar. Targeted true positive rate (if \code{type_rate = "positive"}) or true negative rate (if \code{type_rate = "negative"}).
-#' @param N1 Optional positive integer. Sample size for group 1. Must be supplied together with \code{N2}; if both are \code{NULL}, sample size determination is performed.
-#' @param N2 Optional positive integer. Sample size for group 2. Must be supplied together with \code{N1}; if both are \code{NULL}, sample size determination is performed.
-#' @param a0 Positive numeric scalar. Alpha parameter of the Beta prior under the null hypothesis.
-#' @param b0 Positive numeric scalar. Beta parameter of the Beta prior under the null hypothesis.
-#' @param a1 Positive numeric scalar. Alpha parameter of the Beta prior for group 1 under the alternative hypothesis.
-#' @param b1 Positive numeric scalar. Beta parameter of the Beta prior for group 1 under the alternative hypothesis.
-#' @param a2 Positive numeric scalar. Alpha parameter of the Beta prior for group 2 under the alternative hypothesis.
-#' @param b2 Positive numeric scalar. Beta parameter of the Beta prior for group 2 under the alternative hypothesis.
+#' @param true_rate Numeric scalar. Target true positive rate (between 0.6 and 0.999) for sample size determination.
+#' @param N1 Optional positive integer. Sample size for group 1 for power calculation. Must be supplied together with \code{N2}; if both are \code{NULL}, sample size determination is performed.
+#' @param N2 Optional positive integer. Sample size for group 2 for power calculation. Must be supplied together with \code{N1}; if both are \code{NULL}, sample size determination is performed.
+#' @param a0 Positive numeric scalar. Alpha parameter of the Beta analysis prior under the null hypothesis.
+#' @param b0 Positive numeric scalar. Beta parameter of the Beta analysis prior under the null hypothesis.
+#' @param a1 Positive numeric scalar. Alpha parameter of the Beta analysis prior for group 1 under the alternative hypothesis.
+#' @param b1 Positive numeric scalar. Beta parameter of the Beta analysis prior for group 1 under the alternative hypothesis.
+#' @param a2 Positive numeric scalar. Alpha parameter of the Beta analysis prior for group 2 under the alternative hypothesis.
+#' @param b2 Positive numeric scalar. Beta parameter of the Beta analysis prior for group 2 under the alternative hypothesis.
 #' @param prior_design_1 Character. The design prior of group 1: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).
-#' @param a1d Positive numeric scalar. Alpha parameter of the design prior for group 1 (used if \code{prior_design_1 = "beta"}).
-#' @param b1d Positive numeric scalar. Beta parameter of the design prior for group 1 (used if \code{prior_design_1 = "beta"}).
-#' @param dp1 Numeric scalar. True proportion for group 1 in the design prior (used if \code{prior_design_1 = "Point"}).
+#' @param a1d Positive numeric scalar. Alpha parameter of the design prior for group 1 (required if \code{prior_design_1 = "beta"}).
+#' @param b1d Positive numeric scalar. Beta parameter of the design prior for group 1 (required if \code{prior_design_1 = "beta"}).
+#' @param dp1 Numeric scalar. True proportion for group 1 in the design prior (required if \code{prior_design_1 = "Point"}).
 #' @param prior_design_2 Character. The design prior of group 2: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).
-#' @param a2d Positive numeric scalar. Alpha parameter of the design prior for group 2 (used if \code{prior_design_2 = "beta"}).
-#' @param b2d Positive numeric scalar. Beta parameter of the design prior for group 2 (used if \code{prior_design_2 = "beta"}).
-#' @param dp2 Numeric scalar. True proportion for group 2 in the design prior (used if \code{prior_design_2 = "Point"}).
+#' @param a2d Positive numeric scalar. Alpha parameter of the design prior for group 2 (required if \code{prior_design_2 = "beta"}).
+#' @param b2d Positive numeric scalar. Beta parameter of the design prior for group 2 (required if \code{prior_design_2 = "beta"}).
+#' @param dp2 Numeric scalar. True proportion for group 2 in the design prior (required if \code{prior_design_2 = "Point"}).
 #' @details
 #'
 #' \strong{Sample Size Determination Mode (when \code{N1 = NULL} and \code{N2 = NULL}):}
@@ -2044,6 +2039,7 @@ BFpower.bin <- function(threshold, type_rate="positive"  ,true_rate , false_rate
 #' @return A list of class \code{BFpower} containing:
 #'   \itemize{
 #'     \item \code{type}: Character. Test type (always "Two-proportions").
+#'     \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 #'     \item \code{analysis_h0}: List of analysis prior parameters under the null, containing \code{a} and \code{b}.
 #'     \item \code{analysis_h1_theta_1}: List of analysis prior parameters for group 1 under the alternative, containing \code{a} and \code{b}.
 #'     \item \code{analysis_h1_theta_2}: List of analysis prior parameters for group 2 under the alternative, containing \code{a} and \code{b}.
@@ -2057,7 +2053,6 @@ BFpower.bin <- function(threshold, type_rate="positive"  ,true_rate , false_rate
 #'       \code{p} (point-prior proportion).
 #'     \item \code{results}: Data frame of probabilities of compelling and misleading evidence.
 #'     \item \code{grid}: Grid used internally for the computation of the results (i.e., true/false positive and negative rates) and the plot method.
-#'     \item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 #'   \item \code{mode_bf}: Numeric scalar. Indicates whether sample size determination (\code{1}) or power calculation (\code{0}) is performed. This output is only used internally in the print method.
 #'   }
 #' @examples
@@ -2334,6 +2329,7 @@ BFpower.props <- function(threshold ,type_rate="positive", true_rate ,
 
   object <- list(
     type = type,
+    threshold = threshold,
     analysis_h0=analysis_h0,
     analysis_h1_theta_1= analysis_h1_theta_1,
     analysis_h1_theta_2=analysis_h1_theta_2,
@@ -2341,7 +2337,6 @@ BFpower.props <- function(threshold ,type_rate="positive", true_rate ,
     design_h1_theta_2=design_h1_theta_2,
     results = results_out,
     grid= grid_out,
-    threshold = threshold,
     mode_bf = mode_bf
   )
   class(object) <- "BFpower"
@@ -2685,14 +2680,14 @@ BF10.ttest.TwoSample <- function(tval, N1, N2,alternative, ROPE = NULL, prior_an
 #'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.1}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
 #'   then the region of practical equivalence is \code{[-0.1, 0.3]}.
 #'
-#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
-#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0,
+#'   the interval null extends from \code{h0} to \code{h0 + ROPE}.
+#'   Example: If \code{h0 = 0.1}, \code{alternative = "greater"}, \code{ROPE = 0.2},
 #'   then the region of practical equivalence is \code{[0.1, 0.3]}.
 #'
-#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
-#'   to \code{h0}. Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0,
+#'   the interval null extends from \code{h0 + ROPE} to \code{h0}.
+#'   Example: If \code{h0 = 0.1}, \code{alternative = "less"}, \code{ROPE = -0.2},
 #'   then the region of practical equivalence is \code{[-0.1, 0.1]}.
 #'
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis: default beta (\code{"d_beta"}), beta (\code{"beta"}), or normal-moment (\code{"Moment"}).
@@ -2711,7 +2706,7 @@ BF10.ttest.TwoSample <- function(tval, N1, N2,alternative, ROPE = NULL, prior_an
 #'   \item \code{r}: Numeric scalar. Observed correlation coefficient.
 #'   \item \code{n}: Positive integer scalar. Sample size.
 #'   \item \code{analysis_h1}: List with the analysis prior parameters:
-#'   \code{prior}, \code{location}, \code{k}, \code{alpha}, \code{beta}, and \code{scale}.
+#'   \code{prior}, \code{k}, \code{alpha}, \code{beta},\code{location} (being the same as \code{h0} for the moment-normal prior, otherwise it is \code{NULL}), and \code{scale}.
 #'   \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 #'   \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 #'   \item \code{p.value}: Numeric scalar. p-value.
@@ -3007,14 +3002,14 @@ BF10.f.test <- function(fval, df1, df2, ROPE = NULL, prior_analysis, rscale, f_m
 #'   is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
 #'   then the region of practical equivalence is \code{[0.3, 0.7]}.
 #'
-#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-#'   deviation from \code{h0}, so the interval null extends from \code{h0} to
-#'   \code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+#'   For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0,
+#'   the interval null extends from \code{h0} to \code{h0 + ROPE}.
+#'   Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
 #'   then the region of practical equivalence is \code{[0.5, 0.7]}.
 #'
-#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-#'   deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
-#'   to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
+#'   For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0,
+#'   the interval null extends from \code{h0 + ROPE} to \code{h0}.
+#'   Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
 #'   then the region of practical equivalence is \code{[0.3, 0.5]}.
 #'
 #' @param prior_analysis Character. The analysis prior under the alternative hypothesis:
@@ -3182,12 +3177,12 @@ BF10.bin.test <- function( n,x, h0, alternative, ROPE = NULL, prior_analysis, al
 #' @param x1 Non-negative numeric integer. Number of successes observed in group 1 (must be \eqn{\ge 0} and \eqn{\le N_1} ).
 #' @param N2 Positive numeric integer. Sample size for group 2 (must be > 0).
 #' @param x2 Non-negative numeric integer. Number of successes observed in group 2 (must be \eqn{\ge 0} and \eqn{\le N_2}).
-#' @param a0 Positive numeric scalar. Alpha parameter of the Beta prior under the null hypothesis.
-#' @param b0 Positive numeric scalar. Beta parameter of the Beta prior under the null hypothesis.
-#' @param a1 Positive numeric scalar. Alpha parameter of the Beta prior for group 1 under the alternative hypothesis.
-#' @param b1 Positive numeric scalar. Beta parameter of the Beta prior for group 1 under the alternative hypothesis.
-#' @param a2 Positive numeric scalar. Alpha parameter of the Beta prior for group 2 under the alternative hypothesis.
-#' @param b2 Positive numeric scalar. Beta parameter of the Beta prior for group 2 under the alternative hypothesis.
+#' @param a0 Positive numeric scalar. Alpha parameter of the Beta analysis prior under the null hypothesis.
+#' @param b0 Positive numeric scalar. Beta parameter of the Beta analysis prior under the null hypothesis.
+#' @param a1 Positive numeric scalar. Alpha parameter of the Beta analysis prior for group 1 under the alternative hypothesis.
+#' @param b1 Positive numeric scalar. Beta parameter of the Beta analysis prior for group 1 under the alternative hypothesis.
+#' @param a2 Positive numeric scalar. Alpha parameter of the Beta analysis prior for group 2 under the alternative hypothesis.
+#' @param b2 Positive numeric scalar. Beta parameter of the Beta analysis prior for group 2 under the alternative hypothesis.
 #'
 #' @return A list of class \code{BFvalue} containing:
 #' \itemize{

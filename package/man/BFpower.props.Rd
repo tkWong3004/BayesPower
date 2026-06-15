@@ -31,44 +31,45 @@ BFpower.props(
 
 \item{type_rate}{Character. Choose \code{"positive"} to control true positive rate or \code{"negative"} to control true negative rate.}
 
-\item{true_rate}{Numeric scalar. Targeted true positive rate (if \code{type_rate = "positive"}) or true negative rate (if \code{type_rate = "negative"}).}
+\item{true_rate}{Numeric scalar. Target true positive rate (between 0.6 and 0.999) for sample size determination.}
 
-\item{N1}{Optional positive integer. Sample size for group 1. Must be supplied together with \code{N2}; if both are \code{NULL}, sample size determination is performed.}
+\item{N1}{Optional positive integer. Sample size for group 1 for power calculation. Must be supplied together with \code{N2}; if both are \code{NULL}, sample size determination is performed.}
 
-\item{N2}{Optional positive integer. Sample size for group 2. Must be supplied together with \code{N1}; if both are \code{NULL}, sample size determination is performed.}
+\item{N2}{Optional positive integer. Sample size for group 2 for power calculation. Must be supplied together with \code{N1}; if both are \code{NULL}, sample size determination is performed.}
 
-\item{a0}{Positive numeric scalar. Alpha parameter of the Beta prior under the null hypothesis.}
+\item{a0}{Positive numeric scalar. Alpha parameter of the Beta analysis prior under the null hypothesis.}
 
-\item{b0}{Positive numeric scalar. Beta parameter of the Beta prior under the null hypothesis.}
+\item{b0}{Positive numeric scalar. Beta parameter of the Beta analysis prior under the null hypothesis.}
 
-\item{a1}{Positive numeric scalar. Alpha parameter of the Beta prior for group 1 under the alternative hypothesis.}
+\item{a1}{Positive numeric scalar. Alpha parameter of the Beta analysis prior for group 1 under the alternative hypothesis.}
 
-\item{b1}{Positive numeric scalar. Beta parameter of the Beta prior for group 1 under the alternative hypothesis.}
+\item{b1}{Positive numeric scalar. Beta parameter of the Beta analysis prior for group 1 under the alternative hypothesis.}
 
-\item{a2}{Positive numeric scalar. Alpha parameter of the Beta prior for group 2 under the alternative hypothesis.}
+\item{a2}{Positive numeric scalar. Alpha parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
 
-\item{b2}{Positive numeric scalar. Beta parameter of the Beta prior for group 2 under the alternative hypothesis.}
+\item{b2}{Positive numeric scalar. Beta parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
 
 \item{prior_design_1}{Character. The design prior of group 1: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
-\item{a1d}{Positive numeric scalar. Alpha parameter of the design prior for group 1 (used if \code{prior_design_1 = "beta"}).}
+\item{a1d}{Positive numeric scalar. Alpha parameter of the design prior for group 1 (required if \code{prior_design_1 = "beta"}).}
 
-\item{b1d}{Positive numeric scalar. Beta parameter of the design prior for group 1 (used if \code{prior_design_1 = "beta"}).}
+\item{b1d}{Positive numeric scalar. Beta parameter of the design prior for group 1 (required if \code{prior_design_1 = "beta"}).}
 
-\item{dp1}{Numeric scalar. True proportion for group 1 in the design prior (used if \code{prior_design_1 = "Point"}).}
+\item{dp1}{Numeric scalar. True proportion for group 1 in the design prior (required if \code{prior_design_1 = "Point"}).}
 
 \item{prior_design_2}{Character. The design prior of group 2: \code{"beta"}, \code{"Point"}, or \code{"same"} (if \code{"same"}, the design prior is identical to the analysis prior).}
 
-\item{a2d}{Positive numeric scalar. Alpha parameter of the design prior for group 2 (used if \code{prior_design_2 = "beta"}).}
+\item{a2d}{Positive numeric scalar. Alpha parameter of the design prior for group 2 (required if \code{prior_design_2 = "beta"}).}
 
-\item{b2d}{Positive numeric scalar. Beta parameter of the design prior for group 2 (used if \code{prior_design_2 = "beta"}).}
+\item{b2d}{Positive numeric scalar. Beta parameter of the design prior for group 2 (required if \code{prior_design_2 = "beta"}).}
 
-\item{dp2}{Numeric scalar. True proportion for group 2 in the design prior (used if \code{prior_design_2 = "Point"}).}
+\item{dp2}{Numeric scalar. True proportion for group 2 in the design prior (required if \code{prior_design_2 = "Point"}).}
 }
 \value{
 A list of class \code{BFpower} containing:
 \itemize{
 \item \code{type}: Character. Test type (always "Two-proportions").
+\item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 \item \code{analysis_h0}: List of analysis prior parameters under the null, containing \code{a} and \code{b}.
 \item \code{analysis_h1_theta_1}: List of analysis prior parameters for group 1 under the alternative, containing \code{a} and \code{b}.
 \item \code{analysis_h1_theta_2}: List of analysis prior parameters for group 2 under the alternative, containing \code{a} and \code{b}.
@@ -82,7 +83,6 @@ group 2 under the alternative hypothesis. The list contains \code{prior} (prior 
 \code{p} (point-prior proportion).
 \item \code{results}: Data frame of probabilities of compelling and misleading evidence.
 \item \code{grid}: Grid used internally for the computation of the results (i.e., true/false positive and negative rates) and the plot method.
-\item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 \item \code{mode_bf}: Numeric scalar. Indicates whether sample size determination (\code{1}) or power calculation (\code{0}) is performed. This output is only used internally in the print method.
 }
 }

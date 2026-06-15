@@ -32,13 +32,13 @@ true/false positive or true/false negative rates .}
 
 \item{true_rate}{Numeric scalar. Target true positive or negative rate .}
 
-\item{false_rate}{Numeric scalar. Target false positive or negative rate .}
+\item{false_rate}{Numeric scalar. Target false positive or false negative rate (between 0.001 and 0.1) for sample size determination.}
 
-\item{N1}{Positive numeric integer. Sample size for group 1, used if \code{r = NULL} (must be \eqn{\ge 2}).}
+\item{N1}{Positive numeric integer. Sample size for group 1 for power calculation, used if \code{r = NULL} (must be \eqn{\ge 2}).}
 
-\item{N2}{Positive numeric integer. Sample size for group 2, used if \code{r = NULL} (must be \eqn{\ge 2}).}
+\item{N2}{Positive numeric integer. Sample size for group 2 for power calculation, used if \code{r = NULL} (must be \eqn{\ge 2}).}
 
-\item{r}{Optional numeric scalar. Ratio of sample size \code{N2 / N1} (used if \code{N1} and \code{N2} are NULL).}
+\item{r}{Optional numeric scalar. Ratio of sample size \code{N2 / N1} for sample size determination (used if \code{N1} and \code{N2} are NULL).}
 
 \item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
@@ -82,6 +82,7 @@ Not used when \code{prior_design = "Point"}.}
 An object of class \code{BFpower} containing:
 \itemize{
 \item \code{type}: Character. Test type (always "Independent-samples t-test (equal variance)").
+\item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 \item \code{analysis_h1}: List with the analysis prior parameters:
@@ -89,7 +90,6 @@ An object of class \code{BFpower} containing:
 \item \code{design_h1}:  List with the design prior parameters:
 \code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
 \item \code{results}: Data frame with probabilities of compelling/misleading evidence.
-\item \code{threshold}: Numeric scalar. Threshold of compelling evidence.
 \item \code{setting}: List containing \code{mode_bf}, indicating whether
 sample size determination (\code{1}) or power calculation (\code{0}) is
 performed, and \code{same.priors}, indicating whether the design and

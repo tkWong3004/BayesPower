@@ -36,14 +36,14 @@ element is positive (i.e., \code{ROPE[1] < 0 < ROPE[2]}). The resulting region o
 is \code{[h0 + ROPE[1], h0 + ROPE[2]]}. Example: If \code{h0 = 0.5}, \code{alternative = "two.sided"}, \code{ROPE = c(-0.2, 0.2)},
 then the region of practical equivalence is \code{[0.3, 0.7]}.
 
-For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0, defining an upper
-deviation from \code{h0}, so the interval null extends from \code{h0} to
-\code{h0 + ROPE}. Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
+For \code{alternative = "greater"}, argument \code{ROPE} must be a numeric scalar > 0,
+the interval null extends from \code{h0} to \code{h0 + ROPE}.
+Example: If \code{h0 = 0.5}, \code{alternative = "greater"}, \code{ROPE = 0.2},
 then the region of practical equivalence is \code{[0.5, 0.7]}.
 
-For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0, defining a lower
-deviation from \code{h0}, so the interval null extends from \code{h0 + ROPE}
-to \code{h0}. Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
+For \code{alternative = "less"}, argument \code{ROPE} must be a numeric scalar < 0,
+the interval null extends from \code{h0 + ROPE} to \code{h0}.
+Example: If \code{h0 = 0.5}, \code{alternative = "less"}, \code{ROPE = -0.2},
 then the region of practical equivalence is \code{[0.3, 0.5]}.}
 
 \item{prior_analysis}{Character. The analysis prior under the alternative hypothesis:

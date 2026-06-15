@@ -27,11 +27,11 @@ BFpower.ttest.OneSample(
 
 \item{type_rate}{Character. Either \code{"positive"} (controls true/false positive rates) or \code{"negative"} (controls true/false negative rates).}
 
-\item{true_rate}{Numeric scalar. Target true positive or negative rate (between 0.6 and 0.999).}
+\item{true_rate}{Numeric scalar. Target true positive or negative rate (between 0.6 and 0.999) for sample size determination.}
 
-\item{false_rate}{Numeric scalar. Target false positive or false negative rate (between 0.001 and 0.1).}
+\item{false_rate}{Numeric scalar. Target false positive or false negative rate (between 0.001 and 0.1) for sample size determination.}
 
-\item{N}{Numeric integer. Sample size.}
+\item{N}{Numeric integer. Sample size for power calculation. If \code{NULL}, sample size determination is performed.}
 
 \item{alternative}{Character. The direction of the alternative hypothesis : two-sided (\code{"two.sided"} ), right-sided (\code{"greater"}), or left-sided (\code{"less"}).}
 
@@ -75,6 +75,7 @@ Not used when \code{prior_design = "Point"}.}
 An object of class \code{BFpower} containing:
 \itemize{
 \item \code{type}: Character. Test type (always "One-sample t-test").
+\item \code{threshold}: Numeric scalar. threshold of compelling evidence.
 \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 \item \code{ROPE}: Optional numeric vector or scalar for interval null bounds.
 \item \code{analysis_h1}: List with the analysis prior parameters:
@@ -82,7 +83,6 @@ An object of class \code{BFpower} containing:
 \item \code{design_h1}: List with the design prior parameters:
 \code{prior}, \code{location}, \code{scale}, and optionally \code{dff}.
 \item \code{results}: Data frame of probabilities: compelling/misleading evidence.
-\item \code{threshold}: Numeric scalar. threshold of compelling evidence.
 \item \code{setting}: List containing \code{mode_bf}, indicating whether
 sample size determination (\code{1}) or power calculation (\code{0}) is
 performed, and \code{same.priors}, indicating whether the design and

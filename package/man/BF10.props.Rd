@@ -15,17 +15,17 @@ BF10.props(N1, x1, N2, x2, a0, b0, a1, b1, a2, b2)
 
 \item{x2}{Non-negative numeric integer. Number of successes observed in group 2 (must be \eqn{\ge 0} and \eqn{\le N_2}).}
 
-\item{a0}{Positive numeric scalar. Alpha parameter of the Beta prior under the null hypothesis.}
+\item{a0}{Positive numeric scalar. Alpha parameter of the Beta analysis prior under the null hypothesis.}
 
-\item{b0}{Positive numeric scalar. Beta parameter of the Beta prior under the null hypothesis.}
+\item{b0}{Positive numeric scalar. Beta parameter of the Beta analysis prior under the null hypothesis.}
 
-\item{a1}{Positive numeric scalar. Alpha parameter of the Beta prior for group 1 under the alternative hypothesis.}
+\item{a1}{Positive numeric scalar. Alpha parameter of the Beta analysis prior for group 1 under the alternative hypothesis.}
 
-\item{b1}{Positive numeric scalar. Beta parameter of the Beta prior for group 1 under the alternative hypothesis.}
+\item{b1}{Positive numeric scalar. Beta parameter of the Beta analysis prior for group 1 under the alternative hypothesis.}
 
-\item{a2}{Positive numeric scalar. Alpha parameter of the Beta prior for group 2 under the alternative hypothesis.}
+\item{a2}{Positive numeric scalar. Alpha parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
 
-\item{b2}{Positive numeric scalar. Beta parameter of the Beta prior for group 2 under the alternative hypothesis.}
+\item{b2}{Positive numeric scalar. Beta parameter of the Beta analysis prior for group 2 under the alternative hypothesis.}
 }
 \value{
 A list of class \code{BFvalue} containing:
