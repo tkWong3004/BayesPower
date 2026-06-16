@@ -46,8 +46,7 @@ of practical equivalence, whose lower bound is fixed at zero. Thus,
 equivalent to the null value. If provided, it must be positive.
 
 For example, if \code{ROPE = 0.2}, then the region of practical equivalence
-is \code{[0, 0.2]}.
-Example: If \code{ROPE =  0.2}, then the effective null interval is \code{[0, 0.2]}.}
+is \code{[0, 0.2]}.}
 
 \item{prior_analysis}{Character. The analysis prior model under the alternative hypothesis:
 \code{"effectsize"} or \code{"Moment"}.}

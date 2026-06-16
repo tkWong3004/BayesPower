@@ -96,12 +96,12 @@ A list of class \code{BFpower} containing:
 \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 \item \code{analysis_h1}: List describing the analysis prior, containing
-\code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0} for the moment-normal prior), \code{alpha} (alpha parameter),
-\code{beta} (beta parameter), and \code{scale} (scale parameter).
+\code{prior} (prior distribution) \code{alpha} (alpha parameter),
+\code{beta} (beta parameter),  \code{location} (location parameter being the same as \code{h0} for the moment-normal prior),
+and \code{scale} (scale parameter).
 \item \code{design_h1}: List describing the design prior, containing, the list contains
-\code{prior} (prior distribution), \code{location} (location parameter),
-\code{alpha} (alpha parameter), \code{beta} (beta parameter), and
-\code{scale} (scale parameter).
+\code{prior} (prior distribution), \code{alpha} (alpha parameter), \code{beta} (beta parameter),
+\code{location} (location parameter), and  \code{scale} (scale parameter).
 \item \code{results}: Data frame of probabilities of compelling/misleading evidence and the required or supplied sample size.
 \item \code{setting}: List containing \code{mode_bf}, indicating whether
 sample size determination (\code{1}) or power calculation (\code{0}) is

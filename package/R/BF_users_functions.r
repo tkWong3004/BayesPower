@@ -1227,7 +1227,6 @@ BFpower.cor<- function(threshold , type_rate="positive",true_rate, false_rate ,N
 #'
 #'   For example, if \code{ROPE = 0.2}, then the region of practical equivalence
 #'   is \code{[0, 0.2]}.
-#'   Example: If \code{ROPE =  0.2}, then the effective null interval is \code{[0, 0.2]}.
 #' @param prior_analysis Character. The analysis prior model under the alternative hypothesis:
 #'   \code{"effectsize"} or \code{"Moment"}.
 #' @param rscale Numeric scalar. Scale parameter for the effect-size analysis prior under the alternative hypothesis (required if \code{prior_analysis = "effectsize"}).
@@ -1683,12 +1682,12 @@ BFpower.f.test <- function(threshold, type_rate="positive",true_rate, false_rate
 #'   \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 #'   \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 #'   \item \code{analysis_h1}: List describing the analysis prior, containing
-#'     \code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0} for the moment-normal prior), \code{alpha} (alpha parameter),
-#'     \code{beta} (beta parameter), and \code{scale} (scale parameter).
+#'     \code{prior} (prior distribution) \code{alpha} (alpha parameter),
+#'     \code{beta} (beta parameter),  \code{location} (location parameter being the same as \code{h0} for the moment-normal prior),
+#'      and \code{scale} (scale parameter).
 #'   \item \code{design_h1}: List describing the design prior, containing, the list contains
-#'     \code{prior} (prior distribution), \code{location} (location parameter),
-#'     \code{alpha} (alpha parameter), \code{beta} (beta parameter), and
-#'     \code{scale} (scale parameter).
+#'     \code{prior} (prior distribution), \code{alpha} (alpha parameter), \code{beta} (beta parameter),
+#'     \code{location} (location parameter), and  \code{scale} (scale parameter).
 #'   \item \code{results}: Data frame of probabilities of compelling/misleading evidence and the required or supplied sample size.
 #'     \item \code{setting}: List containing \code{mode_bf}, indicating whether
 #'       sample size determination (\code{1}) or power calculation (\code{0}) is
@@ -1917,9 +1916,9 @@ BFpower.bin <- function(threshold, type_rate="positive"  ,true_rate , false_rate
   )
   analysis_h1 <- list(
     prior = prior_analysis,
-    location = if(prior_analysis == "Moment") location else NULL,
     alpha=alpha,
     beta=beta,
+    location = if(prior_analysis == "Moment") location else NULL,
     scale=scale
   )
 
@@ -1928,9 +1927,9 @@ BFpower.bin <- function(threshold, type_rate="positive"  ,true_rate , false_rate
     # Base fields always included
     design_h1 <-  list(
       prior = prior_design,
-      location = location_d,
       alpha=alpha_d,
       beta=beta_d,
+      location = location_d,
       scale=scale_d
     )
 
@@ -3027,7 +3026,9 @@ BF10.f.test <- function(fval, df1, df2, ROPE = NULL, prior_analysis, rscale, f_m
 #'     \item \code{h0}: Numeric scalar. Null proportion value.
 #'     \item \code{x}: Non-negative integer scalar.  Number of successes.
 #'     \item \code{n}: Positive integer scalar. Sample size.
-#'     \item \code{analysis_h1}: List describing the analysis prior, containing \code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0}),\code{alpha} (alpha parameter), \code{beta} (beta parameter), and \code{scale} (scale parameter).
+#'    \item \code{analysis_h1}: List describing the analysis prior, containing
+#'     \code{prior} (prior distribution) \code{alpha} (alpha parameter),
+#'     \code{beta} (beta parameter),  \code{location} (location parameter being the same as \code{h0} for the moment-normal prior),
 #'     \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 #'     \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 #'     \item \code{p.value}: Numeric scalar. p-value.

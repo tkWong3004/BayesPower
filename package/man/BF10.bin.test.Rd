@@ -65,7 +65,9 @@ An object of class \code{BFvalue} containing:
 \item \code{h0}: Numeric scalar. Null proportion value.
 \item \code{x}: Non-negative integer scalar.  Number of successes.
 \item \code{n}: Positive integer scalar. Sample size.
-\item \code{analysis_h1}: List describing the analysis prior, containing \code{prior} (prior distribution), \code{location} (location parameter being the same as \code{h0}),\code{alpha} (alpha parameter), \code{beta} (beta parameter), and \code{scale} (scale parameter).
+\item \code{analysis_h1}: List describing the analysis prior, containing
+\code{prior} (prior distribution) \code{alpha} (alpha parameter),
+\code{beta} (beta parameter),  \code{location} (location parameter being the same as \code{h0} for the moment-normal prior),
 \item \code{alternative}: Character. The direction of the alternative hypothesis (\code{"two.sided"}, \code{"greater"}, or \code{"less"}).
 \item \code{ROPE}: Optional numeric vector or scalar. Interval bounds under the null, if any.
 \item \code{p.value}: Numeric scalar. p-value.
