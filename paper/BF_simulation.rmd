@@ -259,8 +259,8 @@ TPR <- switch(
   } else {
     mean(if (t.cri.h1 > 0) tval_h1 > t.cri.h1 else tval_h1 < t.cri.h1)
   },
-  "greater" = mean(tval_h1 > max(t.cri.h1)),
-  "less" = mean(tval_h1 < max(t.cri.h1))
+  "greater" = mean(tval_h1 > t.cri.h1),
+  "less" = mean(tval_h1 < t.cri.h1)
 )
 
 FPR <- switch(
@@ -270,8 +270,8 @@ FPR <- switch(
   } else {
     mean(if (t.cri.h1 > 0) tval_h0 > t.cri.h1 else tval_h0 < t.cri.h1)
   },
-  "greater" = mean(tval_h0 > max(t.cri.h1)),
-  "less" = mean(tval_h0 < max(t.cri.h1))
+  "greater" = mean(tval_h0 > t.cri.h1),
+  "less" = mean(tval_h0 < t.cri.h1)
 )
 
 if (any(t.cri.h0 == "bound cannot be found")) {
@@ -285,8 +285,8 @@ if (any(t.cri.h0 == "bound cannot be found")) {
     } else {
       mean(if (t.cri.h0 > 0) tval_h0 < t.cri.h0 else tval_h0 > t.cri.h0)
     },
-    "greater" = mean(tval_h0 < max(t.cri.h0)),
-    "less" = mean(tval_h0 > min(t.cri.h0))
+    "greater" = mean(tval_h0 < t.cri.h0),
+    "less" = mean(tval_h0 > t.cri.h0)
   )
 
   FNR <- switch(
@@ -296,8 +296,8 @@ if (any(t.cri.h0 == "bound cannot be found")) {
     } else {
       mean(if (t.cri.h0 > 0) tval_h1 < t.cri.h0 else tval_h1 > t.cri.h0)
     },
-    "greater" = mean(tval_h1 < max(t.cri.h0)),
-    "less" = mean(tval_h1 > min(t.cri.h0))
+    "greater" = mean(tval_h1 < t.cri.h0),
+    "less" = mean(tval_h1 > t.cri.h0)
   )
 }
   
@@ -574,8 +574,8 @@ TPR <- switch(
   } else {
     mean(if (t.cri.h1 > 0) tval_h1 > t.cri.h1 else tval_h1 < t.cri.h1)
   },
-  "greater" = mean(tval_h1 > max(t.cri.h1)),
-  "less" = mean(tval_h1 < max(t.cri.h1))
+  "greater" = mean(tval_h1 > t.cri.h1),
+  "less" = mean(tval_h1 < t.cri.h1)
 )
 
 FPR <- switch(
@@ -585,8 +585,8 @@ FPR <- switch(
   } else {
     mean(if (t.cri.h1 > 0) tval_h0 > t.cri.h1 else tval_h0 < t.cri.h1)
   },
-  "greater" = mean(tval_h0 > max(t.cri.h1)),
-  "less" = mean(tval_h0 < max(t.cri.h1))
+  "greater" = mean(tval_h0 > t.cri.h1),
+  "less" = mean(tval_h0 < t.cri.h1)
 )
 
 if (any(t.cri.h0 == "bound cannot be found")) {
@@ -603,8 +603,8 @@ if (any(t.cri.h0 == "bound cannot be found")) {
     } else {
       mean(if (t.cri.h0 > 0) tval_h0 < t.cri.h0 else tval_h0 > t.cri.h0)
     },
-    "greater" = mean(tval_h0 < max(t.cri.h0)),
-    "less" = mean(tval_h0 > min(t.cri.h0))
+    "greater" = mean(tval_h0 < t.cri.h0),
+    "less" = mean(tval_h0 > t.cri.h0)
   )
 
   FNR <- switch(
@@ -614,8 +614,8 @@ if (any(t.cri.h0 == "bound cannot be found")) {
     } else {
       mean(if (t.cri.h0 > 0) tval_h1 < t.cri.h0 else tval_h1 > t.cri.h0)
     },
-    "greater" = mean(tval_h1 < max(t.cri.h0)),
-    "less" = mean(tval_h1 > min(t.cri.h0))
+    "greater" = mean(tval_h1 < t.cri.h0),
+    "less" = mean(tval_h1 > t.cri.h0)
   )
 }
  simulated[i,] <- c(TPR,FPR,TNR,FNR)
@@ -689,7 +689,7 @@ Users can specify the parameters below for the simulation and call the function 
 ```{r, results='hide'}
   
 # number of iterations
-iter <- 10000
+iter <- 5000
   
 # specification of analysis and design priors
 # Note:
@@ -970,8 +970,8 @@ Based on the simulated rho under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prior 
   } else {
     mean(if (r.cri.h1 > h0) rval_h1 > r.cri.h1 else rval_h1 < r.cri.h1)
   },
-  "greater" = mean(rval_h1 > max(r.cri.h1)),
-  "less" = mean(rval_h1 < max(r.cri.h1))
+  "greater" = mean(rval_h1 > r.cri.h1),
+  "less" = mean(rval_h1 < r.cri.h1)
 )
 
   FPR <- switch(
@@ -981,8 +981,8 @@ Based on the simulated rho under $\mathcal{H}_0$ and $\mathcal{H}_1$, the prior 
   } else {
     mean(if (r.cri.h1 > h0) rval_h0 > r.cri.h1 else rval_h0 < r.cri.h1)
   },
-  "greater" = mean(rval_h0 > max(r.cri.h1)),
-  "less" = mean(rval_h0 < max(r.cri.h1))
+  "greater" = mean(rval_h0 > r.cri.h1),
+  "less" = mean(rval_h0 < r.cri.h1)
 )
 
 if (any(r.cri.h0 == "bound cannot be found")) {
@@ -995,8 +995,8 @@ if (any(r.cri.h0 == "bound cannot be found")) {
     } else {
       mean(if (r.cri.h0 > h0) rval_h0 < r.cri.h0 else rval_h0 > r.cri.h0)
     },
-    "greater" = mean(rval_h0 < max(r.cri.h0)),
-    "less" = mean(rval_h0 > max(r.cri.h0))
+    "greater" = mean(rval_h0 < r.cri.h0),
+    "less" = mean(rval_h0 > r.cri.h0)
   )
 
   FNR <- switch(
@@ -1006,8 +1006,8 @@ if (any(r.cri.h0 == "bound cannot be found")) {
     } else {
       mean(if (r.cri.h0 > h0) rval_h1 < r.cri.h0 else rval_h1 > r.cri.h0)
     },
-    "greater" = mean(rval_h1 < max(r.cri.h0)),
-    "less" = mean(rval_h1 > max(r.cri.h0))
+    "greater" = mean(rval_h1 < r.cri.h0),
+    "less" = mean(rval_h1 > r.cri.h0)
   )
 }
  simulated[i,] <- c(TPR,FPR,TNR,FNR)
@@ -1363,7 +1363,7 @@ Users can specify the parameters below for the simulation and call the function 
 ```{r, results='hide'}
   
 # number of iterations
-iter <- 10000
+iter <- 5000
   
 # specification of analysis and design prior
 # Note:

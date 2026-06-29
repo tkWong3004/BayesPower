@@ -60,7 +60,7 @@ then the region of practical equivalence is \code{[-0.1, 0.1]}.}
 \item{scale}{Numeric scalar.  Scale parameter for the analysis prior (required if \code{prior_analysis = "Moment"}).}
 }
 \value{
-A list with class \code{"BFvalue"} containing:
+A list with class \code{BFvalue} containing:
 \itemize{
 \item \code{type}: Character. Test type (always "Correlation").
 \item \code{bf10}: Numeric scalar. The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.

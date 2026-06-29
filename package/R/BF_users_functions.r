@@ -2697,7 +2697,7 @@ BF10.ttest.TwoSample <- function(tval, N1, N2,alternative, ROPE = NULL, prior_an
 #'   (required if \code{prior_analysis = "beta"}).
 #' @param scale Numeric scalar.  Scale parameter for the analysis prior (required if \code{prior_analysis = "Moment"}).
 #'
-#' @return A list with class \code{"BFvalue"} containing:
+#' @return A list with class \code{BFvalue} containing:
 #' \itemize{
 #'   \item \code{type}: Character. Test type (always "Correlation").
 #'   \item \code{bf10}: Numeric scalar. The computed Bayes factor in favor of the alternative hypothesis relative to the null hypothesis.

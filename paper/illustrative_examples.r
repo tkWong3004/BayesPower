@@ -61,17 +61,16 @@ round(sqrt(var_d),3)
 
 # power analysis for future study
 results <- BFpower.ttest.TwoSample(
-  alternative = "two.sided",
-  ROPE = c(-0.36, 0.36),
   threshold = 3,
+  type_rate = "negative",
   true_rate = 0.8,
   false_rate = 0.05,
-  type_rate = "negative",
+  r = 1,
+  alternative = "two.sided",
+  ROPE = c(-0.36, 0.36),
   prior_analysis = "Normal",
   location = -0.23,
-  scale = 0.2,
-  dff = 1,
-  r = 1
+  scale = 0.2
 )
 print(results)
 plot(results, plot_power = TRUE, plot_rel = TRUE)
@@ -105,17 +104,18 @@ results
 results$bf10
 
 # power analysis
-results <-  BFpower.cor(
-  alternative = "greater",
-  h0 = 0,
+results <- BFpower.cor(
   threshold = 3,
   true_rate = 0.8,
   false_rate = 0.05,
+  h0 = 0,
+  alternative = "greater",
   prior_analysis = "beta",
-  alpha = 1 ,
-  beta = 1 ,
+  alpha = 1,
+  beta = 1,
   prior_design = "Point",
-  location_d = 0.3)
+  location_d = 0.3
+)
 print(results)
 plot(results, plot_power = TRUE, plot_rel = TRUE)
 
@@ -127,9 +127,9 @@ results <- BFpower.f.test(
   p = 3,
   k = 4,
   prior_analysis = "effectsize",
-  dff = 3,
   rscale = 0.18,
   f_m = 0.1,
+  dff = 3,
   prior_design = "Point",
   f_m_d = 0.1
 )
@@ -151,11 +151,11 @@ print(results)
 results$bf10
 # power analysis
 results <- BFpower.bin(
-  alternative = "greater",
   threshold = 3,
   true_rate = 0.8,
   false_rate = 0.05,
   h0 = 0.5,
+  alternative = "greater",
   prior_analysis = "beta",
   alpha = 1,
   beta = 1
