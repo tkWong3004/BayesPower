@@ -12,3 +12,4 @@ This folder contains the manuscript and supplementary files used to reproduce th
 
 `illustrative_examples.r`: This R file is used for reproducing the results in Section 5, Application, of the paper.
 
+`Figure1.r`: This R file is used for reproducing Figure 1 in the manuscript.
